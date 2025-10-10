@@ -1,2 +1,2 @@
 # Vizar
-Solution for Visakhapatnam Green Energy Solutions
+Solution for Visakhapatnam Green Energy Resources
