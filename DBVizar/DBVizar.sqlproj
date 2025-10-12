@@ -59,5 +59,12 @@
     <Folder Include="PublishLocations" />
     <Folder Include="StoredProcedures" />
     <Folder Include="Tables" />
+    <Folder Include="StoredProcedures\LoadData" />
+    <Folder Include="StoredProcedures\Insert" />
+    <Folder Include="StoredProcedures\LoadData\Common" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Tables\User.sql" />
+    <Build Include="StoredProcedures\Insert\Insert_User.sql" />
   </ItemGroup>
 </Project>

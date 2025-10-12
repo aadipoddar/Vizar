@@ -1,8 +1,8 @@
 ﻿using Android.App;
 using Android.Runtime;
 
-namespace Vizar
-{
+namespace Vizar;
+
     [Application]
     public class MainApplication : MauiApplication
     {
@@ -13,4 +13,3 @@ namespace Vizar
 
         protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
     }
-}

@@ -1,7 +1,7 @@
 using Vizar.Shared.Services;
 
-namespace Vizar.Services
-{
+namespace Vizar.Services;
+
     public class FormFactor : IFormFactor
     {
         public string GetFormFactor()
@@ -14,4 +14,3 @@ namespace Vizar.Services
             return DeviceInfo.Platform.ToString() + " - " + DeviceInfo.VersionString;
         }
     }
-}

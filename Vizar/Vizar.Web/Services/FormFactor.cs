@@ -1,7 +1,7 @@
 using Vizar.Shared.Services;
 
-namespace Vizar.Web.Services
-{
+namespace Vizar.Web.Services;
+
     public class FormFactor : IFormFactor
     {
         public string GetFormFactor()
@@ -14,4 +14,3 @@ namespace Vizar.Web.Services
             return Environment.OSVersion.ToString();
         }
     }
-}

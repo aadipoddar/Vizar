@@ -1,10 +1,9 @@
 ﻿using Foundation;
 
-namespace Vizar
-{
+namespace Vizar;
+
     [Register("AppDelegate")]
     public class AppDelegate : MauiUIApplicationDelegate
     {
         protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
     }
-}

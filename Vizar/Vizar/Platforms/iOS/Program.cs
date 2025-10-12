@@ -1,8 +1,8 @@
 ﻿using ObjCRuntime;
 using UIKit;
 
-namespace Vizar
-{
+namespace Vizar;
+
     public class Program
     {
         // This is the main entry point of the application.
@@ -13,4 +13,3 @@ namespace Vizar
             UIApplication.Main(args, null, typeof(AppDelegate));
         }
     }
-}

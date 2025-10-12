@@ -2,8 +2,8 @@
 using Vizar.Services;
 using Vizar.Shared.Services;
 
-namespace Vizar
-{
+namespace Vizar;
+
     public static class MauiProgram
     {
         public static MauiApp CreateMauiApp()
@@ -29,4 +29,3 @@ namespace Vizar
             return builder.Build();
         }
     }
-}
