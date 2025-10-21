@@ -62,9 +62,16 @@
     <Folder Include="StoredProcedures\LoadData" />
     <Folder Include="StoredProcedures\Insert" />
     <Folder Include="StoredProcedures\LoadData\Common" />
+    <Folder Include="StoredProcedures\Insert\Common" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\User.sql" />
-    <Build Include="StoredProcedures\Insert\Insert_User.sql" />
+    <Build Include="StoredProcedures\Insert\Common\Insert_User.sql" />
+    <Build Include="StoredProcedures\LoadData\Common\Load_TableData.sql" />
+    <Build Include="StoredProcedures\LoadData\Common\Load_TableData_By_Id.sql" />
+    <Build Include="StoredProcedures\LoadData\Common\Load_TableData_By_Status.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PublishLocations\LocalVizar.publish.xml" />
   </ItemGroup>
 </Project>

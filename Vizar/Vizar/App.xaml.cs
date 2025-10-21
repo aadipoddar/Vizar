@@ -7,8 +7,5 @@
             InitializeComponent();
         }
 
-        protected override Window CreateWindow(IActivationState? activationState)
-        {
-            return new Window(new MainPage()) { Title = "Vizar" };
-        }
-    }
+	protected override Window CreateWindow(IActivationState? activationState) => new Window(new MainPage()) { Title = "Vizar" };
+}

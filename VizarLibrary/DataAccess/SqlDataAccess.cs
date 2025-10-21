@@ -9,7 +9,7 @@ namespace VizarLibrary.DataAccess;
 
 public static class SqlDataAccess
 {
-	private static readonly string _databaseConnection = ConnectionStrings.Azure;
+	private static readonly string _databaseConnection = ConnectionStrings.Local;
 
 	public static async Task<List<T>> LoadData<T, U>(string storedProcedure, U parameters)
 	{
@@ -37,12 +37,9 @@ public static class SqlDataAccess
 
 public class DateOnlyTypeHandler : SqlMapper.TypeHandler<DateOnly>
 {
-	public override DateOnly Parse(object value)
-	{
-		return value is DateOnly dateOnly
+	public override DateOnly Parse(object value) => value is DateOnly dateOnly
 			? dateOnly
 			: DateOnly.FromDateTime((DateTime)value);
-	}
 
 	public override void SetValue([DisallowNull] IDbDataParameter parameter, DateOnly value)
 	{

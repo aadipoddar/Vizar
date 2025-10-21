@@ -1,0 +1,20 @@
+﻿@page "/Login"
+
+<PageTitle>Login - Vizar</PageTitle>
+
+<h1>Login To Vizar</h1>
+
+<SfTextBox Placeholder="Please Enter Your Phone Number or Email"
+		   FloatLabelType="FloatLabelType.Auto"
+		   Value="@_phoneEmail"
+		   @ref="_phoneEmailTextBox"
+		   Input="OnPhoneEmailInput" />
+
+<SfTextBox Placeholder="@_passwordPlaceholder"
+		   FloatLabelType="FloatLabelType.Auto"
+		   Value="@_password"
+		   @ref="_passwordTextBox"
+		   Input="OnPasswordInput"
+		   Type="InputType.Password" />
+
+<SfButton Content="Login" OnClick="OnLoginClick" />

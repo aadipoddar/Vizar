@@ -6,3 +6,20 @@
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.JSInterop
+
+@using Vizar.Shared.Services
+
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Inputs
+
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+@inject IFormFactor FormFactor
+@inject ISaveAndViewService SaveAndViewService
+@inject IDataStorageService DataStorageService
+@inject IVibrationService VibrationService
+@inject ISoundService SoundService
+@inject IUpdateService UpdateService
+@inject INotificationService NotificationService
