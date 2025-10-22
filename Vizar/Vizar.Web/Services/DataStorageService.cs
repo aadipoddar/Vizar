@@ -28,8 +28,11 @@ public class DataStorageService(ProtectedLocalStorage protectedLocalStorage) : I
 	}
 
 
-	public async Task<bool> LocalExists(string key) =>
-		File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Secrets.DatabaseName, key));
+	public async Task<bool> LocalExists(string key)
+	{
+		await Task.CompletedTask;
+		return File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Secrets.DatabaseName, key));
+	}
 
 	public async Task LocalSaveAsync(string key, string value) =>
 		await File.WriteAllTextAsync(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Secrets.DatabaseName, key), value);
@@ -42,6 +45,9 @@ public class DataStorageService(ProtectedLocalStorage protectedLocalStorage) : I
 		return null;
 	}
 
-	public async Task LocalRemove(string key) =>
+	public async Task LocalRemove(string key)
+	{
+		await Task.CompletedTask;
 		File.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), Secrets.DatabaseName, key));
+	}
 }

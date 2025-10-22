@@ -6,7 +6,7 @@ namespace Vizar.Shared.Services;
 
 public static class AuthenticationService
 {
-	public static async Task<UserModel?> ValidateUser(
+	public static async Task<UserModel> ValidateUser(
 		IDataStorageService dataStorageService,
 		NavigationManager navigationManager,
 		IVibrationService vibrationService,
@@ -43,6 +43,6 @@ public static class AuthenticationService
 	{
 		await dataStorageService.SecureRemoveAll();
 		vibrationService.VibrateWithTime(500);
-		navigationManager.NavigateTo("/Login", forceLoad: true);
+		navigationManager.NavigateTo("/login", forceLoad: true);
 	}
 }

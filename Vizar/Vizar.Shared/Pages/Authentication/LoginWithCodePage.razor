@@ -1,0 +1,50 @@
+﻿@page "/login-with-code"
+
+<PageTitle>Login With Code - Vizar</PageTitle>
+
+<h1>Login With Code To Vizar</h1>
+
+<SfTextBox Placeholder="Please Enter Your Phone Number or Email"
+		   FloatLabelType="FloatLabelType.Auto"
+		   @bind-Value="@_phoneEmail"
+		   @ref="_phoneEmailTextBox" />
+
+<SfButton Content="@(_isCodeSent ? "Resend Code" : "Send Code")"
+		  OnClick="OnSendCodeClick"
+		  Disabled="_isVerifying || string.IsNullOrWhiteSpace(_phoneEmail)" />
+
+<p>@_codePlaceholder</p>
+
+<SfOtpInput Length="6"
+			Placeholder="000000"
+			Value="@_otpCode"
+			@ref="_otpInput"
+			Type="OtpInputType.Number"
+			Disabled="!_isCodeSent"
+			OnInput="OnOtpInputChange" />
+
+<SfButton Content="@(_isVerifying ? "Verifying..." : "Login")"
+		  OnClick="OnLoginWithCodeClick"
+		  Disabled="!_isCodeSent || _otpCode.Length < 6 || _isVerifying" />
+
+<p @onclick="OnBackToPasswordClick">Back to Password Login</p>
+
+<SfToast @ref="_sfErrorToast"
+		 ID="_sfErrorToast"
+		 Title="@_errorTitle"
+		 Content="@_errorMessage"
+		 Timeout="5000">
+	<ToastPosition X="Right" Y="Top" />
+	<ToastShowAnimationSettings Effect="ToastEffect.SlideLeftIn" />
+	<ToastHideAnimationSettings Effect="ToastEffect.SlideRightOut" />
+</SfToast>
+
+<SfToast @ref="_sfSuccessToast"
+		 ID="_sfSuccessToast"
+		 Title="@_successTitle"
+		 Content="@_successMessage"
+		 Timeout="5000">
+	<ToastPosition X="Right" Y="Top" />
+	<ToastShowAnimationSettings Effect="ToastEffect.SlideLeftIn" />
+	<ToastHideAnimationSettings Effect="ToastEffect.SlideRightOut" />
+</SfToast>

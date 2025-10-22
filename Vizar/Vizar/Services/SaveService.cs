@@ -13,6 +13,7 @@ public class SaveAndViewService : ISaveAndViewService
 	public async Task<string> SaveAndView(string filename, string contentType, MemoryStream stream)
 	{
 		SaveService saveService = new();
+		await Task.CompletedTask;
 		return saveService.SaveAndView(filename, contentType, stream);
 	}
 }

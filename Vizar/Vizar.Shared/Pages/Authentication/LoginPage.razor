@@ -1,4 +1,4 @@
-﻿@page "/Login"
+﻿@page "/login"
 
 <PageTitle>Login - Vizar</PageTitle>
 
@@ -17,4 +17,18 @@
 		   Input="OnPasswordInput"
 		   Type="InputType.Password" />
 
-<SfButton Content="Login" OnClick="OnLoginClick" />
+<p @onclick="OnForgotPasswordClick">Forgot Password? Login with Code</p>
+
+<SfButton Content="Login" OnClick="OnLoginClick" Disabled="!_isVerifying" />
+
+<p>&copy; @DateTime.Now.Year A Product By <a href="https://aadisoft.vercel.app" target="_blank">AadiSoft</a>. All rights reserved.</p>
+
+<SfToast @ref="_sfErrorToast"
+		 ID="_sfErrorToast"
+		 Title="@_errorTitle"
+		 Content="@_errorMessage"
+		 Timeout="5000">
+	<ToastPosition X="Right" Y="Top" />
+	<ToastShowAnimationSettings Effect="ToastEffect.SlideLeftIn" />
+	<ToastHideAnimationSettings Effect="ToastEffect.SlideRightOut" />
+</SfToast>

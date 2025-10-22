@@ -2,7 +2,7 @@
 
 using Application = Android.App.Application;
 
-namespace Vizar.Platforms.Android;
+namespace Vizar.Services.Android;
 
 public static class AadiSoftUpdater
 {
