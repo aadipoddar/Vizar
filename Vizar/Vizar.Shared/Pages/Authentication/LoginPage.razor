@@ -1,37 +1,293 @@
 ﻿@page "/login"
-
 <PageTitle>Login - Vizar</PageTitle>
 
-<h1>Login To Vizar</h1>
+<div class="login-container">
+	<div class="login-card">
+		<!-- Header Section -->
+		<div class="login-header">
+			<div class="logo-container">
+				<h1 class="logo-text">Vizar</h1>
+			</div>
+			<h2 class="welcome-text">Welcome Back</h2>
+			<p class="subtitle">Please login to your account</p>
+		</div>
 
-<SfTextBox Placeholder="Please Enter Your Phone Number or Email"
-		   FloatLabelType="FloatLabelType.Auto"
-		   Value="@_phoneEmail"
-		   @ref="_phoneEmailTextBox"
-		   Input="OnPhoneEmailInput" />
+		<!-- Form Section -->
+		<div class="login-form">
+			<!-- Phone/Email Input -->
+			<div class="form-group">
+				<SfTextBox Placeholder="Email or Phone Number"
+						   FloatLabelType="FloatLabelType.Auto"
+						   Value="@_phoneEmail"
+						   @ref="_phoneEmailTextBox"
+						   Input="OnPhoneEmailInput"
+						   CssClass="custom-input" />
+			</div>
 
-<SfTextBox Placeholder="@_passwordPlaceholder"
-		   FloatLabelType="FloatLabelType.Auto"
-		   Value="@_password"
-		   @ref="_passwordTextBox"
-		   Input="OnPasswordInput"
-		   Type="InputType.Password" />
+			<!-- Password Input -->
+			<div class="form-group">
+				<SfTextBox Placeholder="@_passwordPlaceholder"
+						   FloatLabelType="FloatLabelType.Auto"
+						   Value="@_password"
+						   @ref="_passwordTextBox"
+						   Input="OnPasswordInput"
+						   Type="InputType.Password"
+						   CssClass="custom-input" />
+			</div>
 
-@if (_isLoginWithCodeEnabled)
-{
-	<p @onclick="OnForgotPasswordClick">Forgot Password? Login with Code</p>
-}
+			<!-- Forgot Password Link -->
+			@if (_isLoginWithCodeEnabled)
+			{
+				<div class="forgot-password-section">
+					<p class="forgot-link" @onclick="OnForgotPasswordClick">
+						<svg class="link-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+							<path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+						</svg>
+						Forgot Password? Login with Code
+					</p>
+				</div>
+			}
 
-<SfButton Content="Login" OnClick="OnLoginClick" />
+			<!-- Login Button -->
+			<div class="form-group">
+				<SfButton Content="@(_isVerifying ? "Logging in..." : "Login to Vizar")"
+						  OnClick="OnLoginClick"
+						  Disabled="_isVerifying"
+						  CssClass="btn-login" />
+			</div>
+		</div>
+	</div>
 
-<p>&copy; @DateTime.Now.Year A Product By <a href="https://aadisoft.vercel.app" target="_blank">AadiSoft</a>. All rights reserved.</p>
+	<!-- Footer -->
+	<div class="login-footer">
+		<p>© @DateTime.Now.Year A Product By <a href="https://aadisoft.vercel.app" target="_blank">AadiSoft</a>. All rights reserved.</p>
+	</div>
+</div>
 
+<!-- Toast Notifications -->
 <SfToast @ref="_sfErrorToast"
 		 ID="_sfErrorToast"
 		 Title="@_errorTitle"
 		 Content="@_errorMessage"
-		 Timeout="5000">
+		 Timeout="5000"
+		 CssClass="error-toast">
 	<ToastPosition X="Right" Y="Top" />
 	<ToastShowAnimationSettings Effect="ToastEffect.SlideLeftIn" />
 	<ToastHideAnimationSettings Effect="ToastEffect.SlideRightOut" />
 </SfToast>
+
+<style>
+	* {
+		box-sizing: border-box;
+	}
+
+	body {
+		margin: 0;
+		padding: 0;
+	}
+
+	.login-container {
+		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		padding: 20px;
+		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+	}
+
+	.login-card {
+		width: 100%;
+		max-width: 450px;
+		background: #ffffff;
+		border-radius: 16px;
+		box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+		overflow: hidden;
+		animation: slideUp 0.5s ease-out;
+	}
+
+	@@keyframes slideUp {
+		from {
+			opacity: 0;
+			transform: translateY(30px);
+		}
+
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.login-header {
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		padding: 40px 30px 30px;
+		text-align: center;
+		color: #ffffff;
+	}
+
+	.logo-container {
+		margin-bottom: 20px;
+	}
+
+	.logo-text {
+		font-size: 36px;
+		font-weight: 700;
+		margin: 0;
+		letter-spacing: -1px;
+	}
+
+	.welcome-text {
+		font-size: 24px;
+		font-weight: 600;
+		margin: 0 0 8px 0;
+	}
+
+	.subtitle {
+		font-size: 14px;
+		opacity: 0.9;
+		margin: 0;
+		font-weight: 400;
+	}
+
+	.login-form {
+		padding: 40px 30px;
+	}
+
+	.form-group {
+		margin-bottom: 24px;
+	}
+
+	.forgot-password-section {
+		margin-bottom: 24px;
+		text-align: right;
+	}
+
+	.forgot-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		color: #667eea;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s;
+		margin: 0;
+	}
+
+		.forgot-link:hover {
+			color: #5048e5;
+			text-decoration: underline;
+		}
+
+	.link-icon {
+		width: 16px;
+		height: 16px;
+	}
+
+	.login-footer {
+		margin-top: 30px;
+		text-align: center;
+		color: rgba(255, 255, 255, 0.9);
+		font-size: 13px;
+	}
+
+		.login-footer p {
+			margin: 0;
+		}
+
+		.login-footer a {
+			color: #ffffff;
+			font-weight: 600;
+			text-decoration: none;
+			transition: opacity 0.2s;
+		}
+
+			.login-footer a:hover {
+				opacity: 0.8;
+				text-decoration: underline;
+			}
+
+	/* Syncfusion Component Overrides */
+	::deep .custom-input,
+	::deep .custom-input .e-input-group,
+	::deep .custom-input .e-input-group input {
+		height: 48px;
+		font-size: 15px;
+		border-radius: 8px;
+	}
+
+		::deep .custom-input .e-input-group {
+			border: 2px solid #e0e0e0;
+			transition: all 0.3s;
+		}
+
+			::deep .custom-input .e-input-group:focus-within {
+				border-color: #667eea;
+				box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+			}
+
+	::deep .btn-login {
+		width: 100%;
+		height: 48px;
+		font-size: 15px;
+		font-weight: 600;
+		border: none;
+		border-radius: 8px;
+		cursor: pointer;
+		transition: all 0.3s;
+		text-transform: none;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		color: #ffffff;
+		box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+	}
+
+		::deep .btn-login:hover:not(:disabled) {
+			box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+			transform: translateY(-2px);
+		}
+
+		::deep .btn-login:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+			transform: none !important;
+		}
+
+	/* Toast Styles */
+	::deep .error-toast .e-toast {
+		background: #f44336;
+		color: #ffffff;
+	}
+
+	/* Responsive Design */
+	@@media (max-width: 640px) {
+		.login-container {
+			padding: 12px;
+		}
+
+		.login-card {
+			border-radius: 12px;
+		}
+
+		.login-header {
+			padding: 30px 20px 24px;
+		}
+
+		.logo-text {
+			font-size: 32px;
+		}
+
+		.welcome-text {
+			font-size: 20px;
+		}
+
+		.login-form {
+			padding: 30px 20px;
+		}
+
+		.forgot-password-section {
+			text-align: center;
+		}
+	}
+</style>
