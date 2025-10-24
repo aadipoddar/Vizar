@@ -163,6 +163,21 @@ public partial class LoginPage
 		}
 	}
 
+	private async Task OnForgotPasswordClick()
+	{
+		if (!_isLoginWithCodeEnabled)
+			return;
+
+		if (_user is not null && _user.Id > 0)
+		{
+			_user.CodeResends = 0;
+			_user.FailedAttempts = 0;
+			await UserData.InsertUser(_user);
+		}
+
+		NavigationManager.NavigateTo("/login-with-code");
+	}
+
 	private async Task ShowToast(string title, string message, string type)
 	{
 		VibrationService.VibrateWithTime(200);
@@ -177,20 +192,5 @@ public partial class LoginPage
 				Content = _errorMessage
 			});
 		}
-	}
-
-	private async Task OnForgotPasswordClick()
-	{
-		if (!_isLoginWithCodeEnabled)
-			return;
-
-		if (_user is not null && _user.Id > 0)
-		{
-			_user.CodeResends = 0;
-			_user.FailedAttempts = 0;
-			await UserData.InsertUser(_user);
-		}
-
-		NavigationManager.NavigateTo("/login-with-code");
 	}
 }

@@ -1,0 +1,8 @@
+﻿CREATE TABLE [dbo].[Voucher]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [Name] VARCHAR(500) NOT NULL UNIQUE, 
+    [PrefixCode] VARCHAR(10) NOT NULL UNIQUE, 
+    [Remarks] VARCHAR(MAX) NULL,
+    [Status] BIT NOT NULL DEFAULT 1, 
+)

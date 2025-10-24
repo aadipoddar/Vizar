@@ -14,4 +14,6 @@ public static class SettingsKeys
 	public static string EnableUsersToResetPassword => "EnableUsersToResetPassword";
 	public static string CodeResendLimit => "CodeResendLimit";
 	public static string CodeExpiryMinutes => "CodeExpiryMinutes";
+
+	public static string CompanyLedgerId => "CompanyLedgerId";
 }

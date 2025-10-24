@@ -9,4 +9,6 @@ BEGIN
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'CodeResendLimit'					, N'3'		, N'Maximum number of code resends allowed')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'CodeExpiryMinutes'				, N'10'		, N'Expiry time for codes in minutes')
 
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'CompanyLedgerId'					, N'1'		, N'Ledger Id for the company account')
+
 END

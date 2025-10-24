@@ -10,6 +10,8 @@ else
 {
 	<h1>Hello, world!</h1>
 
+	<SfButton Content="Purchase" OnClick='() => NavigationManager.NavigateTo("/inventory/purchase")' />
+
 	<SfButton Content="Log Out" OnClick='async () => await AuthenticationService.Logout(DataStorageService, NavigationManager, VibrationService)' />
 
 	<span>

@@ -64,6 +64,12 @@
     <Folder Include="StoredProcedures\LoadData\Common" />
     <Folder Include="StoredProcedures\Insert\Common" />
     <Folder Include="Tables\Common" />
+    <Folder Include="Tables\Inventory" />
+    <Folder Include="Tables\Accounts" />
+    <Folder Include="Tables\Item" />
+    <Folder Include="Tables\Accounts\Masters" />
+    <Folder Include="StoredProcedures\LoadData\Items" />
+    <Folder Include="StoredProcedures\LoadData\Accounts" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="StoredProcedures\Insert\Common\Insert_User.sql" />
@@ -76,10 +82,27 @@
     <Build Include="StoredProcedures\Insert\Common\Update_Settings.sql" />
     <Build Include="StoredProcedures\LoadData\Common\Load_Settings_By_Key.sql" />
     <Build Include="StoredProcedures\LoadData\Common\Load_CurrentDateTime.sql" />
+    <Build Include="Tables\Inventory\Purchase.sql" />
+    <Build Include="Tables\Inventory\PurchaseDetail.sql" />
+    <Build Include="Tables\Item\Item.sql" />
+    <Build Include="Tables\Item\ItemType.sql" />
+    <Build Include="Tables\Item\ItemCategory.sql" />
+    <Build Include="Tables\Accounts\Masters\AccountType.sql" />
+    <Build Include="Tables\Accounts\Masters\FinancialYear.sql" />
+    <Build Include="Tables\Accounts\Masters\Group.sql" />
+    <Build Include="Tables\Accounts\Masters\Ledger.sql" />
+    <Build Include="Tables\Accounts\Masters\Voucher.sql" />
+    <Build Include="Tables\Common\StateUT.sql" />
+    <Build Include="Tables\Item\Manufacturer.sql" />
+    <Build Include="Tables\Item\Tax.sql" />
+    <Build Include="StoredProcedures\LoadData\Items\Load_Item_By_Party_PurchaseDateTime.sql" />
+    <Build Include="StoredProcedures\LoadData\Accounts\Load_FinancialYear_By_DateTime.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalVizar.publish.xml" />
-    <None Include="DBVizar.publish.xml" />
     <None Include="PublishLocations\AzureVizar.publish.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="DBVizar.refactorlog" />
   </ItemGroup>
 </Project>

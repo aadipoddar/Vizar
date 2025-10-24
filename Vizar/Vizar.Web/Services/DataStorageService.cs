@@ -24,7 +24,8 @@ public class DataStorageService(ProtectedLocalStorage protectedLocalStorage) : I
 	{
 		await _protectedLocalStorage.DeleteAsync(StorageFileNames.UserDataFileName);
 
-		//await LocalRemove(StorageFileNames.OrderDataFileName);
+		await LocalRemove(StorageFileNames.PurchaseDataFileName);
+		await LocalRemove(StorageFileNames.PurchaseCartDataFileName);
 	}
 
 

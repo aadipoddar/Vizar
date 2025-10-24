@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="7b2cfb22-1a0a-4177-b745-7d9be53ab203" ChangeDateTime="10/24/2025 14:42:05">
+    <Property Name="ElementName" Value="[dbo].[Purchase].[SupplierId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Purchase]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="PartyId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="9d557a0d-8857-4f60-9a03-00f1d70ea72a" ChangeDateTime="10/24/2025 14:42:37">
+    <Property Name="ElementName" Value="[dbo].[Purchase].[DiscountPercent]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Purchase]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CashDiscountPercent" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6b778208-1d9c-41d0-90bb-23aecf393ca5" ChangeDateTime="10/24/2025 14:58:35">
+    <Property Name="ElementName" Value="[dbo].[PurchaseDetail].[RawMaterialId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[PurchaseDetail]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ItemId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="a2979ae5-cb48-499a-9071-9bd793dbd17f" ChangeDateTime="10/24/2025 15:17:11">
+    <Property Name="ElementName" Value="[dbo].[Ledger].[StateId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Ledger]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="StateUTId" />
+  </Operation>
+</Operations>

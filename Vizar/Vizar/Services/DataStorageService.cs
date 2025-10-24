@@ -26,6 +26,8 @@ public class DataStorageService : IDataStorageService
 		SecureStorage.Default.RemoveAll();
 
 		await LocalRemove(StorageFileNames.UserDataFileName);
+		await LocalRemove(StorageFileNames.PurchaseDataFileName);
+		await LocalRemove(StorageFileNames.PurchaseCartDataFileName);
 	}
 
 

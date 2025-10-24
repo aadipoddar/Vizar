@@ -1,0 +1,49 @@
+﻿@page "/inventory/purchase"
+
+@using VizarLibrary.Models.Accounts
+
+<PageTitle>Purchase - Vizar</PageTitle>
+
+<SfAutoComplete Placeholder="Select a Party For Purchase"
+				Value="@_selectedParty"
+				TValue="LedgerModel"
+				TItem="LedgerModel"
+				DataSource="@_parties"
+				FloatLabelType="FloatLabelType.Auto"
+				AllowFiltering="true"
+				FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
+	<AutoCompleteEvents TItem="LedgerModel" TValue="LedgerModel" ValueChange="OnPartyChanged" />
+	<AutoCompleteFieldSettings Value="Name" />
+</SfAutoComplete>
+
+<SfDatePicker Placeholder="Select Purchase Date"
+			  FloatLabelType="FloatLabelType.Auto"
+			  Value="@_purchase.TransactionDateTime"
+			  TValue="DateTime"
+			  Format="dd/MM/yy">
+	<DatePickerEvents TValue="DateTime" ValueChange="OnTransactionDateChanged" />
+</SfDatePicker>
+
+<SfTextBox Placeholder="Enter the Transaction No"
+		   @bind-Value="_purchase.TransactionNo"
+		   FloatLabelType="FloatLabelType.Auto" />
+
+<SfToast @ref="_sfErrorToast"
+		 ID="_sfErrorToast"
+		 Title="@_errorTitle"
+		 Content="@_errorMessage"
+		 Timeout="5000">
+	<ToastPosition X="Right" Y="Top" />
+	<ToastShowAnimationSettings Effect="ToastEffect.SlideLeftIn" />
+	<ToastHideAnimationSettings Effect="ToastEffect.SlideRightOut" />
+</SfToast>
+
+<SfToast @ref="_sfSuccessToast"
+		 ID="_sfSuccessToast"
+		 Title="@_successTitle"
+		 Content="@_successMessage"
+		 Timeout="5000">
+	<ToastPosition X="Right" Y="Top" />
+	<ToastShowAnimationSettings Effect="ToastEffect.SlideLeftIn" />
+	<ToastHideAnimationSettings Effect="ToastEffect.SlideRightOut" />
+</SfToast>
