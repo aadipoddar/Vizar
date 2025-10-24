@@ -18,6 +18,9 @@ public partial class LoginPage
 
 	private string _passwordPlaceholder = "Enter password";
 
+	private bool _isLoginWithCodeEnabled = true;
+	private int _maxLoginAttempts;
+
 	private List<UserModel> _users = [];
 
 	private SfTextBox _phoneEmailTextBox;
@@ -37,6 +40,10 @@ public partial class LoginPage
 		{
 			await DataStorageService.SecureRemoveAll();
 			await _phoneEmailTextBox.FocusAsync();
+
+			_maxLoginAttempts = int.Parse((await SettingsData.LoadSettingsByKey(SettingsKeys.MaxLoginAttempts)).Value);
+			_isLoginWithCodeEnabled = bool.Parse((await SettingsData.LoadSettingsByKey(SettingsKeys.EnableLoginWithCode)).Value);
+
 			_users = await CommonData.LoadTableData<UserModel>(TableNames.User);
 		}
 		catch (Exception ex)
@@ -78,6 +85,12 @@ public partial class LoginPage
 		_user = _users.FirstOrDefault(u => u.Phone == _phoneEmail || u.Email == _phoneEmail);
 		if (_user is not null && _password == _user.Password && _user.Status)
 		{
+			_user.FailedAttempts = 0;
+			_user.CodeResends = 0;
+			_user.LastCodeDateTime = null;
+			_user.LastCode = null;
+			await UserData.InsertUser(_user);
+
 			await DataStorageService.SecureSaveAsync(StorageFileNames.UserDataFileName, System.Text.Json.JsonSerializer.Serialize(_user));
 			NavigationManager.NavigateTo("/");
 		}
@@ -105,6 +118,19 @@ public partial class LoginPage
 
 			if (_password != _user.Password)
 			{
+				_user.FailedAttempts++;
+
+				if (_user.FailedAttempts >= _maxLoginAttempts)
+				{
+					_user.Status = false;
+					await UserData.InsertUser(_user);
+					await ShowToast("Account Locked", "Your account has been locked due to multiple failed login attempts. Please contact support.", "error");
+					NavigationManager.NavigateTo("/login", true);
+					return;
+				}
+
+				await UserData.InsertUser(_user);
+
 				await _passwordTextBox.FocusAsync();
 				await ShowToast("Login Failed", "Incorrect password. Please try again.", "error");
 				return;
@@ -116,6 +142,12 @@ public partial class LoginPage
 				await ShowToast("Login Failed", "This account is inactive. Please contact support.", "error");
 				return;
 			}
+
+			_user.FailedAttempts = 0;
+			_user.CodeResends = 0;
+			_user.LastCodeDateTime = null;
+			_user.LastCode = null;
+			await UserData.InsertUser(_user);
 
 			await DataStorageService.SecureSaveAsync(StorageFileNames.UserDataFileName, System.Text.Json.JsonSerializer.Serialize(_user));
 			VibrationService.VibrateWithTime(500);
@@ -147,6 +179,18 @@ public partial class LoginPage
 		}
 	}
 
-	private void OnForgotPasswordClick() =>
+	private async Task OnForgotPasswordClick()
+	{
+		if (!_isLoginWithCodeEnabled)
+			return;
+
+		if (_user is not null && _user.Id > 0)
+		{
+			_user.CodeResends = 0;
+			_user.FailedAttempts = 0;
+			await UserData.InsertUser(_user);
+		}
+
 		NavigationManager.NavigateTo("/login-with-code");
+	}
 }

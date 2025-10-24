@@ -17,9 +17,12 @@
 		   Input="OnPasswordInput"
 		   Type="InputType.Password" />
 
-<p @onclick="OnForgotPasswordClick">Forgot Password? Login with Code</p>
+@if (_isLoginWithCodeEnabled)
+{
+	<p @onclick="OnForgotPasswordClick">Forgot Password? Login with Code</p>
+}
 
-<SfButton Content="Login" OnClick="OnLoginClick" Disabled="!_isVerifying" />
+<SfButton Content="Login" OnClick="OnLoginClick" />
 
 <p>&copy; @DateTime.Now.Year A Product By <a href="https://aadisoft.vercel.app" target="_blank">AadiSoft</a>. All rights reserved.</p>
 

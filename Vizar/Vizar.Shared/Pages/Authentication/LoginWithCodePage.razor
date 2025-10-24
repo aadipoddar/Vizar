@@ -11,23 +11,31 @@
 
 <SfButton Content="@(_isCodeSent ? "Resend Code" : "Send Code")"
 		  OnClick="OnSendCodeClick"
-		  Disabled="_isVerifying || string.IsNullOrWhiteSpace(_phoneEmail)" />
+		  Disabled="_isVerifying" />
 
 <p>@_codePlaceholder</p>
 
 <SfOtpInput Length="6"
 			Placeholder="000000"
-			Value="@_otpCode"
+			@bind-Value="_otpCode"
 			@ref="_otpInput"
 			Type="OtpInputType.Number"
-			Disabled="!_isCodeSent"
-			OnInput="OnOtpInputChange" />
+			Disabled="!_isCodeSent" />
+
+@if (_isEnabledUsersResetPassword)
+{
+	<SfTextBox Placeholder="Enter Your new Password (Optional)"
+			   FloatLabelType="FloatLabelType.Auto"
+			   @bind-Value="@_newPassword"
+			   Type="InputType.Password"
+			   @ref="_newPasswordTextBox" />
+}
 
 <SfButton Content="@(_isVerifying ? "Verifying..." : "Login")"
 		  OnClick="OnLoginWithCodeClick"
 		  Disabled="!_isCodeSent || _otpCode.Length < 6 || _isVerifying" />
 
-<p @onclick="OnBackToPasswordClick">Back to Password Login</p>
+<p @onclick='() => NavigationManager.NavigateTo("/login")'>Back to Password Login</p>
 
 <SfToast @ref="_sfErrorToast"
 		 ID="_sfErrorToast"

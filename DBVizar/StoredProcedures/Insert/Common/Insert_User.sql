@@ -6,13 +6,18 @@
 	@Email VARCHAR(250) = NULL,
 	@Inventory BIT = 0,
 	@Admin BIT = 0,
-	@Status BIT = 1
+	@Remarks VARCHAR(MAX) = NULL,
+	@Status BIT = 1,
+	@FailedAttempts INT = 0,
+	@CodeResends INT = 0,
+	@LastCode INT = NULL,
+	@LastCodeDateTime DATETIME = NULL
 AS
 BEGIN
 	IF @Id = 0
 	BEGIN
-		INSERT INTO [dbo].[User] ([Name], [Password], [Phone], [Email], [Inventory], [Admin], [Status])
-		VALUES (@Name, @Password, @Phone, @Email, @Inventory, @Admin, @Status)
+		INSERT INTO [dbo].[User] ([Name], [Password], [Phone], [Email], [Inventory], [Admin], [Status], [LastCode], [LastCodeDateTime], [Remarks], [FailedAttempts], [CodeResends])
+		VALUES (@Name, @Password, @Phone, @Email, @Inventory, @Admin, @Status, @LastCode, @LastCodeDateTime, @Remarks, @FailedAttempts, @CodeResends)
 	END
 	ELSE
 	BEGIN
@@ -24,7 +29,12 @@ BEGIN
 			[Email] = @Email,
 			[Inventory] = @Inventory,
 			[Admin] = @Admin,
-			[Status] = @Status
+			[Remarks] = @Remarks,
+			[Status] = @Status,
+			[FailedAttempts] = @FailedAttempts,
+			[CodeResends] = @CodeResends,
+			[LastCode] = @LastCode,
+			[LastCodeDateTime] = @LastCodeDateTime
 		WHERE [Id] = @Id
 	END
 END

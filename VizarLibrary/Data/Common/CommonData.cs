@@ -12,4 +12,7 @@ public static class CommonData
 
 	public static async Task<List<T>> LoadTableDataByStatus<T>(string TableName, bool Status = true) where T : new() =>
 			await SqlDataAccess.LoadData<T, dynamic>(StoredProcedureNames.LoadTableDataByStatus, new { TableName, Status });
+
+	public static async Task<DateTime> LoadCurrentDateTime() =>
+		(await SqlDataAccess.LoadData<DateTime, dynamic>(StoredProcedureNames.LoadCurrentDateTime, new { })).FirstOrDefault();
 }

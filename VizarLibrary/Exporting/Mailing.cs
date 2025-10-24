@@ -29,14 +29,14 @@ public static class Mailing
 		await client.DisconnectAsync(true);
 	}
 
-	public static async Task SendMailCodeToUser(UserModel user, string code)
+	public static async Task SendMailCodeToUser(UserModel user, string code, int codeExpiryMinutes)
 	{
 		var subject = "Your Login Code for Vizar";
-		var htmlBody = GenerateLoginCodeEmailHtml(user.Name, code);
+		var htmlBody = GenerateLoginCodeEmailHtml(user, code, codeExpiryMinutes);
 		await SendEmail(user.Name, user.Email, subject, htmlBody);
 	}
 
-	private static string GenerateLoginCodeEmailHtml(string userName, string code)
+	private static string GenerateLoginCodeEmailHtml(UserModel user, string code, int codeExpiryMinutes)
 	{
 		return $@"
 <!DOCTYPE html>
@@ -61,7 +61,7 @@ public static class Mailing
                     <!-- Content -->
                     <tr>
                         <td style=""padding: 40px;"">
-                            <h2 style=""margin: 0 0 20px 0; color: #333333; font-size: 24px; font-weight: 600;"">Hello {userName},</h2>
+                            <h2 style=""margin: 0 0 20px 0; color: #333333; font-size: 24px; font-weight: 600;"">Hello {user.Name},</h2>
                             <p style=""margin: 0 0 30px 0; color: #666666; font-size: 16px; line-height: 1.6;"">
                                 You've requested a login code for your Vizar account. Use the code below to complete your sign-in:
                             </p>
@@ -76,14 +76,14 @@ public static class Mailing
                             </table>
                             
                             <p style=""margin: 30px 0 20px 0; color: #666666; font-size: 16px; line-height: 1.6;"">
-                                This code will expire in <strong>10 minutes</strong> for your security.
+                                This code will expire in <strong>{codeExpiryMinutes} minutes</strong> for your security.
                             </p>
                             
                             <!-- CTA Button -->
                             <table role=""presentation"" style=""width: 100%; border-collapse: collapse; margin: 20px 0;"">
                                 <tr>
                                     <td align=""center"">
-                                        <a href=""https://vizar.azurewebsites.net/"" style=""display: inline-block; padding: 14px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);"">Go to Vizar Login</a>
+                                        <a href=""https://vizar.azurewebsites.net/login-with-code-redirect/{user.Id}/{code}"" style=""display: inline-block; padding: 14px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);"">Go to Vizar Login</a>
                                     </td>
                                 </tr>
                             </table>
