@@ -97,6 +97,7 @@
     <Build Include="Tables\Item\Tax.sql" />
     <Build Include="StoredProcedures\LoadData\Items\Load_Item_By_Party_PurchaseDateTime.sql" />
     <Build Include="StoredProcedures\LoadData\Accounts\Load_FinancialYear_By_DateTime.sql" />
+    <Build Include="Tables\Common\Company.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalVizar.publish.xml" />

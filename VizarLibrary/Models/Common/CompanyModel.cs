@@ -1,11 +1,9 @@
-﻿namespace VizarLibrary.Models.Accounts;
+﻿namespace VizarLibrary.Models.Common;
 
-public class LedgerModel
+public class CompanyModel
 {
 	public int Id { get; set; }
 	public string Name { get; set; }
-	public int GroupId { get; set; }
-	public int AccountTypeId { get; set; }
 	public string Code { get; set; }
 	public int? StateUTId { get; set; }
 	public string? GSTNo { get; set; }

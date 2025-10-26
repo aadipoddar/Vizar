@@ -15,5 +15,5 @@ public static class SettingsKeys
 	public static string CodeResendLimit => "CodeResendLimit";
 	public static string CodeExpiryMinutes => "CodeExpiryMinutes";
 
-	public static string CompanyLedgerId => "CompanyLedgerId";
+	public static string PrimaryCompanyLinkingId => "PrimaryCompanyLinkingId";
 }

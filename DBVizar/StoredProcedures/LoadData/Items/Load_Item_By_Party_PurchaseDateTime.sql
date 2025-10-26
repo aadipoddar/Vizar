@@ -33,26 +33,7 @@ BEGIN
 					 ORDER BY pd.Id DESC)
 			END, i.[Rate]) AS [Rate],
 
-		ISNULL(
-			CASE 
-				WHEN @PartyId > 0 THEN
-					(SELECT TOP 1 TaxId FROM PurchaseDetail pd
-					 INNER JOIN Purchase p ON pd.PurchaseId = p.Id
-					 WHERE pd.ItemId = i.[Id]
-					   AND p.PartyId = @PartyId
-					   AND p.Status = 1
-					   AND pd.Status = 1
-					   AND p.TransactionDateTime <= @PurchaseDateTime
-					   ORDER BY pd.Id DESC)
-				ELSE
-					(SELECT TOP 1 TaxId FROM PurchaseDetail pd
-					 INNER JOIN Purchase p ON pd.PurchaseId = p.Id
-					 WHERE pd.ItemId = i.[Id]
-					   AND p.Status = 1
-					   AND pd.Status = 1
-					   AND p.TransactionDateTime <= @PurchaseDateTime
-					   ORDER BY pd.Id DESC)
-			END, i.[TaxId]) AS [TaxId],
+		i.[TaxId],
 
 
 		ISNULL(
