@@ -1,5 +1,5 @@
 ﻿CREATE PROCEDURE [dbo].[Insert_User]
-	@Id INT,
+	@Id INT OUTPUT,
 	@Name VARCHAR(250),
 	@Phone VARCHAR(10),
 	@Password VARCHAR(250),
@@ -16,8 +16,38 @@ AS
 BEGIN
 	IF @Id = 0
 	BEGIN
-		INSERT INTO [dbo].[User] ([Name], [Password], [Phone], [Email], [Inventory], [Admin], [Status], [LastCode], [LastCodeDateTime], [Remarks], [FailedAttempts], [CodeResends])
-		VALUES (@Name, @Password, @Phone, @Email, @Inventory, @Admin, @Status, @LastCode, @LastCodeDateTime, @Remarks, @FailedAttempts, @CodeResends)
+		INSERT INTO [dbo].[User]
+		(
+			[Name],
+			[Password],
+			[Phone],
+			[Email],
+			[Inventory],
+			[Admin],
+			[Status],
+			[LastCode],
+			[LastCodeDateTime],
+			[Remarks],
+			[FailedAttempts],
+			[CodeResends]
+		)
+		VALUES
+		(
+			@Name,
+			@Password,
+			@Phone,
+			@Email,
+			@Inventory,
+			@Admin,
+			@Status,
+			@LastCode,
+			@LastCodeDateTime,
+			@Remarks,
+			@FailedAttempts,
+			@CodeResends
+		);
+
+		SET @Id = SCOPE_IDENTITY();
 	END
 	ELSE
 	BEGIN
@@ -37,4 +67,6 @@ BEGIN
 			[LastCodeDateTime] = @LastCodeDateTime
 		WHERE [Id] = @Id
 	END
+
+	SELECT @Id AS Id
 END

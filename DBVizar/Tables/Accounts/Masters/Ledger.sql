@@ -4,7 +4,7 @@
     [Name] VARCHAR(500) NOT NULL UNIQUE, 
     [GroupId] INT NOT NULL, 
     [AccountTypeId] INT NOT NULL, 
-    [Code] VARCHAR(20) NOT NULL UNIQUE, 
+    [Code] VARCHAR(50) NOT NULL UNIQUE, 
     [StateUTId] INT NULL, 
     [GSTNo] VARCHAR(MAX) NULL, 
     [PANNo] VARCHAR(MAX) NULL,

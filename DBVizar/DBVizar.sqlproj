@@ -70,6 +70,8 @@
     <Folder Include="Tables\Accounts\Masters" />
     <Folder Include="StoredProcedures\LoadData\Items" />
     <Folder Include="StoredProcedures\LoadData\Accounts" />
+    <Folder Include="StoredProcedures\Insert\Items" />
+    <Folder Include="StoredProcedures\Insert\Accounts" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="StoredProcedures\Insert\Common\Insert_User.sql" />
@@ -98,6 +100,12 @@
     <Build Include="StoredProcedures\LoadData\Items\Load_Item_By_Party_PurchaseDateTime.sql" />
     <Build Include="StoredProcedures\LoadData\Accounts\Load_FinancialYear_By_DateTime.sql" />
     <Build Include="Tables\Common\Company.sql" />
+    <Build Include="StoredProcedures\LoadData\Common\Load_TableData_By_Code.sql" />
+    <Build Include="StoredProcedures\Insert\Items\Insert_ItemCategory.sql" />
+    <Build Include="StoredProcedures\Insert\Items\Insert_ItemType.sql" />
+    <Build Include="StoredProcedures\Insert\Items\Insert_Manufacturer.sql" />
+    <Build Include="StoredProcedures\Insert\Items\Insert_Item.sql" />
+    <Build Include="StoredProcedures\Insert\Accounts\Insert_Ledger.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalVizar.publish.xml" />

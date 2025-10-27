@@ -5,6 +5,9 @@ namespace VizarLibrary.Data.Item;
 
 public static class ItemData
 {
+	public static async Task<int> InsertItem(ItemModel item) =>
+		(await SqlDataAccess.LoadData<int, dynamic>(StoredProcedureNames.InsertItem, item)).FirstOrDefault();
+
 	public static async Task<List<ItemModel>> LoadItemByPartyPurchaseDateTime(int PartyId, DateTime PurchaseDateTime, bool OnlyActive = true) =>
 		await SqlDataAccess.LoadData<ItemModel, dynamic>(StoredProcedureNames.LoadItemByPartyPurchaseDateTime, new { PartyId, PurchaseDateTime, OnlyActive });
 }

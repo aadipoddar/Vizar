@@ -16,4 +16,10 @@ public static class SettingsKeys
 	public static string CodeExpiryMinutes => "CodeExpiryMinutes";
 
 	public static string PrimaryCompanyLinkingId => "PrimaryCompanyLinkingId";
+
+	public static string LedgerCodePrefix => "LedgerCodePrefix";
+	public static string ItemCategoryCodePrefix => "ItemCategoryCodePrefix";
+	public static string ItemTypeCodePrefix => "ItemTypeCodePrefix";
+	public static string ItemCodePrefix => "ItemCodePrefix";
+	public static string ManufacturerCodePrefix => "ManufacturerCodePrefix";
 }

@@ -186,8 +186,6 @@ public partial class PurchasePage
 			_taxes = await CommonData.LoadTableDataByStatus<TaxModel>(TableNames.Tax);
 
 			_items = [.. _items.OrderBy(s => s.Name)];
-			_taxes = [.. _taxes.OrderBy(s => s.Name)];
-
 			_items.Add(new()
 			{
 				Id = 0,
@@ -306,6 +304,7 @@ public partial class PurchasePage
 		_selectedItem = args.Value;
 
 		if (_selectedItem is null)
+		{
 			_selectedCart = new()
 			{
 				ItemId = 0,
@@ -318,6 +317,7 @@ public partial class PurchasePage
 				SGSTPercent = 0,
 				IGSTPercent = 0
 			};
+		}
 
 		else
 			_selectedCart = new()
@@ -328,9 +328,9 @@ public partial class PurchasePage
 				UnitOfMeasurement = _selectedItem.UnitOfMeasurement,
 				Rate = _selectedItem.Rate,
 				DiscountPercent = 0,
-				CGSTPercent = 0,
-				SGSTPercent = 0,
-				IGSTPercent = 0
+				CGSTPercent = _taxes.FirstOrDefault(s => s.Id == _selectedItem.TaxId).CGST,
+				SGSTPercent = _taxes.FirstOrDefault(s => s.Id == _selectedItem.TaxId).SGST,
+				IGSTPercent = _taxes.FirstOrDefault(s => s.Id == _selectedItem.TaxId).IGST
 			};
 
 		UpdateSelectedItemFinancialDetails();

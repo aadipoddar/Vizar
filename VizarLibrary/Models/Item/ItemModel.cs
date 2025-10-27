@@ -11,7 +11,7 @@ public class ItemModel
 	public decimal Rate { get; set; }
 	public int TaxId { get; set; }
 	public string UnitOfMeasurement { get; set; }
-	public decimal ReorderLevel { get; set; }
+	public decimal? ReorderLevel { get; set; }
 	public string? Remarks { get; set; }
 	public bool Status { get; set; }
 }

@@ -12,6 +12,9 @@ public static class TableNames
 	public static string Purchase => "Purchase";
 	public static string PurchaseDetail => "PurchaseDetail";
 	public static string Item => "Item";
+	public static string ItemCategory => "ItemCategory";
+	public static string ItemType => "ItemType";
+	public static string Manufacturer => "Manufacturer";
 }
 
 public static class StoredProcedureNames
@@ -19,6 +22,7 @@ public static class StoredProcedureNames
 	public static string LoadTableData => "Load_TableData";
 	public static string LoadTableDataById => "Load_TableData_By_Id";
 	public static string LoadTableDataByStatus => "Load_TableData_By_Status";
+	public static string LoadTableDataByCode => "Load_TableData_By_Code";
 	public static string LoadCurrentDateTime => "Load_CurrentDateTime";
 	public static string LoadSettingsByKey => "Load_Settings_By_Key";
 
@@ -29,6 +33,13 @@ public static class StoredProcedureNames
 	public static string InsertUser => "Insert_User";
 	public static string ResetSettings => "Reset_Settings";
 	public static string UpdateSettings => "Update_Settings";
+
+	public static string InsertManufacturer => "Insert_Manufacturer";
+	public static string InsertItemCategory => "Insert_ItemCategory";
+	public static string InsertItemType => "Insert_ItemType";
+	public static string InsertItem => "Insert_Item";
+
+	public static string InsertLedger => "Insert_Ledger";
 }
 
 public static class ViewNames
