@@ -1,0 +1,1290 @@
+﻿@page "/help/inventory/purchase"
+
+<PageTitle>Purchase Order Help - Vizar</PageTitle>
+
+<div class="help-container">
+	<!-- Header -->
+	<div class="help-header">
+		<div class="help-header-content">
+			<button class="btn-back" @onclick='() => NavigationManager.NavigateTo("/inventory/purchase")'>
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M19 12H5M12 19l-7-7 7-7" />
+				</svg>
+				<span>Back to Purchase Order</span>
+			</button>
+			<h1 class="help-title">Purchase Order - User Guide</h1>
+			<p class="help-subtitle">Complete guide to creating and managing purchase orders</p>
+		</div>
+	</div>
+
+	<!-- Content -->
+	<div class="help-content">
+		
+		<!-- Overview Section -->
+		<section class="help-section">
+			<div class="section-header-help">
+				<svg class="section-icon-help" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<circle cx="12" cy="12" r="10" />
+					<line x1="12" y1="16" x2="12" y2="12" />
+					<line x1="12" y1="8" x2="12.01" y2="8" />
+				</svg>
+				<h2>Overview</h2>
+			</div>
+			<div class="help-text">
+				<p>The Purchase Order page allows you to create, manage, and track purchase transactions from your suppliers. This comprehensive interface helps you maintain accurate inventory records, manage costs, and streamline your procurement process.</p>
+				<p><strong>Key Features:</strong></p>
+				<ul>
+					<li>Multi-item purchase order creation</li>
+					<li>Automatic tax calculations (CGST, SGST, IGST)</li>
+					<li>Flexible discount management</li>
+					<li>Real-time financial summaries</li>
+					<li>Item identification tracking</li>
+					<li>Auto-generated transaction numbers</li>
+					<li>Data persistence across sessions</li>
+				</ul>
+			</div>
+		</section>
+
+		<!-- Header Navigation Section -->
+		<section class="help-section">
+			<div class="section-header-help">
+				<svg class="section-icon-help" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+					<line x1="9" y1="3" x2="9" y2="21" />
+				</svg>
+				<h2>Header Navigation</h2>
+			</div>
+			<div class="help-text">
+				<p>The header section provides quick access to navigation and important actions:</p>
+				<div class="feature-grid">
+					<div class="feature-card">
+						<h4>🏢 Company Logo</h4>
+						<p>Displays your company branding and identity.</p>
+					</div>
+					<div class="feature-card">
+						<h4>🗂️ Breadcrumb Navigation</h4>
+						<p><strong>Inventory → Purchase Order</strong> - Click "Inventory" to return to the inventory dashboard.</p>
+					</div>
+					<div class="feature-card">
+						<h4>⬅️ Back Button</h4>
+						<p>Returns to the main dashboard.</p>
+					</div>
+					<div class="feature-card">
+						<h4>🕒 History Button</h4>
+						<p>Opens the transaction history to view past purchase orders.</p>
+					</div>
+					<div class="feature-card">
+						<h4>❓ Help Button</h4>
+						<p>Opens this help guide (you're here!).</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Transaction Summary Section -->
+		<section class="help-section">
+			<div class="section-header-help">
+				<svg class="section-icon-help" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+					<polyline points="14 2 14 8 20 8" />
+				</svg>
+				<h2>Transaction Summary</h2>
+			</div>
+			<div class="help-text">
+				<p>This section captures the essential details of your purchase transaction:</p>
+				
+				<div class="field-explanation">
+					<h4>Company <span class="required-indicator">*Required</span></h4>
+					<p><strong>Purpose:</strong> Select the company branch or entity making the purchase.</p>
+					<p><strong>How to use:</strong> Click the dropdown and start typing to filter companies. If the company doesn't exist, you can create a new one by selecting the "Add New" option.</p>
+					<p><strong>Note:</strong> This determines which company's inventory will be updated.</p>
+				</div>
+
+				<div class="field-explanation">
+					<h4>Party (Supplier) <span class="required-indicator">*Required</span></h4>
+					<p><strong>Purpose:</strong> Select the supplier or vendor from whom you're purchasing.</p>
+					<p><strong>How to use:</strong> Type to search for existing suppliers. Select "Add New" to create a new supplier ledger if needed.</p>
+					<p><strong>Note:</strong> The party selection may filter available items based on supplier relationships.</p>
+				</div>
+
+				<div class="field-explanation">
+					<h4>Transaction Date <span class="required-indicator">*Required</span></h4>
+					<p><strong>Purpose:</strong> The date when the purchase transaction occurred.</p>
+					<p><strong>How to use:</strong> Click the calendar icon to select a date or manually enter in DD/MM/YY format.</p>
+					<p><strong>Note:</strong> This date determines the financial year and affects reporting periods.</p>
+				</div>
+
+				<div class="field-explanation">
+					<h4>Financial Year</h4>
+					<p><strong>Purpose:</strong> Displays the financial year based on the transaction date.</p>
+					<p><strong>How it works:</strong> Automatically calculated and shown in YYYY to YYYY format.</p>
+					<p><strong>Note:</strong> This is read-only and ensures transactions are recorded in the correct fiscal period.</p>
+				</div>
+
+				<div class="field-explanation">
+					<h4>Transaction No</h4>
+					<p><strong>Purpose:</strong> Unique identifier for the purchase order.</p>
+					<p><strong>How to use:</strong> You can manually enter a transaction number or check the "Auto Generate" checkbox to let the system create one automatically.</p>
+					<p><strong>Auto Generate:</strong> When enabled, the field becomes read-only and a unique number is generated based on your company's numbering sequence.</p>
+					<p><strong>Note:</strong> Transaction numbers help track and reference specific purchases.</p>
+				</div>
+
+				<div class="field-explanation">
+					<h4>Remarks / Narration</h4>
+					<p><strong>Purpose:</strong> Add notes, references, or additional information about the purchase.</p>
+					<p><strong>How to use:</strong> Enter any relevant details such as PO number, delivery terms, or special instructions.</p>
+					<p><strong>Tip:</strong> Use this field to maintain an audit trail and add context to the transaction.</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- Financial Summary Section -->
+		<section class="help-section">
+			<div class="section-header-help">
+				<svg class="section-icon-help" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<line x1="12" y1="1" x2="12" y2="23" />
+					<path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+				</svg>
+				<h2>Financial Summary</h2>
+			</div>
+			<div class="help-text">
+				<p>Real-time calculation of the total purchase amount including all charges and discounts:</p>
+
+				<div class="calculation-flow">
+					<div class="calc-step">
+						<h4>1. Base Total</h4>
+						<p>Sum of (Quantity × Rate) for all items in the cart.</p>
+						<p class="formula">Base Total = Σ (Item Qty × Item Rate)</p>
+					</div>
+
+					<div class="calc-step">
+						<h4>2. Discount (-)</h4>
+						<p>Total discount amount deducted from the base total.</p>
+						<p class="formula">Discount = Σ (Item Discount Amounts)</p>
+						<p class="note-text">Shown in red to indicate reduction.</p>
+					</div>
+
+					<div class="calc-step">
+						<h4>3. After Discount</h4>
+						<p>Base total minus discounts.</p>
+						<p class="formula">After Discount = Base Total - Discount</p>
+					</div>
+
+					<div class="calc-step">
+						<h4>4. Tax (+)</h4>
+						<p>Total GST (CGST + SGST + IGST) on all items.</p>
+						<p class="formula">Tax = Σ (CGST Amt + SGST Amt + IGST Amt)</p>
+					</div>
+
+					<div class="calc-step">
+						<h4>5. After Tax</h4>
+						<p>Total after adding taxes (or same as After Discount if tax inclusive).</p>
+						<p class="formula">After Tax = After Discount + Tax (or After Discount if inclusive)</p>
+					</div>
+
+					<div class="calc-step">
+						<h4>6. Other Charges</h4>
+						<p>Additional charges like freight, handling, etc.</p>
+						<p><strong>How to use:</strong> Enter a percentage, and the amount is calculated automatically.</p>
+						<p class="formula">Other Charges Amt = After Tax × (Other Charges %/100)</p>
+					</div>
+
+					<div class="calc-step">
+						<h4>7. Cash Discount</h4>
+						<p>Additional discount offered for cash/early payment.</p>
+						<p><strong>How to use:</strong> Enter a percentage to apply a further discount.</p>
+						<p class="formula">Cash Discount Amt = (After Tax + Other Charges) × (Cash Discount %/100)</p>
+					</div>
+
+					<div class="calc-step">
+						<h4>8. Round Off</h4>
+						<p>Adjustment to round the final amount.</p>
+						<p><strong>Auto-calculated:</strong> System automatically rounds to the nearest whole number.</p>
+						<p><strong>Manual override:</strong> You can enter a custom round-off value if needed.</p>
+					</div>
+
+					<div class="calc-step total-step">
+						<h4>9. Total Amount</h4>
+						<p>Final payable amount for the purchase order.</p>
+						<p class="formula">Total = (After Tax + Other Charges - Cash Discount) + Round Off</p>
+						<p class="note-text">Displayed prominently in blue highlighting.</p>
+					</div>
+				</div>
+
+				<div class="tip-box">
+					<strong>💡 Tip:</strong> All financial calculations update automatically as you add items or modify values. Watch this summary to understand the final cost breakdown.
+				</div>
+			</div>
+		</section>
+
+		<!-- Add to Cart Section -->
+		<section class="help-section">
+			<div class="section-header-help">
+				<svg class="section-icon-help" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<circle cx="9" cy="21" r="1" />
+					<circle cx="20" cy="21" r="1" />
+					<path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+				</svg>
+				<h2>Add Item to Cart</h2>
+			</div>
+			<div class="help-text">
+				<p>This section allows you to add items to your purchase order with detailed pricing and tax information:</p>
+
+				<h3>Step-by-Step Process:</h3>
+
+				<div class="field-explanation">
+					<h4>Step 1: Select Item <span class="required-indicator">*Required</span></h4>
+					<p><strong>How to use:</strong> Click the dropdown and start typing the item name or code. The system will filter matching items.</p>
+					<p><strong>Auto-fill:</strong> When you select an item, the system automatically fills in:</p>
+					<ul>
+						<li>Unit of Measurement (UOM)</li>
+						<li>Current rate/price</li>
+						<li>Default tax rates (CGST, SGST, IGST)</li>
+					</ul>
+					<p><strong>Add New Item:</strong> If the item doesn't exist, select "Add New" to create it.</p>
+				</div>
+
+				<div class="field-explanation">
+					<h4>Step 2: Enter Item Details</h4>
+					<p>Fill in or modify the following fields in the first row:</p>
+					<ul>
+						<li><strong>Qty (Quantity):</strong> Number of units being purchased</li>
+						<li><strong>Rate:</strong> Price per unit (auto-filled but can be modified)</li>
+						<li><strong>Disc %:</strong> Discount percentage (0-100%)</li>
+						<li><strong>CGST %:</strong> Central GST percentage</li>
+						<li><strong>SGST %:</strong> State GST percentage</li>
+						<li><strong>IGST %:</strong> Integrated GST percentage (for inter-state)</li>
+						<li><strong>Remarks:</strong> Optional notes specific to this item</li>
+						<li><strong>Tax Incl.:</strong> Check if the rate includes tax</li>
+					</ul>
+				</div>
+
+				<div class="field-explanation">
+					<h4>Step 3: Review Calculated Amounts</h4>
+					<p>The second row displays automatically calculated values aligned with the input fields above:</p>
+					<ul>
+						<li><strong>Identification No.:</strong> Enter a unique identifier like serial number, batch number, or asset tag</li>
+						<li><strong>Base Total:</strong> Qty × Rate (displayed below Rate field)</li>
+						<li><strong>After Disc:</strong> Base Total after discount (below Qty field)</li>
+						<li><strong>Disc Amt:</strong> Calculated discount amount (below Disc %)</li>
+						<li><strong>CGST Amt:</strong> Calculated CGST amount (below CGST %)</li>
+						<li><strong>SGST Amt:</strong> Calculated SGST amount (below SGST %)</li>
+						<li><strong>IGST Amt:</strong> Calculated IGST amount (below IGST %)</li>
+						<li><strong>Total:</strong> Final item total (below Remarks)</li>
+					</ul>
+				</div>
+
+				<div class="field-explanation">
+					<h4>Step 4: Add to Cart</h4>
+					<p><strong>Click the "Add" button</strong> to add the item to your cart.</p>
+					<p><strong>Duplicate items:</strong> If you add the same item again, the quantities are combined.</p>
+					<p><strong>Form reset:</strong> After adding, the form clears and focuses back on the Item field for quick entry of the next item.</p>
+				</div>
+
+				<div class="tip-box">
+					<strong>💡 Tips:</strong>
+					<ul>
+						<li>All numeric fields update calculations in real-time as you type</li>
+						<li>Use Tab key to quickly move between fields</li>
+						<li>The "Tax Incl." checkbox affects whether tax is added to or included in the total</li>
+						<li>Amounts in red indicate deductions (discounts)</li>
+						<li>The Identification No. field is useful for tracking specific units, batches, or serial numbers</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+
+		<!-- Purchase Items Grid Section -->
+		<section class="help-section">
+			<div class="section-header-help">
+				<svg class="section-icon-help" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M3 3h7a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H3V3z" />
+					<path d="M14 3h7v17h-7V3z" />
+				</svg>
+				<h2>Purchase Items Grid</h2>
+			</div>
+			<div class="help-text">
+				<p>The grid displays all items added to your purchase order cart with comprehensive details:</p>
+
+				<h3>Grid Columns Explained:</h3>
+				<div class="grid-columns">
+					<div class="column-item">
+						<strong>Item Name:</strong> Name of the purchased item
+					</div>
+					<div class="column-item">
+						<strong>Identification No.:</strong> Unique identifier (serial/batch number)
+					</div>
+					<div class="column-item">
+						<strong>UOM:</strong> Unit of measurement (pcs, kg, liters, etc.)
+					</div>
+					<div class="column-item">
+						<strong>Qty:</strong> Quantity being purchased
+					</div>
+					<div class="column-item">
+						<strong>Rate:</strong> Price per unit
+					</div>
+					<div class="column-item">
+						<strong>Base Total:</strong> Qty × Rate
+					</div>
+					<div class="column-item">
+						<strong>Disc %:</strong> Discount percentage
+					</div>
+					<div class="column-item">
+						<strong>Disc Amt:</strong> Discount amount (shown in red)
+					</div>
+					<div class="column-item">
+						<strong>After Disc:</strong> Amount after discount
+					</div>
+					<div class="column-item">
+						<strong>CGST %, CGST Amt:</strong> Central GST details
+					</div>
+					<div class="column-item">
+						<strong>SGST %, SGST Amt:</strong> State GST details
+					</div>
+					<div class="column-item">
+						<strong>IGST %, IGST Amt:</strong> Integrated GST details
+					</div>
+					<div class="column-item">
+						<strong>Tax Total:</strong> Sum of all taxes
+					</div>
+					<div class="column-item">
+						<strong>Tax Incl.:</strong> ✓ if tax is included, – if tax is additional
+					</div>
+					<div class="column-item">
+						<strong>Total:</strong> Final line item total (shown in blue)
+					</div>
+					<div class="column-item">
+						<strong>Remarks:</strong> Item-specific notes
+					</div>
+					<div class="column-item">
+						<strong>Actions:</strong> Edit and Delete buttons
+					</div>
+				</div>
+
+				<h3>Grid Features:</h3>
+				<div class="feature-list">
+					<div class="feature-item">
+						<h4>🔍 Search</h4>
+						<p>Use the search box at the top to quickly find items in the grid.</p>
+					</div>
+					<div class="feature-item">
+						<h4>🔄 Sorting</h4>
+						<p>Click any column header to sort by that column (ascending/descending).</p>
+					</div>
+					<div class="feature-item">
+						<h4>📊 Column Totals</h4>
+						<p>The footer row shows aggregate totals for all numeric columns:</p>
+						<ul>
+							<li>Total Items count</li>
+							<li>Sum of quantities</li>
+							<li>Sum of all amounts</li>
+							<li>Total discounts (in red)</li>
+							<li>Grand total (in blue)</li>
+						</ul>
+					</div>
+					<div class="feature-item">
+						<h4>✏️ Edit Action</h4>
+						<p>Click the blue edit icon to modify an item. This will:</p>
+						<ol>
+							<li>Remove the item from the grid</li>
+							<li>Populate the "Add to Cart" form with the item's data</li>
+							<li>Allow you to make changes and re-add it</li>
+						</ol>
+					</div>
+					<div class="feature-item">
+						<h4>🗑️ Delete Action</h4>
+						<p>Click the red delete icon to remove an item from the cart immediately.</p>
+					</div>
+					<div class="feature-item">
+						<h4>🎨 Color Coding</h4>
+						<ul>
+							<li><span style="color: #dc2626;">Red numbers:</span> Discounts and deductions</li>
+							<li><span style="color: #1e40af;">Blue numbers:</span> Totals and final amounts</li>
+							<li>Alternating row colors for easier reading</li>
+							<li>Hover effects highlight the current row</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="tip-box">
+					<strong>💡 Pro Tip:</strong> The grid automatically updates all totals when you edit or delete items. Always review the footer totals before saving your transaction.
+				</div>
+			</div>
+		</section>
+
+		<!-- Action Buttons Section -->
+		<section class="help-section">
+			<div class="section-header-help">
+				<svg class="section-icon-help" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+					<line x1="12" y1="8" x2="12" y2="16" />
+					<line x1="8" y1="12" x2="16" y2="12" />
+				</svg>
+				<h2>Action Buttons</h2>
+			</div>
+			<div class="help-text">
+				<div class="button-explanation">
+					<h4>💾 Save Transaction (Blue Button)</h4>
+					<p><strong>Purpose:</strong> Finalizes and saves the purchase order to the database.</p>
+					<p><strong>What it does:</strong></p>
+					<ul>
+						<li>Validates all required fields</li>
+						<li>Checks that at least one item is in the cart</li>
+						<li>Verifies the financial year is open and not locked</li>
+						<li>Saves the purchase order header and all line items</li>
+						<li>Updates inventory quantities</li>
+						<li>Updates supplier ledger balance</li>
+						<li>Clears the cart after successful save</li>
+					</ul>
+					<p><strong>Required before saving:</strong></p>
+					<ul>
+						<li>✓ Company selected</li>
+						<li>✓ Party selected</li>
+						<li>✓ Transaction date set</li>
+						<li>✓ Transaction number entered (or auto-generated)</li>
+						<li>✓ At least one item in cart</li>
+						<li>✓ Total amount greater than zero</li>
+					</ul>
+					<p class="note-text">You'll see a success message when the transaction is saved, or an error message if validation fails.</p>
+				</div>
+
+				<div class="button-explanation">
+					<h4>🗑️ Clear Cart (Gray Button)</h4>
+					<p><strong>Purpose:</strong> Removes all items from the current cart.</p>
+					<p><strong>What it does:</strong></p>
+					<ul>
+						<li>Clears all items from the purchase items grid</li>
+						<li>Resets the item entry form</li>
+						<li>Resets financial summary calculations</li>
+						<li>Does NOT clear transaction summary fields (Company, Party, Date, etc.)</li>
+					</ul>
+					<p><strong>When to use:</strong> If you want to start over with item selection but keep the transaction header details.</p>
+					<p class="warning-text">⚠️ Warning: This action cannot be undone. All items will be removed from the cart.</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- Data Persistence Section -->
+		<section class="help-section">
+			<div class="section-header-help">
+				<svg class="section-icon-help" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+					<polyline points="17 21 17 13 7 13 7 21" />
+				</svg>
+				<h2>Data Persistence & Auto-Save</h2>
+			</div>
+			<div class="help-text">
+				<p>The system automatically saves your work to protect against data loss:</p>
+				
+				<div class="feature-item">
+					<h4>💾 Automatic Saving</h4>
+					<p>Your purchase order data is automatically saved to local storage whenever you:</p>
+					<ul>
+						<li>Select or change the company</li>
+						<li>Select or change the party</li>
+						<li>Change the transaction date</li>
+						<li>Toggle auto-generate transaction number</li>
+						<li>Add an item to the cart</li>
+						<li>Edit or remove cart items</li>
+						<li>Modify other charges or cash discount</li>
+						<li>Change round-off amount</li>
+					</ul>
+				</div>
+
+				<div class="feature-item">
+					<h4>🔄 Data Recovery</h4>
+					<p>If you close the page or your browser crashes, your data is preserved. When you return to the purchase order page, the system automatically:</p>
+					<ul>
+						<li>Restores your unsaved transaction details</li>
+						<li>Reloads all items in your cart</li>
+						<li>Recalculates all financial summaries</li>
+					</ul>
+				</div>
+
+				<div class="feature-item">
+					<h4>🧹 Data Cleanup</h4>
+					<p>Local storage data is automatically cleared when you:</p>
+					<ul>
+						<li>Successfully save a transaction</li>
+						<li>Navigate away after saving</li>
+					</ul>
+					<p>This ensures you start fresh for the next purchase order.</p>
+				</div>
+
+				<div class="tip-box">
+					<strong>💡 Best Practice:</strong> While auto-save protects your work, remember to click "Save Transaction" when you're done to permanently record the purchase order in the database.
+				</div>
+			</div>
+		</section>
+
+		<!-- Workflow Section -->
+		<section class="help-section">
+			<div class="section-header-help">
+				<svg class="section-icon-help" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+				</svg>
+				<h2>Recommended Workflow</h2>
+			</div>
+			<div class="help-text">
+				<p>Follow this step-by-step workflow for creating purchase orders efficiently:</p>
+
+				<div class="workflow-steps">
+					<div class="workflow-step">
+						<div class="step-number">1</div>
+						<div class="step-content">
+							<h4>Set Transaction Details</h4>
+							<ul>
+								<li>Select Company</li>
+								<li>Select Party (Supplier)</li>
+								<li>Set Transaction Date</li>
+								<li>Enter or auto-generate Transaction Number</li>
+								<li>Add Remarks if needed</li>
+							</ul>
+						</div>
+					</div>
+
+					<div class="workflow-step">
+						<div class="step-number">2</div>
+						<div class="step-content">
+							<h4>Add Items to Cart</h4>
+							<ul>
+								<li>Select Item from dropdown</li>
+								<li>Enter Quantity and verify Rate</li>
+								<li>Set Discount % if applicable</li>
+								<li>Verify or adjust Tax rates</li>
+								<li>Add Identification Number if tracking specific units</li>
+								<li>Check "Tax Incl." if rate includes tax</li>
+								<li>Add Remarks for the item if needed</li>
+								<li>Click "Add" button</li>
+								<li>Repeat for all items</li>
+							</ul>
+						</div>
+					</div>
+
+					<div class="workflow-step">
+						<div class="step-number">3</div>
+						<div class="step-content">
+							<h4>Review Cart & Financials</h4>
+							<ul>
+								<li>Check all items in the grid are correct</li>
+								<li>Verify quantities and rates</li>
+								<li>Review tax calculations</li>
+								<li>Check footer totals</li>
+								<li>Review Financial Summary on the right</li>
+							</ul>
+						</div>
+					</div>
+
+					<div class="workflow-step">
+						<div class="step-number">4</div>
+						<div class="step-content">
+							<h4>Apply Additional Charges</h4>
+							<ul>
+								<li>Enter Other Charges % if applicable (freight, handling, etc.)</li>
+								<li>Enter Cash Discount % if applicable</li>
+								<li>Adjust Round Off if needed (or leave auto-calculated)</li>
+								<li>Review the final Total Amount</li>
+							</ul>
+						</div>
+					</div>
+
+					<div class="workflow-step">
+						<div class="step-number">5</div>
+						<div class="step-content">
+							<h4>Final Review & Save</h4>
+							<ul>
+								<li>Double-check all details</li>
+								<li>Ensure Total Amount is correct</li>
+								<li>Click "Save Transaction" button</li>
+								<li>Wait for success confirmation</li>
+								<li>Transaction number will be saved for reference</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Troubleshooting Section -->
+		<section class="help-section">
+			<div class="section-header-help">
+				<svg class="section-icon-help" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<circle cx="12" cy="12" r="10" />
+					<line x1="12" y1="8" x2="12" y2="12" />
+					<line x1="12" y1="16" x2="12.01" y2="16" />
+				</svg>
+				<h2>Troubleshooting & FAQs</h2>
+			</div>
+			<div class="help-text">
+				<div class="faq-item">
+					<h4>❓ Why can't I save my transaction?</h4>
+					<p><strong>Possible reasons:</strong></p>
+					<ul>
+						<li>Company not selected</li>
+						<li>Party (Supplier) not selected</li>
+						<li>Transaction date not set</li>
+						<li>Transaction number is empty (and auto-generate is off)</li>
+						<li>Cart is empty (no items added)</li>
+						<li>Financial year is locked</li>
+						<li>Financial year is inactive</li>
+						<li>Total amount is zero or negative</li>
+					</ul>
+					<p><strong>Solution:</strong> Check the error message displayed. It will tell you exactly what's missing or incorrect.</p>
+				</div>
+
+				<div class="faq-item">
+					<h4>❓ Why are my tax calculations different from expected?</h4>
+					<p><strong>Check:</strong></p>
+					<ul>
+						<li>Is the "Tax Incl." checkbox correct? If checked, tax is included in the rate, not added</li>
+						<li>Are the CGST/SGST/IGST percentages correct for the item?</li>
+						<li>Is the discount applied before tax calculation? (It should be)</li>
+					</ul>
+					<p><strong>Calculation Order:</strong> Base Total → Discount → After Discount → Tax → Total</p>
+				</div>
+
+				<div class="faq-item">
+					<h4>❓ Can I edit a saved transaction?</h4>
+					<p>No, once saved, transactions are permanent for audit compliance. If you need to make changes:</p>
+					<ul>
+						<li>Create a return/reversal transaction</li>
+						<li>Create a new corrected transaction</li>
+						<li>Contact your administrator if the transaction was saved in error</li>
+					</ul>
+				</div>
+
+				<div class="faq-item">
+					<h4>❓ What happens to inventory when I save?</h4>
+					<p>When you save a purchase order:</p>
+					<ul>
+						<li>Inventory quantities are <strong>increased</strong> for all items</li>
+						<li>Inventory is updated for the selected company only</li>
+						<li>Item costs may be updated based on your accounting method</li>
+						<li>The <strong>Net Rate</strong> is calculated for each item, which represents the true per-unit cost</li>
+					</ul>
+				</div>
+
+				<div class="faq-item">
+					<h4>❓ How is the Net Rate calculated?</h4>
+					<p>The Net Rate represents the actual per-unit cost of each item after applying all transaction-level adjustments:</p>
+					<p class="formula">Net Rate = ((Total / Quantity) × (1 + Other Charges %)) × (1 - Cash Discount %)</p>
+					<p><strong>Calculation steps:</strong></p>
+					<ol>
+						<li><strong>Per Unit Cost:</strong> Divide the item's total by quantity (includes base rate, item discount, and taxes)</li>
+						<li><strong>Add Other Charges:</strong> Apply the Other Charges percentage from Financial Summary</li>
+						<li><strong>Subtract Cash Discount:</strong> Apply the Cash Discount percentage from Financial Summary</li>
+					</ol>
+					<p><strong>Example:</strong></p>
+					<ul>
+						<li>Item Total: ₹1,000 for 10 units = ₹100 per unit</li>
+						<li>Other Charges: 5% → ₹100 × 1.05 = ₹105</li>
+						<li>Cash Discount: 2% → ₹105 × 0.98 = ₹102.90</li>
+						<li><strong>Net Rate = ₹102.90 per unit</strong></li>
+					</ul>
+					<p class="note-text">This Net Rate is stored with each purchase item and used for inventory valuation and cost analysis.</p>
+				</div>
+
+				<div class="faq-item">
+					<h4>❓ What happens to the supplier ledger?</h4>
+					<p>When you save:</p>
+					<ul>
+						<li>The supplier's (Party's) ledger is <strong>credited</strong> with the total amount</li>
+						<li>This increases the amount you owe to the supplier</li>
+						<li>The balance can be viewed in the supplier ledger report</li>
+					</ul>
+				</div>
+
+				<div class="faq-item">
+					<h4>❓ Why did my items disappear after adding?</h4>
+					<p>This is normal behavior. After clicking "Add," the item moves from the entry form to the grid below. Check the "Purchase Items" grid to see all added items.</p>
+				</div>
+
+				<div class="faq-item">
+					<h4>❓ Can I use CGST+SGST and IGST together?</h4>
+					<p>No. For each item, use either:</p>
+					<ul>
+						<li><strong>CGST + SGST</strong> for intra-state purchases (within same state)</li>
+						<li><strong>IGST</strong> for inter-state purchases (different states)</li>
+					</ul>
+					<p>The system allows both to be entered, but typically only one type should be used per item based on the supplier's location.</p>
+				</div>
+
+				<div class="faq-item">
+					<h4>❓ What is the Identification No. field for?</h4>
+					<p>Use this optional field to track:</p>
+					<ul>
+						<li>Serial numbers for individual units</li>
+						<li>Batch numbers for production tracking</li>
+						<li>Asset tags for fixed assets</li>
+						<li>Lot numbers for quality control</li>
+						<li>Any other unique identifier for specific inventory units</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+
+		<!-- Tips & Best Practices -->
+		<section class="help-section">
+			<div class="section-header-help">
+				<svg class="section-icon-help" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+					<polyline points="22 4 12 14.01 9 11.01" />
+				</svg>
+				<h2>Tips & Best Practices</h2>
+			</div>
+			<div class="help-text">
+				<div class="tips-grid">
+					<div class="tip-card">
+						<h4>⚡ Speed Up Data Entry</h4>
+						<ul>
+							<li>Use Tab key to move between fields quickly</li>
+							<li>Enable auto-generate for transaction numbers</li>
+							<li>Set up default suppliers for frequent purchases</li>
+							<li>Keep item master data up-to-date with accurate rates and taxes</li>
+						</ul>
+					</div>
+
+					<div class="tip-card">
+						<h4>✅ Accuracy Checks</h4>
+						<ul>
+							<li>Always verify the Total Amount before saving</li>
+							<li>Double-check quantities and rates</li>
+							<li>Review tax rates match your supplier's invoice</li>
+							<li>Use remarks to note invoice numbers or PO references</li>
+						</ul>
+					</div>
+
+					<div class="tip-card">
+						<h4>📊 Better Reporting</h4>
+						<ul>
+							<li>Be consistent with transaction dates (use invoice date)</li>
+							<li>Add detailed remarks for easier searching later</li>
+							<li>Use identification numbers for serialized items</li>
+							<li>Keep transaction numbers sequential</li>
+						</ul>
+					</div>
+
+					<div class="tip-card">
+						<h4>🔒 Data Security</h4>
+						<ul>
+							<li>Don't leave the page open and unattended</li>
+							<li>Save transactions promptly</li>
+							<li>Review financial year status before bulk entry</li>
+							<li>Verify you're posting to the correct company</li>
+						</ul>
+					</div>
+
+					<div class="tip-card">
+						<h4>🎯 Process Efficiency</h4>
+						<ul>
+							<li>Add all items before applying final discounts</li>
+							<li>Review the grid footer totals frequently</li>
+							<li>Use the Clear Cart button to start fresh if needed</li>
+							<li>Access History to reference previous purchases</li>
+						</ul>
+					</div>
+
+					<div class="tip-card">
+						<h4>💰 Financial Management</h4>
+						<ul>
+							<li>Understand the difference between Tax Inclusive and Exclusive</li>
+							<li>Apply item-level discounts before cart-level discounts</li>
+							<li>Use Other Charges for freight/handling costs</li>
+							<li>Apply Cash Discount only when terms are met</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<section class="help-footer">
+			<div class="footer-content">
+				<h3>Need More Help?</h3>
+				<p>If you have questions not covered in this guide, please contact:</p>
+				<div class="contact-info">
+					<p>📧 Email: softaadi@gmail.com</p>
+					<p>📞 Phone: +91 9007388669</p>
+					<p>🌐 Website: aadi.vercel.app</p>
+				</div>
+				<button class="btn-back-bottom" @onclick='() => NavigationManager.NavigateTo("/inventory/purchase")'>
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M19 12H5M12 19l-7-7 7-7" />
+					</svg>
+					<span>Back to Purchase Order</span>
+				</button>
+			</div>
+		</section>
+
+	</div>
+</div>
+
+<style>
+	* {
+		box-sizing: border-box;
+		margin: 0;
+		padding: 0;
+	}
+
+	.help-container {
+		background: #f8fafc;
+		min-height: 100vh;
+	}
+
+	/* Header */
+	.help-header {
+		background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+		color: white;
+		padding: 48px 32px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	}
+
+	.help-header-content {
+		max-width: 1200px;
+		margin: 0 auto;
+	}
+
+	.btn-back {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 10px 20px;
+		background: rgba(255, 255, 255, 0.2);
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		border-radius: 8px;
+		color: white;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		margin-bottom: 24px;
+	}
+
+		.btn-back:hover {
+			background: rgba(255, 255, 255, 0.3);
+			transform: translateX(-4px);
+		}
+
+	.help-title {
+		font-size: 36px;
+		font-weight: 700;
+		margin-bottom: 12px;
+		letter-spacing: -0.5px;
+	}
+
+	.help-subtitle {
+		font-size: 18px;
+		opacity: 0.9;
+		font-weight: 400;
+	}
+
+	/* Content */
+	.help-content {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 48px 32px;
+	}
+
+	.help-section {
+		background: white;
+		border-radius: 12px;
+		padding: 32px;
+		margin-bottom: 32px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+		border: 1px solid #e2e8f0;
+	}
+
+	.section-header-help {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		margin-bottom: 24px;
+		padding-bottom: 16px;
+		border-bottom: 2px solid #e2e8f0;
+	}
+
+		.section-header-help h2 {
+			font-size: 24px;
+			font-weight: 700;
+			color: #0f172a;
+		}
+
+	.section-icon-help {
+		color: #3b82f6;
+		flex-shrink: 0;
+	}
+
+	.help-text {
+		color: #475569;
+		line-height: 1.7;
+	}
+
+		.help-text p {
+			margin-bottom: 16px;
+		}
+
+		.help-text h3 {
+			font-size: 20px;
+			color: #1e293b;
+			margin: 24px 0 16px 0;
+			font-weight: 600;
+		}
+
+		.help-text h4 {
+			font-size: 16px;
+			color: #1e293b;
+			margin: 16px 0 8px 0;
+			font-weight: 600;
+		}
+
+		.help-text ul, .help-text ol {
+			margin-left: 24px;
+			margin-bottom: 16px;
+		}
+
+		.help-text li {
+			margin-bottom: 8px;
+		}
+
+	/* Feature Grid */
+	.feature-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 16px;
+		margin: 24px 0;
+	}
+
+	.feature-card {
+		background: #f8fafc;
+		padding: 20px;
+		border-radius: 8px;
+		border: 1px solid #e2e8f0;
+	}
+
+		.feature-card h4 {
+			margin: 0 0 8px 0 !important;
+			color: #1e293b;
+			font-size: 15px;
+		}
+
+		.feature-card p {
+			margin: 0 !important;
+			font-size: 14px;
+			color: #64748b;
+		}
+
+	/* Field Explanation */
+	.field-explanation {
+		background: #f8fafc;
+		padding: 20px;
+		border-radius: 8px;
+		border-left: 4px solid #3b82f6;
+		margin-bottom: 20px;
+	}
+
+		.field-explanation h4 {
+			margin: 0 0 12px 0 !important;
+			color: #1e293b;
+		}
+
+		.field-explanation p {
+			margin-bottom: 12px !important;
+		}
+
+	.required-indicator {
+		color: #ef4444;
+		font-size: 13px;
+		font-weight: 600;
+	}
+
+	/* Calculation Flow */
+	.calculation-flow {
+		margin: 24px 0;
+	}
+
+	.calc-step {
+		background: white;
+		padding: 16px;
+		border-radius: 8px;
+		border: 1px solid #e2e8f0;
+		margin-bottom: 12px;
+		position: relative;
+		padding-left: 60px;
+	}
+
+		.calc-step h4 {
+			margin: 0 0 8px 0 !important;
+			color: #1e293b;
+			font-size: 16px;
+		}
+
+		.calc-step p {
+			margin-bottom: 4px !important;
+			font-size: 14px;
+		}
+
+	.calc-step.total-step {
+		background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+		border: 2px solid #3b82f6;
+	}
+
+	.formula {
+		font-family: 'Courier New', monospace;
+		background: #1e293b;
+		color: #10b981;
+		padding: 8px 12px;
+		border-radius: 4px;
+		font-size: 13px;
+		display: inline-block;
+		margin: 8px 0 !important;
+	}
+
+	.note-text {
+		font-style: italic;
+		color: #64748b;
+		font-size: 13px !important;
+	}
+
+	/* Tip Box */
+	.tip-box {
+		background: #fef3c7;
+		border: 1px solid #fcd34d;
+		border-left: 4px solid #f59e0b;
+		padding: 16px;
+		border-radius: 8px;
+		margin: 20px 0;
+	}
+
+		.tip-box strong {
+			color: #92400e;
+		}
+
+		.tip-box ul {
+			margin-top: 8px;
+			margin-bottom: 0;
+		}
+
+	.warning-text {
+		color: #dc2626;
+		font-weight: 600;
+		font-size: 14px !important;
+	}
+
+	/* Grid Columns */
+	.grid-columns {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: 12px;
+		margin: 16px 0;
+	}
+
+	.column-item {
+		background: #f8fafc;
+		padding: 12px 16px;
+		border-radius: 6px;
+		border: 1px solid #e2e8f0;
+		font-size: 14px;
+	}
+
+		.column-item strong {
+			color: #1e293b;
+		}
+
+	/* Feature List */
+	.feature-list {
+		margin: 20px 0;
+	}
+
+	.feature-item {
+		margin-bottom: 20px;
+	}
+
+		.feature-item h4 {
+			margin: 0 0 8px 0 !important;
+			color: #1e293b;
+		}
+
+	/* Button Explanation */
+	.button-explanation {
+		background: #f8fafc;
+		padding: 20px;
+		border-radius: 8px;
+		border: 1px solid #e2e8f0;
+		margin-bottom: 20px;
+	}
+
+		.button-explanation h4 {
+			margin: 0 0 12px 0 !important;
+			font-size: 18px;
+		}
+
+	/* Workflow Steps */
+	.workflow-steps {
+		margin: 24px 0;
+	}
+
+	.workflow-step {
+		display: flex;
+		gap: 20px;
+		margin-bottom: 24px;
+		padding: 20px;
+		background: #f8fafc;
+		border-radius: 8px;
+		border: 1px solid #e2e8f0;
+	}
+
+	.step-number {
+		width: 48px;
+		height: 48px;
+		background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+		color: white;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 24px;
+		font-weight: 700;
+		flex-shrink: 0;
+	}
+
+	.step-content h4 {
+		margin: 0 0 12px 0 !important;
+		color: #1e293b;
+		font-size: 18px;
+	}
+
+	.step-content ul {
+		margin: 0 0 0 20px !important;
+	}
+
+	/* FAQ */
+	.faq-item {
+		background: #f8fafc;
+		padding: 20px;
+		border-radius: 8px;
+		border: 1px solid #e2e8f0;
+		margin-bottom: 16px;
+	}
+
+		.faq-item h4 {
+			margin: 0 0 12px 0 !important;
+			color: #1e293b;
+			font-size: 16px;
+		}
+
+	/* Tips Grid */
+	.tips-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: 20px;
+		margin: 24px 0;
+	}
+
+	.tip-card {
+		background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+		padding: 20px;
+		border-radius: 8px;
+		border: 1px solid #bae6fd;
+	}
+
+		.tip-card h4 {
+			margin: 0 0 12px 0 !important;
+			color: #0c4a6e;
+		}
+
+		.tip-card ul {
+			margin: 0 0 0 20px !important;
+		}
+
+		.tip-card li {
+			color: #0369a1;
+		}
+
+	/* Footer */
+	.help-footer {
+		background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+		border-radius: 12px;
+		padding: 40px;
+		text-align: center;
+		color: white;
+	}
+
+	.footer-content h3 {
+		font-size: 24px;
+		margin-bottom: 16px;
+	}
+
+	.contact-info {
+		margin: 24px 0;
+		font-size: 16px;
+		line-height: 1.8;
+	}
+
+		.contact-info p {
+			margin-bottom: 8px !important;
+		}
+
+	.btn-back-bottom {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 12px 24px;
+		background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+		border: none;
+		border-radius: 8px;
+		color: white;
+		font-size: 16px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		margin-top: 16px;
+	}
+
+		.btn-back-bottom:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+		}
+
+	/* Responsive */
+	@@media (max-width: 768px) {
+		.help-header {
+			padding: 32px 20px;
+		}
+
+		.help-title {
+			font-size: 28px;
+		}
+
+		.help-subtitle {
+			font-size: 16px;
+		}
+
+		.help-content {
+			padding: 24px 20px;
+		}
+
+		.help-section {
+			padding: 24px 20px;
+		}
+
+		.section-header-help h2 {
+			font-size: 20px;
+		}
+
+		.feature-grid,
+		.tips-grid,
+		.grid-columns {
+			grid-template-columns: 1fr;
+		}
+
+		.workflow-step {
+			flex-direction: column;
+		}
+
+		.step-number {
+			width: 40px;
+			height: 40px;
+			font-size: 20px;
+		}
+	}
+</style>

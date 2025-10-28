@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 
+using VizarLibrary.Data.Common;
+using VizarLibrary.DataAccess;
 using VizarLibrary.Models.Common;
 
 namespace Vizar.Shared.Services;
@@ -19,6 +21,13 @@ public static class AuthenticationService
 		var user = System.Text.Json.JsonSerializer.Deserialize<UserModel>(userData);
 		if (user is null)
 			await Logout(dataStorageService, navigationManager, vibrationService);
+
+		var serverUser = await CommonData.LoadTableDataById<UserModel>(TableNames.User, user.Id);
+		if (serverUser is null)
+			await Logout(dataStorageService, navigationManager, vibrationService);
+
+		user = serverUser;
+		await dataStorageService.SecureSaveAsync(StorageFileNames.UserDataFileName, System.Text.Json.JsonSerializer.Serialize(user));
 
 		if (!user.Status)
 			await Logout(dataStorageService, navigationManager, vibrationService);

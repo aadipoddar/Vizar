@@ -519,7 +519,11 @@ public partial class PurchasePage
 			item.IGSTAmount = item.AfterDiscount * (item.IGSTPercent / 100);
 			item.TotalTaxAmount = item.CGSTAmount + item.SGSTAmount + item.IGSTAmount;
 			item.Total = item.InclusiveTax ? item.AfterDiscount : item.AfterDiscount + item.TotalTaxAmount;
-			item.NetRate = item.Total / item.Quantity * (1 + (_purchase.OtherChargesPercent * 100)) * (1 - (_purchase.CashDiscountPercent / 100));
+
+			// Net Rate = (Total / Quantity) + Other Charges % - Cash Discount %
+			var perUnitCost = item.Total / item.Quantity;
+			var withOtherCharges = perUnitCost * (1 + (_purchase.OtherChargesPercent / 100));
+			item.NetRate = withOtherCharges * (1 - (_purchase.CashDiscountPercent / 100));
 		}
 
 		_purchase.ItemsTotalAmount = _cart.Sum(x => x.Total);
@@ -699,6 +703,23 @@ public partial class PurchasePage
 	}
 	#endregion
 
+	#region Utilities
+	private async Task NavigateToTransactionHistoryPage()
+	{
+		if (FormFactor.GetFormFactor() == "Web")
+			await JSRuntime.InvokeVoidAsync("open", "/report/inventory/purchase", "_blank");
+		else
+			NavigationManager.NavigateTo("/report/inventory/purchase");
+	}
+
+	private async Task NavigateToHelpPage()
+	{
+		if (FormFactor.GetFormFactor() == "Web")
+			await JSRuntime.InvokeVoidAsync("open", "/help/inventory/purchase", "_blank");
+		else
+			NavigationManager.NavigateTo("/help/inventory/purchase");
+	}
+
 	private async Task ShowToast(string title, string message, string type)
 	{
 		VibrationService.VibrateWithTime(200);
@@ -725,4 +746,5 @@ public partial class PurchasePage
 			});
 		}
 	}
+	#endregion
 }
