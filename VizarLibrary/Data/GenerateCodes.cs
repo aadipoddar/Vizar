@@ -2,6 +2,7 @@
 using VizarLibrary.DataAccess;
 using VizarLibrary.Models.Accounts;
 using VizarLibrary.Models.Common;
+using VizarLibrary.Models.Inventory;
 using VizarLibrary.Models.Item;
 
 namespace VizarLibrary.Data;
@@ -10,6 +11,7 @@ public static class GenerateCodes
 {
 	public enum CodeType
 	{
+		Purchase,
 		Ledger,
 		Manufacturer,
 		ItemCategory,
@@ -24,6 +26,10 @@ public static class GenerateCodes
 		{
 			switch (type)
 			{
+				case CodeType.Purchase:
+					var purchase = await CommonData.LoadTableDataByTransactionNo<PurchaseModel>(TableNames.Purchase, code);
+					isDuplicate = purchase is not null;
+					break;
 				case CodeType.Ledger:
 					var ledger = await CommonData.LoadTableDataByCode<LedgerModel>(TableNames.Ledger, code);
 					isDuplicate = ledger is not null;
@@ -60,6 +66,30 @@ public static class GenerateCodes
 				code = $"{prefix}{1.ToString($"D{numberLength}")}";
 		}
 		return code;
+	}
+
+	public static async Task<string> GeneratePurchaseTransactionNo(PurchaseModel purchase)
+	{
+		var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, purchase.FinancialYearId);
+		var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, purchase.CompanyId)).Code;
+		var purchasePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.PurchaseTransactionPrefix)).Value;
+
+		var lastPurchase = await CommonData.LoadLastTableDataByCompanyFinancialYear<PurchaseModel>(TableNames.Purchase, purchase.CompanyId, purchase.FinancialYearId);
+		if (lastPurchase is not null)
+		{
+			var lastTransactionNo = lastPurchase.TransactionNo;
+			if (lastTransactionNo.StartsWith($"{companyPrefix}{financialYear.YearNo}{purchasePrefix}"))
+			{
+				var lastNumberPart = lastTransactionNo[(companyPrefix.Length + financialYear.YearNo.ToString().Length + purchasePrefix.Length)..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{purchasePrefix}{nextNumber:D6}", 6, CodeType.Purchase);
+				}
+			}
+		}
+
+		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{purchasePrefix}000001", 6, CodeType.Purchase);
 	}
 
 	public static async Task<string> GenerateLedgerCode()

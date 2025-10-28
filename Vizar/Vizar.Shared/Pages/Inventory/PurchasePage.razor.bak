@@ -1,0 +1,369 @@
+@page "/inventory/purchase"
+
+@using VizarLibrary.Models.Common
+@using VizarLibrary.Models.Accounts
+@using VizarLibrary.Models.Item
+
+<PageTitle>Purchase Order - Vizar</PageTitle>
+
+@if (_isLoading)
+{
+	<div class="loading-overlay">
+		<SfSpinner @bind-Visible="_isLoading" Label="Loading Purchase Order..." CssClass="custom-spinner" />
+	</div>
+}
+else
+{
+	<div class="purchase-container">
+		<!-- Page Header -->
+		<div class="page-header">
+			<div class="header-left">
+				<h1 class="page-title">
+					<svg class="title-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+						<rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+					</svg>
+					Purchase Order
+				</h1>
+				<p class="page-subtitle">Create and manage purchase transactions</p>
+			</div>
+			<div class="header-actions">
+				<button class="btn-secondary">
+					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<polyline points="1 4 1 10 7 10"></polyline>
+						<path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+					</svg>
+					Reset
+				</button>
+				<button class="btn-primary">
+					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+						<polyline points="17 21 17 13 7 13 7 21"></polyline>
+						<polyline points="7 3 7 8 15 8"></polyline>
+					</svg>
+					Save Draft
+				</button>
+				<button class="btn-success">
+					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<polyline points="20 6 9 17 4 12"></polyline>
+					</svg>
+					Submit Order
+				</button>
+			</div>
+		</div>
+
+		<!-- Main Content -->
+		<div class="purchase-content">
+			<!-- Left Panel - Form -->
+			<div class="form-panel">
+				<!-- Basic Information Card -->
+				<div class="info-card">
+					<div class="card-header">
+						<h3 class="card-title">Basic Information</h3>
+						<span class="card-badge">Required</span>
+					</div>
+					<div class="card-body">
+						<div class="form-row">
+							<div class="form-field">
+								<label class="field-label">Company *</label>
+								<SfAutoComplete Value="@_selectedCompany"
+					TValue="CompanyModel"
+					TItem="CompanyModel"
+					DataSource="@_companies"
+					Autofill="true"
+					Placeholder="Select a Company For Purchase"
+					FloatLabelType="FloatLabelType.Auto"
+					AllowFiltering="true"
+					FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
+		<AutoCompleteEvents TItem="CompanyModel" TValue="CompanyModel" ValueChange="OnCompanyChanged" />
+		<AutoCompleteFieldSettings Value="Name" />
+	</SfAutoComplete>
+
+	<SfAutoComplete Value="@_selectedParty"
+					TValue="LedgerModel"
+					TItem="LedgerModel"
+					DataSource="@_parties"
+					Autofill="true"
+					Placeholder="Select a Party For Purchase"
+					FloatLabelType="FloatLabelType.Auto"
+					AllowFiltering="true"
+					FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
+		<AutoCompleteEvents TItem="LedgerModel" TValue="LedgerModel" ValueChange="OnPartyChanged" />
+		<AutoCompleteFieldSettings Value="Name" />
+	</SfAutoComplete>
+
+	<SfDatePicker Value="@_purchase.TransactionDateTime"
+				  TValue="DateTime"
+				  Format="dd/MM/yy"
+				  Placeholder="Select Purchase Date"
+				  FloatLabelType="FloatLabelType.Auto">
+		<DatePickerEvents TValue="DateTime" ValueChange="OnTransactionDateChanged" />
+	</SfDatePicker>
+
+	<SfTextBox Value="@($"{_selectedFinancialYear?.StartDate:yyyy} to {_selectedFinancialYear?.EndDate:yyyy}")"
+			   Readonly="true"
+			   Placeholder="Financial Year"
+			   FloatLabelType="FloatLabelType.Auto" />
+
+	<SfTextBox @bind-Value="_purchase.TransactionNo"
+			   Placeholder="Enter the Transaction No"
+			   FloatLabelType="FloatLabelType.Auto" />
+
+	<SfTextBox @bind-Value="_purchase.Remarks"
+			   Multiline="true"
+			   Placeholder="Enter the Transaction Remarks (Narration)"
+			   FloatLabelType="FloatLabelType.Auto" />
+
+	<SfNumericTextBox Value="@_itemBaseTotal"
+					  Readonly="true"
+					  TValue="decimal"
+					  Decimals="2"
+					  Placeholder="Base Total of The Items"
+					  FloatLabelType="FloatLabelType.Auto" />
+
+	<SfNumericTextBox Value="@_itemDiscountTotal"
+					  Readonly="true"
+					  TValue="decimal"
+					  Decimals="2"
+					  Placeholder="Total Discount Amount of The Items"
+					  FloatLabelType="FloatLabelType.Auto" />
+
+	<SfNumericTextBox Value="@_itemAfterDiscountTotal"
+					  Readonly="true"
+					  TValue="decimal"
+					  Decimals="2"
+					  Placeholder="Total After Individual Item Discount"
+					  FloatLabelType="FloatLabelType.Auto" />
+
+	<SfNumericTextBox Value="@_itemTaxTotal"
+					  Readonly="true"
+					  TValue="decimal"
+					  Decimals="2"
+					  Placeholder="Total Tax Amount of The Items"
+					  FloatLabelType="FloatLabelType.Auto" />
+
+	<SfNumericTextBox Value="@_itemAfterTaxTotal"
+					  Readonly="true"
+					  TValue="decimal"
+					  Decimals="2"
+					  Placeholder="Total After Individual Item Tax"
+					  FloatLabelType="FloatLabelType.Auto" />
+
+	<SfNumericTextBox Value="@_purchase.OtherChargesPercent"
+					  TValue="decimal"
+					  Max="100"
+					  Min="0"
+					  Decimals="2"
+					  Placeholder="Enter Other Charges Percent"
+					  FloatLabelType="FloatLabelType.Auto">
+		<NumericTextBoxEvents TValue="decimal" ValueChange="OnOtherDiscountPercentChanged" />
+	</SfNumericTextBox>
+
+	<SfNumericTextBox Value="@_purchase.OtherChargesAmount"
+					  Readonly="true"
+					  TValue="decimal"
+					  Decimals="2"
+					  Placeholder="Other Charges Amount"
+					  FloatLabelType="FloatLabelType.Auto" />
+
+	<SfNumericTextBox Value="@_purchase.CashDiscountPercent"
+					  TValue="decimal"
+					  Max="100"
+					  Min="0"
+					  Decimals="2"
+					  Placeholder="Enter Cash Discount Percent"
+					  FloatLabelType="FloatLabelType.Auto">
+		<NumericTextBoxEvents TValue="decimal" ValueChange="OnCashDiscountPercentChanged" />
+	</SfNumericTextBox>
+
+	<SfNumericTextBox Value="@_purchase.CashDiscountAmount"
+					  Readonly="true"
+					  TValue="decimal"
+					  Decimals="2"
+					  Placeholder="Cash Discount Amount"
+					  FloatLabelType="FloatLabelType.Auto" />
+
+	<SfNumericTextBox Value="@_purchase.RoundOffAmount"
+					  TValue="decimal"
+					  Decimals="2"
+					  Placeholder="Enter Round Off Amount"
+					  FloatLabelType="FloatLabelType.Auto">
+		<NumericTextBoxEvents TValue="decimal" ValueChange="OnRoundOffAmountChanged" />
+	</SfNumericTextBox>
+
+	<SfNumericTextBox Value="@_purchase.TotalAmount"
+					  Readonly="true"
+					  TValue="decimal"
+					  Decimals="2"
+					  Placeholder="Final Purchase Amount"
+					  FloatLabelType="FloatLabelType.Auto" />
+
+	<SfAutoComplete @ref="_sfItemAutoComplete"
+					Value="@_selectedItem"
+					TValue="ItemModel?"
+					TItem="ItemModel"
+					DataSource="@_items"
+					Autofill="true"
+					Placeholder="Select an Item For Purchase"
+					FloatLabelType="FloatLabelType.Auto"
+					AllowFiltering="true"
+					FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
+		<AutoCompleteEvents TItem="ItemModel" TValue="ItemModel?" ValueChange="OnItemChanged" />
+		<AutoCompleteFieldSettings Value="Name" />
+	</SfAutoComplete>
+
+	<SfNumericTextBox Value="@_selectedCart.Quantity"
+					  TValue="decimal"
+					  Decimals="2"
+					  Min="0"
+					  Placeholder="Quantity"
+					  FloatLabelType="FloatLabelType.Auto">
+		<NumericTextBoxEvents TValue="decimal" ValueChange="OnItemQuantityChanged" />
+	</SfNumericTextBox>
+
+	<SfNumericTextBox Value="@_selectedCart.Rate"
+					  TValue="decimal"
+					  Decimals="2"
+					  Min="0"
+					  Placeholder="Rate"
+					  FloatLabelType="FloatLabelType.Auto">
+		<NumericTextBoxEvents TValue="decimal" ValueChange="OnItemRateChanged" />
+	</SfNumericTextBox>
+
+	<SfNumericTextBox Value="@_selectedCart.BaseTotal"
+					  TValue="decimal"
+					  Decimals="2"
+					  Min="0"
+					  Readonly="true"
+					  Placeholder="Base Total"
+					  FloatLabelType="FloatLabelType.Auto" />
+
+	<SfTextBox @bind-Value="_selectedCart.UnitOfMeasurement"
+			   Placeholder="UOM"
+			   FloatLabelType="FloatLabelType.Auto" />
+
+	<SfNumericTextBox Value="@_selectedCart.DiscountPercent"
+					  TValue="decimal"
+					  Decimals="2"
+					  Min="0"
+					  Max="100"
+					  Placeholder="Disc %"
+					  FloatLabelType="FloatLabelType.Auto">
+		<NumericTextBoxEvents TValue="decimal" ValueChange="OnItemDiscountPercentChanged" />
+	</SfNumericTextBox>
+
+	<SfNumericTextBox Value="@_selectedCart.DiscountAmount"
+					  TValue="decimal"
+					  Decimals="2"
+					  Readonly="true"
+					  Placeholder="Disc Amt"
+					  FloatLabelType="FloatLabelType.Auto" />
+
+	<SfNumericTextBox Value="@_selectedCart.AfterDiscount"
+					  TValue="decimal"
+					  Decimals="2"
+					  Readonly="true"
+					  Placeholder="After Disc"
+					  FloatLabelType="FloatLabelType.Auto" />
+
+	<SfNumericTextBox Value="@_selectedCart.CGSTPercent"
+					  TValue="decimal"
+					  Decimals="2"
+					  Min="0"
+					  Max="100"
+					  Placeholder="CGST"
+					  FloatLabelType="FloatLabelType.Auto">
+		<NumericTextBoxEvents TValue="decimal" ValueChange="OnItemCGSTPercentChanged" />
+	</SfNumericTextBox>
+
+	<SfNumericTextBox Value="@_selectedCart.CGSTAmount"
+					  TValue="decimal"
+					  Decimals="2"
+					  Readonly="true"
+					  Placeholder="CGST Amt"
+					  FloatLabelType="FloatLabelType.Auto" />
+
+	<SfNumericTextBox Value="@_selectedCart.SGSTPercent"
+					  TValue="decimal"
+					  Decimals="2"
+					  Min="0"
+					  Max="100"
+					  Placeholder="SGST"
+					  FloatLabelType="FloatLabelType.Auto">
+		<NumericTextBoxEvents TValue="decimal" ValueChange="OnItemSGSTPercentChanged" />
+	</SfNumericTextBox>
+
+	<SfNumericTextBox Value="@_selectedCart.SGSTAmount"
+					  TValue="decimal"
+					  Decimals="2"
+					  Readonly="true"
+					  Placeholder="SGST Amt"
+					  FloatLabelType="FloatLabelType.Auto" />
+
+	<SfNumericTextBox Value="@_selectedCart.IGSTPercent"
+					  TValue="decimal"
+					  Decimals="2"
+					  Min="0"
+					  Max="100"
+					  Placeholder="IGST"
+					  FloatLabelType="FloatLabelType.Auto">
+		<NumericTextBoxEvents TValue="decimal" ValueChange="OnItemIGSTPercentChanged" />
+	</SfNumericTextBox>
+
+	<SfNumericTextBox Value="@_selectedCart.IGSTAmount"
+					  TValue="decimal"
+					  Decimals="2"
+					  Readonly="true"
+					  Placeholder="IGST Amt"
+					  FloatLabelType="FloatLabelType.Auto" />
+
+	<SfNumericTextBox Value="@_selectedCart.TotalTaxAmount"
+					  TValue="decimal"
+					  Decimals="2"
+					  Readonly="true"
+					  Placeholder="Tax Amt"
+					  FloatLabelType="FloatLabelType.Auto" />
+
+	<SfCheckBox @bind-Checked="_selectedCart.InclusiveTax"
+				Label="Tax Inclusive" 
+				TChecked="bool"
+				ValueChange="OnItemInclusiveTaxChanged"/>
+
+	<SfNumericTextBox Value="@_selectedCart.Total"
+					  TValue="decimal"
+					  Decimals="2"
+					  Readonly="true"
+					  Placeholder="Total"
+					  FloatLabelType="FloatLabelType.Auto" />
+
+	<SfTextBox @bind-Value="_selectedCart.Remarks"
+			   Multiline="true"
+			   Placeholder="Item Remarks"
+			   FloatLabelType="FloatLabelType.Auto" />
+
+	<SfButton Content="Add" OnClick="AddItemToCart" />
+
+	<SfGrid ID="_sfCartGrid"
+			@ref="_sfCartGrid"
+			DataSource="_cart" />
+}
+
+<SfToast @ref="_sfErrorToast"
+		 ID="_sfErrorToast"
+		 Title="@_errorTitle"
+		 Content="@_errorMessage"
+		 Timeout="5000">
+	<ToastPosition X="Right" Y="Top" />
+	<ToastShowAnimationSettings Effect="ToastEffect.SlideLeftIn" />
+	<ToastHideAnimationSettings Effect="ToastEffect.SlideRightOut" />
+</SfToast>
+
+<SfToast @ref="_sfSuccessToast"
+		 ID="_sfSuccessToast"
+		 Title="@_successTitle"
+		 Content="@_successMessage"
+		 Timeout="5000">
+	<ToastPosition X="Right" Y="Top" />
+	<ToastShowAnimationSettings Effect="ToastEffect.SlideLeftIn" />
+	<ToastHideAnimationSettings Effect="ToastEffect.SlideRightOut" />
+</SfToast>

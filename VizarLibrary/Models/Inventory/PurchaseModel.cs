@@ -9,10 +9,10 @@ public class PurchaseModel
 	public DateTime TransactionDateTime { get; set; }
 	public int FinancialYearId { get; set; }
 	public decimal ItemsTotalAmount { get; set; }
-	public decimal CashDiscountPercent { get; set; }
-	public decimal CashDiscountAmount { get; set; }
 	public decimal OtherChargesPercent { get; set; }
 	public decimal OtherChargesAmount { get; set; }
+	public decimal CashDiscountPercent { get; set; }
+	public decimal CashDiscountAmount { get; set; }
 	public decimal RoundOffAmount { get; set; }
 	public decimal TotalAmount { get; set; }
 	public string? Remarks { get; set; }
@@ -56,6 +56,7 @@ public class PurchaseItemCartModel
 {
 	public int ItemId { get; set; }
 	public string ItemName { get; set; }
+	public string? IdentificationNo { get; set; }
 	public decimal Quantity { get; set; }
 	public string UnitOfMeasurement { get; set; }
 	public decimal Rate { get; set; }

@@ -16,5 +16,9 @@ BEGIN
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ItemTypeCodePrefix'				, N'ITTY'	, N'Prefix for Item Type Codes')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ItemCodePrefix'					, N'IT'		, N'Prefix for Item Codes')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ManufacturerCodePrefix'			, N'MFR'	, N'Prefix for Manufacturer Codes')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'PurchaseTransactionPrefix'		, N'PUR'	, N'Prefix for Purchase Transaction Numbers')
+
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'UpdateItemMasterRateOnPurchase'	, N'true'	, N'Update Item Master Rate on Purchase Transactions')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'UpdateItemMasterUOMOnPurchase'	, N'true'	, N'Update Item Master Unit of Measurement on Purchase Transactions')
 
 END

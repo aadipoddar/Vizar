@@ -4,7 +4,7 @@
     [PurchaseId] INT NOT NULL,
 	[ItemId] INT NOT NULL,
 	[IdentificationNo] VARCHAR(MAX) NULL,
-	[Quantity] DECIMAL(7, 3) NOT NULL DEFAULT 1,
+	[Quantity] MONEY NOT NULL DEFAULT 1,
 	[UnitOfMeasurement] VARCHAR(20) NOT NULL,
 	[Rate] MONEY NOT NULL,
 	[BaseTotal] MONEY NOT NULL DEFAULT 0,

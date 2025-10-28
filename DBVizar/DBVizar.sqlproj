@@ -72,6 +72,8 @@
     <Folder Include="StoredProcedures\LoadData\Accounts" />
     <Folder Include="StoredProcedures\Insert\Items" />
     <Folder Include="StoredProcedures\Insert\Accounts" />
+    <Folder Include="StoredProcedures\Insert\Inventory" />
+    <Folder Include="StoredProcedures\LoadData\Inventory" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="StoredProcedures\Insert\Common\Insert_User.sql" />
@@ -106,6 +108,11 @@
     <Build Include="StoredProcedures\Insert\Items\Insert_Manufacturer.sql" />
     <Build Include="StoredProcedures\Insert\Items\Insert_Item.sql" />
     <Build Include="StoredProcedures\Insert\Accounts\Insert_Ledger.sql" />
+    <Build Include="StoredProcedures\Insert\Inventory\Insert_Purchase.sql" />
+    <Build Include="StoredProcedures\Insert\Inventory\Insert_PurchaseDetail.sql" />
+    <Build Include="StoredProcedures\LoadData\Inventory\Load_PurchaseDetail_By_Purchase.sql" />
+    <Build Include="StoredProcedures\LoadData\Common\Load_LastTableData_By_FinancialYear.sql" />
+    <Build Include="StoredProcedures\LoadData\Common\Load_TableData_By_TransactionNo.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalVizar.publish.xml" />

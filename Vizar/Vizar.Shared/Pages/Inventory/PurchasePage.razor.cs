@@ -6,8 +6,10 @@ using Syncfusion.Blazor.Notifications;
 
 using Vizar.Shared.Services;
 
+using VizarLibrary.Data;
 using VizarLibrary.Data.Accounts;
 using VizarLibrary.Data.Common;
+using VizarLibrary.Data.Inventory;
 using VizarLibrary.Data.Item;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Models.Accounts;
@@ -23,6 +25,7 @@ public partial class PurchasePage
 
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
+	private bool _autoGenerateTransactionNo = false;
 
 	private decimal _itemBaseTotal = 0;
 	private decimal _itemDiscountTotal = 0;
@@ -266,6 +269,12 @@ public partial class PurchasePage
 		await SavePurchaseFile();
 	}
 
+	private async Task OnAutoGenerateTransactionNoChecked(Syncfusion.Blazor.Buttons.ChangeEventArgs<bool> args)
+	{
+		_autoGenerateTransactionNo = args.Checked;
+		await SavePurchaseFile();
+	}
+
 	private async Task OnCashDiscountPercentChanged(Syncfusion.Blazor.Inputs.ChangeEventArgs<decimal> args)
 	{
 		_purchase.CashDiscountPercent = args.Value;
@@ -304,7 +313,6 @@ public partial class PurchasePage
 		_selectedItem = args.Value;
 
 		if (_selectedItem is null)
-		{
 			_selectedCart = new()
 			{
 				ItemId = 0,
@@ -317,21 +325,19 @@ public partial class PurchasePage
 				SGSTPercent = 0,
 				IGSTPercent = 0
 			};
-		}
 
 		else
-			_selectedCart = new()
-			{
-				ItemId = _selectedItem.Id,
-				ItemName = _selectedItem.Name,
-				Quantity = 1,
-				UnitOfMeasurement = _selectedItem.UnitOfMeasurement,
-				Rate = _selectedItem.Rate,
-				DiscountPercent = 0,
-				CGSTPercent = _taxes.FirstOrDefault(s => s.Id == _selectedItem.TaxId).CGST,
-				SGSTPercent = _taxes.FirstOrDefault(s => s.Id == _selectedItem.TaxId).SGST,
-				IGSTPercent = _taxes.FirstOrDefault(s => s.Id == _selectedItem.TaxId).IGST
-			};
+		{
+			_selectedCart.ItemId = _selectedItem.Id;
+			_selectedCart.ItemName = _selectedItem.Name;
+			_selectedCart.Quantity = 1;
+			_selectedCart.UnitOfMeasurement = _selectedItem.UnitOfMeasurement;
+			_selectedCart.Rate = _selectedItem.Rate;
+			_selectedCart.DiscountPercent = 0;
+			_selectedCart.CGSTPercent = _taxes.FirstOrDefault(s => s.Id == _selectedItem.TaxId).CGST;
+			_selectedCart.SGSTPercent = _taxes.FirstOrDefault(s => s.Id == _selectedItem.TaxId).SGST;
+			_selectedCart.IGSTPercent = _taxes.FirstOrDefault(s => s.Id == _selectedItem.TaxId).IGST;
+		}
 
 		UpdateSelectedItemFinancialDetails();
 	}
@@ -405,8 +411,11 @@ public partial class PurchasePage
 
 	private async Task AddItemToCart()
 	{
-		if (_selectedItem is null)
+		if (_selectedItem is null || _selectedItem.Id <= 0 || _selectedCart.Quantity <= 0 || _selectedCart.Rate < 0 || _selectedCart.DiscountPercent < 0 || _selectedCart.CGSTPercent < 0 || _selectedCart.SGSTPercent < 0 || _selectedCart.IGSTPercent < 0 || _selectedCart.Total < 0)
+		{
+			await ShowToast("Invalid Item Details", "Please ensure all item details are correctly filled before adding to the cart.", "error");
 			return;
+		}
 
 		UpdateSelectedItemFinancialDetails();
 
@@ -425,21 +434,72 @@ public partial class PurchasePage
 			{
 				ItemId = _selectedCart.ItemId,
 				ItemName = _selectedCart.ItemName,
+				IdentificationNo = _selectedCart.IdentificationNo,
 				Quantity = _selectedCart.Quantity,
 				UnitOfMeasurement = _selectedCart.UnitOfMeasurement,
 				Rate = _selectedCart.Rate,
 				DiscountPercent = _selectedCart.DiscountPercent,
 				CGSTPercent = _selectedCart.CGSTPercent,
 				SGSTPercent = _selectedCart.SGSTPercent,
-				IGSTPercent = _selectedCart.IGSTPercent
+				IGSTPercent = _selectedCart.IGSTPercent,
+				InclusiveTax = _selectedCart.InclusiveTax,
+				Remarks = _selectedCart.Remarks
 			});
 
 		_selectedItem = null;
 		_selectedCart = new();
 
 		await _sfItemAutoComplete.FocusAsync();
-
 		await SavePurchaseFile();
+	}
+
+	private async Task EditCartItem(PurchaseItemCartModel cartItem)
+	{
+		_selectedItem = _items.FirstOrDefault(s => s.Id == cartItem.ItemId);
+
+		if (_selectedItem is null)
+			return;
+
+		_selectedCart = new()
+		{
+			ItemId = cartItem.ItemId,
+			ItemName = cartItem.ItemName,
+			IdentificationNo = cartItem.IdentificationNo,
+			Quantity = cartItem.Quantity,
+			UnitOfMeasurement = cartItem.UnitOfMeasurement,
+			Rate = cartItem.Rate,
+			DiscountPercent = cartItem.DiscountPercent,
+			CGSTPercent = cartItem.CGSTPercent,
+			SGSTPercent = cartItem.SGSTPercent,
+			IGSTPercent = cartItem.IGSTPercent,
+			InclusiveTax = cartItem.InclusiveTax,
+			Remarks = cartItem.Remarks
+		};
+
+		await _sfItemAutoComplete.FocusAsync();
+		UpdateSelectedItemFinancialDetails();
+		await RemoveItemFromCart(cartItem);
+	}
+
+	private async Task RemoveItemFromCart(PurchaseItemCartModel cartItem)
+	{
+		_cart.Remove(cartItem);
+		await SavePurchaseFile();
+	}
+
+	private async Task ClearCart()
+	{
+		if (_cart.Count == 0)
+		{
+			await ShowToast("Cart Empty", "The cart is already empty.", "error");
+			return;
+		}
+
+		_cart.Clear();
+		_selectedItem = null;
+		_selectedCart = new();
+		await SavePurchaseFile();
+		await ShowToast("Cart Cleared", "All items have been removed from the cart.", "success");
 	}
 	#endregion
 
@@ -497,6 +557,9 @@ public partial class PurchasePage
 			_purchase.FinancialYearId = _selectedFinancialYear.Id;
 		}
 		#endregion
+
+		if (_autoGenerateTransactionNo)
+			_purchase.TransactionNo = await GenerateCodes.GeneratePurchaseTransactionNo(_purchase);
 	}
 
 	private async Task SavePurchaseFile(bool customRoundOff = false)
@@ -524,6 +587,107 @@ public partial class PurchasePage
 
 			StateHasChanged();
 
+			_isProcessing = false;
+		}
+	}
+
+	private async Task<bool> ValidateForm()
+	{
+		if (_cart.Count == 0)
+		{
+			await ShowToast("Cart is Empty", "Please add at least one item to the cart before saving the transaction.", "error");
+			return false;
+		}
+
+		if (_selectedCompany is null || _purchase.CompanyId <= 0)
+		{
+			await ShowToast("Company Not Selected", "Please select a company for the purchase transaction.", "error");
+			return false;
+		}
+
+		if (_selectedParty is null || _purchase.PartyId <= 0)
+		{
+			await ShowToast("Party Not Selected", "Please select a party ledger for the purchase transaction.", "error");
+			return false;
+		}
+
+		if (string.IsNullOrEmpty(_purchase.TransactionNo) || string.IsNullOrWhiteSpace(_purchase.TransactionNo))
+		{
+			await ShowToast("Transaction Number Missing", "Please enter a transaction number for the purchase.", "error");
+			return false;
+		}
+
+		if (_purchase.TransactionDateTime == default)
+		{
+			await ShowToast("Transaction Date Missing", "Please select a valid transaction date for the purchase.", "error");
+			return false;
+		}
+
+		if (_selectedFinancialYear is null || _purchase.FinancialYearId <= 0)
+		{
+			await ShowToast("Financial Year Not Found", "The transaction date does not fall within any financial year. Please check the date and try again.", "error");
+			return false;
+		}
+
+		if (_selectedFinancialYear.Locked)
+		{
+			await ShowToast("Financial Year Locked", "The financial year for the selected transaction date is locked. Please select a different date.", "error");
+			return false;
+		}
+
+		if (_selectedFinancialYear.Status == false)
+		{
+			await ShowToast("Financial Year Inactive", "The financial year for the selected transaction date is inactive. Please select a different date.", "error");
+			return false;
+		}
+
+		if (_purchase.TotalAmount <= 0)
+		{
+			await ShowToast("Invalid Total Amount", "The total amount of the purchase transaction must be greater than zero.", "error");
+			return false;
+		}
+
+		return true;
+	}
+
+	private async Task SaveTransaction()
+	{
+		if (_isProcessing || _isLoading)
+			return;
+
+		try
+		{
+			_isProcessing = true;
+
+			await SavePurchaseFile(true);
+
+			if (!await ValidateForm())
+			{
+				_isProcessing = false;
+				return;
+			}
+
+			_purchase.Status = true;
+			var currentDateTime = await CommonData.LoadCurrentDateTime();
+			_purchase.TransactionDateTime = DateOnly.FromDateTime(_purchase.TransactionDateTime).ToDateTime(new TimeOnly(currentDateTime.Hour, currentDateTime.Minute, currentDateTime.Second));
+			_purchase.LastModifiedAt = currentDateTime;
+			_purchase.CreatedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
+			_purchase.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
+			_purchase.UserId = _user.Id;
+			_purchase.LastModifiedBy = _user.Id;
+
+			_purchase.Id = await PurchaseData.SavePurchaseTransaction(_purchase, _cart);
+			await DeleteLocalFiles();
+			NavigationManager.NavigateTo(NavigationManager.Uri, true);
+
+			await ShowToast("Save Transaction", "Transaction saved successfully!", "success");
+		}
+		catch (Exception ex)
+		{
+			await ShowToast("An Error Occurred While Saving Transaction", ex.Message, "error");
+		}
+		finally
+		{
 			_isProcessing = false;
 		}
 	}
