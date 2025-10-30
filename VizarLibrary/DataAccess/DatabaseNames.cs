@@ -33,6 +33,7 @@ public static class StoredProcedureNames
 	public static string LoadItemByPartyPurchaseDateTime => "Load_Item_By_Party_PurchaseDateTime";
 
 	public static string LoadPurchaseDetailByPurchase => "Load_PurchaseDetail_By_Purchase";
+	public static string LoadPurchaseOverviewByDate => "Load_PurchaseOverview_By_Date";
 
 	public static string InsertUser => "Insert_User";
 	public static string ResetSettings => "Reset_Settings";
@@ -51,4 +52,5 @@ public static class StoredProcedureNames
 
 public static class ViewNames
 {
+	public static string PurchaseOverview => "Purchase_Overview";
 }

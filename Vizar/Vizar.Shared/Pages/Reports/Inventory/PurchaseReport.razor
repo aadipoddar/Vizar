@@ -1,0 +1,66 @@
+﻿@page "/report/inventory/purchase"
+
+@using VizarLibrary.Models.Common
+@using VizarLibrary.Models.Accounts
+@using VizarLibrary.Models.Inventory
+
+<PageTitle>Purchase Report - Vizar</PageTitle>
+
+@if (_isLoading)
+{
+	<SfSpinner @bind-Visible="_isLoading" Label="Page is Loading, Please Wait" />
+}
+else
+{
+	<SfDateRangePicker StartDate="_fromDate"
+					   EndDate="_toDate"
+					   TValue="DateTime"
+					   Format="dd/MM/yyyy"
+					   AllowEdit="true"
+					   Placeholder="Select a date range">
+		<DateRangePickerEvents TValue="DateTime" ValueChange="OnDateRangeChanged" />
+	</SfDateRangePicker>
+
+	<SfAutoComplete Value="@_selectedCompany"
+					TValue="CompanyModel"
+					TItem="CompanyModel"
+					DataSource="@_companies"
+					Autofill="true"
+					Placeholder="Select a Company"
+					AllowFiltering="true"
+					FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
+		<AutoCompleteEvents TItem="CompanyModel" TValue="CompanyModel" ValueChange="OnCompanyChanged" />
+		<AutoCompleteFieldSettings Value="Name" />
+	</SfAutoComplete>
+
+	<SfAutoComplete Value="@_selectedParty"
+					TValue="LedgerModel"
+					TItem="LedgerModel"
+					DataSource="@_parties"
+					Autofill="true"
+					Placeholder="Select a Party"
+					AllowFiltering="true"
+					FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
+		<AutoCompleteEvents TItem="LedgerModel" TValue="LedgerModel" ValueChange="OnPartyChanged" />
+		<AutoCompleteFieldSettings Value="Name" />
+	</SfAutoComplete>
+
+	<SfButton OnClick="ExportExcel" Content="@(_isProcessing ? "Processing..." : "Export to Excel")" Disabled="@_isProcessing" />
+	<SfButton OnClick="ExportPdf" Content="@(_isProcessing ? " Processing..." : "Export to PDF")" Disabled="@_isProcessing" />
+	<SfButton OnClick="ExportPowerBI" Content="@(_isProcessing ? " Processing..." : "Export to Power BI")" Disabled="@_isProcessing" />
+
+	<SfGrid ID="_sfPurchaseGrid"
+			@ref="_sfPurchaseGrid"
+			TValue="PurchaseOverviewModel"
+			DataSource="_purchaseOverviews" />
+}
+
+<SfToast @ref="_sfErrorToast"
+		 ID="_sfErrorToast"
+		 Title="@_errorTitle"
+		 Content="@_errorMessage"
+		 Timeout="5000">
+	<ToastPosition X="Right" Y="Top" />
+	<ToastShowAnimationSettings Effect="ToastEffect.SlideLeftIn" />
+	<ToastHideAnimationSettings Effect="ToastEffect.SlideRightOut" />
+</SfToast>

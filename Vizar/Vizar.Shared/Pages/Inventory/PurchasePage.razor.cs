@@ -706,51 +706,6 @@ public partial class PurchasePage
 	}
 	#endregion
 
-	#region Utilities
-	private async Task NavigateToTransactionHistoryPage()
-	{
-		if (FormFactor.GetFormFactor() == "Web")
-			await JSRuntime.InvokeVoidAsync("open", "/report/inventory/purchase", "_blank");
-		else
-			NavigationManager.NavigateTo("/report/inventory/purchase");
-	}
-
-	private async Task NavigateToHelpPage()
-	{
-		if (FormFactor.GetFormFactor() == "Web")
-			await JSRuntime.InvokeVoidAsync("open", "/help/inventory/purchase", "_blank");
-		else
-			NavigationManager.NavigateTo("/help/inventory/purchase");
-	}
-
-	private async Task ShowToast(string title, string message, string type)
-	{
-		VibrationService.VibrateWithTime(200);
-
-		if (type == "error")
-		{
-			_errorTitle = title;
-			_errorMessage = message;
-			await _sfErrorToast.ShowAsync(new()
-			{
-				Title = _errorTitle,
-				Content = _errorMessage
-			});
-		}
-
-		else if (type == "success")
-		{
-			_successTitle = title;
-			_successMessage = message;
-			await _sfSuccessToast.ShowAsync(new()
-			{
-				Title = _successTitle,
-				Content = _successMessage
-			});
-		}
-	}
-	#endregion
-
 	#region Uploading Document
 	private void UploadDocument()
 	{
@@ -837,6 +792,51 @@ public partial class PurchasePage
 		catch (Exception ex)
 		{
 			await ShowToast("An Error Occurred While Interpreting Files", ex.Message, "error");
+		}
+	}
+	#endregion
+
+	#region Utilities
+	private async Task NavigateToTransactionHistoryPage()
+	{
+		if (FormFactor.GetFormFactor() == "Web")
+			await JSRuntime.InvokeVoidAsync("open", "/report/inventory/purchase", "_blank");
+		else
+			NavigationManager.NavigateTo("/report/inventory/purchase");
+	}
+
+	private async Task NavigateToHelpPage()
+	{
+		if (FormFactor.GetFormFactor() == "Web")
+			await JSRuntime.InvokeVoidAsync("open", "/help/inventory/purchase", "_blank");
+		else
+			NavigationManager.NavigateTo("/help/inventory/purchase");
+	}
+
+	private async Task ShowToast(string title, string message, string type)
+	{
+		VibrationService.VibrateWithTime(200);
+
+		if (type == "error")
+		{
+			_errorTitle = title;
+			_errorMessage = message;
+			await _sfErrorToast.ShowAsync(new()
+			{
+				Title = _errorTitle,
+				Content = _errorMessage
+			});
+		}
+
+		else if (type == "success")
+		{
+			_successTitle = title;
+			_successMessage = message;
+			await _sfSuccessToast.ShowAsync(new()
+			{
+				Title = _successTitle,
+				Content = _successMessage
+			});
 		}
 	}
 	#endregion

@@ -424,7 +424,35 @@
 			</div>
 			<div class="help-text">
 				<div class="button-explanation">
-					<h4>💾 Save Transaction (Blue Button)</h4>
+					<h4>� Upload Document (Blue Button)</h4>
+					<p><strong>Purpose:</strong> Attach the original purchase invoice, bill, or receipt to the purchase order for record keeping.</p>
+					<p><strong>What it does:</strong></p>
+					<ul>
+						<li>Opens a professional dialog for document management</li>
+						<li>Allows uploading documents up to 50MB in size</li>
+						<li>Stores documents securely in Azure Blob Storage</li>
+						<li>Supports multiple file formats: PDF, DOC, DOCX, JPG, JPEG, PNG</li>
+						<li>Provides download and remove functionality for uploaded documents</li>
+					</ul>
+					<p><strong>How to use:</strong></p>
+					<ol>
+						<li>Click the "Upload Document" button in the action buttons section</li>
+						<li>In the dialog, either drag and drop your file or click "Browse" to select a file</li>
+						<li>The file will automatically upload and be linked to the purchase order</li>
+						<li>Once uploaded, you can download, interpret, or remove the document</li>
+					</ol>
+					<p><strong>Document Actions:</strong></p>
+					<ul>
+						<li><strong>Download:</strong> Downloads the uploaded document to your device</li>
+						<li><strong>Interpret:</strong> AI-powered document analysis (coming soon)</li>
+						<li><strong>Remove:</strong> Deletes the document from storage and unlinks it from the order</li>
+					</ul>
+					<p class="note-text"><strong>Best Practice:</strong> Upload original invoices immediately to maintain accurate records and enable future auditing.</p>
+					<p class="warning-text">⚠️ Maximum file size: 50MB. Supported formats: PDF, Word, Images (JPG, PNG).</p>
+				</div>
+
+				<div class="button-explanation">
+					<h4>�💾 Save Transaction (Blue Button)</h4>
 					<p><strong>Purpose:</strong> Finalizes and saves the purchase order to the database.</p>
 					<p><strong>What it does:</strong></p>
 					<ul>
@@ -458,11 +486,187 @@
 						<li>Resets financial summary calculations</li>
 						<li>Does NOT clear transaction summary fields (Company, Party, Date, etc.)</li>
 					</ul>
-					<p><strong>When to use:</strong> If you want to start over with item selection but keep the transaction header details.</p>
-					<p class="warning-text">⚠️ Warning: This action cannot be undone. All items will be removed from the cart.</p>
+				<p><strong>When to use:</strong> If you want to start over with item selection but keep the transaction header details.</p>
+				<p class="warning-text">⚠️ Warning: This action cannot be undone. All items will be removed from the cart.</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- Upload Document Section -->
+	<section class="help-section">
+		<div class="section-header-help">
+			<svg class="section-icon-help" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+				<polyline points="17 8 12 3 7 8" />
+				<line x1="12" y1="3" x2="12" y2="15" />
+			</svg>
+			<h2>Upload Document</h2>
+		</div>
+		<div class="help-text">
+			<p>The Upload Document feature allows you to attach original purchase invoices, bills, or receipts directly to your purchase order. This ensures proper documentation and enables future reference and auditing.</p>
+
+			<h3>Why Upload Documents?</h3>
+			<div class="feature-grid">
+				<div class="feature-card">
+					<h4>📋 Record Keeping</h4>
+					<p>Maintain complete purchase documentation in one place for easy retrieval and audit trails.</p>
+				</div>
+				<div class="feature-card">
+					<h4>🔍 Verification</h4>
+					<p>Cross-reference entered data with original documents to ensure accuracy.</p>
+				</div>
+				<div class="feature-card">
+					<h4>📊 Compliance</h4>
+					<p>Meet regulatory requirements for document retention and tax compliance.</p>
+				</div>
+				<div class="feature-card">
+					<h4>🤖 Future AI Analysis</h4>
+					<p>Enable AI-powered document interpretation for automated data entry (coming soon).</p>
 				</div>
 			</div>
-		</section>
+
+			<h3>How to Upload Documents:</h3>
+			<div class="workflow-steps">
+				<div class="workflow-step">
+					<div class="step-number">1</div>
+					<div class="step-content">
+						<h4>Access Upload Dialog</h4>
+						<ul>
+							<li>Click the "Upload Document" button (blue button with upload icon)</li>
+							<li>Located in the action buttons section below the transaction summary</li>
+							<li>The professional upload dialog will open</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="workflow-step">
+					<div class="step-number">2</div>
+					<div class="step-content">
+						<h4>Upload Your File</h4>
+						<ul>
+							<li><strong>Drag & Drop:</strong> Simply drag your file into the upload area</li>
+							<li><strong>Browse:</strong> Click the "Browse" button to select a file from your computer</li>
+							<li>The file will automatically start uploading (no need to click upload button)</li>
+							<li>You'll see a progress indicator during upload</li>
+							<li>Success message appears when upload completes</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="workflow-step">
+					<div class="step-number">3</div>
+					<div class="step-content">
+						<h4>Manage Uploaded Document</h4>
+						<ul>
+							<li><strong>Download:</strong> Click the blue "Download" button to save the document to your device</li>
+							<li><strong>Interpret:</strong> Click the purple "Interpret" button for AI analysis (feature coming soon)</li>
+							<li><strong>Remove:</strong> Click the red "Remove" button to delete the document and unlink it from the order</li>
+							<li>Document information displays: filename and upload status</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+
+			<h3>Supported File Formats:</h3>
+			<div class="field-explanation">
+				<h4>✓ Accepted File Types</h4>
+				<ul>
+					<li><strong>PDF Documents:</strong> .pdf (Recommended for invoices)</li>
+					<li><strong>Microsoft Word:</strong> .doc, .docx</li>
+					<li><strong>Images:</strong> .jpg, .jpeg, .png (For scanned documents or photos)</li>
+				</ul>
+				<p><strong>Maximum File Size:</strong> 50 MB per document</p>
+				<p class="note-text"><strong>Tip:</strong> PDF format is recommended for best compatibility and file size optimization.</p>
+			</div>
+
+			<h3>Document Security:</h3>
+			<div class="feature-item">
+				<h4>🔒 Secure Storage</h4>
+				<ul>
+					<li>All documents are stored in Azure Blob Storage with enterprise-grade security</li>
+					<li>Files are encrypted during transmission and at rest</li>
+					<li>Each file gets a unique identifier (GUID) to prevent naming conflicts</li>
+					<li>Access is controlled through the application - no direct public access</li>
+					<li>Documents are linked to specific purchase orders in the database</li>
+				</ul>
+			</div>
+
+			<h3>Common Upload Scenarios:</h3>
+			<div class="faq-item">
+				<h4>📸 Uploading Photos from Mobile Device</h4>
+				<p>If you're using a mobile device:</p>
+				<ol>
+					<li>Take a clear photo of the invoice using your device camera</li>
+					<li>Click "Upload Document" button</li>
+					<li>Click "Browse" and select "Camera" or "Photo Library"</li>
+					<li>Select or capture the image</li>
+					<li>The photo will upload automatically</li>
+				</ol>
+				<p class="note-text">Ensure the photo is clear, well-lit, and all text is readable.</p>
+			</div>
+
+			<div class="faq-item">
+				<h4>🖥️ Uploading Scanned Documents from Desktop</h4>
+				<p>For scanned PDFs or documents:</p>
+				<ol>
+					<li>Scan the original invoice/receipt using your scanner</li>
+					<li>Save as PDF (recommended) or image format</li>
+					<li>Click "Upload Document" button in Vizar</li>
+					<li>Drag the file into the upload area OR click "Browse" to select it</li>
+					<li>Wait for upload confirmation</li>
+				</ol>
+			</div>
+
+			<div class="faq-item">
+				<h4>📧 Uploading Email Attachments</h4>
+				<p>If you received the invoice via email:</p>
+				<ol>
+					<li>Download the attachment from your email to your device</li>
+					<li>Open the Purchase Order page in Vizar</li>
+					<li>Click "Upload Document"</li>
+					<li>Select the downloaded file</li>
+					<li>Upload completes automatically</li>
+				</ol>
+			</div>
+
+			<h3>Replacing Documents:</h3>
+			<div class="field-explanation">
+				<h4>How to Replace an Uploaded Document</h4>
+				<p>If you need to upload a different or corrected version:</p>
+				<ol>
+					<li>Open the Upload Document dialog</li>
+					<li>Click the red "Remove" button to delete the current document</li>
+					<li>Confirm the removal</li>
+					<li>Upload the new document using the upload area</li>
+				</ol>
+				<p class="warning-text">⚠️ Note: Removing a document permanently deletes it from storage. This action cannot be undone.</p>
+			</div>
+
+			<div class="tip-box">
+				<strong>💡 Best Practices for Document Upload:</strong>
+				<ul>
+					<li>Upload documents immediately after creating the purchase order</li>
+					<li>Use PDF format when possible for best quality and smallest file size</li>
+					<li>Ensure scanned documents are clear and readable</li>
+					<li>Use descriptive filenames before uploading (e.g., "Invoice_ABC123_2024.pdf")</li>
+					<li>Verify the upload was successful before closing the dialog</li>
+					<li>For large files, ensure you have a stable internet connection</li>
+					<li>Keep original physical documents as per your company's retention policy</li>
+				</ul>
+			</div>
+
+			<div class="tip-box">
+				<strong>⚡ Quick Tips:</strong>
+				<ul>
+					<li><strong>Auto-Upload:</strong> Files automatically upload as soon as you select them - no upload button needed</li>
+					<li><strong>Progress Bar:</strong> Watch the progress bar to see upload status</li>
+					<li><strong>File List:</strong> Uploaded files show filename, size, and status</li>
+					<li><strong>Download Anytime:</strong> You can download documents later for review or sharing</li>
+					<li><strong>Mobile Friendly:</strong> Works seamlessly on desktop, tablet, and mobile devices</li>
+				</ul>
+			</div>
+		</div>
+	</section>
 
 		<!-- Data Persistence Section -->
 		<section class="help-section">
@@ -722,6 +926,52 @@
 				</div>
 			</div>
 		</section>
+
+		<div class="faq-item">
+			<h4>❓ My document upload failed. What should I do?</h4>
+			<p><strong>Common reasons and solutions:</strong></p>
+			<ul>
+				<li><strong>File too large:</strong> Maximum size is 50MB. Compress the file or split into smaller parts</li>
+				<li><strong>Unsupported format:</strong> Use PDF, DOC, DOCX, JPG, JPEG, or PNG only</li>
+				<li><strong>Network issue:</strong> Check your internet connection and try again</li>
+				<li><strong>Browser cache:</strong> Clear browser cache and refresh the page</li>
+				<li><strong>Timeout:</strong> For very large files on slow connections, try a smaller file size</li>
+			</ul>
+			<p class="note-text">If the problem persists, try converting the document to PDF and reducing the file size.</p>
+		</div>
+
+		<div class="faq-item">
+			<h4>❓ Can I upload multiple documents to one purchase order?</h4>
+			<p>Currently, each purchase order supports one document attachment. If you need to attach multiple documents:</p>
+			<ul>
+				<li>Combine them into a single PDF using a PDF merger tool</li>
+				<li>Upload the most important document (original invoice)</li>
+				<li>Store additional documents in your company's document management system</li>
+			</ul>
+			<p class="note-text">Future updates may support multiple document attachments.</p>
+		</div>
+
+		<div class="faq-item">
+			<h4>❓ What happens to the uploaded document when I save the transaction?</h4>
+			<p>The document remains permanently linked to the purchase order:</p>
+			<ul>
+				<li>It's stored securely in Azure Blob Storage</li>
+				<li>The document URL is saved in the database with the purchase record</li>
+				<li>You can access it anytime from the transaction history</li>
+				<li>The document persists even if you navigate away before saving the transaction</li>
+			</ul>
+		</div>
+
+		<div class="faq-item">
+			<h4>❓ Can I download documents on mobile devices?</h4>
+			<p>Yes! The download functionality works across all platforms:</p>
+			<ul>
+				<li><strong>Desktop:</strong> Downloads to your default downloads folder</li>
+				<li><strong>Mobile (iOS/Android):</strong> Opens in native file viewer or saves to downloads</li>
+				<li><strong>Web:</strong> Downloads through browser's download manager</li>
+			</ul>
+			<p class="note-text">On mobile devices, you may need to grant storage permissions.</p>
+		</div>
 
 		<!-- Tips & Best Practices -->
 		<section class="help-section">

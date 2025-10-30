@@ -1,7 +1,4 @@
-﻿
-
-
-using VizarLibrary.Data.Common;
+﻿using VizarLibrary.Data.Common;
 using VizarLibrary.Data.Item;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Models.Common;
@@ -20,6 +17,9 @@ public static class PurchaseData
 
 	public static async Task<List<PurchaseDetailModel>> LoadPurchaseDetailByPurchase(int PurchaseId) =>
 		await SqlDataAccess.LoadData<PurchaseDetailModel, dynamic>(StoredProcedureNames.LoadPurchaseDetailByPurchase, new { PurchaseId });
+
+	public static async Task<List<PurchaseOverviewModel>> LoadPurchaseOverviewByDate(DateTime StartDate, DateTime EndDate) =>
+		await SqlDataAccess.LoadData<PurchaseOverviewModel, dynamic>(StoredProcedureNames.LoadPurchaseOverviewByDate, new { StartDate, EndDate });
 
 	public static async Task<int> SavePurchaseTransaction(PurchaseModel purchase, List<PurchaseItemCartModel> purchaseDetails)
 	{
