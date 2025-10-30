@@ -2,7 +2,9 @@ using Microsoft.JSInterop;
 
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
+using Syncfusion.Blazor.Inputs;
 using Syncfusion.Blazor.Notifications;
+using Syncfusion.Blazor.Popups;
 
 using Vizar.Shared.Services;
 
@@ -26,6 +28,7 @@ public partial class PurchasePage
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
 	private bool _autoGenerateTransactionNo = false;
+	private bool _isUploadDialogVisible = false;
 
 	private decimal _itemBaseTotal = 0;
 	private decimal _itemDiscountTotal = 0;
@@ -48,6 +51,8 @@ public partial class PurchasePage
 
 	private SfAutoComplete<ItemModel?, ItemModel> _sfItemAutoComplete;
 	private SfGrid<PurchaseItemCartModel> _sfCartGrid;
+	private SfDialog _uploadDocumentDialog;
+	private SfUploader _sfDocumentUploader;
 
 	private string _errorTitle = string.Empty;
 	private string _errorMessage = string.Empty;
@@ -519,8 +524,6 @@ public partial class PurchasePage
 			item.IGSTAmount = item.AfterDiscount * (item.IGSTPercent / 100);
 			item.TotalTaxAmount = item.CGSTAmount + item.SGSTAmount + item.IGSTAmount;
 			item.Total = item.InclusiveTax ? item.AfterDiscount : item.AfterDiscount + item.TotalTaxAmount;
-
-			// Net Rate = (Total / Quantity) + Other Charges % - Cash Discount %
 			var perUnitCost = item.Total / item.Quantity;
 			var withOtherCharges = perUnitCost * (1 + (_purchase.OtherChargesPercent / 100));
 			item.NetRate = withOtherCharges * (1 - (_purchase.CashDiscountPercent / 100));
@@ -744,6 +747,96 @@ public partial class PurchasePage
 				Title = _successTitle,
 				Content = _successMessage
 			});
+		}
+	}
+	#endregion
+
+	#region Uploading Document
+	private void UploadDocument()
+	{
+		_isUploadDialogVisible = true;
+		StateHasChanged();
+	}
+
+	private async Task OnRemoveFile(RemovingEventArgs args) =>
+		await RemoveExistingDocument();
+
+	private async Task RemoveExistingDocument()
+	{
+		try
+		{
+			if (string.IsNullOrEmpty(_purchase.DocumentUrl))
+				return;
+
+			var fileName = _purchase.DocumentUrl.Split('/').Last();
+			await BlobStorageAccess.DeleteFileFromBlobStorage(fileName, BlobStorageContainers.purchase);
+			_purchase.DocumentUrl = null;
+
+			await SavePurchaseFile();
+			await ShowToast("Document Removed", "The uploaded document has been removed successfully.", "success");
+		}
+		catch (Exception ex)
+		{
+			await ShowToast("An Error Occurred While Removing Document", ex.Message, "error");
+		}
+	}
+
+	private async Task DownloadExistingDocument()
+	{
+		try
+		{
+			if (string.IsNullOrEmpty(_purchase.DocumentUrl))
+				return;
+
+			var (fileStream, contentType) = await BlobStorageAccess.DownloadFileFromBlobStorage(_purchase.DocumentUrl, BlobStorageContainers.purchase);
+			var fileName = _purchase.DocumentUrl.Split('/').Last();
+			await SaveAndViewService.SaveAndView(fileName, contentType, fileStream);
+		}
+		catch (Exception ex)
+		{
+			await ShowToast("An Error Occurred While Downloading Document", ex.Message, "error");
+		}
+	}
+
+	private void CloseUploadDialog()
+	{
+		_isUploadDialogVisible = false;
+		StateHasChanged();
+	}
+
+	private async Task OnUploaderFileChange(UploadChangeEventArgs args)
+	{
+		try
+		{
+			var uploadedFiles = args.Files;
+
+			if (uploadedFiles is not null && uploadedFiles.Count == 1)
+			{
+				if (!string.IsNullOrEmpty(_purchase.DocumentUrl))
+					await RemoveExistingDocument();
+
+				await using var file = uploadedFiles[0].File.OpenReadStream(maxAllowedSize: 52428800); // 50 MB
+				var fileName = $"{Guid.NewGuid()}_{uploadedFiles[0].File.Name}";
+				var fileUrl = await BlobStorageAccess.UploadFileToBlobStorage(file, fileName, BlobStorageContainers.purchase);
+				_purchase.DocumentUrl = fileUrl; await SavePurchaseFile();
+				await ShowToast("Document Uploaded Successfully", "The document has been uploaded and linked to the purchase transaction.", "success");
+			}
+		}
+		catch (Exception ex)
+		{
+			await ShowToast("An Error Occurred While Uploading Document", ex.Message, "error");
+		}
+	}
+
+	private async Task InterpretFiles()
+	{
+		try
+		{
+			await ShowToast("Feature Not Implemented", "The interpret files feature is not yet implemented.", "error");
+		}
+		catch (Exception ex)
+		{
+			await ShowToast("An Error Occurred While Interpreting Files", ex.Message, "error");
 		}
 	}
 	#endregion

@@ -10,61 +10,64 @@ public partial class SaveService
 	public partial string SaveAndView(string filename, string contentType, MemoryStream stream)
 	{
 		StorageFile stFile;
-		string extension = Path.GetExtension(filename);
+		string extension = Path.GetExtension(filename).ToLower();
 		//Gets process windows handle to open the dialog in application process. 
 		IntPtr windowHandle = System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle;
 		if (!Windows.Foundation.Metadata.ApiInformation.IsTypePresent("Windows.Phone.UI.Input.HardwareButtons"))
 		{
 			//Creates file save picker to save a file. 
 			FileSavePicker savePicker = new();
-			if (extension == ".xlsx")
+			savePicker.SuggestedFileName = filename;
+
+			// Map file extensions to their types
+			var fileTypeMap = new Dictionary<string, (string description, string ext)>
 			{
-				savePicker.DefaultFileExtension = ".xlsx";
-				savePicker.SuggestedFileName = filename;
-				//Saves the file as xlsx file.
-				savePicker.FileTypeChoices.Add("XLSX", [".xlsx"]);
+				// Documents
+				{ ".pdf", ("PDF", ".pdf") },
+				{ ".doc", ("DOC", ".doc") },
+				{ ".docx", ("DOCX", ".docx") },
+				{ ".rtf", ("RTF", ".rtf") },
+				
+				// Spreadsheets
+				{ ".xlsx", ("XLSX", ".xlsx") },
+				{ ".xls", ("XLS", ".xls") },
+				{ ".csv", ("CSV", ".csv") },
+				
+				// Presentations
+				{ ".pptx", ("PPTX", ".pptx") },
+				{ ".ppt", ("PPT", ".ppt") },
+				
+				// Images
+				{ ".png", ("PNG", ".png") },
+				{ ".jpg", ("JPG", ".jpg") },
+				{ ".jpeg", ("JPEG", ".jpeg") },
+				{ ".gif", ("GIF", ".gif") },
+				{ ".bmp", ("BMP", ".bmp") },
+				{ ".svg", ("SVG", ".svg") },
+				{ ".webp", ("WEBP", ".webp") },
+				
+				// Archives
+				{ ".zip", ("ZIP", ".zip") },
+				{ ".rar", ("RAR", ".rar") },
+				{ ".7z", ("7Z", ".7z") },
+				
+				// Text
+				{ ".txt", ("TXT", ".txt") },
+				{ ".json", ("JSON", ".json") },
+				{ ".xml", ("XML", ".xml") }
+			};
+
+			if (fileTypeMap.ContainsKey(extension))
+			{
+				var fileType = fileTypeMap[extension];
+				savePicker.DefaultFileExtension = fileType.ext;
+				savePicker.FileTypeChoices.Add(fileType.description, new List<string> { fileType.ext });
 			}
-			if (extension == ".docx")
+			else
 			{
-				savePicker.DefaultFileExtension = ".docx";
-				savePicker.SuggestedFileName = filename;
-				//Saves the file as Docx file.
-				savePicker.FileTypeChoices.Add("DOCX", [".docx"]);
-			}
-			else if (extension == ".doc")
-			{
-				savePicker.DefaultFileExtension = ".doc";
-				savePicker.SuggestedFileName = filename;
-				//Saves the file as Doc file.
-				savePicker.FileTypeChoices.Add("DOC", [".doc"]);
-			}
-			else if (extension == ".rtf")
-			{
-				savePicker.DefaultFileExtension = ".rtf";
-				savePicker.SuggestedFileName = filename;
-				//Saves the file as Rtf file.
-				savePicker.FileTypeChoices.Add("RTF", [".rtf"]);
-			}
-			else if (extension == ".pdf")
-			{
-				savePicker.DefaultFileExtension = ".pdf";
-				savePicker.SuggestedFileName = filename;
-				//Saves the file as Pdf file.
-				savePicker.FileTypeChoices.Add("PDF", [".pdf"]);
-			}
-			else if (extension == ".pptx")
-			{
-				savePicker.DefaultFileExtension = ".pptx";
-				savePicker.SuggestedFileName = filename;
-				//Saves the file as pptx file.
-				savePicker.FileTypeChoices.Add("PPTX", [".pptx"]);
-			}
-			else if (extension == ".png")
-			{
-				savePicker.DefaultFileExtension = ".png";
-				savePicker.SuggestedFileName = filename;
-				//Saves the file as png file.
-				savePicker.FileTypeChoices.Add("PNG", [".png"]);
+				// Default for unknown file types
+				savePicker.DefaultFileExtension = extension;
+				savePicker.FileTypeChoices.Add("All Files", new List<string> { extension });
 			}
 
 			WinRT.Interop.InitializeWithWindow.Initialize(savePicker, windowHandle);

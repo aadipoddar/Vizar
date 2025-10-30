@@ -14,6 +14,7 @@
 	[RoundOffAmount] MONEY NOT NULL DEFAULT 0,
 	[TotalAmount] MONEY NOT NULL DEFAULT 0,
 	[Remarks] VARCHAR(MAX) NULL,
+	[DocumentUrl] VARCHAR(MAX) NULL,
 	[UserId] INT NOT NULL,
 	[CreatedAt] DATETIME NOT NULL DEFAULT (((getdate() AT TIME ZONE 'UTC') AT TIME ZONE 'India Standard Time')),
 	[CreatedFromPlatform] VARCHAR(MAX) NOT NULL,

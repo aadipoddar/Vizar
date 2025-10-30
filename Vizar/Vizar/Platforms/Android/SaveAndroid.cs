@@ -45,6 +45,49 @@ public partial class SaveService
 		}
 		if (file.Exists())
 		{
+			// Auto-detect MIME type if not provided
+			if (string.IsNullOrEmpty(contentType))
+			{
+				string extension = Path.GetExtension(filename).ToLower();
+				var mimeTypes = new Dictionary<string, string>
+				{
+					// Documents
+					{ ".pdf", "application/pdf" },
+					{ ".doc", "application/msword" },
+					{ ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+					
+					// Spreadsheets
+					{ ".xls", "application/vnd.ms-excel" },
+					{ ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+					{ ".csv", "text/csv" },
+					
+					// Images
+					{ ".jpg", "image/jpeg" },
+					{ ".jpeg", "image/jpeg" },
+					{ ".png", "image/png" },
+					{ ".gif", "image/gif" },
+					{ ".bmp", "image/bmp" },
+					{ ".svg", "image/svg+xml" },
+					{ ".webp", "image/webp" },
+					
+					// Archives
+					{ ".zip", "application/zip" },
+					{ ".rar", "application/x-rar-compressed" },
+					{ ".7z", "application/x-7z-compressed" },
+					
+					// Text
+					{ ".txt", "text/plain" },
+					{ ".json", "application/json" },
+					{ ".xml", "application/xml" },
+					
+					// Other
+					{ ".ppt", "application/vnd.ms-powerpoint" },
+					{ ".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation" }
+				};
+
+				contentType = mimeTypes.ContainsKey(extension) ? mimeTypes[extension] : "application/octet-stream";
+			}
+
 			if (Build.VERSION.SdkInt >= BuildVersionCodes.N)
 			{
 				var fileUri = AndroidX.Core.Content.FileProvider.GetUriForFile(Application.Context, Application.Context.PackageName + ".provider", file);

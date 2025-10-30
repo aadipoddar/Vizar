@@ -16,6 +16,7 @@ public class PurchaseModel
 	public decimal RoundOffAmount { get; set; }
 	public decimal TotalAmount { get; set; }
 	public string? Remarks { get; set; }
+	public string? DocumentUrl { get; set; }
 	public int UserId { get; set; }
 	public DateTime CreatedAt { get; set; }
 	public string CreatedFromPlatform { get; set; }

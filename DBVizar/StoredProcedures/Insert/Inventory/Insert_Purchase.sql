@@ -13,6 +13,7 @@
 	@RoundOffAmount MONEY,
 	@TotalAmount MONEY,
 	@Remarks VARCHAR(MAX),
+	@DocumentUrl VARCHAR(MAX) = NULL,
 	@UserId INT,
 	@CreatedAt DATETIME,
 	@CreatedFromPlatform VARCHAR(MAX),
@@ -39,6 +40,7 @@ BEGIN
 			[RoundOffAmount],
 			[TotalAmount],
 			[Remarks],
+			[DocumentUrl],
 			[UserId],
 			[CreatedFromPlatform],
 			[Status]
@@ -58,6 +60,7 @@ BEGIN
 			@RoundOffAmount,
 			@TotalAmount,
 			@Remarks,
+			@DocumentUrl,
 			@UserId,
 			@CreatedFromPlatform,
 			@Status
@@ -82,6 +85,7 @@ BEGIN
 			[RoundOffAmount] = @RoundOffAmount,
 			[TotalAmount] = @TotalAmount,
 			[Remarks] = @Remarks,
+			[DocumentUrl] = @DocumentUrl,
 			[Status] = @Status,
 			[LastModifiedBy] = @LastModifiedBy,
 			[LastModifiedAt] = @LastModifiedAt,
