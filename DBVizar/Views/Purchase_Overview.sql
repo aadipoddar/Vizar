@@ -45,8 +45,8 @@ SELECT
 
 	[p].[Remarks],
 	[p].[DocumentUrl],
-	[p].[UserId] AS UserId,
-	[u].[Name] AS UserName,
+	[p].[CreatedBy],
+	[u].[Name] AS CreatedByName,
 	[p].[CreatedAt],
 	[p].[CreatedFromPlatform],
 	[p].[LastModifiedBy],
@@ -63,7 +63,7 @@ INNER JOIN
 INNER JOIN
 	[dbo].[FinancialYear] AS fy ON p.FinancialYearId = fy.Id
 INNER JOIN
-	[dbo].[User] AS u ON p.UserId = u.Id
+	[dbo].[User] AS u ON p.[CreatedBy] = u.Id
 LEFT JOIN
 	[dbo].[User] AS lm ON p.LastModifiedBy = lm.Id
 INNER JOIN
@@ -92,7 +92,7 @@ GROUP BY
 	[p].[TotalAmount],
 	[p].[Remarks],
 	[p].[DocumentUrl],
-	[p].[UserId],
+	[p].[CreatedBy],
 	[u].[Name],
 	[p].[CreatedAt],
 	[p].[CreatedFromPlatform],

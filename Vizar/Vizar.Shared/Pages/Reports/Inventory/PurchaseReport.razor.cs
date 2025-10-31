@@ -1,3 +1,5 @@
+using Microsoft.JSInterop;
+
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 
@@ -16,6 +18,7 @@ public partial class PurchaseReport
 {
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
+	private bool _showAllColumns = false;
 
 	private DateTime _fromDate = DateTime.Now.Date;
 	private DateTime _toDate = DateTime.Now.Date;
@@ -150,7 +153,98 @@ public partial class PurchaseReport
 	}
 	#endregion
 
+	#region Actions
+	private async Task ViewPurchase(int purchaseId)
+	{
+		try
+		{
+			if (FormFactor.GetFormFactor() == "Web")
+				await JSRuntime.InvokeVoidAsync("open", $"/inventory/purchase?id={purchaseId}", "_blank");
+			else
+				NavigationManager.NavigateTo($"/inventory/purchase?id={purchaseId}");
+		}
+		catch (Exception ex)
+		{
+			await ShowToast("Error", $"An error occurred while opening purchase: {ex.Message}", "error");
+		}
+	}
+
+	private async Task DownloadInvoice(int purchaseId)
+	{
+		if (_isProcessing)
+			return;
+
+		try
+		{
+			_isProcessing = true;
+			StateHasChanged();
+
+			// TODO: Implement invoice generation and download logic
+			await ShowToast("Info", "Invoice download functionality will be implemented soon.", "error");
+		}
+		catch (Exception ex)
+		{
+			await ShowToast("Error", $"An error occurred while downloading invoice: {ex.Message}", "error");
+		}
+		finally
+		{
+			_isProcessing = false;
+			StateHasChanged();
+		}
+	}
+
+	private async Task DownloadOriginalInvoice(string documentUrl)
+	{
+		if (_isProcessing)
+			return;
+
+		try
+		{
+			if (string.IsNullOrEmpty(documentUrl))
+			{
+				await ShowToast("Warning", "No original document available for this purchase.", "error");
+				return;
+			}
+
+			_isProcessing = true;
+
+			var (fileStream, contentType) = await BlobStorageAccess.DownloadFileFromBlobStorage(documentUrl, BlobStorageContainers.purchase);
+			var fileName = documentUrl.Split('/').Last();
+			await SaveAndViewService.SaveAndView(fileName, contentType, fileStream);
+		}
+		catch (Exception ex)
+		{
+			await ShowToast("Error", $"An error occurred while downloading original invoice: {ex.Message}", "error");
+		}
+		finally
+		{
+			_isProcessing = false;
+			StateHasChanged();
+		}
+	}
+	#endregion
+
+	#region Toggle View
+	private async Task ToggleDetailsView()
+	{
+		_showAllColumns = !_showAllColumns;
+		StateHasChanged();
+
+		// Refresh grid to apply column changes
+		if (_sfPurchaseGrid is not null)
+			await _sfPurchaseGrid.Refresh();
+	}
+	#endregion
+
 	#region Utilities
+	private async Task NavigateToPurchasePage()
+	{
+		if (FormFactor.GetFormFactor() == "Web")
+			await JSRuntime.InvokeVoidAsync("open", "/inventory/purchase", "_blank");
+		else
+			NavigationManager.NavigateTo("/inventory/purchase");
+	}
+
 	private async Task ShowToast(string title, string message, string type)
 	{
 		VibrationService.VibrateWithTime(200);

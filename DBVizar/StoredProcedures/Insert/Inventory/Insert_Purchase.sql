@@ -14,7 +14,7 @@
 	@TotalAmount MONEY,
 	@Remarks VARCHAR(MAX),
 	@DocumentUrl VARCHAR(MAX) = NULL,
-	@UserId INT,
+	@CreatedBy INT,
 	@CreatedAt DATETIME,
 	@CreatedFromPlatform VARCHAR(MAX),
 	@Status BIT,
@@ -41,7 +41,7 @@ BEGIN
 			[TotalAmount],
 			[Remarks],
 			[DocumentUrl],
-			[UserId],
+			[CreatedBy],
 			[CreatedFromPlatform],
 			[Status]
 		)
@@ -61,7 +61,7 @@ BEGIN
 			@TotalAmount,
 			@Remarks,
 			@DocumentUrl,
-			@UserId,
+			@CreatedBy,
 			@CreatedFromPlatform,
 			@Status
 		)

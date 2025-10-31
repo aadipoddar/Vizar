@@ -15,7 +15,7 @@
 	[TotalAmount] MONEY NOT NULL DEFAULT 0,
 	[Remarks] VARCHAR(MAX) NULL,
 	[DocumentUrl] VARCHAR(MAX) NULL,
-	[UserId] INT NOT NULL,
+	[CreatedBy] INT NOT NULL,
 	[CreatedAt] DATETIME NOT NULL DEFAULT (((getdate() AT TIME ZONE 'UTC') AT TIME ZONE 'India Standard Time')),
 	[CreatedFromPlatform] VARCHAR(MAX) NOT NULL,
 	[Status] BIT NOT NULL DEFAULT 1,
@@ -25,6 +25,6 @@
     CONSTRAINT [FK_Purchase_ToCompany] FOREIGN KEY ([CompanyId]) REFERENCES [Company]([Id]),
     CONSTRAINT [FK_Purchase_ToLedger] FOREIGN KEY ([PartyId]) REFERENCES [Ledger]([Id]), 
     CONSTRAINT [FK_Purchase_ToFinancialYear] FOREIGN KEY ([FinancialYearId]) REFERENCES [dbo].[FinancialYear]([Id]),
-    CONSTRAINT [FK_Purchase_ToUser] FOREIGN KEY ([UserId]) REFERENCES [User]([Id]),
+    CONSTRAINT [FK_Purchase_ToUser] FOREIGN KEY ([CreatedBy]) REFERENCES [User]([Id]),
 	CONSTRAINT [FK_Purchase_LastModifiedBy_ToUser] FOREIGN KEY ([LastModifiedBy]) REFERENCES [User]([Id])
 )

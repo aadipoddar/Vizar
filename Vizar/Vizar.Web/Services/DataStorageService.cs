@@ -31,11 +31,11 @@ public class DataStorageService(ProtectedLocalStorage protectedLocalStorage) : I
 		(await _protectedLocalStorage.GetAsync<string>(key)).Success;
 
 	public async Task LocalSaveAsync(string key, string value) =>
-		await _protectedLocalStorage.SetAsync(key, value);
+		await SecureSaveAsync(key, value);
 
 	public async Task<string?> LocalGetAsync(string key) =>
-		(await _protectedLocalStorage.GetAsync<string>(key)).Value;
+		await SecureGetAsync(key);
 
 	public async Task LocalRemove(string key) =>
-		await _protectedLocalStorage.DeleteAsync(key);
+		await SecureRemove(key);
 }

@@ -142,7 +142,7 @@ public partial class PurchasePage
 					PartyId = _selectedParty.Id,
 					TransactionDateTime = await CommonData.LoadCurrentDateTime(),
 					FinancialYearId = (await FinancialYearData.LoadFinancialYearByDateTime(await CommonData.LoadCurrentDateTime())).Id,
-					UserId = _user.Id,
+					CreatedBy = _user.Id,
 					ItemsTotalAmount = 0,
 					CashDiscountPercent = 0,
 					CashDiscountAmount = 0,
@@ -550,7 +550,7 @@ public partial class PurchasePage
 
 		_purchase.CompanyId = _selectedCompany.Id;
 		_purchase.PartyId = _selectedParty.Id;
-		_purchase.UserId = _user.Id;
+		_purchase.CreatedBy = _user.Id;
 
 		#region Financial Year
 		_selectedFinancialYear = await FinancialYearData.LoadFinancialYearByDateTime(_purchase.TransactionDateTime);
@@ -680,7 +680,7 @@ public partial class PurchasePage
 			_purchase.LastModifiedAt = currentDateTime;
 			_purchase.CreatedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
 			_purchase.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
-			_purchase.UserId = _user.Id;
+			_purchase.CreatedBy = _user.Id;
 			_purchase.LastModifiedBy = _user.Id;
 
 			_purchase.Id = await PurchaseData.SavePurchaseTransaction(_purchase, _cart);

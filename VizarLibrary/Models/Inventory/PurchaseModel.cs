@@ -17,7 +17,7 @@ public class PurchaseModel
 	public decimal TotalAmount { get; set; }
 	public string? Remarks { get; set; }
 	public string? DocumentUrl { get; set; }
-	public int UserId { get; set; }
+	public int CreatedBy { get; set; }
 	public DateTime CreatedAt { get; set; }
 	public string CreatedFromPlatform { get; set; }
 	public bool Status { get; set; }
@@ -124,8 +124,8 @@ public class PurchaseOverviewModel
 
 	public string? Remarks { get; set; }
 	public string? DocumentUrl { get; set; }
-	public int UserId { get; set; }
-	public string UserName { get; set; }
+	public int CreatedBy { get; set; }
+	public string CreatedByName { get; set; }
 	public DateTime CreatedAt { get; set; }
 	public string CreatedFromPlatform { get; set; }
 	public int? LastModifiedBy { get; set; }
