@@ -61,13 +61,13 @@ public partial class SaveService
 			{
 				var fileType = fileTypeMap[extension];
 				savePicker.DefaultFileExtension = fileType.ext;
-				savePicker.FileTypeChoices.Add(fileType.description, new List<string> { fileType.ext });
+				savePicker.FileTypeChoices.Add(fileType.description, [fileType.ext]);
 			}
 			else
 			{
 				// Default for unknown file types
 				savePicker.DefaultFileExtension = extension;
-				savePicker.FileTypeChoices.Add("All Files", new List<string> { extension });
+				savePicker.FileTypeChoices.Add("All Files", [extension]);
 			}
 
 			WinRT.Interop.InitializeWithWindow.Initialize(savePicker, windowHandle);

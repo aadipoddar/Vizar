@@ -8,6 +8,7 @@ using Vizar.Shared.Services;
 using VizarLibrary.Data.Common;
 using VizarLibrary.Data.Inventory;
 using VizarLibrary.DataAccess;
+using VizarLibrary.Exporting.Purchase;
 using VizarLibrary.Models.Accounts;
 using VizarLibrary.Models.Common;
 using VizarLibrary.Models.Inventory;
@@ -211,7 +212,50 @@ public partial class PurchaseReport
 	#region Exporting
 	private async Task ExportExcel(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
 	{
-		await _sfPurchaseGrid.ExportToExcelAsync();
+		if (_isProcessing)
+			return;
+
+		try
+		{
+			_isProcessing = true;
+			StateHasChanged();
+
+			// Convert DateTime to DateOnly for Excel export
+			DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
+			DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
+
+			// Call the Excel export utility
+			var stream = await Task.Run(() =>
+				PurchaseReportExcelExport.ExportPurchaseReport(
+					_purchaseOverviews,
+					dateRangeStart,
+					dateRangeEnd,
+					_showAllColumns
+				)
+			);
+
+			// Generate file name with date range
+			string fileName = $"PURCHASE_REPORT";
+			if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
+			{
+				fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
+			}
+			fileName += ".xlsx";
+
+			// Save and view the Excel file
+			await SaveAndViewService.SaveAndView(fileName, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", stream);
+
+			await ShowToast("Success", "Purchase report exported to Excel successfully.", "success");
+		}
+		catch (Exception ex)
+		{
+			await ShowToast("Error", $"An error occurred while exporting to Excel: {ex.Message}", "error");
+		}
+		finally
+		{
+			_isProcessing = false;
+			StateHasChanged();
+		}
 	}
 
 	private async Task ExportPdf(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
