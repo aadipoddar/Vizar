@@ -214,6 +214,16 @@ else
 					<GridAggregates>
 						<GridAggregate>
 							<GridAggregateColumns>
+								<GridAggregateColumn Field="@nameof(PurchaseReturnOverviewModel.TransactionNo)" Type="AggregateType.Count">
+									<FooterTemplate>
+										@{
+											var aggregate = (context as AggregateTemplateContext);
+										}
+										<div class="aggregate-label">
+											<strong>Total Items: @aggregate.Count</strong>
+										</div>
+									</FooterTemplate>
+								</GridAggregateColumn>
 								<GridAggregateColumn Field="@nameof(PurchaseReturnOverviewModel.TotalItems)" Type="AggregateType.Sum" Format="N0">
 									<FooterTemplate>
 										@{
@@ -801,6 +811,10 @@ else
 				}
 
 	/* Professional Grid Styles */
+	.e-grid .e-summaryrow .e-summarycell {
+		background-color: #deecf9;
+	}
+
 	::deep .professional-grid {
 		border: none;
 	}

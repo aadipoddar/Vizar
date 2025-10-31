@@ -19,6 +19,7 @@ public partial class PurchaseReport
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
 	private bool _showAllColumns = false;
+	private bool _showPurchaseReturns = false;
 
 	private DateTime _fromDate = DateTime.Now.Date;
 	private DateTime _toDate = DateTime.Now.Date;
@@ -29,6 +30,7 @@ public partial class PurchaseReport
 	private List<CompanyModel> _companies = [];
 	private List<LedgerModel> _parties = [];
 	private List<PurchaseOverviewModel> _purchaseOverviews = [];
+	private List<PurchaseReturnOverviewModel> _purchaseReturnOverviews = [];
 
 	private SfGrid<PurchaseOverviewModel> _sfPurchaseGrid;
 
@@ -100,6 +102,9 @@ public partial class PurchaseReport
 				_purchaseOverviews = [.. _purchaseOverviews.Where(_ => _.PartyId == _selectedParty.Id)];
 
 			_purchaseOverviews = [.. _purchaseOverviews.OrderBy(_ => _.TransactionDateTime)];
+
+			if (_showPurchaseReturns)
+				await LoadPurchaseReturnOverviews();
 		}
 		catch (Exception ex)
 		{
@@ -112,6 +117,73 @@ public partial class PurchaseReport
 			_isProcessing = false;
 			StateHasChanged();
 		}
+	}
+
+	private async Task LoadPurchaseReturnOverviews()
+	{
+		_purchaseReturnOverviews = await PurchaseReturnData.LoadPurchaseReturnOverviewByDate(
+			DateOnly.FromDateTime(_fromDate).ToDateTime(TimeOnly.MinValue),
+			DateOnly.FromDateTime(_toDate).ToDateTime(TimeOnly.MaxValue));
+
+		if (_selectedCompany?.Id > 0)
+			_purchaseReturnOverviews = [.. _purchaseReturnOverviews.Where(_ => _.CompanyId == _selectedCompany.Id)];
+
+		if (_selectedParty?.Id > 0)
+			_purchaseReturnOverviews = [.. _purchaseReturnOverviews.Where(_ => _.PartyId == _selectedParty.Id)];
+
+		_purchaseReturnOverviews = [.. _purchaseReturnOverviews.OrderBy(_ => _.TransactionDateTime)];
+
+		MergePurchaseAndReturns();
+	}
+
+	private void MergePurchaseAndReturns()
+	{
+		_purchaseOverviews.AddRange(_purchaseReturnOverviews.Select(pr => new PurchaseOverviewModel
+		{
+			Id = pr.Id * -1, // Negative ID to differentiate returns
+			CompanyId = pr.CompanyId,
+			CompanyName = pr.CompanyName,
+			PartyId = pr.PartyId,
+			PartyName = pr.PartyName,
+			TransactionDateTime = pr.TransactionDateTime,
+			CashDiscountAmount = -pr.CashDiscountAmount,
+			OtherChargesAmount = -pr.OtherChargesAmount,
+			RoundOffAmount = -pr.RoundOffAmount,
+			TotalAmount = -pr.TotalAmount,
+			AfterDiscount = -pr.AfterDiscount,
+			BaseTotal = -pr.BaseTotal,
+			CashDiscountPercent = pr.CashDiscountPercent,
+			CGSTAmount = -pr.CGSTAmount,
+			CGSTPercent = pr.CGSTPercent,
+			CreatedAt = pr.CreatedAt,
+			CreatedBy = pr.CreatedBy,
+			CreatedByName = pr.CreatedByName,
+			CreatedFromPlatform = pr.CreatedFromPlatform,
+			DiscountAmount = -pr.DiscountAmount,
+			DiscountPercent = pr.DiscountPercent,
+			DocumentUrl = pr.DocumentUrl,
+			FinancialYear = pr.FinancialYear,
+			FinancialYearId = pr.FinancialYearId,
+			IGSTAmount = -pr.IGSTAmount,
+			IGSTPercent = pr.IGSTPercent,
+			Remarks = pr.Remarks,
+			LastModifiedAt = pr.LastModifiedAt,
+			LastModifiedBy = pr.LastModifiedBy,
+			LastModifiedByUserName = pr.LastModifiedByUserName,
+			LastModifiedFromPlatform = pr.LastModifiedFromPlatform,
+			SGSTAmount = -pr.SGSTAmount,
+			SGSTPercent = pr.SGSTPercent,
+			TotalAfterCashDiscount = -pr.TotalAfterCashDiscount,
+			TotalAfterOtherCharges = -pr.TotalAfterOtherCharges,
+			TotalAfterTax = -pr.TotalAfterTax,
+			TotalItems = pr.TotalItems,
+			TotalQuantity = -pr.TotalQuantity,
+			TotalTaxAmount = -pr.TotalTaxAmount,
+			TransactionNo = pr.TransactionNo,
+			OtherChargesPercent = pr.OtherChargesPercent
+		}));
+
+		_purchaseOverviews = [.. _purchaseOverviews.OrderBy(_ => _.TransactionDateTime)];
 	}
 	#endregion
 
@@ -226,6 +298,13 @@ public partial class PurchaseReport
 
 		if (_sfPurchaseGrid is not null)
 			await _sfPurchaseGrid.Refresh();
+	}
+
+	private async Task TogglePurchaseReturns()
+	{
+		_showPurchaseReturns = !_showPurchaseReturns;
+		await LoadPurchaseOverviews();
+		StateHasChanged();
 	}
 	#endregion
 

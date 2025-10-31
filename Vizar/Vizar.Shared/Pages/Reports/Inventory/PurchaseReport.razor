@@ -174,23 +174,32 @@ else
 					</svg>
 					<h2 class="section-title">Purchase Transactions</h2>
 				</div>
-				<button class="btn-toggle-details" @onclick="ToggleDetailsView" title="@(_showAllColumns ? "Show Less" : "Show All Details")">
-					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						@if (_showAllColumns)
-						{
-							<circle cx="12" cy="12" r="1" />
-							<circle cx="19" cy="12" r="1" />
-							<circle cx="5" cy="12" r="1" />
-						}
-						else
-						{
-							<rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-							<line x1="9" y1="9" x2="15" y2="9" />
-							<line x1="9" y1="15" x2="15" y2="15" />
-						}
-					</svg>
-					@(_showAllColumns ? "Show Less" : "Details")
-				</button>
+				<div class="header-actions">
+					<button class="btn-toggle-returns @(_showPurchaseReturns ? "active" : "")" @onclick="TogglePurchaseReturns" title="@(_showPurchaseReturns ? "Hide Purchase Returns" : "Show Purchase Returns")">
+						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<polyline points="9 14 4 9 9 4" />
+							<path d="M20 20v-7a4 4 0 0 0-4-4H4" />
+						</svg>
+						@(_showPurchaseReturns ? "Hide Returns" : "Show Returns")
+					</button>
+					<button class="btn-toggle-details" @onclick="ToggleDetailsView" title="@(_showAllColumns ? "Show Less" : "Show All Details")">
+						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							@if (_showAllColumns)
+							{
+								<circle cx="12" cy="12" r="1" />
+								<circle cx="19" cy="12" r="1" />
+								<circle cx="5" cy="12" r="1" />
+							}
+							else
+							{
+								<rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+								<line x1="9" y1="9" x2="15" y2="9" />
+								<line x1="9" y1="15" x2="15" y2="15" />
+							}
+						</svg>
+						@(_showAllColumns ? "Show Less" : "Details")
+					</button>
+				</div>
 			</div>
 			<div class="section-body grid-body">
 				<SfGrid ID="_sfPurchaseGrid"
@@ -210,10 +219,20 @@ else
 
 					<GridPageSettings PageSize="20" PageSizes="new int[] { 10, 20, 50, 100 }" />
 					<GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
-					
+
 					<GridAggregates>
 						<GridAggregate>
 							<GridAggregateColumns>
+							<GridAggregateColumn Field="@nameof(PurchaseOverviewModel.TransactionNo)" Type="AggregateType.Count">
+									<FooterTemplate>
+										@{
+											var aggregate = (context as AggregateTemplateContext);
+										}
+										<div class="aggregate-label">
+											<strong>Total Items: @aggregate.Count</strong>
+										</div>
+									</FooterTemplate>
+								</GridAggregateColumn>
 								<GridAggregateColumn Field="@nameof(PurchaseOverviewModel.TotalItems)" Type="AggregateType.Sum" Format="N0">
 									<FooterTemplate>
 										@{
@@ -617,6 +636,61 @@ else
 		letter-spacing: -0.2px;
 	}
 
+	/* Header Actions Container */
+	.header-actions {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	/* Toggle Returns Button */
+	.btn-toggle-returns {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		height: 38px;
+		padding: 0 20px;
+		border: 1px solid #e2e8f0;
+		background: #ffffff;
+		border-radius: 8px;
+		font-size: 13px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		color: #64748b;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	}
+
+		.btn-toggle-returns:hover {
+			background: #fef2f2;
+			border-color: #ef4444;
+			color: #ef4444;
+			box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);
+			transform: translateY(-1px);
+		}
+
+		.btn-toggle-returns.active {
+			background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+			border-color: #dc2626;
+			color: #ffffff;
+			box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+		}
+
+			.btn-toggle-returns.active:hover {
+				background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+				box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+			}
+
+		.btn-toggle-returns:active {
+			transform: translateY(0);
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+		}
+
+		.btn-toggle-returns svg {
+			flex-shrink: 0;
+		}
+
 	/* Toggle Details Button */
 	.btn-toggle-details {
 		display: flex;
@@ -801,6 +875,10 @@ else
 				}
 
 	/* Professional Grid Styles */
+	.e-grid .e-summaryrow .e-summarycell {
+		background-color: #deecf9;
+	}
+
 	::deep .professional-grid {
 		border: none;
 	}
@@ -903,13 +981,13 @@ else
 				box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
 			}
 
-	/* Empty Grid State */
-	::deep .professional-grid .e-emptyrow {
-		text-align: center;
-		padding: 48px 24px;
-		color: #94a3b8;
-		font-size: 14px;
-	}
+		/* Empty Grid State */
+		::deep .professional-grid .e-emptyrow {
+			text-align: center;
+			padding: 48px 24px;
+			color: #94a3b8;
+			font-size: 14px;
+		}
 
 	/* Grid Cell Text Coloring (matching Purchase screen) */
 	.grid-discount {
@@ -957,7 +1035,8 @@ else
 	.total-aggregate {
 		color: #1e40af;
 		font-size: 14px;
-	}	/* Grid Action Buttons */
+	}
+	/* Grid Action Buttons */
 	.grid-actions {
 		display: flex;
 		align-items: center;
