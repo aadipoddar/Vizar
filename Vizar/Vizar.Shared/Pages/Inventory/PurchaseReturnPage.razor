@@ -1,10 +1,10 @@
-@page "/inventory/purchase"
+﻿@page "/inventory/purchasereturn"
 
 @using VizarLibrary.Models.Common
 @using VizarLibrary.Models.Accounts
 @using VizarLibrary.Models.Item
 
-<PageTitle>Purchase - Vizar</PageTitle>
+<PageTitle>Purchase Return - Vizar</PageTitle>
 
 @if (_isLoading)
 {
@@ -20,11 +20,11 @@ else
 			<div class="header-breadcrumb">
 				<span class="breadcrumb-item" @onclick='() => NavigationManager.NavigateTo("/inventory")'>Inventory</span>
 				<span class="breadcrumb-separator">/</span>
-				<span class="breadcrumb-item active">Purchase Order</span>
+				<span class="breadcrumb-item active">Purchase Return</span>
 			</div>
 		</div>
 		<div class="header-center">
-			<h1 class="page-title">Create Purchase Order</h1>
+			<h1 class="page-title">Create Purchase Return</h1>
 		</div>
 		<div class="header-right">
 			<button class="btn-icon" @onclick='() => NavigationManager.NavigateTo("/")' title="Home">
@@ -114,7 +114,7 @@ else
 								Transaction Date <span class="required">*</span> / Financial Year
 							</label>
 							<div class="date-year-wrapper">
-								<SfDatePicker Value="@_purchase.TransactionDateTime"
+								<SfDatePicker Value="@_purchaseReturn.TransactionDateTime"
 											  TValue="DateTime"
 											  Format="dd/MM/yy"
 											  Placeholder="Select Date"
@@ -136,7 +136,7 @@ else
 								Transaction No
 							</label>
 							<div class="transaction-no-wrapper">
-								<SfTextBox @bind-Value="_purchase.TransactionNo"
+								<SfTextBox @bind-Value="_purchaseReturn.TransactionNo"
 										   Placeholder="Enter Transaction No"
 										   FloatLabelType="FloatLabelType.Never"
 										   Readonly="@_autoGenerateTransactionNo"
@@ -156,7 +156,7 @@ else
 							<label class="field-label">
 								Remarks / Narration
 							</label>
-							<SfTextBox @bind-Value="_purchase.Remarks"
+							<SfTextBox @bind-Value="_purchaseReturn.Remarks"
 									   Multiline="true"
 									   Placeholder="Enter remarks..."
 									   FloatLabelType="FloatLabelType.Never"
@@ -220,7 +220,7 @@ else
 						<div class="financial-row-dual">
 							<label class="financial-label">Other Charges</label>
 							<div class="dual-inputs">
-								<SfNumericTextBox Value="@_purchase.OtherChargesPercent"
+								<SfNumericTextBox Value="@_purchaseReturn.OtherChargesPercent"
 												  TValue="decimal"
 												  Max="100"
 												  Min="0"
@@ -231,7 +231,7 @@ else
 												  CssClass="custom-numeric editable-field small-input">
 									<NumericTextBoxEvents TValue="decimal" ValueChange="OnOtherDiscountPercentChanged" />
 								</SfNumericTextBox>
-								<SfNumericTextBox Value="@_purchase.OtherChargesAmount"
+								<SfNumericTextBox Value="@_purchaseReturn.OtherChargesAmount"
 												  Readonly="true"
 												  TValue="decimal"
 												  ShowSpinButton="false"
@@ -245,7 +245,7 @@ else
 						<div class="financial-row-dual">
 							<label class="financial-label">Cash Discount</label>
 							<div class="dual-inputs">
-								<SfNumericTextBox Value="@_purchase.CashDiscountPercent"
+								<SfNumericTextBox Value="@_purchaseReturn.CashDiscountPercent"
 												  TValue="decimal"
 												  Max="100"
 												  Min="0"
@@ -256,7 +256,7 @@ else
 												  CssClass="custom-numeric editable-field small-input">
 									<NumericTextBoxEvents TValue="decimal" ValueChange="OnCashDiscountPercentChanged" />
 								</SfNumericTextBox>
-								<SfNumericTextBox Value="@_purchase.CashDiscountAmount"
+								<SfNumericTextBox Value="@_purchaseReturn.CashDiscountAmount"
 												  Readonly="true"
 												  TValue="decimal"
 												  ShowSpinButton="false"
@@ -269,7 +269,7 @@ else
 						<!-- Round Off -->
 						<div class="financial-row">
 							<label class="financial-label">Round Off</label>
-							<SfNumericTextBox Value="@_purchase.RoundOffAmount"
+							<SfNumericTextBox Value="@_purchaseReturn.RoundOffAmount"
 											  TValue="decimal"
 											  Placeholder="0.00"
 											  FloatLabelType="FloatLabelType.Never"
@@ -281,7 +281,7 @@ else
 						<!-- Total Amount -->
 						<div class="financial-row total-row">
 							<label class="financial-label-total">Total Amount</label>
-							<SfNumericTextBox Value="@_purchase.TotalAmount"
+							<SfNumericTextBox Value="@_purchaseReturn.TotalAmount"
 											  Readonly="true"
 											  TValue="decimal"
 											  ShowSpinButton="false"
@@ -523,7 +523,7 @@ else
 						<path d="M3 3h7a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H3V3z" />
 						<path d="M14 3h7v17h-7V3z" />
 					</svg>
-					<h2 class="section-title">Purchase Items</h2>
+					<h2 class="section-title">Purchase Return Items</h2>
 				</div>
 			</div>
 			<div class="section-body grid-body">
@@ -766,20 +766,20 @@ else
 		</Header>
 		<Content>
 			<div style="padding: 24px;">
-				@if (_purchase is not null && !string.IsNullOrEmpty(_purchase.DocumentUrl))
+				@if (_purchaseReturn is not null && !string.IsNullOrEmpty(_purchaseReturn.DocumentUrl))
 				{
 					<!-- Existing Document Section -->
 					<div style="background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 32px; text-align: center; margin-bottom: 24px;">
 						<div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
 							<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #10b981;">
-								<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-								<polyline points="14 2 14 8 20 8"/>
-								<line x1="9" y1="15" x2="15" y2="15"/>
-								<line x1="9" y1="11" x2="15" y2="11"/>
+								<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+								<polyline points="14 2 14 8 20 8" />
+								<line x1="9" y1="15" x2="15" y2="15" />
+								<line x1="9" y1="11" x2="15" y2="11" />
 							</svg>
 							<div>
 								<h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600; color: #0f172a;">Document Uploaded Successfully</h3>
-								<p style="margin: 0; font-size: 14px; color: #64748b;">@(_purchase.DocumentUrl.Split('/').Last())</p>
+								<p style="margin: 0; font-size: 14px; color: #64748b;">@(_purchaseReturn.DocumentUrl.Split('/').Last())</p>
 							</div>
 						</div>
 					</div>
@@ -788,26 +788,26 @@ else
 					<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
 						<button class="dialog-btn dialog-btn-primary" @onclick="DownloadExistingDocument">
 							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-								<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-								<polyline points="7 10 12 15 17 10"/>
-								<line x1="12" y1="15" x2="12" y2="3"/>
+								<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+								<polyline points="7 10 12 15 17 10" />
+								<line x1="12" y1="15" x2="12" y2="3" />
 							</svg>
 							<span>Download</span>
 						</button>
 						<button class="dialog-btn dialog-btn-info" @onclick="InterpretFiles">
 							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-								<circle cx="12" cy="12" r="10"/>
-								<line x1="12" y1="16" x2="12" y2="12"/>
-								<line x1="12" y1="8" x2="12.01" y2="8"/>
+								<circle cx="12" cy="12" r="10" />
+								<line x1="12" y1="16" x2="12" y2="12" />
+								<line x1="12" y1="8" x2="12.01" y2="8" />
 							</svg>
 							<span>Interpret</span>
 						</button>
 						<button class="dialog-btn dialog-btn-danger" @onclick="RemoveExistingDocument">
 							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-								<polyline points="3 6 5 6 21 6"/>
-								<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-								<line x1="10" y1="11" x2="10" y2="17"/>
-								<line x1="14" y1="11" x2="14" y2="17"/>
+								<polyline points="3 6 5 6 21 6" />
+								<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+								<line x1="10" y1="11" x2="10" y2="17" />
+								<line x1="14" y1="11" x2="14" y2="17" />
 							</svg>
 							<span>Remove</span>
 						</button>
@@ -819,9 +819,9 @@ else
 					<div style="background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 48px 32px; text-align: center; transition: all 0.3s ease;">
 						<div style="display: flex; flex-direction: column; align-items: center; gap: 16px; margin-bottom: 24px;">
 							<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #94a3b8;">
-								<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-								<polyline points="17 8 12 3 7 8"/>
-								<line x1="12" y1="3" x2="12" y2="15"/>
+								<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+								<polyline points="17 8 12 3 7 8" />
+								<line x1="12" y1="3" x2="12" y2="15" />
 							</svg>
 							<div>
 								<h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600; color: #0f172a;">Upload Document</h3>

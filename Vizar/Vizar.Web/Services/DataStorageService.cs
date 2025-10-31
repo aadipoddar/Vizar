@@ -25,6 +25,8 @@ public class DataStorageService(ProtectedLocalStorage protectedLocalStorage) : I
 
 		await LocalRemove(StorageFileNames.PurchaseDataFileName);
 		await LocalRemove(StorageFileNames.PurchaseCartDataFileName);
+		await LocalRemove(StorageFileNames.PurchaseReturnDataFileName);
+		await LocalRemove(StorageFileNames.PurchaseReturnCartDataFileName);
 	}
 
 	public async Task<bool> LocalExists(string key) =>

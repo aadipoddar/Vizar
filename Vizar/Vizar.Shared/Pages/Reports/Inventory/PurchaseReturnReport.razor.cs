@@ -14,7 +14,7 @@ using VizarLibrary.Models.Inventory;
 
 namespace Vizar.Shared.Pages.Reports.Inventory;
 
-public partial class PurchaseReport
+public partial class PurchaseReturnReport
 {
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
@@ -28,9 +28,9 @@ public partial class PurchaseReport
 
 	private List<CompanyModel> _companies = [];
 	private List<LedgerModel> _parties = [];
-	private List<PurchaseOverviewModel> _purchaseOverviews = [];
+	private List<PurchaseReturnOverviewModel> _purchaseReturnOverviews = [];
 
-	private SfGrid<PurchaseOverviewModel> _sfPurchaseGrid;
+	private SfGrid<PurchaseReturnOverviewModel> _sfPurchaseReturnGrid;
 
 	private string _errorTitle = string.Empty;
 	private string _errorMessage = string.Empty;
@@ -53,7 +53,7 @@ public partial class PurchaseReport
 	{
 		await LoadCompanies();
 		await LoadParties();
-		await LoadPurchaseOverviews();
+		await LoadPurchaseReturnOverviews();
 	}
 
 	private async Task LoadCompanies()
@@ -80,7 +80,7 @@ public partial class PurchaseReport
 		_selectedParty = _parties.FirstOrDefault(_ => _.Id == 0);
 	}
 
-	private async Task LoadPurchaseOverviews()
+	private async Task LoadPurchaseReturnOverviews()
 	{
 		if (_isProcessing)
 			return;
@@ -89,26 +89,26 @@ public partial class PurchaseReport
 		{
 			_isProcessing = true;
 
-			_purchaseOverviews = await PurchaseData.LoadPurchaseOverviewByDate(
+			_purchaseReturnOverviews = await PurchaseReturnData.LoadPurchaseReturnOverviewByDate(
 			DateOnly.FromDateTime(_fromDate).ToDateTime(TimeOnly.MinValue),
 			DateOnly.FromDateTime(_toDate).ToDateTime(TimeOnly.MaxValue));
 
 			if (_selectedCompany?.Id > 0)
-				_purchaseOverviews = [.. _purchaseOverviews.Where(_ => _.CompanyId == _selectedCompany.Id)];
+				_purchaseReturnOverviews = [.. _purchaseReturnOverviews.Where(_ => _.CompanyId == _selectedCompany.Id)];
 
 			if (_selectedParty?.Id > 0)
-				_purchaseOverviews = [.. _purchaseOverviews.Where(_ => _.PartyId == _selectedParty.Id)];
+				_purchaseReturnOverviews = [.. _purchaseReturnOverviews.Where(_ => _.PartyId == _selectedParty.Id)];
 
-			_purchaseOverviews = [.. _purchaseOverviews.OrderBy(_ => _.TransactionDateTime)];
+			_purchaseReturnOverviews = [.. _purchaseReturnOverviews.OrderBy(_ => _.TransactionDateTime)];
 		}
 		catch (Exception ex)
 		{
-			await ShowToast("Error", $"An error occurred while loading purchase overviews: {ex.Message}", "error");
+			await ShowToast("Error", $"An error occurred while loading purchase return overviews: {ex.Message}", "error");
 		}
 		finally
 		{
-			if (_sfPurchaseGrid is not null)
-				await _sfPurchaseGrid.Refresh();
+			if (_sfPurchaseReturnGrid is not null)
+				await _sfPurchaseReturnGrid.Refresh();
 			_isProcessing = false;
 			StateHasChanged();
 		}
@@ -120,31 +120,31 @@ public partial class PurchaseReport
 	{
 		_fromDate = args.StartDate;
 		_toDate = args.EndDate;
-		await LoadPurchaseOverviews();
+		await LoadPurchaseReturnOverviews();
 	}
 
 	private async Task OnCompanyChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<CompanyModel, CompanyModel> args)
 	{
 		_selectedCompany = args.Value;
-		await LoadPurchaseOverviews();
+		await LoadPurchaseReturnOverviews();
 	}
 
 	private async Task OnPartyChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<LedgerModel, LedgerModel> args)
 	{
 		_selectedParty = args.Value;
-		await LoadPurchaseOverviews();
+		await LoadPurchaseReturnOverviews();
 	}
 	#endregion
 
 	#region Exporting
 	private async Task ExportExcel(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
 	{
-		await _sfPurchaseGrid.ExportToExcelAsync();
+		await _sfPurchaseReturnGrid.ExportToExcelAsync();
 	}
 
 	private async Task ExportPdf(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
 	{
-		await _sfPurchaseGrid.ExportToPdfAsync();
+		await _sfPurchaseReturnGrid.ExportToPdfAsync();
 	}
 
 	private async Task ExportPowerBI(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
@@ -154,14 +154,14 @@ public partial class PurchaseReport
 	#endregion
 
 	#region Actions
-	private async Task ViewPurchase(int purchaseId)
+	private async Task ViewPurchaseReturn(int purchaseId)
 	{
 		try
 		{
 		}
 		catch (Exception ex)
 		{
-			await ShowToast("Error", $"An error occurred while opening purchase: {ex.Message}", "error");
+			await ShowToast("Error", $"An error occurred while opening purchase return: {ex.Message}", "error");
 		}
 	}
 
@@ -198,13 +198,13 @@ public partial class PurchaseReport
 		{
 			if (string.IsNullOrEmpty(documentUrl))
 			{
-				await ShowToast("Warning", "No original document available for this purchase.", "error");
+				await ShowToast("Warning", "No original document available for this purchase return.", "error");
 				return;
 			}
 
 			_isProcessing = true;
 
-			var (fileStream, contentType) = await BlobStorageAccess.DownloadFileFromBlobStorage(documentUrl, BlobStorageContainers.purchase);
+			var (fileStream, contentType) = await BlobStorageAccess.DownloadFileFromBlobStorage(documentUrl, BlobStorageContainers.purchasereturn);
 			var fileName = documentUrl.Split('/').Last();
 			await SaveAndViewService.SaveAndView(fileName, contentType, fileStream);
 		}
@@ -224,18 +224,18 @@ public partial class PurchaseReport
 		_showAllColumns = !_showAllColumns;
 		StateHasChanged();
 
-		if (_sfPurchaseGrid is not null)
-			await _sfPurchaseGrid.Refresh();
+		if (_sfPurchaseReturnGrid is not null)
+			await _sfPurchaseReturnGrid.Refresh();
 	}
 	#endregion
 
 	#region Utilities
-	private async Task NavigateToPurchasePage()
+	private async Task NavigateToPurchaseReturnPage()
 	{
 		if (FormFactor.GetFormFactor() == "Web")
-			await JSRuntime.InvokeVoidAsync("open", "/inventory/purchase", "_blank");
+			await JSRuntime.InvokeVoidAsync("open", "/inventory/purchasereturn", "_blank");
 		else
-			NavigationManager.NavigateTo("/inventory/purchase");
+			NavigationManager.NavigateTo("/inventory/purchasereturn");
 	}
 
 	private async Task ShowToast(string title, string message, string type)

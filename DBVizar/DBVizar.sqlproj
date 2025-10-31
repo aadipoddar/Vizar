@@ -116,6 +116,13 @@
     <Build Include="StoredProcedures\LoadData\Common\Load_TableData_By_TransactionNo.sql" />
     <Build Include="Views\Purchase_Overview.sql" />
     <Build Include="StoredProcedures\LoadData\Inventory\Load_PurchaseOverview_By_Date.sql" />
+    <Build Include="Tables\Inventory\PurchaseReturn.sql" />
+    <Build Include="Tables\Inventory\PurchaseReturnDetail.sql" />
+    <Build Include="StoredProcedures\Insert\Inventory\Insert_PurchaseReturn.sql" />
+    <Build Include="StoredProcedures\Insert\Inventory\Insert_PurchaseReturnDetail.sql" />
+    <Build Include="StoredProcedures\LoadData\Inventory\Load_PurchaseReturnDetail_By_PurchaseReturn.sql" />
+    <Build Include="Views\PurchaseReturn_Overview.sql" />
+    <Build Include="StoredProcedures\LoadData\Inventory\Load_PurchaseReturnOverview_By_Date.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalVizar.publish.xml" />

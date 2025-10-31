@@ -11,6 +11,8 @@ public static class TableNames
 	public static string FinancialYear => "FinancialYear";
 	public static string Purchase => "Purchase";
 	public static string PurchaseDetail => "PurchaseDetail";
+	public static string PurchaseReturn => "PurchaseReturn";
+	public static string PurchaseReturnDetail => "PurchaseReturnDetail";
 	public static string Item => "Item";
 	public static string ItemCategory => "ItemCategory";
 	public static string ItemType => "ItemType";
@@ -34,6 +36,8 @@ public static class StoredProcedureNames
 
 	public static string LoadPurchaseDetailByPurchase => "Load_PurchaseDetail_By_Purchase";
 	public static string LoadPurchaseOverviewByDate => "Load_PurchaseOverview_By_Date";
+	public static string LoadPurchaseReturnDetailByPurchase => "Load_PurchaseReturnDetail_By_Purchase";
+	public static string LoadPurchaseReturnOverviewByDate => "Load_PurchaseReturnOverview_By_Date";
 
 	public static string InsertUser => "Insert_User";
 	public static string ResetSettings => "Reset_Settings";
@@ -46,6 +50,8 @@ public static class StoredProcedureNames
 
 	public static string InsertPurchase => "Insert_Purchase";
 	public static string InsertPurchaseDetail => "Insert_PurchaseDetail";
+	public static string InsertPurchaseReturn => "Insert_PurchaseReturn";
+	public static string InsertPurchaseReturnDetail => "Insert_PurchaseReturnDetail";
 
 	public static string InsertLedger => "Insert_Ledger";
 }
@@ -53,4 +59,5 @@ public static class StoredProcedureNames
 public static class ViewNames
 {
 	public static string PurchaseOverview => "Purchase_Overview";
+	public static string PurchaseReturnOverview => "PurchaseReturn_Overview";
 }

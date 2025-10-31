@@ -1,0 +1,28 @@
+﻿CREATE TABLE [dbo].[PurchaseReturnDetail]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [PurchaseReturnId] INT NOT NULL,
+	[ItemId] INT NOT NULL,
+	[IdentificationNo] VARCHAR(MAX) NULL,
+	[Quantity] MONEY NOT NULL DEFAULT 1,
+	[UnitOfMeasurement] VARCHAR(20) NOT NULL,
+	[Rate] MONEY NOT NULL,
+	[BaseTotal] MONEY NOT NULL DEFAULT 0,
+	[DiscountPercent] DECIMAL(5, 2) NOT NULL DEFAULT 0,
+	[DiscountAmount] MONEY NOT NULL DEFAULT 0,
+	[AfterDiscount] MONEY NOT NULL DEFAULT 0,
+	[CGSTPercent] DECIMAL(5, 2) NOT NULL DEFAULT 0,
+	[CGSTAmount] MONEY NOT NULL DEFAULT 0,
+	[SGSTPercent] DECIMAL(5, 2) NOT NULL DEFAULT 0,
+	[SGSTAmount] MONEY NOT NULL DEFAULT 0,
+	[IGSTPercent] DECIMAL(5, 2) NOT NULL DEFAULT 0,
+	[IGSTAmount] MONEY NOT NULL DEFAULT 0,
+	[TotalTaxAmount] MONEY NOT NULL DEFAULT 0,
+	[InclusiveTax] BIT NOT NULL DEFAULT 0,
+	[Total] MONEY NOT NULL DEFAULT 0,
+	[NetRate] MONEY NOT NULL DEFAULT 0,
+	[Remarks] VARCHAR(MAX) NULL,
+	[Status] BIT NOT NULL DEFAULT 1, 
+    CONSTRAINT [FK_PurchaseReturnDetail_ToPurchaseReturn] FOREIGN KEY ([PurchaseReturnId]) REFERENCES [PurchaseReturn]([Id]),
+	CONSTRAINT [FK_PurchaseReturnDetail_ToItem] FOREIGN KEY ([ItemId]) REFERENCES [Item]([Id])
+)

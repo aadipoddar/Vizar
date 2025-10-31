@@ -12,6 +12,7 @@ public static class GenerateCodes
 	public enum CodeType
 	{
 		Purchase,
+		PurchaseReturn,
 		Ledger,
 		Manufacturer,
 		ItemCategory,
@@ -29,6 +30,10 @@ public static class GenerateCodes
 				case CodeType.Purchase:
 					var purchase = await CommonData.LoadTableDataByTransactionNo<PurchaseModel>(TableNames.Purchase, code);
 					isDuplicate = purchase is not null;
+					break;
+				case CodeType.PurchaseReturn:
+					var purchaseReturn = await CommonData.LoadTableDataByTransactionNo<PurchaseReturnModel>(TableNames.PurchaseReturn, code);
+					isDuplicate = purchaseReturn is not null;
 					break;
 				case CodeType.Ledger:
 					var ledger = await CommonData.LoadTableDataByCode<LedgerModel>(TableNames.Ledger, code);
@@ -90,6 +95,30 @@ public static class GenerateCodes
 		}
 
 		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{purchasePrefix}000001", 6, CodeType.Purchase);
+	}
+
+	public static async Task<string> GeneratePurchaseReturnTransactionNo(PurchaseReturnModel purchaseReturn)
+	{
+		var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, purchaseReturn.FinancialYearId);
+		var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, purchaseReturn.CompanyId)).Code;
+		var purchaseReturnPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.PurchaseReturnTransactionPrefix)).Value;
+
+		var lastPurchase = await CommonData.LoadLastTableDataByCompanyFinancialYear<PurchaseReturnModel>(TableNames.PurchaseReturn, purchaseReturn.CompanyId, purchaseReturn.FinancialYearId);
+		if (lastPurchase is not null)
+		{
+			var lastTransactionNo = lastPurchase.TransactionNo;
+			if (lastTransactionNo.StartsWith($"{companyPrefix}{financialYear.YearNo}{purchaseReturnPrefix}"))
+			{
+				var lastNumberPart = lastTransactionNo[(companyPrefix.Length + financialYear.YearNo.ToString().Length + purchaseReturnPrefix.Length)..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{purchaseReturnPrefix}{nextNumber:D6}", 6, CodeType.PurchaseReturn);
+				}
+			}
+		}
+
+		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{purchaseReturnPrefix}000001", 6, CodeType.PurchaseReturn);
 	}
 
 	public static async Task<string> GenerateLedgerCode()
