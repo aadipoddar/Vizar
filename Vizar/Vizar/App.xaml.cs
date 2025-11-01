@@ -7,5 +7,5 @@ public partial class App : Application
 		InitializeComponent();
 	}
 
-	protected override Window CreateWindow(IActivationState? activationState) => new Window(new MainPage()) { Title = "Vizar" };
+	protected override Window CreateWindow(IActivationState? activationState) => new(new MainPage()) { Title = "Vizar" };
 }

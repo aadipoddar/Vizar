@@ -188,7 +188,50 @@ public partial class PurchaseReturnReport
 
 	private async Task ExportPdf(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
 	{
-		await _sfPurchaseReturnGrid.ExportToPdfAsync();
+		if (_isProcessing)
+			return;
+
+		try
+		{
+			_isProcessing = true;
+			StateHasChanged();
+
+			// Convert DateTime to DateOnly for PDF export
+			DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
+			DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
+
+			// Call the PDF export utility
+			var stream = await Task.Run(() =>
+				PurchaseReturnReportPdfExport.ExportPurchaseReturnReport(
+					_purchaseReturnOverviews,
+					dateRangeStart,
+					dateRangeEnd,
+					_showAllColumns
+				)
+			);
+
+			// Generate file name with date range
+			string fileName = $"PURCHASE_RETURN_REPORT";
+			if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
+			{
+				fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
+			}
+			fileName += ".pdf";
+
+			// Save and view the PDF file
+			await SaveAndViewService.SaveAndView(fileName, "application/pdf", stream);
+
+			await ShowToast("Success", "Purchase return report exported to PDF successfully.", "success");
+		}
+		catch (Exception ex)
+		{
+			await ShowToast("Error", $"An error occurred while exporting to PDF: {ex.Message}", "error");
+		}
+		finally
+		{
+			_isProcessing = false;
+			StateHasChanged();
+		}
 	}
 
 	private async Task ExportPowerBI(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
@@ -209,7 +252,7 @@ public partial class PurchaseReturnReport
 		}
 	}
 
-	private async Task DownloadInvoice(int purchaseId)
+	private async Task DownloadInvoice(int purchaseReturnId)
 	{
 		if (_isProcessing)
 			return;
@@ -219,12 +262,61 @@ public partial class PurchaseReturnReport
 			_isProcessing = true;
 			StateHasChanged();
 
-			// TODO: Implement invoice generation and download logic
-			await ShowToast("Info", "Invoice download functionality will be implemented soon.", "error");
+			// Load purchase return header
+			var purchaseReturnHeader = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, purchaseReturnId);
+			if (purchaseReturnHeader == null)
+			{
+				await ShowToast("Error", "Purchase return not found.", "error");
+				return;
+			}
+
+			// Load purchase return details
+			var purchaseReturnDetails = await PurchaseReturnData.LoadPurchaseReturnDetailByPurchase(purchaseReturnId);
+			if (purchaseReturnDetails == null || !purchaseReturnDetails.Any())
+			{
+				await ShowToast("Error", "No line items found for this purchase return.", "error");
+				return;
+			}
+
+			// Load company information
+			var company = await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, purchaseReturnHeader.CompanyId);
+			if (company == null)
+			{
+				await ShowToast("Error", "Company information not found.", "error");
+				return;
+			}
+
+			// Load party (supplier) information
+			var party = await CommonData.LoadTableDataById<LedgerModel>(TableNames.Ledger, purchaseReturnHeader.PartyId);
+			if (party == null)
+			{
+				await ShowToast("Error", "Party information not found.", "error");
+				return;
+			}
+
+			// Generate invoice PDF
+			var pdfStream = await Task.Run(() =>
+				PurchaseReturnInvoicePDFExport.ExportPurchaseReturnInvoice(
+					purchaseReturnHeader,
+					purchaseReturnDetails,
+					company,
+					party,
+					null, // logo path - uses default
+					"PURCHASE RETURN"
+				)
+			);
+
+			// Generate file name
+			string fileName = $"PURCHASE_RETURN_{purchaseReturnHeader.TransactionNo}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+
+			// Save and view the PDF
+			await SaveAndViewService.SaveAndView(fileName, "application/pdf", pdfStream);
+
+			await ShowToast("Success", "Purchase return invoice generated successfully.", "success");
 		}
 		catch (Exception ex)
 		{
-			await ShowToast("Error", $"An error occurred while downloading invoice: {ex.Message}", "error");
+			await ShowToast("Error", $"An error occurred while generating invoice: {ex.Message}", "error");
 		}
 		finally
 		{

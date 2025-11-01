@@ -260,7 +260,50 @@ public partial class PurchaseReport
 
 	private async Task ExportPdf(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
 	{
-		await _sfPurchaseGrid.ExportToPdfAsync();
+		if (_isProcessing)
+			return;
+
+		try
+		{
+			_isProcessing = true;
+			StateHasChanged();
+
+			// Convert DateTime to DateOnly for PDF export
+			DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
+			DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
+
+			// Call the PDF export utility
+			var stream = await Task.Run(() =>
+				PurchaseReportPDFExport.ExportPurchaseReport(
+					_purchaseOverviews,
+					dateRangeStart,
+					dateRangeEnd,
+					_showAllColumns
+				)
+			);
+
+			// Generate file name with date range
+			string fileName = $"PURCHASE_REPORT";
+			if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
+			{
+				fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
+			}
+			fileName += ".pdf";
+
+			// Save and view the PDF file
+			await SaveAndViewService.SaveAndView(fileName, "application/pdf", stream);
+
+			await ShowToast("Success", "Purchase report exported to PDF successfully.", "success");
+		}
+		catch (Exception ex)
+		{
+			await ShowToast("Error", $"An error occurred while exporting to PDF: {ex.Message}", "error");
+		}
+		finally
+		{
+			_isProcessing = false;
+			StateHasChanged();
+		}
 	}
 
 	private async Task ExportPowerBI(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
@@ -291,18 +334,142 @@ public partial class PurchaseReport
 			_isProcessing = true;
 			StateHasChanged();
 
-			// TODO: Implement invoice generation and download logic
-			await ShowToast("Info", "Invoice download functionality will be implemented soon.", "error");
+			// Check if purchaseId is negative (indicates a purchase return)
+			bool isPurchaseReturn = purchaseId < 0;
+			int actualId = Math.Abs(purchaseId);
+
+			if (isPurchaseReturn)
+			{
+				// Handle Purchase Return Invoice
+				await DownloadPurchaseReturnInvoice(actualId);
+			}
+			else
+			{
+				// Handle Purchase Invoice
+				await DownloadPurchaseInvoice(actualId);
+			}
 		}
 		catch (Exception ex)
 		{
-			await ShowToast("Error", $"An error occurred while downloading invoice: {ex.Message}", "error");
+			await ShowToast("Error", $"An error occurred while generating invoice: {ex.Message}", "error");
 		}
 		finally
 		{
 			_isProcessing = false;
 			StateHasChanged();
 		}
+	}
+
+	private async Task DownloadPurchaseInvoice(int purchaseId)
+	{
+		// Load purchase header
+		var purchaseHeader = await CommonData.LoadTableDataById<PurchaseModel>(TableNames.Purchase, purchaseId);
+		if (purchaseHeader == null)
+		{
+			await ShowToast("Error", "Purchase record not found.", "error");
+			return;
+		}
+
+		// Load purchase details
+		var purchaseDetails = await PurchaseData.LoadPurchaseDetailByPurchase(purchaseId);
+		if (purchaseDetails == null || !purchaseDetails.Any())
+		{
+			await ShowToast("Error", "No purchase details found for this transaction.", "error");
+			return;
+		}
+
+		// Load company information
+		var company = await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, purchaseHeader.CompanyId);
+		if (company == null)
+		{
+			await ShowToast("Error", "Company information not found.", "error");
+			return;
+		}
+
+		// Load party/supplier information
+		var party = await CommonData.LoadTableDataById<LedgerModel>(TableNames.Ledger, purchaseHeader.PartyId);
+		if (party == null)
+		{
+			await ShowToast("Error", "Party information not found.", "error");
+			return;
+		}
+
+		// Generate invoice PDF
+		var stream = await Task.Run(() =>
+			PurchaseInvoicePDFExport.ExportPurchaseInvoice(
+				purchaseHeader,
+				purchaseDetails,
+				company,
+				party,
+				logoPath: null, // Uses default logo from wwwroot
+				invoiceType: "PURCHASE INVOICE"
+			)
+		);
+
+		// Generate file name
+		string fileName = $"PURCHASE_INVOICE_{purchaseHeader.TransactionNo}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+		fileName = fileName.Replace("/", "_").Replace("\\", "_"); // Clean up transaction number
+
+		// Save and view the invoice PDF
+		await SaveAndViewService.SaveAndView(fileName, "application/pdf", stream);
+
+		await ShowToast("Success", $"Invoice generated successfully for {purchaseHeader.TransactionNo}", "success");
+	}
+
+	private async Task DownloadPurchaseReturnInvoice(int purchaseReturnId)
+	{
+		// Load purchase return header
+		var purchaseReturnHeader = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, purchaseReturnId);
+		if (purchaseReturnHeader == null)
+		{
+			await ShowToast("Error", "Purchase return record not found.", "error");
+			return;
+		}
+
+		// Load purchase return details
+		var purchaseReturnDetails = await PurchaseReturnData.LoadPurchaseReturnDetailByPurchase(purchaseReturnId);
+		if (purchaseReturnDetails == null || !purchaseReturnDetails.Any())
+		{
+			await ShowToast("Error", "No purchase return details found for this transaction.", "error");
+			return;
+		}
+
+		// Load company information
+		var company = await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, purchaseReturnHeader.CompanyId);
+		if (company == null)
+		{
+			await ShowToast("Error", "Company information not found.", "error");
+			return;
+		}
+
+		// Load party/supplier information
+		var party = await CommonData.LoadTableDataById<LedgerModel>(TableNames.Ledger, purchaseReturnHeader.PartyId);
+		if (party == null)
+		{
+			await ShowToast("Error", "Party information not found.", "error");
+			return;
+		}
+
+		// Generate invoice PDF
+		var stream = await Task.Run(() =>
+			PurchaseReturnInvoicePDFExport.ExportPurchaseReturnInvoice(
+				purchaseReturnHeader,
+				purchaseReturnDetails,
+				company,
+				party,
+				logoPath: null, // Uses default logo from wwwroot
+				invoiceType: "PURCHASE RETURN INVOICE"
+			)
+		);
+
+		// Generate file name
+		string fileName = $"PURCHASE_RETURN_INVOICE_{purchaseReturnHeader.TransactionNo}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+		fileName = fileName.Replace("/", "_").Replace("\\", "_"); // Clean up transaction number
+
+		// Save and view the invoice PDF
+		await SaveAndViewService.SaveAndView(fileName, "application/pdf", stream);
+
+		await ShowToast("Success", $"Purchase return invoice generated successfully for {purchaseReturnHeader.TransactionNo}", "success");
 	}
 
 	private async Task DownloadOriginalInvoice(string documentUrl)

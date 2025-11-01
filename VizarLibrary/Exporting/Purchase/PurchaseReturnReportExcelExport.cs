@@ -82,8 +82,8 @@ public static class PurchaseReturnReportExcelExport
 		if (showAllColumns)
 		{
 			// All columns - detailed view
-			columnOrder = new()
-			{
+			columnOrder =
+			[
 				"Id", "TransactionNo", "CompanyId", "CompanyName", "PartyId", "PartyName",
 				"TransactionDateTime", "FinancialYearId", "FinancialYear",
 				"TotalItems", "TotalQuantity", "BaseTotal",
@@ -96,16 +96,16 @@ public static class PurchaseReturnReportExcelExport
 				"Remarks", "DocumentUrl",
 				"CreatedBy", "CreatedByName", "CreatedAt", "CreatedFromPlatform",
 				"LastModifiedBy", "LastModifiedByUserName", "LastModifiedAt", "LastModifiedFromPlatform"
-			};
+			];
 		}
 		else
 		{
 			// Summary columns - key fields only
-			columnOrder = new()
-			{
+			columnOrder =
+			[
 				"TransactionNo", "CompanyName", "PartyName", "TransactionDateTime",
 				"TotalItems", "TotalQuantity", "DiscountAmount", "CashDiscountAmount", "TotalAmount"
-			};
+			];
 		}
 
 		// Call the generic Excel export utility

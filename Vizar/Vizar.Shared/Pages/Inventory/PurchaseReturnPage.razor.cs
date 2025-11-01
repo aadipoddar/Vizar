@@ -684,10 +684,11 @@ public partial class PurchaseReturnPage
 			_purchaseReturn.LastModifiedBy = _user.Id;
 
 			_purchaseReturn.Id = await PurchaseReturnData.SavePurchaseReturnTransaction(_purchaseReturn, _cart);
+			await GenerateAndDownloadInvoice();
 			await DeleteLocalFiles();
 			NavigationManager.NavigateTo(NavigationManager.Uri, true);
 
-			await ShowToast("Save Transaction", "Transaction saved successfully!", "success");
+			await ShowToast("Save Transaction", "Transaction saved successfully! Invoice has been generated.", "success");
 		}
 		catch (Exception ex)
 		{
@@ -696,6 +697,60 @@ public partial class PurchaseReturnPage
 		finally
 		{
 			_isProcessing = false;
+		}
+	}
+
+	private async Task GenerateAndDownloadInvoice()
+	{
+		try
+		{
+			// Load saved purchase return details (since _purchaseReturn now has the Id)
+			var savedPurchaseReturn = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, _purchaseReturn.Id);
+			if (savedPurchaseReturn == null)
+			{
+				await ShowToast("Warning", "Invoice generation skipped - purchase return data not found.", "error");
+				return;
+			}
+
+			// Load purchase return details from database
+			var purchaseReturnDetails = await PurchaseReturnData.LoadPurchaseReturnDetailByPurchase(_purchaseReturn.Id);
+			if (purchaseReturnDetails == null || !purchaseReturnDetails.Any())
+			{
+				await ShowToast("Warning", "Invoice generation skipped - no line items found.", "error");
+				return;
+			}
+
+			// Load company and party
+			var company = await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, savedPurchaseReturn.CompanyId);
+			var party = await CommonData.LoadTableDataById<LedgerModel>(TableNames.Ledger, savedPurchaseReturn.PartyId);
+
+			if (company == null || party == null)
+			{
+				await ShowToast("Warning", "Invoice generation skipped - company or party not found.", "error");
+				return;
+			}
+
+			// Generate invoice PDF
+			var pdfStream = await Task.Run(() =>
+				VizarLibrary.Exporting.Purchase.PurchaseReturnInvoicePDFExport.ExportPurchaseReturnInvoice(
+					savedPurchaseReturn,
+					purchaseReturnDetails,
+					company,
+					party,
+					null, // logo path - uses default
+					"PURCHASE RETURN INVOICE"
+				)
+			);
+
+			// Generate file name
+			string fileName = $"PURCHASE_RETURN_INVOICE_{savedPurchaseReturn.TransactionNo}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+
+			// Save and view the PDF
+			await SaveAndViewService.SaveAndView(fileName, "application/pdf", pdfStream);
+		}
+		catch (Exception ex)
+		{
+			await ShowToast("Invoice Generation Failed", $"Transaction saved but invoice generation failed: {ex.Message}", "error");
 		}
 	}
 

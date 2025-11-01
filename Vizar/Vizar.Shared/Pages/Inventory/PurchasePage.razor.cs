@@ -684,10 +684,11 @@ public partial class PurchasePage
 			_purchase.LastModifiedBy = _user.Id;
 
 			_purchase.Id = await PurchaseData.SavePurchaseTransaction(_purchase, _cart);
+			await GenerateAndDownloadInvoice();
 			await DeleteLocalFiles();
 			NavigationManager.NavigateTo(NavigationManager.Uri, true);
 
-			await ShowToast("Save Transaction", "Transaction saved successfully!", "success");
+			await ShowToast("Save Transaction", "Transaction saved successfully! Invoice has been generated.", "success");
 		}
 		catch (Exception ex)
 		{
@@ -696,6 +697,60 @@ public partial class PurchasePage
 		finally
 		{
 			_isProcessing = false;
+		}
+	}
+
+	private async Task GenerateAndDownloadInvoice()
+	{
+		try
+		{
+			// Load saved purchase details (since _purchase now has the Id)
+			var savedPurchase = await CommonData.LoadTableDataById<PurchaseModel>(TableNames.Purchase, _purchase.Id);
+			if (savedPurchase == null)
+			{
+				await ShowToast("Warning", "Invoice generation skipped - purchase data not found.", "error");
+				return;
+			}
+
+			// Load purchase details from database
+			var purchaseDetails = await PurchaseData.LoadPurchaseDetailByPurchase(_purchase.Id);
+			if (purchaseDetails == null || !purchaseDetails.Any())
+			{
+				await ShowToast("Warning", "Invoice generation skipped - no line items found.", "error");
+				return;
+			}
+
+			// Company and party are already loaded (_selectedCompany, _selectedParty)
+			var company = await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, savedPurchase.CompanyId);
+			var party = await CommonData.LoadTableDataById<LedgerModel>(TableNames.Ledger, savedPurchase.PartyId);
+
+			if (company == null || party == null)
+			{
+				await ShowToast("Warning", "Invoice generation skipped - company or party not found.", "error");
+				return;
+			}
+
+			// Generate invoice PDF
+			var pdfStream = await Task.Run(() =>
+				VizarLibrary.Exporting.Purchase.PurchaseInvoicePDFExport.ExportPurchaseInvoice(
+					savedPurchase,
+					purchaseDetails,
+					company,
+					party,
+					null, // logo path - uses default
+					"PURCHASE INVOICE"
+				)
+			);
+
+			// Generate file name
+			string fileName = $"PURCHASE_INVOICE_{savedPurchase.TransactionNo}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+
+			// Save and view the PDF
+			await SaveAndViewService.SaveAndView(fileName, "application/pdf", pdfStream);
+		}
+		catch (Exception ex)
+		{
+			await ShowToast("Invoice Generation Failed", $"Transaction saved but invoice generation failed: {ex.Message}", "error");
 		}
 	}
 

@@ -448,7 +448,7 @@ else
 					<!-- Rate - show Base Total -->
 					<div class="amount-field amount-field-small">
 						<div class="amount-display empty-display">
-							<span class="amount-label">Base Total</span>
+							<span class="amount-label">Base</span>
 							<span class="amount-value">@_selectedCart.BaseTotal.ToString("N2")</span>
 						</div>
 					</div>
@@ -658,6 +658,29 @@ else
 					</GridAggregates>
 
 					<GridColumns>
+						<GridColumn HeaderText="Actions" Width="100" TextAlign="TextAlign.Center">
+							<Template>
+								@{
+									var item = (context as dynamic);
+									<div class="grid-actions">
+										<button class="btn-grid-action btn-edit" title="Edit Item" @onclick="@(() => EditCartItem(item))">
+											<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+												<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+												<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+											</svg>
+										</button>
+										<button class="btn-grid-action btn-delete" title="Remove Item" @onclick="@(() => RemoveItemFromCart(item))">
+											<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+												<polyline points="3 6 5 6 21 6" />
+												<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+												<line x1="10" y1="11" x2="10" y2="17" />
+												<line x1="14" y1="11" x2="14" y2="17" />
+											</svg>
+										</button>
+									</div>
+								}
+							</Template>
+						</GridColumn>
 						<GridColumn Field="ItemName" HeaderText="Item Name" Width="200" />
 						<GridColumn Field="IdentificationNo" HeaderText="Identification No." Width="180" />
 						<GridColumn Field="UnitOfMeasurement" HeaderText="UOM" Width="80" TextAlign="TextAlign.Center" />
@@ -698,29 +721,6 @@ else
 							</Template>
 						</GridColumn>
 						<GridColumn Field="Remarks" HeaderText="Remarks" Width="150" />
-						<GridColumn HeaderText="Actions" Width="100" TextAlign="TextAlign.Center">
-							<Template>
-								@{
-									var item = (context as dynamic);
-									<div class="grid-actions">
-										<button class="btn-grid-action btn-edit" title="Edit Item" @onclick="@(() => EditCartItem(item))">
-											<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-												<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-												<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-											</svg>
-										</button>
-										<button class="btn-grid-action btn-delete" title="Remove Item" @onclick="@(() => RemoveItemFromCart(item))">
-											<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-												<polyline points="3 6 5 6 21 6" />
-												<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-												<line x1="10" y1="11" x2="10" y2="17" />
-												<line x1="14" y1="11" x2="14" y2="17" />
-											</svg>
-										</button>
-									</div>
-								}
-							</Template>
-						</GridColumn>
 					</GridColumns>
 				</SfGrid>
 			</div>
@@ -969,7 +969,7 @@ else
 
 	/* Main Container */
 	.purchase-container {
-		padding: 24px 32px;
+		padding: 16px 32px;
 		max-width: 1920px;
 		margin: 0 auto;
 		background: #f8fafc;
@@ -979,8 +979,8 @@ else
 	/* Two Column Layout */
 	.two-column-layout {
 		display: flex;
-		gap: 24px;
-		margin-bottom: 24px;
+		gap: 16px;
+		margin-bottom: 16px;
 	}
 
 		.two-column-layout > :first-child {
@@ -988,7 +988,7 @@ else
 		}
 
 		.two-column-layout > :last-child {
-			flex: 0 0 calc(25% - 24px);
+			flex: 0 0 calc(25% - 16px);
 		}
 
 	/* Section Card Styles */
@@ -997,12 +997,12 @@ else
 		border-radius: 12px;
 		border: 1px solid #e2e8f0;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-		margin-bottom: 24px;
+		margin-bottom: 16px;
 		overflow: hidden;
 	}
 
 	.section-header {
-		padding: 20px 24px;
+		padding: 16px 20px;
 		border-bottom: 1px solid #e2e8f0;
 		background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
 	}
@@ -1027,26 +1027,26 @@ else
 	}
 
 	.section-body {
-		padding: 24px;
+		padding: 16px 20px;
 	}
 
 	/* Form Grid Layout */
 	.form-grid {
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
-		gap: 20px 24px;
+		gap: 16px 20px;
 	}
 
 	.form-grid-single {
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
-		gap: 20px 24px;
+		gap: 16px 20px;
 	}
 
 	.form-field {
 		display: flex;
 		flex-direction: column;
-		gap: 8px;
+		gap: 6px;
 	}
 
 	.form-field-full {
@@ -1181,21 +1181,21 @@ else
 	.financial-grid {
 		display: flex;
 		flex-direction: column;
-		gap: 8px;
+		gap: 6px;
 	}
 
 	.financial-row {
 		display: grid;
 		grid-template-columns: 100px 1fr;
 		align-items: center;
-		gap: 12px;
+		gap: 10px;
 	}
 
 	.financial-row-dual {
 		display: grid;
 		grid-template-columns: 100px 1fr;
 		align-items: center;
-		gap: 12px;
+		gap: 10px;
 	}
 
 	.dual-inputs {
@@ -1365,13 +1365,13 @@ else
 		grid-template-columns: 2fr repeat(7, 1fr) 1.5fr 100px;
 		gap: 12px;
 		align-items: end;
-		margin-bottom: 16px;
+		margin-bottom: 12px;
 	}
 
 	.cart-field {
 		display: flex;
 		flex-direction: column;
-		gap: 6px;
+		gap: 4px;
 	}
 
 	.cart-field-item {
@@ -1569,6 +1569,9 @@ else
 		font-size: 14px;
 		font-weight: 700;
 		color: #1e293b;
+		text-align: right;
+		width: 100%;
+		display: block;
 	}
 
 		.amount-value.discount-amt {

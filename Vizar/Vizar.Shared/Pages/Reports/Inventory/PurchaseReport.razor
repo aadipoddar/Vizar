@@ -366,6 +366,34 @@ else
 					</GridAggregates>
 
 					<GridColumns>
+						<GridColumn HeaderText="Actions" Width="160" TextAlign="TextAlign.Center">
+							<Template>
+								@{
+									var purchase = (context as PurchaseOverviewModel);
+								}
+								<div class="grid-actions">
+									<button class="btn-grid-action btn-view" @onclick="() => ViewPurchase(purchase.Id)" title="View Purchase">
+										<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+											<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+											<circle cx="12" cy="12" r="3" />
+										</svg>
+									</button>
+									<button class="btn-grid-action btn-invoice" @onclick="() => DownloadInvoice(purchase.Id)" title="Download Invoice">
+										<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+											<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+											<polyline points="7 10 12 15 17 10" />
+											<line x1="12" y1="15" x2="12" y2="3" />
+										</svg>
+									</button>
+									<button class="btn-grid-action btn-original" @onclick="() => DownloadOriginalInvoice(purchase.DocumentUrl)" disabled="@string.IsNullOrEmpty(purchase.DocumentUrl)" title="Download Original">
+										<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+											<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+											<polyline points="14 2 14 8 20 8" />
+										</svg>
+									</button>
+								</div>
+							</Template>
+						</GridColumn>
 						<GridColumn Field="@nameof(PurchaseOverviewModel.TransactionNo)" HeaderText="Transaction No" Width="170" />
 						<GridColumn Field="@nameof(PurchaseOverviewModel.TransactionDateTime)" HeaderText="Date" Width="150" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime" />
 						<GridColumn Field="@nameof(PurchaseOverviewModel.CompanyName)" HeaderText="Company" Width="180" Visible="_showAllColumns" />
@@ -421,37 +449,6 @@ else
 						<GridColumn Field="@nameof(PurchaseOverviewModel.LastModifiedByUserName)" HeaderText="Modified By" Width="150" Visible="_showAllColumns" />
 						<GridColumn Field="@nameof(PurchaseOverviewModel.LastModifiedAt)" HeaderText="Modified At" Width="160" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime" Visible="_showAllColumns" />
 						<GridColumn Field="@nameof(PurchaseOverviewModel.LastModifiedFromPlatform)" HeaderText="Modified Platform" Width="200" Visible="_showAllColumns" />
-						<GridColumn HeaderText="Actions" Width="160" TextAlign="TextAlign.Center">
-							<Template>
-								@{
-									var purchase = (context as PurchaseOverviewModel);
-								}
-								<div class="grid-actions">
-									<button class="btn-grid-action btn-view" @onclick="() => ViewPurchase(purchase.Id)" title="View Purchase">
-										<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-											<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-											<circle cx="12" cy="12" r="3" />
-										</svg>
-									</button>
-									<button class="btn-grid-action btn-invoice" @onclick="() => DownloadInvoice(purchase.Id)" title="Download Invoice">
-										<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-											<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-											<polyline points="7 10 12 15 17 10" />
-											<line x1="12" y1="15" x2="12" y2="3" />
-										</svg>
-									</button>
-									<button class="btn-grid-action btn-original" @onclick="() => DownloadOriginalInvoice(purchase.DocumentUrl)" disabled="@string.IsNullOrEmpty(purchase.DocumentUrl)" title="Download Original">
-										<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-											<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-											<polyline points="14 2 14 8 20 8" />
-											<line x1="16" y1="13" x2="8" y2="13" />
-											<line x1="16" y1="17" x2="8" y2="17" />
-											<polyline points="10 9 9 9 8 9" />
-										</svg>
-									</button>
-								</div>
-							</Template>
-						</GridColumn>
 					</GridColumns>
 				</SfGrid>
 			</div>
