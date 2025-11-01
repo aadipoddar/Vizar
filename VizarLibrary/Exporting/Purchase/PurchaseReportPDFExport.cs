@@ -76,12 +76,11 @@ public static class PurchaseReportPDFExport
 				"TransactionNo",
 				"TransactionDateTime",
 				"PartyName",
-				"TotalItems",
 				"TotalQuantity",
 				"TotalAfterTax",
+				"OtherChargesPercent",
 				"CashDiscountPercent",
-				"TotalAmount",
-				"CreatedByName"
+				"TotalAmount"
 			};
 		}
 
@@ -255,7 +254,7 @@ public static class PurchaseReportPDFExport
 
 		columnSettings["TotalAfterTax"] = new()
 		{
-			DisplayName = "Total After Tax",
+			DisplayName = "Sub Total",
 			Format = "#,##0.00",
 			HighlightNegative = true,
 			StringFormat = new Syncfusion.Pdf.Graphics.PdfStringFormat

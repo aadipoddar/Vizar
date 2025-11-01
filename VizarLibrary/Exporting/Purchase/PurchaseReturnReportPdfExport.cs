@@ -84,10 +84,10 @@ public static class PurchaseReturnReportPdfExport
 				"CompanyName",
 				"PartyName",
 				"TransactionDateTime",
-				"TotalItems",
 				"TotalQuantity",
-				"DiscountAmount",
-				"CashDiscountAmount",
+				"TotalAfterTax",
+				"OtherChargesPercent",
+				"CashDiscountPercent",
 				"TotalAmount"
 			};
 		}
@@ -269,7 +269,7 @@ public static class PurchaseReturnReportPdfExport
 
 		columnSettings["TotalAfterTax"] = new()
 		{
-			DisplayName = "Total After Tax",
+			DisplayName = "Sub Total",
 			Format = "#,##0.00",
 			HighlightNegative = true,
 			StringFormat = new Syncfusion.Pdf.Graphics.PdfStringFormat

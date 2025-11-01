@@ -17,10 +17,8 @@ else
 		<div class="header-left">
 			<img src="images/logo.png" alt="Vizar" class="header-logo" />
 			<div class="header-divider"></div>
-			<div class="header-breadcrumb">
-				<span class="breadcrumb-item" @onclick='() => NavigationManager.NavigateTo("/inventory")'>Inventory</span>
-				<span class="breadcrumb-separator">/</span>
-				<span class="breadcrumb-item active">Purchase Return</span>
+			<div class="header-text">
+				<span class="app-name">Vizar</span>
 			</div>
 		</div>
 		<div class="header-center">
@@ -894,34 +892,18 @@ else
 		flex-shrink: 0;
 	}
 
-	.header-breadcrumb {
+	.header-text {
 		display: flex;
 		align-items: center;
-		gap: 8px;
-		font-size: 13px;
-		color: #64748b;
-		white-space: nowrap;
+		font-size: 16px;
+		color: #0f172a;
+		font-weight: 600;
 	}
 
-	.breadcrumb-item {
-		transition: color 0.2s;
-	}
-
-		.breadcrumb-item:not(.active) {
-			cursor: pointer;
-		}
-
-			.breadcrumb-item:not(.active):hover {
-				color: #3b82f6;
-			}
-
-		.breadcrumb-item.active {
-			color: #0f172a;
-			font-weight: 500;
-		}
-
-	.breadcrumb-separator {
-		color: #cbd5e1;
+	.app-name {
+		color: #0f172a;
+		font-weight: 600;
+		letter-spacing: 0.5px;
 	}
 
 	.header-center {

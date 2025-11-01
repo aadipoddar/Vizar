@@ -59,7 +59,7 @@ public static class PurchaseReturnReportExcelExport
 			["CGSTAmount"] = new() { DisplayName = "CGST Amount", Format = "#,##0.00", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignRight, IncludeInTotal = true, HighlightNegative = true },
 			["IGSTAmount"] = new() { DisplayName = "IGST Amount", Format = "#,##0.00", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignRight, IncludeInTotal = true, HighlightNegative = true },
 			["TotalTaxAmount"] = new() { DisplayName = "Total Tax", Format = "#,##0.00", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignRight, IncludeInTotal = true, HighlightNegative = true },
-			["TotalAfterTax"] = new() { DisplayName = "Total After Tax", Format = "#,##0.00", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignRight, IncludeInTotal = true, HighlightNegative = true },
+			["TotalAfterTax"] = new() { DisplayName = "Sub Total", Format = "#,##0.00", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignRight, IncludeInTotal = true, HighlightNegative = true },
 			["OtherChargesAmount"] = new() { DisplayName = "Other Charges", Format = "#,##0.00", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignRight, IncludeInTotal = true, HighlightNegative = true },
 			["TotalAfterOtherCharges"] = new() { DisplayName = "After Other Charges", Format = "#,##0.00", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignRight, IncludeInTotal = true, HighlightNegative = true },
 			["CashDiscountAmount"] = new() { DisplayName = "Cash Discount", Format = "#,##0.00", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignRight, IncludeInTotal = true, HighlightNegative = true },
@@ -104,7 +104,7 @@ public static class PurchaseReturnReportExcelExport
 			columnOrder =
 			[
 				"TransactionNo", "CompanyName", "PartyName", "TransactionDateTime",
-				"TotalItems", "TotalQuantity", "DiscountAmount", "CashDiscountAmount", "TotalAmount"
+				"TotalQuantity", "TotalAfterTax", "OtherChargesPercent", "CashDiscountPercent", "TotalAmount"
 			];
 		}
 

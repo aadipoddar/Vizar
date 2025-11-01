@@ -402,14 +402,42 @@ public partial class PurchasePage
 
 		_selectedCart.ItemId = _selectedItem.Id;
 		_selectedCart.ItemName = _selectedItem.Name;
-		_selectedCart.BaseTotal = _selectedCart.Rate * _selectedCart.Quantity;
-		_selectedCart.DiscountAmount = _selectedCart.BaseTotal * (_selectedCart.DiscountPercent / 100);
-		_selectedCart.AfterDiscount = _selectedCart.BaseTotal - _selectedCart.DiscountAmount;
-		_selectedCart.CGSTAmount = _selectedCart.AfterDiscount * (_selectedCart.CGSTPercent / 100);
-		_selectedCart.SGSTAmount = _selectedCart.AfterDiscount * (_selectedCart.SGSTPercent / 100);
-		_selectedCart.IGSTAmount = _selectedCart.AfterDiscount * (_selectedCart.IGSTPercent / 100);
-		_selectedCart.TotalTaxAmount = _selectedCart.CGSTAmount + _selectedCart.SGSTAmount + _selectedCart.IGSTAmount;
-		_selectedCart.Total = _selectedCart.InclusiveTax ? _selectedCart.AfterDiscount : _selectedCart.AfterDiscount + _selectedCart.TotalTaxAmount;
+
+		if (_selectedCart.InclusiveTax)
+		{
+			// When tax is inclusive, rate already contains tax
+			// First, extract the base amount (amount before tax)
+			decimal totalTaxPercent = _selectedCart.CGSTPercent + _selectedCart.SGSTPercent + _selectedCart.IGSTPercent;
+			decimal baseRate = _selectedCart.Rate / (1 + (totalTaxPercent / 100));
+
+			// Calculate base total from base rate
+			_selectedCart.BaseTotal = baseRate * _selectedCart.Quantity;
+
+			// Apply discount on base amount
+			_selectedCart.DiscountAmount = _selectedCart.BaseTotal * (_selectedCart.DiscountPercent / 100);
+			_selectedCart.AfterDiscount = _selectedCart.BaseTotal - _selectedCart.DiscountAmount;
+
+			// Calculate tax on discounted base amount
+			_selectedCart.CGSTAmount = _selectedCart.AfterDiscount * (_selectedCart.CGSTPercent / 100);
+			_selectedCart.SGSTAmount = _selectedCart.AfterDiscount * (_selectedCart.SGSTPercent / 100);
+			_selectedCart.IGSTAmount = _selectedCart.AfterDiscount * (_selectedCart.IGSTPercent / 100);
+			_selectedCart.TotalTaxAmount = _selectedCart.CGSTAmount + _selectedCart.SGSTAmount + _selectedCart.IGSTAmount;
+
+			// Total = base after discount + tax (which equals the discounted rate with tax)
+			_selectedCart.Total = _selectedCart.AfterDiscount + _selectedCart.TotalTaxAmount;
+		}
+		else
+		{
+			// When tax is not inclusive, rate is the base amount
+			_selectedCart.BaseTotal = _selectedCart.Rate * _selectedCart.Quantity;
+			_selectedCart.DiscountAmount = _selectedCart.BaseTotal * (_selectedCart.DiscountPercent / 100);
+			_selectedCart.AfterDiscount = _selectedCart.BaseTotal - _selectedCart.DiscountAmount;
+			_selectedCart.CGSTAmount = _selectedCart.AfterDiscount * (_selectedCart.CGSTPercent / 100);
+			_selectedCart.SGSTAmount = _selectedCart.AfterDiscount * (_selectedCart.SGSTPercent / 100);
+			_selectedCart.IGSTAmount = _selectedCart.AfterDiscount * (_selectedCart.IGSTPercent / 100);
+			_selectedCart.TotalTaxAmount = _selectedCart.CGSTAmount + _selectedCart.SGSTAmount + _selectedCart.IGSTAmount;
+			_selectedCart.Total = _selectedCart.AfterDiscount + _selectedCart.TotalTaxAmount;
+		}
 
 		StateHasChanged();
 	}
@@ -516,14 +544,42 @@ public partial class PurchasePage
 			if (item.Quantity == 0)
 				_cart.Remove(item);
 
-			item.BaseTotal = item.Rate * item.Quantity;
-			item.DiscountAmount = item.BaseTotal * (item.DiscountPercent / 100);
-			item.AfterDiscount = item.BaseTotal - item.DiscountAmount;
-			item.CGSTAmount = item.AfterDiscount * (item.CGSTPercent / 100);
-			item.SGSTAmount = item.AfterDiscount * (item.SGSTPercent / 100);
-			item.IGSTAmount = item.AfterDiscount * (item.IGSTPercent / 100);
-			item.TotalTaxAmount = item.CGSTAmount + item.SGSTAmount + item.IGSTAmount;
-			item.Total = item.InclusiveTax ? item.AfterDiscount : item.AfterDiscount + item.TotalTaxAmount;
+			if (item.InclusiveTax)
+			{
+				// When tax is inclusive, rate already contains tax
+				// First, extract the base amount (amount before tax)
+				decimal totalTaxPercent = item.CGSTPercent + item.SGSTPercent + item.IGSTPercent;
+				decimal baseRate = item.Rate / (1 + (totalTaxPercent / 100));
+
+				// Calculate base total from base rate
+				item.BaseTotal = baseRate * item.Quantity;
+
+				// Apply discount on base amount
+				item.DiscountAmount = item.BaseTotal * (item.DiscountPercent / 100);
+				item.AfterDiscount = item.BaseTotal - item.DiscountAmount;
+
+				// Calculate tax on discounted base amount
+				item.CGSTAmount = item.AfterDiscount * (item.CGSTPercent / 100);
+				item.SGSTAmount = item.AfterDiscount * (item.SGSTPercent / 100);
+				item.IGSTAmount = item.AfterDiscount * (item.IGSTPercent / 100);
+				item.TotalTaxAmount = item.CGSTAmount + item.SGSTAmount + item.IGSTAmount;
+
+				// Total = base after discount + tax
+				item.Total = item.AfterDiscount + item.TotalTaxAmount;
+			}
+			else
+			{
+				// When tax is not inclusive, rate is the base amount
+				item.BaseTotal = item.Rate * item.Quantity;
+				item.DiscountAmount = item.BaseTotal * (item.DiscountPercent / 100);
+				item.AfterDiscount = item.BaseTotal - item.DiscountAmount;
+				item.CGSTAmount = item.AfterDiscount * (item.CGSTPercent / 100);
+				item.SGSTAmount = item.AfterDiscount * (item.SGSTPercent / 100);
+				item.IGSTAmount = item.AfterDiscount * (item.IGSTPercent / 100);
+				item.TotalTaxAmount = item.CGSTAmount + item.SGSTAmount + item.IGSTAmount;
+				item.Total = item.AfterDiscount + item.TotalTaxAmount;
+			}
+
 			var perUnitCost = item.Total / item.Quantity;
 			var withOtherCharges = perUnitCost * (1 + (_purchase.OtherChargesPercent / 100));
 			item.NetRate = withOtherCharges * (1 - (_purchase.CashDiscountPercent / 100));
