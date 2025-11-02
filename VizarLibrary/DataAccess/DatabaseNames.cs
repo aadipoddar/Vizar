@@ -36,7 +36,7 @@ public static class StoredProcedureNames
 
 	public static string LoadPurchaseDetailByPurchase => "Load_PurchaseDetail_By_Purchase";
 	public static string LoadPurchaseOverviewByDate => "Load_PurchaseOverview_By_Date";
-	public static string LoadPurchaseReturnDetailByPurchase => "Load_PurchaseReturnDetail_By_Purchase";
+	public static string LoadPurchaseReturnDetailByPurchaseReturn => "Load_PurchaseReturnDetail_By_PurchaseReturn";
 	public static string LoadPurchaseReturnOverviewByDate => "Load_PurchaseReturnOverview_By_Date";
 
 	public static string InsertUser => "Insert_User";

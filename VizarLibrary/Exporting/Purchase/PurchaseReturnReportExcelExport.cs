@@ -103,7 +103,7 @@ public static class PurchaseReturnReportExcelExport
 			// Summary columns - key fields only
 			columnOrder =
 			[
-				"TransactionNo", "CompanyName", "PartyName", "TransactionDateTime",
+				"TransactionNo", "TransactionDateTime", "PartyName",
 				"TotalQuantity", "TotalAfterTax", "OtherChargesPercent", "CashDiscountPercent", "TotalAmount"
 			];
 		}

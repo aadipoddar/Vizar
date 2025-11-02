@@ -81,9 +81,8 @@ public static class PurchaseReturnReportPdfExport
 			columnOrder = new()
 			{
 				"TransactionNo",
-				"CompanyName",
-				"PartyName",
 				"TransactionDateTime",
+				"PartyName",
 				"TotalQuantity",
 				"TotalAfterTax",
 				"OtherChargesPercent",

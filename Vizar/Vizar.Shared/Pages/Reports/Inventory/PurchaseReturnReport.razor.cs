@@ -245,6 +245,10 @@ public partial class PurchaseReturnReport
 	{
 		try
 		{
+			if (FormFactor.GetFormFactor() == "Web")
+				await JSRuntime.InvokeVoidAsync("open", $"/inventory/purchasereturn/{purchaseId}", "_blank");
+			else
+				NavigationManager.NavigateTo($"/inventory/purchasereturn/{purchaseId}");
 		}
 		catch (Exception ex)
 		{
@@ -271,7 +275,7 @@ public partial class PurchaseReturnReport
 			}
 
 			// Load purchase return details
-			var purchaseReturnDetails = await PurchaseReturnData.LoadPurchaseReturnDetailByPurchase(purchaseReturnId);
+			var purchaseReturnDetails = await PurchaseReturnData.LoadPurchaseReturnDetailByPurchaseReturn(purchaseReturnId);
 			if (purchaseReturnDetails == null || !purchaseReturnDetails.Any())
 			{
 				await ShowToast("Error", "No line items found for this purchase return.", "error");

@@ -54,9 +54,16 @@ public partial class PurchaseReport
 
 	private async Task LoadData()
 	{
+		await LoadDates();
 		await LoadCompanies();
 		await LoadParties();
 		await LoadPurchaseOverviews();
+	}
+
+	private async Task LoadDates()
+	{
+		_fromDate = await CommonData.LoadCurrentDateTime();
+		_toDate = _fromDate;
 	}
 
 	private async Task LoadCompanies()
@@ -317,6 +324,23 @@ public partial class PurchaseReport
 	{
 		try
 		{
+			if (purchaseId < 0)
+			{
+				// Navigate to Purchase Return Page
+				int actualId = Math.Abs(purchaseId);
+				if (FormFactor.GetFormFactor() == "Web")
+					await JSRuntime.InvokeVoidAsync("open", $"/inventory/purchasereturn/{actualId}", "_blank");
+				else
+					NavigationManager.NavigateTo($"/inventory/purchasereturn/{actualId}");
+			}
+			else
+			{
+				// Navigate to Purchase Page
+				if (FormFactor.GetFormFactor() == "Web")
+					await JSRuntime.InvokeVoidAsync("open", $"/inventory/purchase/{purchaseId}", "_blank");
+				else
+					NavigationManager.NavigateTo($"/inventory/purchase/{purchaseId}");
+			}
 		}
 		catch (Exception ex)
 		{
@@ -427,7 +451,7 @@ public partial class PurchaseReport
 		}
 
 		// Load purchase return details
-		var purchaseReturnDetails = await PurchaseReturnData.LoadPurchaseReturnDetailByPurchase(purchaseReturnId);
+		var purchaseReturnDetails = await PurchaseReturnData.LoadPurchaseReturnDetailByPurchaseReturn(purchaseReturnId);
 		if (purchaseReturnDetails == null || !purchaseReturnDetails.Any())
 		{
 			await ShowToast("Error", "No purchase return details found for this transaction.", "error");

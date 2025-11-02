@@ -1,4 +1,5 @@
 ﻿@page "/inventory/purchasereturn"
+@page "/inventory/purchasereturn/{Id:int}"
 
 @using VizarLibrary.Models.Common
 @using VizarLibrary.Models.Accounts
@@ -23,23 +24,44 @@ else
 		</div>
 		<div class="header-center">
 			<h1 class="page-title">Create Purchase Return</h1>
+			<p class="page-subtitle">Create and manage purchase return transactions</p>
 		</div>
 		<div class="header-right">
-			<button class="btn-icon" @onclick='() => NavigationManager.NavigateTo("/")' title="Home">
+			<button class="btn-icon btn-icon-save" @onclick="SaveTransaction" title="Save Transaction">
 				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-					<polyline points="9 22 9 12 15 12 15 22" />
+					<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+					<polyline points="17 21 17 13 7 13 7 21" />
+					<polyline points="7 3 7 8 15 8" />
 				</svg>
 			</button>
-			<button class="btn-icon" @onclick='() => NavigationManager.NavigateTo("/")' title="Back to Dashboard">
+			<button class="btn-icon" @onclick="UploadDocument" title="Upload Document">
 				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<path d="M19 12H5M12 19l-7-7 7-7" />
+					<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+					<polyline points="17 8 12 3 7 8" />
+					<line x1="12" y1="3" x2="12" y2="15" />
 				</svg>
 			</button>
 			<button class="btn-icon" title="Transaction History" @onclick="NavigateToTransactionHistoryPage">
 				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 					<circle cx="12" cy="12" r="10" />
 					<polyline points="12 6 12 12 16 14" />
+				</svg>
+			</button>
+			<button class="btn-icon" @onclick="ResetPage" title="New Purchase Return">
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<line x1="12" y1="5" x2="12" y2="19" />
+					<line x1="5" y1="12" x2="19" y2="12" />
+				</svg>
+			</button>
+			<button class="btn-icon" @onclick='() => NavigationManager.NavigateTo("/")' title="Home">
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+					<polyline points="9 22 9 12 15 12 15 22" />
+				</svg>
+			</button>
+			<button class="btn-icon" @onclick='() => NavigationManager.NavigateTo("/")' title="Back">
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M19 12H5M12 19l-7-7 7-7" />
 				</svg>
 			</button>
 		</div>
@@ -150,7 +172,7 @@ else
 						</div>
 
 						<!-- Remarks -->
-						<div class="form-field">
+						<div class="form-field form-field-full">
 							<label class="field-label">
 								Remarks / Narration
 							</label>
@@ -159,31 +181,6 @@ else
 									   Placeholder="Enter remarks..."
 									   FloatLabelType="FloatLabelType.Never"
 									   CssClass="custom-textbox textarea-field-small" />
-						</div>
-
-						<!-- Action Buttons -->
-						<div class="form-field">
-							<label class="field-label">
-								Actions
-							</label>
-							<div class="action-buttons">
-								<button class="btn-secondary" @onclick="UploadDocument">
-									<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-										<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-										<polyline points="17 8 12 3 7 8" />
-										<line x1="12" y1="3" x2="12" y2="15" />
-									</svg>
-									<span>Upload Document</span>
-								</button>
-								<button class="btn-primary" @onclick="SaveTransaction">
-									<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-										<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-										<polyline points="17 21 17 13 7 13 7 21" />
-										<polyline points="7 3 7 8 15 8" />
-									</svg>
-									<span>Save Transaction</span>
-								</button>
-							</div>
 						</div>
 					</div>
 				</div>
@@ -918,6 +915,13 @@ else
 		letter-spacing: -0.3px;
 	}
 
+	.page-subtitle {
+		font-size: 13px;
+		color: #64748b;
+		margin: 4px 0 0 0;
+		font-weight: 400;
+	}
+
 	.header-right {
 		display: flex;
 		align-items: center;
@@ -947,6 +951,17 @@ else
 
 		.btn-icon:active {
 			transform: scale(0.95);
+		}
+
+	.btn-icon-save {
+		color: #10b981;
+		border-color: #10b981;
+	}
+
+		.btn-icon-save:hover {
+			background: #ecfdf5;
+			border-color: #059669;
+			color: #059669;
 		}
 
 	/* Main Container */

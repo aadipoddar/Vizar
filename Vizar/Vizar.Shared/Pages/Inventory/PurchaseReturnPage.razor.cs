@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 using Syncfusion.Blazor.DropDowns;
@@ -23,6 +24,8 @@ namespace Vizar.Shared.Pages.Inventory;
 
 public partial class PurchaseReturnPage
 {
+	[Parameter] public int? Id { get; set; }
+
 	private UserModel _user;
 
 	private bool _isLoading = true;
@@ -130,8 +133,19 @@ public partial class PurchaseReturnPage
 	{
 		try
 		{
-			if (await DataStorageService.LocalExists(StorageFileNames.PurchaseReturnDataFileName))
+			if (Id.HasValue)
+			{
+				_purchaseReturn = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, Id.Value);
+				if (_purchaseReturn is null)
+				{
+					await ShowToast("Purchase Return Not Found", "The requested purchase return could not be found.", "error");
+					NavigationManager.NavigateTo("/inventory/purchasereturn", true);
+				}
+			}
+
+			else if (await DataStorageService.LocalExists(StorageFileNames.PurchaseReturnDataFileName))
 				_purchaseReturn = System.Text.Json.JsonSerializer.Deserialize<PurchaseReturnModel>(await DataStorageService.LocalGetAsync(StorageFileNames.PurchaseReturnDataFileName));
+
 			else
 			{
 				_purchaseReturn = new()
@@ -184,6 +198,10 @@ public partial class PurchaseReturnPage
 			await ShowToast("An Error Occurred While Loading Purchase Data", ex.Message, "error");
 			await DeleteLocalFiles();
 		}
+		finally
+		{
+			await SavePurchaseReturnFile();
+		}
 	}
 
 	private async Task LoadItems()
@@ -212,13 +230,56 @@ public partial class PurchaseReturnPage
 		{
 			_cart.Clear();
 
-			if (await DataStorageService.LocalExists(StorageFileNames.PurchaseReturnCartDataFileName))
+			if (_purchaseReturn.Id > 0)
+			{
+				var existingCart = await PurchaseReturnData.LoadPurchaseReturnDetailByPurchaseReturn(_purchaseReturn.Id);
+
+				foreach (var item in existingCart)
+				{
+					if (_items.FirstOrDefault(s => s.Id == item.ItemId) is null)
+					{
+						await ShowToast("Item Not Found", $"The item with ID {item.ItemId} in the existing purchase return cart was not found in the available items list. It may have been deleted or is inaccessible.", "error");
+						continue;
+					}
+
+					_cart.Add(new()
+					{
+						ItemId = item.ItemId,
+						ItemName = _items.FirstOrDefault(s => s.Id == item.ItemId)?.Name ?? "",
+						Quantity = item.Quantity,
+						UnitOfMeasurement = item.UnitOfMeasurement,
+						Rate = item.Rate,
+						BaseTotal = item.BaseTotal,
+						DiscountPercent = item.DiscountPercent,
+						DiscountAmount = item.DiscountAmount,
+						AfterDiscount = item.AfterDiscount,
+						CGSTPercent = item.CGSTPercent,
+						CGSTAmount = item.CGSTAmount,
+						SGSTPercent = item.SGSTPercent,
+						SGSTAmount = item.SGSTAmount,
+						IGSTPercent = item.IGSTPercent,
+						IGSTAmount = item.IGSTAmount,
+						TotalTaxAmount = item.TotalTaxAmount,
+						Total = item.Total,
+						InclusiveTax = item.InclusiveTax,
+						IdentificationNo = item.IdentificationNo,
+						NetRate = item.NetRate,
+						Remarks = item.Remarks
+					});
+				}
+			}
+
+			else if (await DataStorageService.LocalExists(StorageFileNames.PurchaseReturnCartDataFileName))
 				_cart = System.Text.Json.JsonSerializer.Deserialize<List<PurchaseReturnItemCartModel>>(await DataStorageService.LocalGetAsync(StorageFileNames.PurchaseReturnCartDataFileName));
 		}
 		catch (Exception ex)
 		{
 			await ShowToast("An Error Occurred While Loading Existing Cart", ex.Message, "error");
 			await DeleteLocalFiles();
+		}
+		finally
+		{
+			await SavePurchaseReturnFile();
 		}
 	}
 	#endregion
@@ -648,9 +709,8 @@ public partial class PurchaseReturnPage
 			if (_sfCartGrid is not null)
 				await _sfCartGrid?.Refresh();
 
-			StateHasChanged();
-
 			_isProcessing = false;
+			StateHasChanged();
 		}
 	}
 
@@ -674,7 +734,7 @@ public partial class PurchaseReturnPage
 			return false;
 		}
 
-		if (string.IsNullOrEmpty(_purchaseReturn.TransactionNo) || string.IsNullOrWhiteSpace(_purchaseReturn.TransactionNo))
+		if (string.IsNullOrWhiteSpace(_purchaseReturn.TransactionNo))
 		{
 			await ShowToast("Transaction Number Missing", "Please enter a transaction number for the purchase return.", "error");
 			return false;
@@ -710,6 +770,18 @@ public partial class PurchaseReturnPage
 			return false;
 		}
 
+		if (_cart.Any(item => item.Quantity <= 0))
+		{
+			await ShowToast("Invalid Item Quantity", "One or more items in the cart have a quantity less than or equal to zero. Please correct the quantities before saving.", "error");
+			return false;
+		}
+
+		if (string.IsNullOrWhiteSpace(_purchaseReturn.DocumentUrl))
+			_purchaseReturn.DocumentUrl = null;
+
+		if (string.IsNullOrWhiteSpace(_purchaseReturn.Remarks))
+			_purchaseReturn.Remarks = null;
+
 		return true;
 	}
 
@@ -742,7 +814,7 @@ public partial class PurchaseReturnPage
 			_purchaseReturn.Id = await PurchaseReturnData.SavePurchaseReturnTransaction(_purchaseReturn, _cart);
 			await GenerateAndDownloadInvoice();
 			await DeleteLocalFiles();
-			NavigationManager.NavigateTo(NavigationManager.Uri, true);
+			NavigationManager.NavigateTo("/inventory/purchasereturn", true);
 
 			await ShowToast("Save Transaction", "Transaction saved successfully! Invoice has been generated.", "success");
 		}
@@ -762,15 +834,15 @@ public partial class PurchaseReturnPage
 		{
 			// Load saved purchase return details (since _purchaseReturn now has the Id)
 			var savedPurchaseReturn = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, _purchaseReturn.Id);
-			if (savedPurchaseReturn == null)
+			if (savedPurchaseReturn is null)
 			{
 				await ShowToast("Warning", "Invoice generation skipped - purchase return data not found.", "error");
 				return;
 			}
 
 			// Load purchase return details from database
-			var purchaseReturnDetails = await PurchaseReturnData.LoadPurchaseReturnDetailByPurchase(_purchaseReturn.Id);
-			if (purchaseReturnDetails == null || !purchaseReturnDetails.Any())
+			var purchaseReturnDetails = await PurchaseReturnData.LoadPurchaseReturnDetailByPurchaseReturn(_purchaseReturn.Id);
+			if (purchaseReturnDetails is null || purchaseReturnDetails.Count == 0)
 			{
 				await ShowToast("Warning", "Invoice generation skipped - no line items found.", "error");
 				return;
@@ -780,7 +852,7 @@ public partial class PurchaseReturnPage
 			var company = await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, savedPurchaseReturn.CompanyId);
 			var party = await CommonData.LoadTableDataById<LedgerModel>(TableNames.Ledger, savedPurchaseReturn.PartyId);
 
-			if (company == null || party == null)
+			if (company is null || party is null)
 			{
 				await ShowToast("Warning", "Invoice generation skipped - company or party not found.", "error");
 				return;
@@ -908,6 +980,12 @@ public partial class PurchaseReturnPage
 	#endregion
 
 	#region Utilities
+	private async Task ResetPage(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
+	{
+		await DeleteLocalFiles();
+		NavigationManager.NavigateTo("/inventory/purchasereturn", true);
+	}
+
 	private async Task NavigateToTransactionHistoryPage()
 	{
 		if (FormFactor.GetFormFactor() == "Web")

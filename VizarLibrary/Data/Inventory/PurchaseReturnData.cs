@@ -11,8 +11,8 @@ public static class PurchaseReturnData
 	public static async Task<int> InsertPurchaseReturnDetail(PurchaseReturnDetailModel purchaseReturnDetail) =>
 		(await SqlDataAccess.LoadData<int, dynamic>(StoredProcedureNames.InsertPurchaseReturnDetail, purchaseReturnDetail)).FirstOrDefault();
 
-	public static async Task<List<PurchaseReturnDetailModel>> LoadPurchaseReturnDetailByPurchase(int PurchaseReturnId) =>
-		await SqlDataAccess.LoadData<PurchaseReturnDetailModel, dynamic>(StoredProcedureNames.LoadPurchaseReturnDetailByPurchase, new { PurchaseReturnId });
+	public static async Task<List<PurchaseReturnDetailModel>> LoadPurchaseReturnDetailByPurchaseReturn(int PurchaseReturnId) =>
+		await SqlDataAccess.LoadData<PurchaseReturnDetailModel, dynamic>(StoredProcedureNames.LoadPurchaseReturnDetailByPurchaseReturn, new { PurchaseReturnId });
 
 	public static async Task<List<PurchaseReturnOverviewModel>> LoadPurchaseReturnOverviewByDate(DateTime StartDate, DateTime EndDate) =>
 		await SqlDataAccess.LoadData<PurchaseReturnOverviewModel, dynamic>(StoredProcedureNames.LoadPurchaseReturnOverviewByDate, new { StartDate, EndDate });
@@ -31,7 +31,7 @@ public static class PurchaseReturnData
 	{
 		if (update)
 		{
-			var existingPurchaseDetails = await LoadPurchaseReturnDetailByPurchase(purchaseReturn.Id);
+			var existingPurchaseDetails = await LoadPurchaseReturnDetailByPurchaseReturn(purchaseReturn.Id);
 			foreach (var item in existingPurchaseDetails)
 			{
 				item.Status = false;

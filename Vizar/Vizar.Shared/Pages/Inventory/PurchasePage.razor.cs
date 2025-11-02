@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 using Syncfusion.Blazor.DropDowns;
@@ -23,6 +24,8 @@ namespace Vizar.Shared.Pages.Inventory;
 
 public partial class PurchasePage
 {
+	[Parameter] public int? Id { get; set; }
+
 	private UserModel _user;
 
 	private bool _isLoading = true;
@@ -130,8 +133,19 @@ public partial class PurchasePage
 	{
 		try
 		{
-			if (await DataStorageService.LocalExists(StorageFileNames.PurchaseDataFileName))
+			if (Id.HasValue)
+			{
+				_purchase = await CommonData.LoadTableDataById<PurchaseModel>(TableNames.Purchase, Id.Value);
+				if (_purchase is null)
+				{
+					await ShowToast("Purchase Not Found", "The requested purchase could not be found.", "error");
+					NavigationManager.NavigateTo("/inventory/purchase", true);
+				}
+			}
+
+			else if (await DataStorageService.LocalExists(StorageFileNames.PurchaseDataFileName))
 				_purchase = System.Text.Json.JsonSerializer.Deserialize<PurchaseModel>(await DataStorageService.LocalGetAsync(StorageFileNames.PurchaseDataFileName));
+
 			else
 			{
 				_purchase = new()
@@ -184,6 +198,10 @@ public partial class PurchasePage
 			await ShowToast("An Error Occurred While Loading Purchase Data", ex.Message, "error");
 			await DeleteLocalFiles();
 		}
+		finally
+		{
+			await SavePurchaseFile();
+		}
 	}
 
 	private async Task LoadItems()
@@ -212,13 +230,56 @@ public partial class PurchasePage
 		{
 			_cart.Clear();
 
-			if (await DataStorageService.LocalExists(StorageFileNames.PurchaseCartDataFileName))
+			if (_purchase.Id > 0)
+			{
+				var existingCart = await PurchaseData.LoadPurchaseDetailByPurchase(_purchase.Id);
+
+				foreach (var item in existingCart)
+				{
+					if (_items.FirstOrDefault(s => s.Id == item.ItemId) is null)
+					{
+						await ShowToast("Item Not Found", $"The item with ID {item.ItemId} in the existing purchase cart was not found in the available items list. It may have been deleted or is inaccessible.", "error");
+						continue;
+					}
+
+					_cart.Add(new()
+					{
+						ItemId = item.ItemId,
+						ItemName = _items.FirstOrDefault(s => s.Id == item.ItemId)?.Name ?? "",
+						Quantity = item.Quantity,
+						UnitOfMeasurement = item.UnitOfMeasurement,
+						Rate = item.Rate,
+						BaseTotal = item.BaseTotal,
+						DiscountPercent = item.DiscountPercent,
+						DiscountAmount = item.DiscountAmount,
+						AfterDiscount = item.AfterDiscount,
+						CGSTPercent = item.CGSTPercent,
+						CGSTAmount = item.CGSTAmount,
+						SGSTPercent = item.SGSTPercent,
+						SGSTAmount = item.SGSTAmount,
+						IGSTPercent = item.IGSTPercent,
+						IGSTAmount = item.IGSTAmount,
+						TotalTaxAmount = item.TotalTaxAmount,
+						Total = item.Total,
+						InclusiveTax = item.InclusiveTax,
+						IdentificationNo = item.IdentificationNo,
+						NetRate = item.NetRate,
+						Remarks = item.Remarks
+					});
+				}
+			}
+
+			else if (await DataStorageService.LocalExists(StorageFileNames.PurchaseCartDataFileName))
 				_cart = System.Text.Json.JsonSerializer.Deserialize<List<PurchaseItemCartModel>>(await DataStorageService.LocalGetAsync(StorageFileNames.PurchaseCartDataFileName));
 		}
 		catch (Exception ex)
 		{
 			await ShowToast("An Error Occurred While Loading Existing Cart", ex.Message, "error");
 			await DeleteLocalFiles();
+		}
+		finally
+		{
+			await SavePurchaseFile();
 		}
 	}
 	#endregion
@@ -648,9 +709,8 @@ public partial class PurchasePage
 			if (_sfCartGrid is not null)
 				await _sfCartGrid?.Refresh();
 
-			StateHasChanged();
-
 			_isProcessing = false;
+			StateHasChanged();
 		}
 	}
 
@@ -674,7 +734,7 @@ public partial class PurchasePage
 			return false;
 		}
 
-		if (string.IsNullOrEmpty(_purchase.TransactionNo) || string.IsNullOrWhiteSpace(_purchase.TransactionNo))
+		if (string.IsNullOrWhiteSpace(_purchase.TransactionNo))
 		{
 			await ShowToast("Transaction Number Missing", "Please enter a transaction number for the purchase.", "error");
 			return false;
@@ -710,6 +770,18 @@ public partial class PurchasePage
 			return false;
 		}
 
+		if (_cart.Any(item => item.Quantity <= 0))
+		{
+			await ShowToast("Invalid Item Quantity", "One or more items in the cart have a quantity less than or equal to zero. Please correct the quantities before saving.", "error");
+			return false;
+		}
+
+		if (string.IsNullOrWhiteSpace(_purchase.DocumentUrl))
+			_purchase.DocumentUrl = null;
+
+		if (string.IsNullOrWhiteSpace(_purchase.Remarks))
+			_purchase.Remarks = null;
+
 		return true;
 	}
 
@@ -742,7 +814,7 @@ public partial class PurchasePage
 			_purchase.Id = await PurchaseData.SavePurchaseTransaction(_purchase, _cart);
 			await GenerateAndDownloadInvoice();
 			await DeleteLocalFiles();
-			NavigationManager.NavigateTo(NavigationManager.Uri, true);
+			NavigationManager.NavigateTo("/inventory/purchase", true);
 
 			await ShowToast("Save Transaction", "Transaction saved successfully! Invoice has been generated.", "success");
 		}
@@ -762,7 +834,7 @@ public partial class PurchasePage
 		{
 			// Load saved purchase details (since _purchase now has the Id)
 			var savedPurchase = await CommonData.LoadTableDataById<PurchaseModel>(TableNames.Purchase, _purchase.Id);
-			if (savedPurchase == null)
+			if (savedPurchase is null)
 			{
 				await ShowToast("Warning", "Invoice generation skipped - purchase data not found.", "error");
 				return;
@@ -770,7 +842,7 @@ public partial class PurchasePage
 
 			// Load purchase details from database
 			var purchaseDetails = await PurchaseData.LoadPurchaseDetailByPurchase(_purchase.Id);
-			if (purchaseDetails == null || !purchaseDetails.Any())
+			if (purchaseDetails is null || purchaseDetails.Count == 0)
 			{
 				await ShowToast("Warning", "Invoice generation skipped - no line items found.", "error");
 				return;
@@ -908,6 +980,12 @@ public partial class PurchasePage
 	#endregion
 
 	#region Utilities
+	private async Task ResetPage(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
+	{
+		await DeleteLocalFiles();
+		NavigationManager.NavigateTo("/inventory/purchase", true);
+	}
+
 	private async Task NavigateToTransactionHistoryPage()
 	{
 		if (FormFactor.GetFormFactor() == "Web")
