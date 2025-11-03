@@ -60,4 +60,6 @@ public static class ViewNames
 {
 	public static string PurchaseOverview => "Purchase_Overview";
 	public static string PurchaseReturnOverview => "PurchaseReturn_Overview";
+	public static string ItemsPurchaseOverview => "Items_Purchase_Overview";
+	public static string ItemsPurchaseReturnOverview => "Items_PurchaseReturn_Overview";
 }

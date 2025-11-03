@@ -10,3 +10,14 @@ public class FinancialYearModel
 	public bool Locked { get; set; }
 	public bool Status { get; set; }
 }
+
+public enum DateRangeType
+{
+	Today,
+	Yesterday,
+	CurrentMonth,
+	PreviousMonth,
+	CurrentFinancialYear,
+	PreviousFinancialYear,
+	AllTime
+}

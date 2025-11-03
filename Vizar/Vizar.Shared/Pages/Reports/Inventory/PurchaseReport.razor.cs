@@ -5,6 +5,7 @@ using Syncfusion.Blazor.Notifications;
 
 using Vizar.Shared.Services;
 
+using VizarLibrary.Data.Accounts;
 using VizarLibrary.Data.Common;
 using VizarLibrary.Data.Inventory;
 using VizarLibrary.DataAccess;
@@ -17,6 +18,8 @@ namespace Vizar.Shared.Pages.Reports.Inventory;
 
 public partial class PurchaseReport
 {
+	private UserModel _user;
+
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
 	private bool _showAllColumns = false;
@@ -53,7 +56,7 @@ public partial class PurchaseReport
 		if (!firstRender)
 			return;
 
-		await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, UserRoles.Inventory);
+		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, UserRoles.Inventory);
 		await LoadData();
 		_isLoading = false;
 		StateHasChanged();
@@ -221,6 +224,68 @@ public partial class PurchaseReport
 		_selectedParty = args.Value;
 		await LoadPurchaseOverviews();
 	}
+
+	private async Task SetDateRange(DateRangeType rangeType)
+	{
+		var today = await CommonData.LoadCurrentDateTime();
+		var currentYear = today.Year;
+		var currentMonth = today.Month;
+
+		switch (rangeType)
+		{
+			case DateRangeType.Today:
+				_fromDate = today;
+				_toDate = today;
+				break;
+
+			case DateRangeType.Yesterday:
+				_fromDate = today.AddDays(-1);
+				_toDate = today.AddDays(-1);
+				break;
+
+			case DateRangeType.CurrentMonth:
+				_fromDate = new DateTime(currentYear, currentMonth, 1);
+				_toDate = _fromDate.AddMonths(1).AddDays(-1);
+				break;
+
+			case DateRangeType.PreviousMonth:
+				_fromDate = new DateTime(_fromDate.Year, _fromDate.Month, 1).AddMonths(-1);
+				_toDate = _fromDate.AddMonths(1).AddDays(-1);
+				break;
+
+			case DateRangeType.CurrentFinancialYear:
+				var currentFY = await FinancialYearData.LoadFinancialYearByDateTime(today);
+				_fromDate = currentFY.StartDate.ToDateTime(TimeOnly.MinValue);
+				_toDate = currentFY.EndDate.ToDateTime(TimeOnly.MaxValue);
+				break;
+
+			case DateRangeType.PreviousFinancialYear:
+				currentFY = await FinancialYearData.LoadFinancialYearByDateTime(_fromDate);
+				var financialYears = await CommonData.LoadTableDataByStatus<FinancialYearModel>(TableNames.FinancialYear);
+				var previousFY = financialYears
+					.Where(fy => fy.Id != currentFY.Id)
+					.OrderByDescending(fy => fy.StartDate)
+					.FirstOrDefault();
+
+				if (previousFY == null)
+				{
+					await ShowToast("Warning", "No previous financial year found.", "error");
+					return;
+				}
+
+				_fromDate = previousFY.StartDate.ToDateTime(TimeOnly.MinValue);
+				_toDate = previousFY.EndDate.ToDateTime(TimeOnly.MaxValue);
+				break;
+
+			case DateRangeType.AllTime:
+				_fromDate = new DateTime(2000, 1, 1);
+				_toDate = today;
+				break;
+		}
+
+		await LoadPurchaseOverviews();
+		StateHasChanged();
+	}
 	#endregion
 
 	#region Exporting
@@ -370,15 +435,9 @@ public partial class PurchaseReport
 			int actualId = Math.Abs(purchaseId);
 
 			if (isPurchaseReturn)
-			{
-				// Handle Purchase Return Invoice
 				await DownloadPurchaseReturnInvoice(actualId);
-			}
 			else
-			{
-				// Handle Purchase Invoice
 				await DownloadPurchaseInvoice(actualId);
-			}
 		}
 		catch (Exception ex)
 		{
@@ -395,7 +454,7 @@ public partial class PurchaseReport
 	{
 		// Load purchase header
 		var purchaseHeader = await CommonData.LoadTableDataById<PurchaseModel>(TableNames.Purchase, purchaseId);
-		if (purchaseHeader == null)
+		if (purchaseHeader is null)
 		{
 			await ShowToast("Error", "Purchase record not found.", "error");
 			return;
@@ -403,7 +462,7 @@ public partial class PurchaseReport
 
 		// Load purchase details
 		var purchaseDetails = await PurchaseData.LoadPurchaseDetailByPurchase(purchaseId);
-		if (purchaseDetails == null || !purchaseDetails.Any())
+		if (purchaseDetails is null || purchaseDetails.Count == 0)
 		{
 			await ShowToast("Error", "No purchase details found for this transaction.", "error");
 			return;
@@ -411,7 +470,7 @@ public partial class PurchaseReport
 
 		// Load company information
 		var company = await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, purchaseHeader.CompanyId);
-		if (company == null)
+		if (company is null)
 		{
 			await ShowToast("Error", "Company information not found.", "error");
 			return;
@@ -419,7 +478,7 @@ public partial class PurchaseReport
 
 		// Load party/supplier information
 		var party = await CommonData.LoadTableDataById<LedgerModel>(TableNames.Ledger, purchaseHeader.PartyId);
-		if (party == null)
+		if (party is null)
 		{
 			await ShowToast("Error", "Party information not found.", "error");
 			return;
@@ -533,6 +592,43 @@ public partial class PurchaseReport
 		}
 	}
 
+	private async Task ConfirmDelete()
+	{
+		if (_isProcessing)
+			return;
+
+		try
+		{
+			_isDeleteDialogVisible = false;
+			_isProcessing = true;
+			StateHasChanged();
+
+			var purchase = await CommonData.LoadTableDataById<PurchaseModel>(TableNames.Purchase, _deleteTransactionId);
+			var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, purchase.FinancialYearId);
+			if (financialYear is null || financialYear.Locked || financialYear.Status == false)
+				throw new InvalidOperationException("Cannot delete purchase transaction as the financial year is locked.");
+
+			if (!_user.Admin)
+				throw new UnauthorizedAccessException("You do not have permission to delete this purchase transaction.");
+
+			await PurchaseData.DeletePurchase(_deleteTransactionId);
+			await ShowToast("Success", $"Purchase transaction {_deleteTransactionNo} has been deleted successfully.", "success");
+
+			_deleteTransactionId = 0;
+			_deleteTransactionNo = string.Empty;
+		}
+		catch (Exception ex)
+		{
+			await ShowToast("Error", $"An error occurred while deleting purchase transaction: {ex.Message}", "error");
+		}
+		finally
+		{
+			_isProcessing = false;
+			StateHasChanged();
+			await LoadPurchaseOverviews();
+		}
+	}
+
 	private async Task ToggleDetailsView()
 	{
 		_showAllColumns = !_showAllColumns;
@@ -599,36 +695,6 @@ public partial class PurchaseReport
 		_deleteTransactionNo = string.Empty;
 		_isDeleteDialogVisible = false;
 		StateHasChanged();
-	}
-
-	private async Task ConfirmDelete()
-	{
-		if (_isProcessing)
-			return;
-
-		try
-		{
-			_isDeleteDialogVisible = false;
-			_isProcessing = true;
-			StateHasChanged();
-
-			await PurchaseData.DeletePurchase(_deleteTransactionId);
-			await LoadPurchaseOverviews();
-
-			await ShowToast("Success", $"Purchase transaction {_deleteTransactionNo} has been deleted successfully.", "success");
-
-			_deleteTransactionId = 0;
-			_deleteTransactionNo = string.Empty;
-		}
-		catch (Exception ex)
-		{
-			await ShowToast("Error", $"An error occurred while deleting purchase transaction: {ex.Message}", "error");
-		}
-		finally
-		{
-			_isProcessing = false;
-			StateHasChanged();
-		}
 	}
 	#endregion
 }

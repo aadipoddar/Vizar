@@ -19,8 +19,8 @@ BEGIN
 		(
 			[Name],
 			[Code],
-			[ItemType],
-			[ItemCategory],
+			[ItemTypeId],
+			[ItemCategoryId],
 			[ManufacturerId],
 			[Rate],
 			[TaxId],
@@ -53,8 +53,8 @@ BEGIN
 		SET
 			[Name] = @Name,
 			[Code] = @Code,
-			[ItemType] = @ItemType,
-			[ItemCategory] = @ItemCategory,
+			[ItemTypeId] = @ItemType,
+			[ItemCategoryId] = @ItemCategory,
 			[ManufacturerId] = @ManufacturerId,
 			[Rate] = @Rate,
 			[TaxId] = @TaxId,

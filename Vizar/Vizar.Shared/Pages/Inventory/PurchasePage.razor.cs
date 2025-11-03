@@ -790,6 +790,23 @@ public partial class PurchasePage
 			return false;
 		}
 
+		if (_purchase.Id > 0)
+		{
+			var existingPurchase = await CommonData.LoadTableDataById<PurchaseModel>(TableNames.Purchase, _purchase.Id);
+			var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, _purchase.FinancialYearId);
+			if (financialYear is null || financialYear.Locked || financialYear.Status == false)
+			{
+				await ShowToast("Financial Year Locked or Inactive", "The financial year for the selected transaction date is either locked or inactive. Please select a different date.", "error");
+				return false;
+			}
+
+			if (!_user.Admin)
+			{
+				await ShowToast("Insufficient Permissions", "You do not have the necessary permissions to modify this transaction.", "error");
+				return false;
+			}
+		}
+
 		if (string.IsNullOrWhiteSpace(_purchase.DocumentUrl))
 			_purchase.DocumentUrl = null;
 

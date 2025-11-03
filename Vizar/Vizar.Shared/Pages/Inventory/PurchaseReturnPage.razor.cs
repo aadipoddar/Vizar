@@ -790,6 +790,23 @@ public partial class PurchaseReturnPage
 			return false;
 		}
 
+		if (_purchaseReturn.Id > 0)
+		{
+			var existingPurchaseReturn = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, _purchaseReturn.Id);
+			var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, existingPurchaseReturn.FinancialYearId);
+			if (financialYear is null || financialYear.Locked || financialYear.Status == false)
+			{
+				await ShowToast("Financial Year Locked or Inactive", "The financial year for the selected transaction date is either locked or inactive. Please select a different date.", "error");
+				return false;
+			}
+
+			if (!_user.Admin)
+			{
+				await ShowToast("Insufficient Permissions", "You do not have the necessary permissions to modify this transaction.", "error");
+				return false;
+			}
+		}
+
 		if (string.IsNullOrWhiteSpace(_purchaseReturn.DocumentUrl))
 			_purchaseReturn.DocumentUrl = null;
 

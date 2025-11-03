@@ -123,7 +123,8 @@
     <Build Include="StoredProcedures\LoadData\Inventory\Load_PurchaseReturnDetail_By_PurchaseReturn.sql" />
     <Build Include="Views\PurchaseReturn_Overview.sql" />
     <Build Include="StoredProcedures\LoadData\Inventory\Load_PurchaseReturnOverview_By_Date.sql" />
-    <Build Include="Views\Itmes_Purchase_Overview.sql" />
+    <Build Include="Views\Items_Purchase_Overview.sql" />
+    <Build Include="Views\Items_PurchaseReturn_Overview.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalVizar.publish.xml" />

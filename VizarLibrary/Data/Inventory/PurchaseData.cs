@@ -1,6 +1,7 @@
 ﻿using VizarLibrary.Data.Common;
 using VizarLibrary.Data.Item;
 using VizarLibrary.DataAccess;
+using VizarLibrary.Models.Accounts;
 using VizarLibrary.Models.Common;
 using VizarLibrary.Models.Inventory;
 using VizarLibrary.Models.Item;
@@ -24,6 +25,10 @@ public static class PurchaseData
 	public static async Task DeletePurchase(int purchaseId)
 	{
 		var purchase = await CommonData.LoadTableDataById<PurchaseModel>(TableNames.Purchase, purchaseId);
+		var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, purchase.FinancialYearId);
+		if (financialYear is null || financialYear.Locked || financialYear.Status == false)
+			throw new InvalidOperationException("Cannot delete purchase transaction as the financial year is locked.");
+
 		if (purchase is not null)
 		{
 			purchase.Status = false;
@@ -34,6 +39,14 @@ public static class PurchaseData
 	public static async Task<int> SavePurchaseTransaction(PurchaseModel purchase, List<PurchaseItemCartModel> purchaseDetails)
 	{
 		bool update = purchase.Id > 0;
+
+		if (update)
+		{
+			var existingPurchase = await CommonData.LoadTableDataById<PurchaseModel>(TableNames.Purchase, purchase.Id);
+			var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, existingPurchase.FinancialYearId);
+			if (financialYear is null || financialYear.Locked || financialYear.Status == false)
+				throw new InvalidOperationException("Cannot update purchase transaction as the financial year is locked.");
+		}
 
 		purchase.Id = await InsertPurchase(purchase);
 		await SavePurchaseDetail(purchase, purchaseDetails, update);

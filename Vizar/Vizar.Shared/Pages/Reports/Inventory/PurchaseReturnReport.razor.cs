@@ -5,7 +5,7 @@ using Syncfusion.Blazor.Notifications;
 using Syncfusion.Blazor.Popups;
 
 using Vizar.Shared.Services;
-
+using VizarLibrary.Data.Accounts;
 using VizarLibrary.Data.Common;
 using VizarLibrary.Data.Inventory;
 using VizarLibrary.DataAccess;
@@ -18,6 +18,8 @@ namespace Vizar.Shared.Pages.Reports.Inventory;
 
 public partial class PurchaseReturnReport
 {
+	private UserModel _user;
+
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
 	private bool _showAllColumns = false;
@@ -54,7 +56,7 @@ public partial class PurchaseReturnReport
 		if (!firstRender)
 			return;
 
-		await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, UserRoles.Inventory);
+		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, UserRoles.Inventory);
 		await LoadData();
 		_isLoading = false;
 		StateHasChanged();
@@ -144,6 +146,68 @@ public partial class PurchaseReturnReport
 	{
 		_selectedParty = args.Value;
 		await LoadPurchaseReturnOverviews();
+	}
+
+	private async Task SetDateRange(DateRangeType rangeType)
+	{
+		var today = DateTime.Now.Date;
+		var currentYear = today.Year;
+		var currentMonth = today.Month;
+
+		switch (rangeType)
+		{
+			case DateRangeType.Today:
+				_fromDate = today;
+				_toDate = today;
+				break;
+
+			case DateRangeType.Yesterday:
+				_fromDate = today.AddDays(-1);
+				_toDate = today.AddDays(-1);
+				break;
+
+			case DateRangeType.CurrentMonth:
+				_fromDate = new DateTime(currentYear, currentMonth, 1);
+				_toDate = _fromDate.AddMonths(1).AddDays(-1);
+				break;
+
+			case DateRangeType.PreviousMonth:
+				_fromDate = new DateTime(_fromDate.Year, _fromDate.Month, 1).AddMonths(-1);
+				_toDate = _fromDate.AddMonths(1).AddDays(-1);
+				break;
+
+			case DateRangeType.CurrentFinancialYear:
+				var currentFY = await FinancialYearData.LoadFinancialYearByDateTime(today);
+				_fromDate = currentFY.StartDate.ToDateTime(TimeOnly.MinValue);
+				_toDate = currentFY.EndDate.ToDateTime(TimeOnly.MaxValue);
+				break;
+
+			case DateRangeType.PreviousFinancialYear:
+				currentFY = await FinancialYearData.LoadFinancialYearByDateTime(_fromDate);
+				var financialYears = await CommonData.LoadTableDataByStatus<FinancialYearModel>(TableNames.FinancialYear);
+				var previousFY = financialYears
+					.Where(fy => fy.Id != currentFY.Id)
+					.OrderByDescending(fy => fy.StartDate)
+					.FirstOrDefault();
+
+				if (previousFY == null)
+				{
+					await ShowToast("Warning", "No previous financial year found.", "error");
+					return;
+				}
+
+				_fromDate = previousFY.StartDate.ToDateTime(TimeOnly.MinValue);
+				_toDate = previousFY.EndDate.ToDateTime(TimeOnly.MaxValue);
+				break;
+
+			case DateRangeType.AllTime:
+				_fromDate = new DateTime(2000, 1, 1);
+				_toDate = today;
+				break;
+		}
+
+		await LoadPurchaseReturnOverviews();
+		StateHasChanged();
 	}
 	#endregion
 
@@ -369,6 +433,43 @@ public partial class PurchaseReturnReport
 		}
 	}
 
+	private async Task ConfirmDelete()
+	{
+		if (_isProcessing)
+			return;
+
+		try
+		{
+			_isDeleteDialogVisible = false;
+			_isProcessing = true;
+			StateHasChanged();
+
+			var purchaseReturn = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, _deleteTransactionId);
+			var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, purchaseReturn.FinancialYearId);
+			if (financialYear is null || financialYear.Locked || financialYear.Status == false)
+				throw new InvalidOperationException("Cannot delete purchase return transaction as the financial year is locked.");
+
+			if (!_user.Admin)
+				throw new UnauthorizedAccessException("You do not have permission to delete this purchase return transaction.");
+
+			await PurchaseReturnData.DeletePurchaseReturn(_deleteTransactionId);
+			await ShowToast("Success", $"Purchase return '{_deleteTransactionNo}' has been successfully deleted.", "success");
+
+			_deleteTransactionId = 0;
+			_deleteTransactionNo = string.Empty;
+		}
+		catch (Exception ex)
+		{
+			await ShowToast("Error", $"Failed to delete purchase return: {ex.Message}", "error");
+		}
+		finally
+		{
+			_isProcessing = false;
+			StateHasChanged();
+			await LoadPurchaseReturnOverviews();
+		}
+	}
+
 	private async Task ToggleDetailsView()
 	{
 		_showAllColumns = !_showAllColumns;
@@ -428,34 +529,6 @@ public partial class PurchaseReturnReport
 		_deleteTransactionId = 0;
 		_deleteTransactionNo = string.Empty;
 		StateHasChanged();
-	}
-
-	private async Task ConfirmDelete()
-	{
-		try
-		{
-			_isDeleteDialogVisible = false;
-			_isProcessing = true;
-			StateHasChanged();
-
-			await PurchaseReturnData.DeletePurchaseReturn(_deleteTransactionId);
-
-			await ShowToast("Success", $"Purchase return '{_deleteTransactionNo}' has been successfully deleted.", "success");
-
-			_deleteTransactionId = 0;
-			_deleteTransactionNo = string.Empty;
-
-			await LoadPurchaseReturnOverviews();
-		}
-		catch (Exception ex)
-		{
-			await ShowToast("Error", $"Failed to delete purchase return: {ex.Message}", "error");
-		}
-		finally
-		{
-			_isProcessing = false;
-			StateHasChanged();
-		}
 	}
 	#endregion
 }

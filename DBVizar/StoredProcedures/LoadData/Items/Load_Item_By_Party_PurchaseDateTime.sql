@@ -8,8 +8,8 @@ BEGIN
 		i.[Id],
 		i.[Name],
 		i.[Code],
-		i.[ItemType],
-		i.[ItemCategory],
+		i.[ItemTypeId],
+		i.[ItemCategoryId],
 		i.[ManufacturerId],
 
 		ISNULL(

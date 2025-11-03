@@ -85,53 +85,80 @@ else
 				</div>
 			</div>
 			<div class="section-body">
-				<div class="filters-grid">
-					<!-- Date Range -->
-					<div class="form-field">
-						<label class="field-label">Date Range</label>
-						<SfDateRangePicker CssClass="custom-daterange"
-										   StartDate="_fromDate"
-										   EndDate="_toDate"
-										   TValue="DateTime"
-										   Format="dd/MM/yyyy"
-										   AllowEdit="true"
-										   Placeholder="Select date range">
-							<DateRangePickerEvents TValue="DateTime" ValueChange="OnDateRangeChanged" />
-						</SfDateRangePicker>
+				<div class="filters-container">
+					<div class="filters-grid">
+						<!-- Date Range -->
+						<div class="form-field">
+							<label class="field-label">Date Range</label>
+							<SfDateRangePicker CssClass="custom-daterange"
+											   StartDate="_fromDate"
+											   EndDate="_toDate"
+											   TValue="DateTime"
+											   Format="dd/MM/yyyy"
+											   AllowEdit="true"
+											   Placeholder="Select date range">
+								<DateRangePickerEvents TValue="DateTime" ValueChange="OnDateRangeChanged" />
+							</SfDateRangePicker>
+						</div>
+
+						<!-- Company -->
+						<div class="form-field">
+							<label class="field-label">Company</label>
+							<SfAutoComplete CssClass="custom-autocomplete"
+											Value="@_selectedCompany"
+											TValue="CompanyModel"
+											TItem="CompanyModel"
+											DataSource="@_companies"
+											Autofill="true"
+											Placeholder="All Companies"
+											AllowFiltering="true"
+											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
+								<AutoCompleteEvents TItem="CompanyModel" TValue="CompanyModel" ValueChange="OnCompanyChanged" />
+								<AutoCompleteFieldSettings Value="Name" />
+							</SfAutoComplete>
+						</div>
+
+						<!-- Party -->
+						<div class="form-field">
+							<label class="field-label">Party</label>
+							<SfAutoComplete CssClass="custom-autocomplete"
+											Value="@_selectedParty"
+											TValue="LedgerModel"
+											TItem="LedgerModel"
+											DataSource="@_parties"
+											Autofill="true"
+											Placeholder="All Parties"
+											AllowFiltering="true"
+											FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
+								<AutoCompleteEvents TItem="LedgerModel" TValue="LedgerModel" ValueChange="OnPartyChanged" />
+								<AutoCompleteFieldSettings Value="Name" />
+							</SfAutoComplete>
+						</div>
 					</div>
 
-					<!-- Company -->
-					<div class="form-field">
-						<label class="field-label">Company</label>
-						<SfAutoComplete CssClass="custom-autocomplete"
-										Value="@_selectedCompany"
-										TValue="CompanyModel"
-										TItem="CompanyModel"
-										DataSource="@_companies"
-										Autofill="true"
-										Placeholder="All Companies"
-										AllowFiltering="true"
-										FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
-							<AutoCompleteEvents TItem="CompanyModel" TValue="CompanyModel" ValueChange="OnCompanyChanged" />
-							<AutoCompleteFieldSettings Value="Name" />
-						</SfAutoComplete>
-					</div>
-
-					<!-- Party -->
-					<div class="form-field">
-						<label class="field-label">Party</label>
-						<SfAutoComplete CssClass="custom-autocomplete"
-										Value="@_selectedParty"
-										TValue="LedgerModel"
-										TItem="LedgerModel"
-										DataSource="@_parties"
-										Autofill="true"
-										Placeholder="All Parties"
-										AllowFiltering="true"
-										FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
-							<AutoCompleteEvents TItem="LedgerModel" TValue="LedgerModel" ValueChange="OnPartyChanged" />
-							<AutoCompleteFieldSettings Value="Name" />
-						</SfAutoComplete>
+					<!-- Date Utility Buttons -->
+					<div class="date-utilities">
+						<button class="btn-date-utility" @onclick="() => SetDateRange(DateRangeType.Today)" title="Today">
+							<span>Today</span>
+						</button>
+						<button class="btn-date-utility" @onclick="() => SetDateRange(DateRangeType.Yesterday)" title="Yesterday">
+							<span>Yesterday</span>
+						</button>
+						<button class="btn-date-utility" @onclick="() => SetDateRange(DateRangeType.CurrentMonth)" title="Current Month">
+							<span>Current Month</span>
+						</button>
+						<button class="btn-date-utility" @onclick="() => SetDateRange(DateRangeType.PreviousMonth)" title="Previous Month">
+							<span>Previous Month</span>
+						</button>
+						<button class="btn-date-utility" @onclick="() => SetDateRange(DateRangeType.CurrentFinancialYear)" title="Current Financial Year">
+							<span>Current FY</span>
+						</button>
+						<button class="btn-date-utility" @onclick="() => SetDateRange(DateRangeType.PreviousFinancialYear)" title="Previous Financial Year">
+							<span>Previous FY</span>
+						</button>
+						<button class="btn-date-utility" @onclick="() => SetDateRange(DateRangeType.AllTime)" title="All Time">
+							<span>All Time</span>
+						</button>
 					</div>
 				</div>
 			</div>
@@ -736,22 +763,69 @@ else
 		padding: 0 !important;
 	}
 
-	/* Filters Grid Layout */
+	/* Filters Container and Grid Layout */
+	.filters-container {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
 	.filters-grid {
 		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		gap: 20px;
+		grid-template-columns: repeat(3, minmax(180px, 250px));
+		gap: 12px;
 		align-items: end;
 	}
+
+	/* Date Utilities */
+	.date-utilities {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		padding: 12px;
+		background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+		border-radius: 8px;
+		border: 1px solid #e2e8f0;
+	}
+
+	.btn-date-utility {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 6px 12px;
+		background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+		color: #475569;
+		border: 1px solid #cbd5e1;
+		border-radius: 6px;
+		font-size: 12px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		white-space: nowrap;
+	}
+
+		.btn-date-utility:hover {
+			background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+			color: white;
+			border-color: #2563eb;
+			transform: translateY(-1px);
+			box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+		}
+
+		.btn-date-utility:active {
+			transform: translateY(0);
+			box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+		}
 
 	.form-field {
 		display: flex;
 		flex-direction: column;
-		gap: 8px;
+		gap: 6px;
+		max-width: 250px;
 	}
 
 	.field-label {
-		font-size: 13px;
+		font-size: 12px;
 		font-weight: 600;
 		color: #334155;
 		letter-spacing: 0.1px;
@@ -764,17 +838,15 @@ else
 		width: 100%;
 	}
 
-		::deep .custom-autocomplete .e-input-group,
-		::deep .custom-datepicker .e-input-group,
-		::deep .custom-daterange .e-input-group {
-			border: 1px solid #cbd5e1;
-			border-radius: 6px;
-			background: #ffffff;
-			transition: all 0.2s ease;
-			height: 40px;
-		}
-
-			::deep .custom-autocomplete .e-input-group:hover,
+	::deep .custom-autocomplete .e-input-group,
+	::deep .custom-datepicker .e-input-group,
+	::deep .custom-daterange .e-input-group {
+		border: 1px solid #cbd5e1;
+		border-radius: 6px;
+		background: #ffffff;
+		transition: all 0.2s ease;
+		height: 36px;
+	}			::deep .custom-autocomplete .e-input-group:hover,
 			::deep .custom-datepicker .e-input-group:hover,
 			::deep .custom-daterange .e-input-group:hover {
 				border-color: #94a3b8;
@@ -1034,6 +1106,10 @@ else
 		.filters-grid {
 			grid-template-columns: repeat(2, 1fr);
 		}
+
+		.date-utilities {
+			justify-content: center;
+		}
 	}
 
 	@@media (max-width: 768px) {
@@ -1061,6 +1137,15 @@ else
 
 		.filters-grid {
 			grid-template-columns: 1fr;
+		}
+
+		.date-utilities {
+			justify-content: center;
+		}
+
+		.btn-date-utility {
+			flex: 1 1 auto;
+			min-width: 120px;
 		}
 	}
 
