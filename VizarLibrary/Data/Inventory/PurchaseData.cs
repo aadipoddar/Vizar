@@ -21,6 +21,16 @@ public static class PurchaseData
 	public static async Task<List<PurchaseOverviewModel>> LoadPurchaseOverviewByDate(DateTime StartDate, DateTime EndDate) =>
 		await SqlDataAccess.LoadData<PurchaseOverviewModel, dynamic>(StoredProcedureNames.LoadPurchaseOverviewByDate, new { StartDate, EndDate });
 
+	public static async Task DeletePurchase(int purchaseId)
+	{
+		var purchase = await CommonData.LoadTableDataById<PurchaseModel>(TableNames.Purchase, purchaseId);
+		if (purchase is not null)
+		{
+			purchase.Status = false;
+			await InsertPurchase(purchase);
+		}
+	}
+
 	public static async Task<int> SavePurchaseTransaction(PurchaseModel purchase, List<PurchaseItemCartModel> purchaseDetails)
 	{
 		bool update = purchase.Id > 0;

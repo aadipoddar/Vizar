@@ -1,4 +1,5 @@
-﻿using VizarLibrary.DataAccess;
+﻿using VizarLibrary.Data.Common;
+using VizarLibrary.DataAccess;
 using VizarLibrary.Models.Inventory;
 
 namespace VizarLibrary.Data.Inventory;
@@ -16,6 +17,16 @@ public static class PurchaseReturnData
 
 	public static async Task<List<PurchaseReturnOverviewModel>> LoadPurchaseReturnOverviewByDate(DateTime StartDate, DateTime EndDate) =>
 		await SqlDataAccess.LoadData<PurchaseReturnOverviewModel, dynamic>(StoredProcedureNames.LoadPurchaseReturnOverviewByDate, new { StartDate, EndDate });
+
+	public static async Task DeletePurchaseReturn(int purchaseReturnId)
+	{
+		var purchaseReturn = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, purchaseReturnId);
+		if (purchaseReturn is not null)
+		{
+			purchaseReturn.Status = false;
+			await InsertPurchaseReturn(purchaseReturn);
+		}
+	}
 
 	public static async Task<int> SavePurchaseReturnTransaction(PurchaseReturnModel purchaseReturn, List<PurchaseReturnItemCartModel> purchaseReturnDetails)
 	{

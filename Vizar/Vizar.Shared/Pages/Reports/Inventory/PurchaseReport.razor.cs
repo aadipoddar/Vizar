@@ -21,6 +21,7 @@ public partial class PurchaseReport
 	private bool _isProcessing = false;
 	private bool _showAllColumns = false;
 	private bool _showPurchaseReturns = false;
+	private bool _isDeleteDialogVisible = false;
 
 	private DateTime _fromDate = DateTime.Now.Date;
 	private DateTime _toDate = DateTime.Now.Date;
@@ -37,8 +38,14 @@ public partial class PurchaseReport
 
 	private string _errorTitle = string.Empty;
 	private string _errorMessage = string.Empty;
+	private string _successTitle = string.Empty;
+	private string _successMessage = string.Empty;
+	private string _deleteTransactionNo = string.Empty;
+	private int _deleteTransactionId = 0;
 
 	private SfToast _sfErrorToast;
+	private SfToast _sfSuccessToast;
+	private Syncfusion.Blazor.Popups.SfDialog _deleteConfirmationDialog;
 
 	#region Load Data
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -565,6 +572,62 @@ public partial class PurchaseReport
 				Title = _errorTitle,
 				Content = _errorMessage
 			});
+		}
+		else if (type == "success")
+		{
+			_successTitle = title;
+			_successMessage = message;
+			await _sfSuccessToast.ShowAsync(new()
+			{
+				Title = _successTitle,
+				Content = _successMessage
+			});
+		}
+	}
+
+	private void ShowDeleteConfirmation(int id, string transactionNo)
+	{
+		_deleteTransactionId = id;
+		_deleteTransactionNo = transactionNo;
+		_isDeleteDialogVisible = true;
+		StateHasChanged();
+	}
+
+	private void CancelDelete()
+	{
+		_deleteTransactionId = 0;
+		_deleteTransactionNo = string.Empty;
+		_isDeleteDialogVisible = false;
+		StateHasChanged();
+	}
+
+	private async Task ConfirmDelete()
+	{
+		if (_isProcessing)
+			return;
+
+		try
+		{
+			_isDeleteDialogVisible = false;
+			_isProcessing = true;
+			StateHasChanged();
+
+			await PurchaseData.DeletePurchase(_deleteTransactionId);
+			await LoadPurchaseOverviews();
+
+			await ShowToast("Success", $"Purchase transaction {_deleteTransactionNo} has been deleted successfully.", "success");
+
+			_deleteTransactionId = 0;
+			_deleteTransactionNo = string.Empty;
+		}
+		catch (Exception ex)
+		{
+			await ShowToast("Error", $"An error occurred while deleting purchase transaction: {ex.Message}", "error");
+		}
+		finally
+		{
+			_isProcessing = false;
+			StateHasChanged();
 		}
 	}
 	#endregion

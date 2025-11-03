@@ -49,10 +49,10 @@ public static class PurchaseInvoicePDFExport
                 Rate = detail.Rate,
                 DiscountPercent = detail.DiscountPercent,
                 AfterDiscount = detail.AfterDiscount,
-                CGSTPercent = detail.InclusiveTax ? detail.CGSTPercent : 0,
-                SGSTPercent = detail.InclusiveTax ? detail.SGSTPercent : 0,
-                IGSTPercent = detail.InclusiveTax ? detail.IGSTPercent : 0,
-                TotalTaxAmount = detail.InclusiveTax ? detail.TotalTaxAmount : 0,
+                CGSTPercent = detail.InclusiveTax ? 0 : detail.CGSTPercent,
+                SGSTPercent = detail.InclusiveTax ? 0 : detail.SGSTPercent,
+                IGSTPercent = detail.InclusiveTax ? 0 : detail.IGSTPercent,
+                TotalTaxAmount = detail.InclusiveTax ? 0 : detail.TotalTaxAmount,
                 Total = detail.Total
             };
         }).ToList();
@@ -105,10 +105,10 @@ public static class PurchaseInvoicePDFExport
             Rate = item.Rate,
             DiscountPercent = item.DiscountPercent,
             AfterDiscount = item.AfterDiscount,
-            CGSTPercent = item.InclusiveTax ? item.CGSTPercent : 0,
-            SGSTPercent = item.InclusiveTax ? item.SGSTPercent : 0,
-            IGSTPercent = item.InclusiveTax ? item.IGSTPercent : 0,
-            TotalTaxAmount = item.InclusiveTax ? item.TotalTaxAmount : 0,
+            CGSTPercent = item.InclusiveTax ? 0 : item.CGSTPercent,
+            SGSTPercent = item.InclusiveTax ? 0 : item.SGSTPercent,
+            IGSTPercent = item.InclusiveTax ? 0 : item.IGSTPercent,
+            TotalTaxAmount = item.InclusiveTax ? 0 : item.TotalTaxAmount,
             Total = item.Total
         }).ToList();
 

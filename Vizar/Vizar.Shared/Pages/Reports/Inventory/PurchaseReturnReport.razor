@@ -1,4 +1,4 @@
-﻿@page "/report/inventory/purchasereturn"
+@page "/report/inventory/purchasereturn"
 
 @using VizarLibrary.Models.Common
 @using VizarLibrary.Models.Accounts
@@ -149,7 +149,7 @@ else
 						<line x1="3" y1="12" x2="3.01" y2="12" />
 						<line x1="3" y1="18" x2="3.01" y2="18" />
 					</svg>
-					<h2 class="section-title">Purchase Transactions</h2>
+					<h2 class="section-title">Purchase Return Transactions</h2>
 				</div>
 				<button class="btn-toggle-details" @onclick="ToggleDetailsView" title="@(_showAllColumns ? "Show Less" : "Show All Details")">
 					<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -334,7 +334,7 @@ else
 					</GridAggregates>
 
 					<GridColumns>
-						<GridColumn HeaderText="Actions" Width="160" TextAlign="TextAlign.Center">
+						<GridColumn HeaderText="Actions" Width="200" TextAlign="TextAlign.Center">
 							<Template>
 								@{
 									var purchaseReturn = (context as PurchaseReturnOverviewModel);
@@ -360,6 +360,14 @@ else
 											<line x1="16" y1="13" x2="8" y2="13" />
 											<line x1="16" y1="17" x2="8" y2="17" />
 											<polyline points="10 9 9 9 8 9" />
+										</svg>
+									</button>
+									<button class="btn-grid-action btn-delete" @onclick="() => ShowDeleteConfirmation(purchaseReturn.Id, purchaseReturn.TransactionNo)" title="Delete Purchase Return">
+										<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+											<polyline points="3 6 5 6 21 6" />
+											<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+											<line x1="10" y1="11" x2="10" y2="17" />
+											<line x1="14" y1="11" x2="14" y2="17" />
 										</svg>
 									</button>
 								</div>
@@ -436,6 +444,71 @@ else
 	<ToastShowAnimationSettings Effect="ToastEffect.SlideLeftIn" />
 	<ToastHideAnimationSettings Effect="ToastEffect.SlideRightOut" />
 </SfToast>
+
+<SfToast @ref="_sfSuccessToast"
+		 ID="_sfSuccessToast"
+		 Title="@_successTitle"
+		 Content="@_successMessage"
+		 Timeout="5000">
+	<ToastPosition X="Right" Y="Top" />
+	<ToastShowAnimationSettings Effect="ToastEffect.SlideLeftIn" />
+	<ToastHideAnimationSettings Effect="ToastEffect.SlideRightOut" />
+</SfToast>
+
+<SfDialog @ref="_deleteConfirmationDialog"
+		  Width="500px"
+		  IsModal="true"
+		  ShowCloseIcon="true"
+		  @bind-Visible="_isDeleteDialogVisible">
+	<DialogTemplates>
+		<Header>
+			<div style="display: flex; align-items: center; gap: 12px; padding: 4px 0;">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #ef4444;">
+					<circle cx="12" cy="12" r="10" />
+					<line x1="12" y1="8" x2="12" y2="12" />
+					<line x1="12" y1="16" x2="12.01" y2="16" />
+				</svg>
+				<span style="font-size: 18px; font-weight: 600; color: #0f172a;">Confirm Delete</span>
+			</div>
+		</Header>
+		<Content>
+			<div style="padding: 24px;">
+				<p style="margin: 0 0 16px 0; font-size: 15px; color: #334155; line-height: 1.6;">
+					Are you sure you want to delete this purchase return transaction?
+				</p>
+				<div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+					<p style="margin: 0 0 8px 0; font-size: 14px; color: #991b1b; font-weight: 600;">Transaction Details:</p>
+					<p style="margin: 0; font-size: 13px; color: #7f1d1d; line-height: 1.5;">
+						<strong>Transaction No:</strong> @_deleteTransactionNo
+					</p>
+				</div>
+				<div style="background: #fffbeb; border-left: 4px solid #f59e0b; border-radius: 6px; padding: 12px; margin-bottom: 20px;">
+					<p style="margin: 0; font-size: 13px; color: #92400e; line-height: 1.6;">
+						<strong>Warning:</strong> This action cannot be undone. All associated data will be permanently deleted.
+					</p>
+				</div>
+				<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+					<button class="dialog-btn dialog-btn-cancel" @onclick="CancelDelete">
+						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<line x1="18" y1="6" x2="6" y2="18" />
+							<line x1="6" y1="6" x2="18" y2="18" />
+						</svg>
+						<span>Cancel</span>
+					</button>
+					<button class="dialog-btn dialog-btn-delete" @onclick="ConfirmDelete">
+						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<polyline points="3 6 5 6 21 6" />
+							<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+							<line x1="10" y1="11" x2="10" y2="17" />
+							<line x1="14" y1="11" x2="14" y2="17" />
+						</svg>
+						<span>Delete</span>
+					</button>
+				</div>
+			</div>
+		</Content>
+	</DialogTemplates>
+</SfDialog>
 
 <style>
 	* {
@@ -990,4 +1063,61 @@ else
 			grid-template-columns: 1fr;
 		}
 	}
+
+	.btn-grid-action.btn-delete {
+			color: #ef4444;
+			border-color: #ef4444;
+		}
+
+			.btn-grid-action.btn-delete:not(:disabled):hover {
+				background: #fef2f2;
+				box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+			}
+
+	/* Dialog Button Styles */
+	.dialog-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 12px 24px;
+		border-radius: 8px;
+		font-size: 14px;
+		font-weight: 600;
+		border: none;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+		.dialog-btn:hover {
+			transform: translateY(-1px);
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		}
+
+		.dialog-btn:active {
+			transform: translateY(0);
+		}
+
+	.dialog-btn-cancel {
+		background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+		color: #475569;
+		border: 1px solid #cbd5e1;
+	}
+
+		.dialog-btn-cancel:hover {
+			background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+			border-color: #94a3b8;
+		}
+
+	.dialog-btn-delete {
+		background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+		color: white;
+		border: 1px solid #dc2626;
+	}
+
+		.dialog-btn-delete:hover {
+			background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+			border-color: #b91c1c;
+			box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+		}
 </style>

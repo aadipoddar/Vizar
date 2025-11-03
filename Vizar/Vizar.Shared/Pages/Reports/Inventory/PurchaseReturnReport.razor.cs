@@ -2,6 +2,7 @@ using Microsoft.JSInterop;
 
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
+using Syncfusion.Blazor.Popups;
 
 using Vizar.Shared.Services;
 
@@ -36,7 +37,16 @@ public partial class PurchaseReturnReport
 	private string _errorTitle = string.Empty;
 	private string _errorMessage = string.Empty;
 
+	private string _successTitle = string.Empty;
+	private string _successMessage = string.Empty;
+
+	private string _deleteTransactionNo = string.Empty;
+	private int _deleteTransactionId = 0;
+	private bool _isDeleteDialogVisible = false;
+
 	private SfToast _sfErrorToast;
+	private SfToast _sfSuccessToast;
+	private SfDialog _deleteConfirmationDialog;
 
 	#region Load Data
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -391,6 +401,60 @@ public partial class PurchaseReturnReport
 				Title = _errorTitle,
 				Content = _errorMessage
 			});
+		}
+		else if (type == "success")
+		{
+			_successTitle = title;
+			_successMessage = message;
+			await _sfSuccessToast.ShowAsync(new()
+			{
+				Title = _successTitle,
+				Content = _successMessage
+			});
+		}
+	}
+
+	private void ShowDeleteConfirmation(int id, string transactionNo)
+	{
+		_deleteTransactionId = id;
+		_deleteTransactionNo = transactionNo;
+		_isDeleteDialogVisible = true;
+		StateHasChanged();
+	}
+
+	private void CancelDelete()
+	{
+		_isDeleteDialogVisible = false;
+		_deleteTransactionId = 0;
+		_deleteTransactionNo = string.Empty;
+		StateHasChanged();
+	}
+
+	private async Task ConfirmDelete()
+	{
+		try
+		{
+			_isDeleteDialogVisible = false;
+			_isProcessing = true;
+			StateHasChanged();
+
+			await PurchaseReturnData.DeletePurchaseReturn(_deleteTransactionId);
+
+			await ShowToast("Success", $"Purchase return '{_deleteTransactionNo}' has been successfully deleted.", "success");
+
+			_deleteTransactionId = 0;
+			_deleteTransactionNo = string.Empty;
+
+			await LoadPurchaseReturnOverviews();
+		}
+		catch (Exception ex)
+		{
+			await ShowToast("Error", $"Failed to delete purchase return: {ex.Message}", "error");
+		}
+		finally
+		{
+			_isProcessing = false;
+			StateHasChanged();
 		}
 	}
 	#endregion

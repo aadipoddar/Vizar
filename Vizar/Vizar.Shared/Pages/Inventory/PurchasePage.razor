@@ -440,19 +440,22 @@ else
 						</div>
 					</div>
 
-					<!-- Rate - show Base Total -->
+					<!-- UOM (below Quantity) -->
+					<div class="amount-field amount-field-small">
+						<div class="amount-display identification-field">
+							<label class="cart-label">UOM</label>
+							<SfTextBox @bind-Value="_selectedCart.UnitOfMeasurement"
+									   Placeholder="UOM..."
+									   FloatLabelType="FloatLabelType.Never"
+									   CssClass="custom-textbox identification-input" />
+						</div>
+					</div>
+
+					<!-- Base Total (below Rate) -->
 					<div class="amount-field amount-field-small">
 						<div class="amount-display empty-display">
 							<span class="amount-label">Base</span>
 							<span class="amount-value">@_selectedCart.BaseTotal.ToString("N2")</span>
-						</div>
-					</div>
-
-					<!-- Quantity (empty spacer) -->
-					<div class="amount-field amount-field-small">
-						<div class="amount-display empty-display">
-							<span class="amount-label">After Disc</span>
-							<span class="amount-value">@_selectedCart.AfterDiscount.ToString("N2")</span>
 						</div>
 					</div>
 

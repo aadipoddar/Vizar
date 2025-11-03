@@ -394,6 +394,8 @@ public partial class PurchaseReturnPage
 
 		else
 		{
+			var isSameState = _selectedParty.StateUTId == _selectedCompany.StateUTId;
+
 			_selectedCart.ItemId = _selectedItem.Id;
 			_selectedCart.ItemName = _selectedItem.Name;
 			_selectedCart.Quantity = 1;
@@ -401,8 +403,8 @@ public partial class PurchaseReturnPage
 			_selectedCart.Rate = _selectedItem.Rate;
 			_selectedCart.DiscountPercent = 0;
 			_selectedCart.CGSTPercent = _taxes.FirstOrDefault(s => s.Id == _selectedItem.TaxId).CGST;
-			_selectedCart.SGSTPercent = _taxes.FirstOrDefault(s => s.Id == _selectedItem.TaxId).SGST;
-			_selectedCart.IGSTPercent = _taxes.FirstOrDefault(s => s.Id == _selectedItem.TaxId).IGST;
+			_selectedCart.SGSTPercent = isSameState ? _taxes.FirstOrDefault(s => s.Id == _selectedItem.TaxId).SGST : 0;
+			_selectedCart.IGSTPercent = isSameState ? 0 : _taxes.FirstOrDefault(s => s.Id == _selectedItem.TaxId).IGST;
 		}
 
 		UpdateSelectedItemFinancialDetails();
@@ -508,6 +510,18 @@ public partial class PurchaseReturnPage
 		if (_selectedItem is null || _selectedItem.Id <= 0 || _selectedCart.Quantity <= 0 || _selectedCart.Rate < 0 || _selectedCart.DiscountPercent < 0 || _selectedCart.CGSTPercent < 0 || _selectedCart.SGSTPercent < 0 || _selectedCart.IGSTPercent < 0 || _selectedCart.Total < 0)
 		{
 			await ShowToast("Invalid Item Details", "Please ensure all item details are correctly filled before adding to the cart.", "error");
+			return;
+		}
+
+		// Validate that all three taxes cannot be applied together
+		int taxCount = 0;
+		if (_selectedCart.CGSTPercent > 0) taxCount++;
+		if (_selectedCart.SGSTPercent > 0) taxCount++;
+		if (_selectedCart.IGSTPercent > 0) taxCount++;
+
+		if (taxCount == 3)
+		{
+			await ShowToast("Invalid Tax Configuration", "All three taxes (CGST, SGST, IGST) cannot be applied together. Use either CGST+SGST or IGST only.", "error");
 			return;
 		}
 
