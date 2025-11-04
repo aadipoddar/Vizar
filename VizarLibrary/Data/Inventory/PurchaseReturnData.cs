@@ -19,6 +19,9 @@ public static class PurchaseReturnData
 	public static async Task<List<PurchaseReturnOverviewModel>> LoadPurchaseReturnOverviewByDate(DateTime StartDate, DateTime EndDate) =>
 		await SqlDataAccess.LoadData<PurchaseReturnOverviewModel, dynamic>(StoredProcedureNames.LoadPurchaseReturnOverviewByDate, new { StartDate, EndDate });
 
+	public static async Task<List<PurchaseReturnItemOverviewModel>> LoadPurchaseReturnItemOverviewByDate(DateTime StartDate, DateTime EndDate) =>
+		await SqlDataAccess.LoadData<PurchaseReturnItemOverviewModel, dynamic>(StoredProcedureNames.LoadPurchaseReturnItemOverviewByDate, new { StartDate, EndDate });
+
 	public static async Task DeletePurchaseReturn(int purchaseReturnId)
 	{
 		var purchaseReturn = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, purchaseReturnId);

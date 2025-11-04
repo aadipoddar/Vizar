@@ -1,4 +1,4 @@
-﻿CREATE VIEW [dbo].[Items_PurchaseReturn_Overview]
+﻿CREATE VIEW [dbo].[Purchase_Item_Overview]
 	AS
 SELECT
 	[i].[Id],
@@ -11,11 +11,14 @@ SELECT
 	[m].[Id] AS ManufacturerId,
 	[m].[Name] AS ManufacturerName,
 
-	[p].[Id] AS PurchaseReturnId,
+	[p].[Id] AS PurchaseId,
 	[p].[TransactionNo],
 	[p].[TransactionDateTime],
+	[c].[Id] AS CompanyId,
+	[c].[Name] AS CompanyName,
 	[l].[Id] AS PartyId,
 	[l].[Name] AS PartyName,
+	[p].[Remarks] AS PurchaseRemarks,
 
 	[pd].[IdentificationNo] AS IdentificationNo,
 
@@ -42,10 +45,10 @@ SELECT
 	[pd].[Remarks] AS Remarks
 
 FROM
-	[dbo].[PurchaseReturnDetail] pd
+	[dbo].[PurchaseDetail] pd
 
 INNER JOIN
-	[dbo].[PurchaseReturn] p ON pd.PurchaseReturnId = p.Id
+	[dbo].[Purchase] p ON pd.PurchaseId = p.Id
 INNER JOIN
 	[dbo].[Item] i ON pd.ItemId = i.Id
 INNER JOIN
@@ -54,6 +57,8 @@ INNER JOIN
 	[dbo].[ItemType] it ON i.ItemTypeId = it.Id
 INNER JOIN
 	[dbo].[Manufacturer] m ON i.ManufacturerId = m.Id
+INNER JOIN
+	[dbo].[Company] c ON p.CompanyId = c.Id
 INNER JOIN
 	[dbo].[Ledger] l ON p.PartyId = l.Id
 

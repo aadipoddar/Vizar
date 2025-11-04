@@ -2,7 +2,6 @@ using Microsoft.JSInterop;
 
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
-using Syncfusion.Blazor.Popups;
 
 using Vizar.Shared.Services;
 
@@ -17,7 +16,7 @@ using VizarLibrary.Models.Inventory;
 
 namespace Vizar.Shared.Pages.Reports.Inventory;
 
-public partial class PurchaseReturnReport
+public partial class PurchaseReturnItemReport
 {
 	private UserModel _user;
 
@@ -33,23 +32,18 @@ public partial class PurchaseReturnReport
 
 	private List<CompanyModel> _companies = [];
 	private List<LedgerModel> _parties = [];
-	private List<PurchaseReturnOverviewModel> _purchaseReturnOverviews = [];
+	private List<PurchaseReturnItemOverviewModel> _purchaseReturnItemOverviews = [];
+	private List<PurchaseItemOverviewModel> _purchaseItemOverviews = [];
 
-	private SfGrid<PurchaseReturnOverviewModel> _sfPurchaseReturnGrid;
+	private SfGrid<PurchaseReturnItemOverviewModel> _sfPurchaseReturnItemGrid;
 
 	private string _errorTitle = string.Empty;
 	private string _errorMessage = string.Empty;
-
 	private string _successTitle = string.Empty;
 	private string _successMessage = string.Empty;
 
-	private string _deleteTransactionNo = string.Empty;
-	private int _deleteTransactionId = 0;
-	private bool _isDeleteDialogVisible = false;
-
 	private SfToast _sfErrorToast;
 	private SfToast _sfSuccessToast;
-	private SfDialog _deleteConfirmationDialog;
 
 	#region Load Data
 	protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -65,9 +59,16 @@ public partial class PurchaseReturnReport
 
 	private async Task LoadData()
 	{
+		await LoadDates();
 		await LoadCompanies();
 		await LoadParties();
-		await LoadPurchaseReturnOverviews();
+		await LoadPurchaseReturnItemOverviews();
+	}
+
+	private async Task LoadDates()
+	{
+		_fromDate = await CommonData.LoadCurrentDateTime();
+		_toDate = _fromDate;
 	}
 
 	private async Task LoadCompanies()
@@ -94,7 +95,7 @@ public partial class PurchaseReturnReport
 		_selectedParty = _parties.FirstOrDefault(_ => _.Id == 0);
 	}
 
-	private async Task LoadPurchaseReturnOverviews()
+	private async Task LoadPurchaseReturnItemOverviews()
 	{
 		if (_isProcessing)
 			return;
@@ -103,50 +104,50 @@ public partial class PurchaseReturnReport
 		{
 			_isProcessing = true;
 
-			_purchaseReturnOverviews = await PurchaseReturnData.LoadPurchaseReturnOverviewByDate(
+			_purchaseReturnItemOverviews = await PurchaseReturnData.LoadPurchaseReturnItemOverviewByDate(
 			DateOnly.FromDateTime(_fromDate).ToDateTime(TimeOnly.MinValue),
 			DateOnly.FromDateTime(_toDate).ToDateTime(TimeOnly.MaxValue));
 
 			if (_selectedCompany?.Id > 0)
-				_purchaseReturnOverviews = [.. _purchaseReturnOverviews.Where(_ => _.CompanyId == _selectedCompany.Id)];
+				_purchaseReturnItemOverviews = [.. _purchaseReturnItemOverviews.Where(_ => _.CompanyId == _selectedCompany.Id)];
 
 			if (_selectedParty?.Id > 0)
-				_purchaseReturnOverviews = [.. _purchaseReturnOverviews.Where(_ => _.PartyId == _selectedParty.Id)];
+				_purchaseReturnItemOverviews = [.. _purchaseReturnItemOverviews.Where(_ => _.PartyId == _selectedParty.Id)];
 
-			_purchaseReturnOverviews = [.. _purchaseReturnOverviews.OrderBy(_ => _.TransactionDateTime)];
+			_purchaseReturnItemOverviews = [.. _purchaseReturnItemOverviews.OrderBy(_ => _.TransactionDateTime)];
 		}
 		catch (Exception ex)
 		{
-			await ShowToast("Error", $"An error occurred while loading purchase return overviews: {ex.Message}", "error");
+			await ShowToast("Error", $"An error occurred while loading purchase return item overviews: {ex.Message}", "error");
 		}
 		finally
 		{
-			if (_sfPurchaseReturnGrid is not null)
-				await _sfPurchaseReturnGrid.Refresh();
+			if (_sfPurchaseReturnItemGrid is not null)
+				await _sfPurchaseReturnItemGrid.Refresh();
 			_isProcessing = false;
 			StateHasChanged();
 		}
 	}
 	#endregion
 
-	#region Changed Events
+	#region Change Events
 	private async Task OnDateRangeChanged(Syncfusion.Blazor.Calendars.RangePickerEventArgs<DateTime> args)
 	{
 		_fromDate = args.StartDate;
 		_toDate = args.EndDate;
-		await LoadPurchaseReturnOverviews();
+		await LoadPurchaseReturnItemOverviews();
 	}
 
 	private async Task OnCompanyChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<CompanyModel, CompanyModel> args)
 	{
 		_selectedCompany = args.Value;
-		await LoadPurchaseReturnOverviews();
+		await LoadPurchaseReturnItemOverviews();
 	}
 
 	private async Task OnPartyChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<LedgerModel, LedgerModel> args)
 	{
 		_selectedParty = args.Value;
-		await LoadPurchaseReturnOverviews();
+		await LoadPurchaseReturnItemOverviews();
 	}
 
 	private async Task SetDateRange(DateRangeType rangeType)
@@ -159,7 +160,7 @@ public partial class PurchaseReturnReport
 			_isProcessing = true;
 			StateHasChanged();
 
-			var today = DateTime.Now.Date;
+			var today = await CommonData.LoadCurrentDateTime();
 			var currentYear = today.Year;
 			var currentMonth = today.Month;
 
@@ -195,9 +196,9 @@ public partial class PurchaseReturnReport
 					currentFY = await FinancialYearData.LoadFinancialYearByDateTime(_fromDate);
 					var financialYears = await CommonData.LoadTableDataByStatus<FinancialYearModel>(TableNames.FinancialYear);
 					var previousFY = financialYears
-						.Where(fy => fy.Id != currentFY.Id)
-						.OrderByDescending(fy => fy.StartDate)
-						.FirstOrDefault();
+					.Where(fy => fy.Id != currentFY.Id)
+					.OrderByDescending(fy => fy.StartDate)
+					.FirstOrDefault();
 
 					if (previousFY == null)
 					{
@@ -222,7 +223,7 @@ public partial class PurchaseReturnReport
 		finally
 		{
 			_isProcessing = false;
-			await LoadPurchaseReturnOverviews();
+			await LoadPurchaseReturnItemOverviews();
 			StateHasChanged();
 		}
 	}
@@ -239,32 +240,28 @@ public partial class PurchaseReturnReport
 			_isProcessing = true;
 			StateHasChanged();
 
-			// Convert DateTime to DateOnly for Excel export
 			DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
 			DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-			// Call the Excel export utility
 			var stream = await Task.Run(() =>
-				PurchaseReturnReportExcelExport.ExportPurchaseReturnReport(
-					_purchaseReturnOverviews,
-					dateRangeStart,
-					dateRangeEnd,
-					_showAllColumns
-				)
+			PurchaseReturnItemReportExcelExport.ExportPurchaseReturnItemReport(
+			_purchaseReturnItemOverviews,
+			dateRangeStart,
+			dateRangeEnd,
+			_showAllColumns
+			)
 			);
 
-			// Generate file name with date range
-			string fileName = $"PURCHASE_RETURN_REPORT";
+			string fileName = $"PURCHASE_RETURN_ITEM_REPORT";
 			if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
 			{
 				fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
 			}
 			fileName += ".xlsx";
 
-			// Save and view the Excel file
 			await SaveAndViewService.SaveAndView(fileName, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", stream);
 
-			await ShowToast("Success", "Purchase return report exported to Excel successfully.", "success");
+			await ShowToast("Success", "Purchase return item report exported to Excel successfully.", "success");
 		}
 		catch (Exception ex)
 		{
@@ -287,32 +284,28 @@ public partial class PurchaseReturnReport
 			_isProcessing = true;
 			StateHasChanged();
 
-			// Convert DateTime to DateOnly for PDF export
 			DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
 			DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-			// Call the PDF export utility
 			var stream = await Task.Run(() =>
-				PurchaseReturnReportPdfExport.ExportPurchaseReturnReport(
-					_purchaseReturnOverviews,
-					dateRangeStart,
-					dateRangeEnd,
-					_showAllColumns
-				)
+			PurchaseReturnItemReportPDFExport.ExportPurchaseReturnItemReport(
+			_purchaseReturnItemOverviews,
+			dateRangeStart,
+			dateRangeEnd,
+			_showAllColumns
+			)
 			);
 
-			// Generate file name with date range
-			string fileName = $"PURCHASE_RETURN_REPORT";
+			string fileName = $"PURCHASE_RETURN_ITEM_REPORT";
 			if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
 			{
 				fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
 			}
 			fileName += ".pdf";
 
-			// Save and view the PDF file
 			await SaveAndViewService.SaveAndView(fileName, "application/pdf", stream);
 
-			await ShowToast("Success", "Purchase return report exported to PDF successfully.", "success");
+			await ShowToast("Success", "Purchase return item report exported to PDF successfully.", "success");
 		}
 		catch (Exception ex)
 		{
@@ -324,22 +317,28 @@ public partial class PurchaseReturnReport
 			StateHasChanged();
 		}
 	}
-
-	private async Task ExportPowerBI(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
-	{
-		await ShowToast("Info", "Power BI export is not implemented yet.", "error");
-	}
 	#endregion
 
 	#region Actions
-	private async Task ViewPurchaseReturn(int purchaseId)
+	private async Task ViewPurchaseReturn(int purchaseReturnId)
 	{
 		try
 		{
-			if (FormFactor.GetFormFactor() == "Web")
-				await JSRuntime.InvokeVoidAsync("open", $"/inventory/purchasereturn/{purchaseId}", "_blank");
+			if (purchaseReturnId < 0)
+			{
+				int actualId = Math.Abs(purchaseReturnId);
+				if (FormFactor.GetFormFactor() == "Web")
+					await JSRuntime.InvokeVoidAsync("open", $"/inventory/purchase/{actualId}", "_blank");
+				else
+					NavigationManager.NavigateTo($"/inventory/purchase/{actualId}");
+			}
 			else
-				NavigationManager.NavigateTo($"/inventory/purchasereturn/{purchaseId}");
+			{
+				if (FormFactor.GetFormFactor() == "Web")
+					await JSRuntime.InvokeVoidAsync("open", $"/inventory/purchasereturn/{purchaseReturnId}", "_blank");
+				else
+					NavigationManager.NavigateTo($"/inventory/purchasereturn/{purchaseReturnId}");
+			}
 		}
 		catch (Exception ex)
 		{
@@ -357,57 +356,51 @@ public partial class PurchaseReturnReport
 			_isProcessing = true;
 			StateHasChanged();
 
-			// Load purchase return header
 			var purchaseReturnHeader = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, purchaseReturnId);
 			if (purchaseReturnHeader == null)
 			{
-				await ShowToast("Error", "Purchase return not found.", "error");
+				await ShowToast("Error", "Purchase return record not found.", "error");
 				return;
 			}
 
-			// Load purchase return details
 			var purchaseReturnDetails = await PurchaseReturnData.LoadPurchaseReturnDetailByPurchaseReturn(purchaseReturnId);
-			if (purchaseReturnDetails == null || !purchaseReturnDetails.Any())
+			if (purchaseReturnDetails is null || purchaseReturnDetails.Count == 0)
 			{
-				await ShowToast("Error", "No line items found for this purchase return.", "error");
+				await ShowToast("Error", "No purchase return details found for this transaction.", "error");
 				return;
 			}
 
-			// Load company information
 			var company = await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, purchaseReturnHeader.CompanyId);
-			if (company == null)
+			if (company is null)
 			{
 				await ShowToast("Error", "Company information not found.", "error");
 				return;
 			}
 
-			// Load party (supplier) information
 			var party = await CommonData.LoadTableDataById<LedgerModel>(TableNames.Ledger, purchaseReturnHeader.PartyId);
-			if (party == null)
+			if (party is null)
 			{
 				await ShowToast("Error", "Party information not found.", "error");
 				return;
 			}
 
-			// Generate invoice PDF
-			var pdfStream = await Task.Run(() =>
-				PurchaseReturnInvoicePDFExport.ExportPurchaseReturnInvoice(
-					purchaseReturnHeader,
-					purchaseReturnDetails,
-					company,
-					party,
-					null, // logo path - uses default
-					"PURCHASE RETURN"
-				)
+			var stream = await Task.Run(() =>
+			PurchaseReturnInvoicePDFExport.ExportPurchaseReturnInvoice(
+			purchaseReturnHeader,
+			purchaseReturnDetails,
+			company,
+			party,
+			logoPath: null,
+			invoiceType: "PURCHASE RETURN INVOICE"
+			)
 			);
 
-			// Generate file name
-			string fileName = $"PURCHASE_RETURN_{purchaseReturnHeader.TransactionNo}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+			string fileName = $"PURCHASE_RETURN_INVOICE_{purchaseReturnHeader.TransactionNo}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+			fileName = fileName.Replace("/", "_").Replace("\\", "_");
 
-			// Save and view the PDF
-			await SaveAndViewService.SaveAndView(fileName, "application/pdf", pdfStream);
+			await SaveAndViewService.SaveAndView(fileName, "application/pdf", stream);
 
-			await ShowToast("Success", "Purchase return invoice generated successfully.", "success");
+			await ShowToast("Success", $"Purchase return invoice generated successfully for {purchaseReturnHeader.TransactionNo}", "success");
 		}
 		catch (Exception ex)
 		{
@@ -420,80 +413,13 @@ public partial class PurchaseReturnReport
 		}
 	}
 
-	private async Task DownloadOriginalInvoice(string documentUrl)
-	{
-		if (_isProcessing)
-			return;
-
-		try
-		{
-			if (string.IsNullOrEmpty(documentUrl))
-			{
-				await ShowToast("Warning", "No original document available for this purchase return.", "error");
-				return;
-			}
-
-			_isProcessing = true;
-
-			var (fileStream, contentType) = await BlobStorageAccess.DownloadFileFromBlobStorage(documentUrl, BlobStorageContainers.purchasereturn);
-			var fileName = documentUrl.Split('/').Last();
-			await SaveAndViewService.SaveAndView(fileName, contentType, fileStream);
-		}
-		catch (Exception ex)
-		{
-			await ShowToast("Error", $"An error occurred while downloading original invoice: {ex.Message}", "error");
-		}
-		finally
-		{
-			_isProcessing = false;
-			StateHasChanged();
-		}
-	}
-
-	private async Task ConfirmDelete()
-	{
-		if (_isProcessing)
-			return;
-
-		try
-		{
-			_isDeleteDialogVisible = false;
-			_isProcessing = true;
-			StateHasChanged();
-
-			var purchaseReturn = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, _deleteTransactionId);
-			var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, purchaseReturn.FinancialYearId);
-			if (financialYear is null || financialYear.Locked || financialYear.Status == false)
-				throw new InvalidOperationException("Cannot delete purchase return transaction as the financial year is locked.");
-
-			if (!_user.Admin)
-				throw new UnauthorizedAccessException("You do not have permission to delete this purchase return transaction.");
-
-			await PurchaseReturnData.DeletePurchaseReturn(_deleteTransactionId);
-			await ShowToast("Success", $"Purchase return '{_deleteTransactionNo}' has been successfully deleted.", "success");
-
-			_deleteTransactionId = 0;
-			_deleteTransactionNo = string.Empty;
-		}
-		catch (Exception ex)
-		{
-			await ShowToast("Error", $"Failed to delete purchase return: {ex.Message}", "error");
-		}
-		finally
-		{
-			_isProcessing = false;
-			StateHasChanged();
-			await LoadPurchaseReturnOverviews();
-		}
-	}
-
 	private async Task ToggleDetailsView()
 	{
 		_showAllColumns = !_showAllColumns;
 		StateHasChanged();
 
-		if (_sfPurchaseReturnGrid is not null)
-			await _sfPurchaseReturnGrid.Refresh();
+		if (_sfPurchaseReturnItemGrid is not null)
+			await _sfPurchaseReturnItemGrid.Refresh();
 	}
 	#endregion
 
@@ -506,12 +432,12 @@ public partial class PurchaseReturnReport
 			NavigationManager.NavigateTo("/inventory/purchasereturn");
 	}
 
-	private async Task NavigateToItemReport(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
+	private async Task NavigateToPurchaseReturnReport(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
 	{
 		if (FormFactor.GetFormFactor() == "Web")
-			await JSRuntime.InvokeVoidAsync("open", "/report/purchasereturnitem", "_blank");
+			await JSRuntime.InvokeVoidAsync("open", "/report/purchasereturn", "_blank");
 		else
-			NavigationManager.NavigateTo("/report/purchasereturnitem");
+			NavigationManager.NavigateTo("/report/purchasereturn");
 	}
 
 	private async Task ShowToast(string title, string message, string type)
@@ -538,22 +464,6 @@ public partial class PurchaseReturnReport
 				Content = _successMessage
 			});
 		}
-	}
-
-	private void ShowDeleteConfirmation(int id, string transactionNo)
-	{
-		_deleteTransactionId = id;
-		_deleteTransactionNo = transactionNo;
-		_isDeleteDialogVisible = true;
-		StateHasChanged();
-	}
-
-	private void CancelDelete()
-	{
-		_isDeleteDialogVisible = false;
-		_deleteTransactionId = 0;
-		_deleteTransactionNo = string.Empty;
-		StateHasChanged();
 	}
 	#endregion
 }

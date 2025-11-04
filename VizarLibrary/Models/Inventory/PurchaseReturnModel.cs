@@ -133,3 +133,42 @@ public class PurchaseReturnOverviewModel
 	public DateTime? LastModifiedAt { get; set; }
 	public string? LastModifiedFromPlatform { get; set; }
 }
+
+public class PurchaseReturnItemOverviewModel
+{
+	public int Id { get; set; }
+	public string ItemName { get; set; }
+	public string ItemCode { get; set; }
+	public int ItemCategoryId { get; set; }
+	public string ItemCategoryName { get; set; }
+	public int ItemTypeId { get; set; }
+	public string ItemTypeName { get; set; }
+	public int ManufacturerId { get; set; }
+	public string ManufacturerName { get; set; }
+	public int PurchaseReturnId { get; set; }
+	public string TransactionNo { get; set; }
+	public DateTime TransactionDateTime { get; set; }
+	public int CompanyId { get; set; }
+	public string CompanyName { get; set; }
+	public int PartyId { get; set; }
+	public string PartyName { get; set; }
+	public string PurchaseReturnRemarks { get; set; }
+	public string IdentificationNo { get; set; }
+	public decimal Quantity { get; set; }
+	public decimal Rate { get; set; }
+	public decimal BaseTotal { get; set; }
+	public decimal DiscountPercent { get; set; }
+	public decimal DiscountAmount { get; set; }
+	public decimal AfterDiscount { get; set; }
+	public decimal CGSTPercent { get; set; }
+	public decimal CGSTAmount { get; set; }
+	public decimal SGSTPercent { get; set; }
+	public decimal SGSTAmount { get; set; }
+	public decimal IGSTPercent { get; set; }
+	public decimal IGSTAmount { get; set; }
+	public decimal TotalTaxAmount { get; set; }
+	public bool InclusiveTax { get; set; }
+	public decimal Total { get; set; }
+	public decimal NetRate { get; set; }
+	public string? Remarks { get; set; }
+}

@@ -512,13 +512,7 @@ public static class PDFReportExportUtil
 		PdfGridLayoutFormat layoutFormat = new()
 		{
 			Layout = PdfLayoutType.Paginate,
-			Break = PdfLayoutBreakType.FitPage,
-			// Set pagination bounds to leave space for header on subsequent pages
-			PaginateBounds = new RectangleF(
-				15,
-				startY,
-				page.GetClientSize().Width - 30,
-				page.GetClientSize().Height - startY - 15)
+			Break = PdfLayoutBreakType.FitPage
 		};
 
 		PdfGridLayoutResult result = pdfGrid.Draw(page, new PointF(15, startY), layoutFormat);

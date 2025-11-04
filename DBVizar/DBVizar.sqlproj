@@ -100,7 +100,6 @@
     <Build Include="Tables\Common\StateUT.sql" />
     <Build Include="Tables\Item\Manufacturer.sql" />
     <Build Include="Tables\Item\Tax.sql" />
-    <Build Include="StoredProcedures\LoadData\Items\Load_Item_By_Party_PurchaseDateTime.sql" />
     <Build Include="StoredProcedures\LoadData\Accounts\Load_FinancialYear_By_DateTime.sql" />
     <Build Include="Tables\Common\Company.sql" />
     <Build Include="StoredProcedures\LoadData\Common\Load_TableData_By_Code.sql" />
@@ -122,9 +121,12 @@
     <Build Include="StoredProcedures\Insert\Inventory\Insert_PurchaseReturnDetail.sql" />
     <Build Include="StoredProcedures\LoadData\Inventory\Load_PurchaseReturnDetail_By_PurchaseReturn.sql" />
     <Build Include="Views\PurchaseReturn_Overview.sql" />
-    <Build Include="StoredProcedures\LoadData\Inventory\Load_PurchaseReturnOverview_By_Date.sql" />
-    <Build Include="Views\Items_Purchase_Overview.sql" />
-    <Build Include="Views\Items_PurchaseReturn_Overview.sql" />
+    <Build Include="StoredProcedures\LoadData\Inventory\Load_PurchaseReturn_Overview_By_Date.sql" />
+    <Build Include="Views\Purchase_Item_Overview.sql" />
+    <Build Include="Views\PurchaseReturn_Item_Overview.sql" />
+    <Build Include="StoredProcedures\LoadData\Inventory\Load_Item_By_Party_PurchaseDateTime.sql" />
+    <Build Include="StoredProcedures\LoadData\Inventory\Load_Purchase_Item_Overview_By_Date.sql" />
+    <Build Include="StoredProcedures\LoadData\Inventory\Load_PurchaseReturn_Item_Overview_By_Date.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\LocalVizar.publish.xml" />

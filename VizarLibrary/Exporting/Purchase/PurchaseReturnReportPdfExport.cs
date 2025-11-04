@@ -30,8 +30,8 @@ public static class PurchaseReturnReportPdfExport
 		if (showAllColumns)
 		{
 			// All columns - detailed view (matching Excel export)
-			columnOrder = new()
-			{
+			columnOrder =
+			[
 				"Id",
 				"TransactionNo",
 				"CompanyId",
@@ -73,13 +73,13 @@ public static class PurchaseReturnReportPdfExport
 				"LastModifiedByUserName",
 				"LastModifiedAt",
 				"LastModifiedFromPlatform"
-			};
+			];
 		}
 		else
 		{
 			// Summary columns - key fields only (matching Excel export)
-			columnOrder = new()
-			{
+			columnOrder =
+			[
 				"TransactionNo",
 				"TransactionDateTime",
 				"PartyName",
@@ -88,7 +88,7 @@ public static class PurchaseReturnReportPdfExport
 				"OtherChargesPercent",
 				"CashDiscountPercent",
 				"TotalAmount"
-			};
+			];
 		}
 
 		// Customize specific columns for PDF display (matching Excel column names)

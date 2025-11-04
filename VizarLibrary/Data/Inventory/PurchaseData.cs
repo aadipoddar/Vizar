@@ -22,6 +22,12 @@ public static class PurchaseData
 	public static async Task<List<PurchaseOverviewModel>> LoadPurchaseOverviewByDate(DateTime StartDate, DateTime EndDate) =>
 		await SqlDataAccess.LoadData<PurchaseOverviewModel, dynamic>(StoredProcedureNames.LoadPurchaseOverviewByDate, new { StartDate, EndDate });
 
+	public static async Task<List<PurchaseItemOverviewModel>> LoadPurchaseItemOverviewByDate(DateTime StartDate, DateTime EndDate) =>
+		await SqlDataAccess.LoadData<PurchaseItemOverviewModel, dynamic>(StoredProcedureNames.LoadPurchaseItemOverviewByDate, new { StartDate, EndDate });
+
+	public static async Task<List<ItemModel>> LoadItemByPartyPurchaseDateTime(int PartyId, DateTime PurchaseDateTime, bool OnlyActive = true) =>
+		await SqlDataAccess.LoadData<ItemModel, dynamic>(StoredProcedureNames.LoadItemByPartyPurchaseDateTime, new { PartyId, PurchaseDateTime, OnlyActive });
+
 	public static async Task DeletePurchase(int purchaseId)
 	{
 		var purchase = await CommonData.LoadTableDataById<PurchaseModel>(TableNames.Purchase, purchaseId);

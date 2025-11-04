@@ -33,11 +33,12 @@ public static class StoredProcedureNames
 	public static string LoadFinancialYearByDateTime => "Load_FinancialYear_By_DateTime";
 
 	public static string LoadItemByPartyPurchaseDateTime => "Load_Item_By_Party_PurchaseDateTime";
-
 	public static string LoadPurchaseDetailByPurchase => "Load_PurchaseDetail_By_Purchase";
 	public static string LoadPurchaseOverviewByDate => "Load_PurchaseOverview_By_Date";
 	public static string LoadPurchaseReturnDetailByPurchaseReturn => "Load_PurchaseReturnDetail_By_PurchaseReturn";
-	public static string LoadPurchaseReturnOverviewByDate => "Load_PurchaseReturnOverview_By_Date";
+	public static string LoadPurchaseReturnOverviewByDate => "Load_PurchaseReturn_Overview_By_Date";
+	public static string LoadPurchaseItemOverviewByDate => "Load_Purchase_Item_Overview_By_Date";
+	public static string LoadPurchaseReturnItemOverviewByDate => "Load_PurchaseReturn_Item_Overview_By_Date";
 
 	public static string InsertUser => "Insert_User";
 	public static string ResetSettings => "Reset_Settings";
@@ -60,6 +61,6 @@ public static class ViewNames
 {
 	public static string PurchaseOverview => "Purchase_Overview";
 	public static string PurchaseReturnOverview => "PurchaseReturn_Overview";
-	public static string ItemsPurchaseOverview => "Items_Purchase_Overview";
-	public static string ItemsPurchaseReturnOverview => "Items_PurchaseReturn_Overview";
+	public static string PurchaseItemOverview => "Purchase_Item_Overview";
+	public static string PurchaseReturnItemOverview => "PurchaseReturn_Item_Overview";
 }

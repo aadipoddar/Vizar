@@ -208,7 +208,7 @@ public partial class PurchaseReturnPage
 	{
 		try
 		{
-			_items = await ItemData.LoadItemByPartyPurchaseDateTime(_purchaseReturn.PartyId, _purchaseReturn.TransactionDateTime);
+			_items = await PurchaseData.LoadItemByPartyPurchaseDateTime(_purchaseReturn.PartyId, _purchaseReturn.TransactionDateTime);
 			_taxes = await CommonData.LoadTableDataByStatus<TaxModel>(TableNames.Tax);
 
 			_items = [.. _items.OrderBy(s => s.Name)];
@@ -1020,9 +1020,9 @@ public partial class PurchaseReturnPage
 	private async Task NavigateToTransactionHistoryPage()
 	{
 		if (FormFactor.GetFormFactor() == "Web")
-			await JSRuntime.InvokeVoidAsync("open", "/report/inventory/purchasereturn", "_blank");
+			await JSRuntime.InvokeVoidAsync("open", "/report/purchasereturn", "_blank");
 		else
-			NavigationManager.NavigateTo("/report/inventory/purchasereturn");
+			NavigationManager.NavigateTo("/report/purchasereturn");
 	}
 
 	private async Task ShowToast(string title, string message, string type)
