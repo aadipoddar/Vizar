@@ -88,12 +88,7 @@ public partial class LoginPage : IAsyncDisposable
 		_user = _users.FirstOrDefault(u => u.Phone == _phoneEmail || u.Email == _phoneEmail);
 		if (_user is not null && _password == _user.Password && _user.Status)
 		{
-			_user.FailedAttempts = 0;
-			_user.CodeResends = 0;
-			_user.LastCodeDateTime = null;
-			_user.LastCode = null;
-			await UserData.InsertUser(_user);
-
+			await UserData.ResetInsertUser(_user);
 			await DataStorageService.SecureSaveAsync(StorageFileNames.UserDataFileName, System.Text.Json.JsonSerializer.Serialize(_user));
 			NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 		}
@@ -128,7 +123,7 @@ public partial class LoginPage : IAsyncDisposable
 					_user.Status = false;
 					await UserData.InsertUser(_user);
 					await _toastNotification.ShowAsync("Account Locked", "Your account has been locked due to multiple failed login attempts. Please contact support.", ToastType.Error);
-					NavigationManager.NavigateTo("/login", true);
+					NavigationManager.NavigateTo(PageRouteNames.Login, true);
 					return;
 				}
 
@@ -146,12 +141,7 @@ public partial class LoginPage : IAsyncDisposable
 				return;
 			}
 
-			_user.FailedAttempts = 0;
-			_user.CodeResends = 0;
-			_user.LastCodeDateTime = null;
-			_user.LastCode = null;
-			await UserData.InsertUser(_user);
-
+			await UserData.ResetInsertUser(_user);
 			await DataStorageService.SecureSaveAsync(StorageFileNames.UserDataFileName, System.Text.Json.JsonSerializer.Serialize(_user));
 			VibrationService.VibrateWithTime(500);
 			NavigationManager.NavigateTo(PageRouteNames.Dashboard);
@@ -170,13 +160,6 @@ public partial class LoginPage : IAsyncDisposable
 	{
 		if (!_isLoginWithCodeEnabled)
 			return;
-
-		if (_user is not null && _user.Id > 0)
-		{
-			_user.CodeResends = 0;
-			_user.FailedAttempts = 0;
-			await UserData.InsertUser(_user);
-		}
 
 		NavigationManager.NavigateTo(PageRouteNames.LoginWithCode);
 	}

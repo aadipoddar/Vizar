@@ -4,14 +4,15 @@
 	@Phone VARCHAR(10),
 	@Password VARCHAR(250),
 	@Email VARCHAR(250) = NULL,
-	@Purchase BIT = 0,
 	@Accounts BIT = 0,
+	@Purchase BIT = 0,
 	@Admin BIT = 0,
 	@Remarks VARCHAR(MAX) = NULL,
 	@Status BIT = 1,
 	@FailedAttempts INT = 0,
 	@CodeResends INT = 0,
 	@LastCode INT = NULL,
+	@LastCodeDeviceId VARCHAR(MAX) = NULL,
 	@LastCodeDateTime DATETIME = NULL
 AS
 BEGIN
@@ -23,15 +24,11 @@ BEGIN
 			[Password],
 			[Phone],
 			[Email],
-			[Purchase],
 			[Accounts],
+			[Purchase],
 			[Admin],
-			[Status],
-			[LastCode],
-			[LastCodeDateTime],
 			[Remarks],
-			[FailedAttempts],
-			[CodeResends]
+			[Status]
 		)
 		VALUES
 		(
@@ -39,15 +36,11 @@ BEGIN
 			@Password,
 			@Phone,
 			@Email,
-			@Purchase,
 			@Accounts,
+			@Purchase,
 			@Admin,
-			@Status,
-			@LastCode,
-			@LastCodeDateTime,
 			@Remarks,
-			@FailedAttempts,
-			@CodeResends
+			@Status
 		);
 
 		SET @Id = SCOPE_IDENTITY();
@@ -60,15 +53,16 @@ BEGIN
 			[Password] = @Password,
 			[Phone] = @Phone,
 			[Email] = @Email,
-			[Purchase] = @Purchase,
 			[Accounts] = @Accounts,
+			[Purchase] = @Purchase,
 			[Admin] = @Admin,
 			[Remarks] = @Remarks,
 			[Status] = @Status,
 			[FailedAttempts] = @FailedAttempts,
 			[CodeResends] = @CodeResends,
 			[LastCode] = @LastCode,
-			[LastCodeDateTime] = @LastCodeDateTime
+			[LastCodeDateTime] = @LastCodeDateTime,
+			[LastCodeDeviceId] = @LastCodeDeviceId
 		WHERE [Id] = @Id
 	END
 

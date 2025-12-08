@@ -26,14 +26,17 @@ public static class AuthenticationService
 		if (serverUser is null)
 			await Logout(dataStorageService, navigationManager, vibrationService);
 
+		if (!serverUser.Status)
+			await Logout(dataStorageService, navigationManager, vibrationService);
+
 		user = serverUser;
 		await dataStorageService.SecureSaveAsync(StorageFileNames.UserDataFileName, System.Text.Json.JsonSerializer.Serialize(user));
 
-		if (!user.Status)
-			await Logout(dataStorageService, navigationManager, vibrationService);
-
 		if (userRoles is null)
+		{
+			await dataStorageService.SecureRemove(StorageFileNames.UserDeviceIdDataFileName);
 			return user;
+		}
 
 		var hasPermission = userRoles switch
 		{
@@ -46,6 +49,7 @@ public static class AuthenticationService
 		if (!hasPermission)
 			await Logout(dataStorageService, navigationManager, vibrationService);
 
+		await dataStorageService.SecureRemove(StorageFileNames.UserDeviceIdDataFileName);
 		return user;
 	}
 

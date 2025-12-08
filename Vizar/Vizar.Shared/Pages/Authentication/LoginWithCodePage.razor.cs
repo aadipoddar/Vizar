@@ -51,7 +51,7 @@ public partial class LoginWithCodePage
 		{
 			await DataStorageService.SecureRemoveAll();
 			await _phoneEmailTextBox.FocusAsync();
-			
+
 			_users = await CommonData.LoadTableData<UserModel>(TableNames.User);
 
 			_isLoginWithCodeEnabled = bool.Parse((await SettingsData.LoadSettingsByKey(SettingsKeys.EnableLoginWithCode)).Value);
@@ -82,8 +82,7 @@ public partial class LoginWithCodePage
 		}
 
 		_isEmail = _phoneEmail.Contains('@') && _phoneEmail.Contains('.');
-		VibrationService.VibrateHapticLongPress();
-
+		
 		var user = _users.FirstOrDefault(u => u.Phone == _phoneEmail || u.Email == _phoneEmail);
 		if (user is null || user.Status == false)
 		{
@@ -114,8 +113,12 @@ public partial class LoginWithCodePage
 						return;
 					}
 
+					var guid = Guid.NewGuid().ToString();
+					await DataStorageService.SecureSaveAsync(StorageFileNames.UserDeviceIdDataFileName, guid);
+
 					_user.LastCode = _verificationCode;
 					_user.LastCodeDateTime = await CommonData.LoadCurrentDateTime();
+					_user.LastCodeDeviceId = guid;
 					await UserData.InsertUser(_user);
 
 					var redirectLink = NavigationManager.BaseUri + PageRouteNames.LoginWithCodeRedirect + $"/{_user.Id}/{_verificationCode}";
@@ -195,7 +198,7 @@ public partial class LoginWithCodePage
 					_user.Status = false;
 					await UserData.InsertUser(_user);
 					await _toastNotification.ShowAsync("Account Locked", "Your account has been locked due to multiple failed login attempts. Please contact support.", ToastType.Error);
-					NavigationManager.NavigateTo(PageRouteNames.Login, true);
+					NavigationManager.NavigateTo(PageRouteNames.Login);
 					return;
 				}
 
@@ -217,31 +220,23 @@ public partial class LoginWithCodePage
 			_user.CodeResends = 0;
 			_user.LastCodeDateTime = null;
 			_user.LastCode = null;
+			_user.LastCodeDeviceId = null;
 
 			if (!string.IsNullOrEmpty(_newPassword))
 			{
-				if (!_isEnabledUsersResetPassword)
+				if (_newPassword.Length < 6)
 				{
 					await _newPasswordTextBox.FocusAsync();
-					await _toastNotification.ShowAsync("Password Reset Disabled", "Password reset functionality is disabled. Please contact support.", ToastType.Error);
-				}
-				else
-				{
-					if (_newPassword.Length < 6)
-					{
-						await _newPasswordTextBox.FocusAsync();
-						await _toastNotification.ShowAsync("Weak Password", "The new password must be at least 6 characters long.", ToastType.Error);
-						return;
-					}
+					await _toastNotification.ShowAsync("Weak Password", "The new password must be at least 6 characters long.", ToastType.Error);
+					return;
 				}
 
-				_user.Password = _newPassword;
+				if (_isEnabledUsersResetPassword)
+					_user.Password = _newPassword;
 			}
 
 			await UserData.InsertUser(_user);
-
 			await DataStorageService.SecureSaveAsync(StorageFileNames.UserDataFileName, System.Text.Json.JsonSerializer.Serialize(_user));
-			VibrationService.VibrateWithTime(500);
 			NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 		}
 		catch (Exception ex)

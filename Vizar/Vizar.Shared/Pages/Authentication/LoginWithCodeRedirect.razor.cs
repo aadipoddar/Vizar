@@ -33,21 +33,22 @@ public partial class LoginWithCodeRedirect
 				return;
 			}
 
+			var deviceId = await DataStorageService.SecureGetAsync(StorageFileNames.UserDeviceIdDataFileName);
 			var codeExpiryMinutes = int.Parse((await SettingsData.LoadSettingsByKey(SettingsKeys.CodeExpiryMinutes)).Value);
 			var currentDateTime = await CommonData.LoadCurrentDateTime();
 
-			if (user is null || user.LastCode != int.Parse(Code) || user.LastCodeDateTime is null || user.LastCodeDateTime.Value.AddMinutes(codeExpiryMinutes) < currentDateTime)
+			if (user is null ||
+				user.LastCode != int.Parse(Code) ||
+				user.LastCodeDateTime is null ||
+				user.LastCodeDateTime.Value.AddMinutes(codeExpiryMinutes) < currentDateTime ||
+				user.LastCodeDeviceId is null ||
+				user.LastCodeDeviceId != deviceId)
 			{
 				NavigationManager.NavigateTo(PageRouteNames.Login);
 				return;
 			}
 
-			user.LastCode = null;
-			user.LastCodeDateTime = null;
-			user.FailedAttempts = 0;
-			user.CodeResends = 0;
-			await UserData.InsertUser(user);
-
+			await UserData.ResetInsertUser(user);
 			await DataStorageService.SecureSaveAsync(StorageFileNames.UserDataFileName, System.Text.Json.JsonSerializer.Serialize(user));
 			NavigationManager.NavigateTo(PageRouteNames.Dashboard, true);
 		}
