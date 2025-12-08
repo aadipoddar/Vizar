@@ -1,0 +1,23 @@
+using Microsoft.AspNetCore.Components;
+
+namespace Vizar.Shared.Components.ToggleButton;
+
+public partial class ToggleSummaryButton
+{
+    [Parameter]
+    public bool ShowSummary { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public EventCallback OnToggle { get; set; }
+
+    private async Task HandleClick()
+    {
+        if (!Disabled)
+        {
+            await OnToggle.InvokeAsync();
+        }
+    }
+}

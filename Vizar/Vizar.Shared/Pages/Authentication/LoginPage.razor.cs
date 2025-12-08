@@ -1,5 +1,6 @@
 using Syncfusion.Blazor.Inputs;
-using Syncfusion.Blazor.Notifications;
+
+using Vizar.Shared.Components.Dialog;
 
 using VizarLibrary.Data.Common;
 using VizarLibrary.DataAccess;
@@ -7,8 +8,10 @@ using VizarLibrary.Models.Common;
 
 namespace Vizar.Shared.Pages.Authentication;
 
-public partial class LoginPage
+public partial class LoginPage : IAsyncDisposable
 {
+	private HotKeysContext _hotKeysContext;
+
 	private UserModel _user = new();
 
 	private bool _isVerifying = false;
@@ -26,10 +29,7 @@ public partial class LoginPage
 	private SfTextBox _phoneEmailTextBox;
 	private SfTextBox _passwordTextBox;
 
-	private string _errorTitle = string.Empty;
-	private string _errorMessage = string.Empty;
-
-	private SfToast _sfErrorToast;
+	private ToastNotification _toastNotification;
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
@@ -38,6 +38,9 @@ public partial class LoginPage
 
 		try
 		{
+			_hotKeysContext = HotKeys.CreateContext()
+				.Add(Code.Enter, OnLoginClick, "Login", Exclude.None);
+
 			await DataStorageService.SecureRemoveAll();
 			await _phoneEmailTextBox.FocusAsync();
 
@@ -48,7 +51,7 @@ public partial class LoginPage
 		}
 		catch (Exception ex)
 		{
-			await ShowToast("An Error Occurred While Initializing Login Page", ex.Message, "error");
+			await _toastNotification.ShowAsync("An Error Occurred While Initializing Login Page", ex.Message, ToastType.Error);
 		}
 	}
 
@@ -92,7 +95,7 @@ public partial class LoginPage
 			await UserData.InsertUser(_user);
 
 			await DataStorageService.SecureSaveAsync(StorageFileNames.UserDataFileName, System.Text.Json.JsonSerializer.Serialize(_user));
-			NavigationManager.NavigateTo("/");
+			NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 		}
 
 		_isVerifying = false;
@@ -112,7 +115,7 @@ public partial class LoginPage
 			if (_user is null)
 			{
 				await _phoneEmailTextBox.FocusAsync();
-				await ShowToast("Login Failed", "No user found with the provided phone number or email.", "error");
+				await _toastNotification.ShowAsync("Login Failed", "No user found with the provided phone number or email.", ToastType.Error);
 				return;
 			}
 
@@ -124,7 +127,7 @@ public partial class LoginPage
 				{
 					_user.Status = false;
 					await UserData.InsertUser(_user);
-					await ShowToast("Account Locked", "Your account has been locked due to multiple failed login attempts. Please contact support.", "error");
+					await _toastNotification.ShowAsync("Account Locked", "Your account has been locked due to multiple failed login attempts. Please contact support.", ToastType.Error);
 					NavigationManager.NavigateTo("/login", true);
 					return;
 				}
@@ -132,14 +135,14 @@ public partial class LoginPage
 				await UserData.InsertUser(_user);
 
 				await _passwordTextBox.FocusAsync();
-				await ShowToast("Login Failed", "Incorrect password. Please try again.", "error");
+				await _toastNotification.ShowAsync("Login Failed", "Incorrect password. Please try again.", ToastType.Error);
 				return;
 			}
 
 			if (!_user.Status)
 			{
 				await _phoneEmailTextBox.FocusAsync();
-				await ShowToast("Login Failed", "This account is inactive. Please contact support.", "error");
+				await _toastNotification.ShowAsync("Login Failed", "This account is inactive. Please contact support.", ToastType.Error);
 				return;
 			}
 
@@ -151,11 +154,11 @@ public partial class LoginPage
 
 			await DataStorageService.SecureSaveAsync(StorageFileNames.UserDataFileName, System.Text.Json.JsonSerializer.Serialize(_user));
 			VibrationService.VibrateWithTime(500);
-			NavigationManager.NavigateTo("/");
+			NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 		}
 		catch (Exception ex)
 		{
-			await ShowToast("An Error Occurred While Logging In", ex.Message, "error");
+			await _toastNotification.ShowAsync("An Error Occurred While Logging In", ex.Message, ToastType.Error);
 		}
 		finally
 		{
@@ -175,22 +178,12 @@ public partial class LoginPage
 			await UserData.InsertUser(_user);
 		}
 
-		NavigationManager.NavigateTo("/login-with-code");
+		NavigationManager.NavigateTo(PageRouteNames.LoginWithCode);
 	}
 
-	private async Task ShowToast(string title, string message, string type)
+	public async ValueTask DisposeAsync()
 	{
-		VibrationService.VibrateWithTime(200);
-
-		if (type == "error")
-		{
-			_errorTitle = title;
-			_errorMessage = message;
-			await _sfErrorToast.ShowAsync(new()
-			{
-				Title = _errorTitle,
-				Content = _errorMessage
-			});
-		}
+		if (_hotKeysContext is not null)
+			await _hotKeysContext.DisposeAsync();
 	}
 }

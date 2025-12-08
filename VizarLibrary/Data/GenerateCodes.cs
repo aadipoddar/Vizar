@@ -1,23 +1,37 @@
-﻿using VizarLibrary.Data.Common;
+﻿using VizarLibrary.Data.Accounts.Masters;
+using VizarLibrary.Data.Common;
 using VizarLibrary.DataAccess;
-using VizarLibrary.Models.Accounts;
+using VizarLibrary.Models.Accounts.FinancialAccounting;
+using VizarLibrary.Models.Accounts.Masters;
 using VizarLibrary.Models.Common;
-using VizarLibrary.Models.Inventory;
-using VizarLibrary.Models.Item;
+using VizarLibrary.Models.Inventory.Item;
+using VizarLibrary.Models.Inventory.Purchase;
 
 namespace VizarLibrary.Data;
 
 public static class GenerateCodes
 {
+	private static int GetNumberOfDigits(this int number) =>
+		number switch
+		{
+			< 10 => 1,
+			< 100 => 2,
+			< 1000 => 3,
+			< 10000 => 4,
+			< 100000 => 5,
+			_ => 6
+		};
+
 	public enum CodeType
 	{
+		Accounting,
+		Ledger,
 		Purchase,
 		PurchaseReturn,
-		Ledger,
-		Manufacturer,
-		ItemCategory,
-		ItemType,
 		Item,
+		ItemType,
+		ItemCategory,
+		Manufacturer,
 	}
 
 	private static async Task<string> CheckDuplicateCode(string code, int numberLength, CodeType type)
@@ -27,6 +41,10 @@ public static class GenerateCodes
 		{
 			switch (type)
 			{
+				case CodeType.Accounting:
+					var accounting = await CommonData.LoadTableDataByTransactionNo<AccountingModel>(TableNames.Accounting, code);
+					isDuplicate = accounting is not null;
+					break;
 				case CodeType.Purchase:
 					var purchase = await CommonData.LoadTableDataByTransactionNo<PurchaseModel>(TableNames.Purchase, code);
 					isDuplicate = purchase is not null;
@@ -71,6 +89,30 @@ public static class GenerateCodes
 				code = $"{prefix}{1.ToString($"D{numberLength}")}";
 		}
 		return code;
+	}
+
+	public static async Task<string> GenerateAccountingTransactionNo(AccountingModel accounting)
+	{
+		var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, accounting.FinancialYearId);
+		var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, accounting.CompanyId)).Code;
+		var accountingPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.FinancialAccountingTransactionPrefix)).Value;
+
+		var lastAccounting = await CommonData.LoadLastTableDataByCompanyFinancialYear<AccountingModel>(TableNames.Accounting, accounting.CompanyId, accounting.FinancialYearId);
+		if (lastAccounting is not null)
+		{
+			var lastTransactionNo = lastAccounting.TransactionNo;
+			if (lastTransactionNo.StartsWith($"{companyPrefix}{financialYear.YearNo}{accountingPrefix}"))
+			{
+				var lastNumberPart = lastTransactionNo[(companyPrefix.Length + financialYear.YearNo.ToString().Length + accountingPrefix.Length)..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{accountingPrefix}{nextNumber:D6}", 6, CodeType.Accounting);
+				}
+			}
+		}
+
+		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{accountingPrefix}000001", 6, CodeType.Accounting);
 	}
 
 	public static async Task<string> GeneratePurchaseTransactionNo(PurchaseModel purchase)
@@ -121,98 +163,130 @@ public static class GenerateCodes
 		return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{purchaseReturnPrefix}000001", 6, CodeType.PurchaseReturn);
 	}
 
+	public static async Task<string> GenerateItemStockAdjustmentTransactionNo(DateTime transactionDateTime)
+	{
+		var financialYear = await FinancialYearData.LoadFinancialYearByDateTime(transactionDateTime);
+		var settings = await SettingsData.LoadSettingsByKey(SettingsKeys.PrimaryCompanyLinkingId);
+		var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, int.Parse(settings.Value))).Code;
+		var adjustmentPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.ItemStockAdjustmentTransactionPrefix)).Value;
+		var currentDateTime = await CommonData.LoadCurrentDateTime();
+
+		return $"{companyPrefix}{financialYear.YearNo}{adjustmentPrefix}{currentDateTime:ddMMyy}{currentDateTime:HHmmss}";
+	}
+
+
 	public static async Task<string> GenerateLedgerCode()
 	{
 		var ledgers = await CommonData.LoadTableData<LedgerModel>(TableNames.Ledger);
-		var prefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.LedgerCodePrefix)).Value;
+		var ledgerPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.LedgerCodePrefix)).Value;
 
-		if (ledgers.Count == 0)
-			return await CheckDuplicateCode($"{prefix}000001", 6, CodeType.Ledger);
-
-		var lastNumberPart = ledgers.LastOrDefault().Code[prefix.Length..];
-
-		if (int.TryParse(lastNumberPart, out int lastNumber))
+		var lastLedger = ledgers.OrderByDescending(l => l.Id).FirstOrDefault();
+		if (lastLedger is not null)
 		{
-			int nextNumber = lastNumber + 1;
-			return await CheckDuplicateCode($"{prefix}{nextNumber:D6}", 6, CodeType.Ledger);
+			var lastLedgerCode = lastLedger.Code;
+			if (lastLedgerCode.StartsWith(ledgerPrefix))
+			{
+				var lastNumberPart = lastLedgerCode[ledgerPrefix.Length..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{ledgerPrefix}{nextNumber:D6}", 6, CodeType.Ledger);
+				}
+			}
 		}
 
-		return await CheckDuplicateCode($"{prefix}000001", 6, CodeType.Ledger);
-	}
-
-	public static async Task<string> GenerateManufactureCode()
-	{
-		var manufactures = await CommonData.LoadTableData<ManufacturerModel>(TableNames.Manufacturer);
-		var prefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.ManufacturerCodePrefix)).Value;
-
-		if (manufactures.Count == 0)
-			return await CheckDuplicateCode($"{prefix}000001", 6, CodeType.Manufacturer);
-
-		var lastNumberPart = manufactures.LastOrDefault().Code[prefix.Length..];
-
-		if (int.TryParse(lastNumberPart, out int lastNumber))
-		{
-			int nextNumber = lastNumber + 1;
-			return await CheckDuplicateCode($"{prefix}{nextNumber:D6}", 6, CodeType.Manufacturer);
-		}
-
-		return await CheckDuplicateCode($"{prefix}000001", 6, CodeType.Manufacturer);
-	}
-
-	public static async Task<string> GenerateItemCategoryCode()
-	{
-		var itemCategories = await CommonData.LoadTableData<ItemCategoryModel>(TableNames.ItemCategory);
-		var prefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.ItemCategoryCodePrefix)).Value;
-
-		if (itemCategories.Count == 0)
-			return await CheckDuplicateCode($"{prefix}000001", 6, CodeType.ItemCategory);
-
-		var lastNumberPart = itemCategories.LastOrDefault().Code[prefix.Length..];
-
-		if (int.TryParse(lastNumberPart, out int lastNumber))
-		{
-			int nextNumber = lastNumber + 1;
-			return await CheckDuplicateCode($"{prefix}{nextNumber:D6}", 6, CodeType.ItemCategory);
-		}
-
-		return await CheckDuplicateCode($"{prefix}000001", 6, CodeType.ItemCategory);
-	}
-
-	public static async Task<string> GenerateItemTypeCode()
-	{
-		var itemTypes = await CommonData.LoadTableData<ItemTypeModel>(TableNames.ItemType);
-		var prefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.ItemTypeCodePrefix)).Value;
-
-		if (itemTypes.Count == 0)
-			return await CheckDuplicateCode($"{prefix}000001", 6, CodeType.ItemType);
-
-		var lastNumberPart = itemTypes.LastOrDefault().Code[prefix.Length..];
-
-		if (int.TryParse(lastNumberPart, out int lastNumber))
-		{
-			int nextNumber = lastNumber + 1;
-			return await CheckDuplicateCode($"{prefix}{nextNumber:D6}", 6, CodeType.ItemType);
-		}
-
-		return await CheckDuplicateCode($"{prefix}000001", 6, CodeType.ItemType);
+		return await CheckDuplicateCode($"{ledgerPrefix}000001", 6, CodeType.Ledger);
 	}
 
 	public static async Task<string> GenerateItemCode()
 	{
 		var items = await CommonData.LoadTableData<ItemModel>(TableNames.Item);
-		var prefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.ItemCodePrefix)).Value;
+		var itemPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.ItemCodePrefix)).Value;
 
-		if (items.Count == 0)
-			return await CheckDuplicateCode($"{prefix}000001", 6, CodeType.Item);
-
-		var lastNumberPart = items.LastOrDefault().Code[prefix.Length..];
-
-		if (int.TryParse(lastNumberPart, out int lastNumber))
+		var lastItem = items.OrderByDescending(r => r.Id).FirstOrDefault();
+		if (lastItem is not null)
 		{
-			int nextNumber = lastNumber + 1;
-			return await CheckDuplicateCode($"{prefix}{nextNumber:D6}", 6, CodeType.Item);
+			var lastItemCode = lastItem.Code;
+			if (lastItemCode.StartsWith(itemPrefix))
+			{
+				var lastNumberPart = lastItemCode[itemPrefix.Length..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{itemPrefix}{nextNumber:D6}", 6, CodeType.Item);
+				}
+			}
 		}
 
-		return await CheckDuplicateCode($"{prefix}000001", 6, CodeType.Item);
+		return await CheckDuplicateCode($"{itemPrefix}000001", 6, CodeType.Item);
+	}
+
+	public static async Task<string> GenerateItemTypeCode()
+	{
+		var itemTypes = await CommonData.LoadTableData<ItemTypeModel>(TableNames.ItemType);
+		var itemTypePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.ItemTypeCodePrefix)).Value;
+
+		var lastItemType = itemTypes.OrderByDescending(r => r.Id).FirstOrDefault();
+		if (lastItemType is not null)
+		{
+			var lastItemTypeCode = lastItemType.Code;
+			if (lastItemTypeCode.StartsWith(itemTypePrefix))
+			{
+				var lastNumberPart = lastItemTypeCode[itemTypePrefix.Length..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{itemTypePrefix}{nextNumber:D6}", 6, CodeType.ItemType);
+				}
+			}
+		}
+
+		return await CheckDuplicateCode($"{itemTypePrefix}000001", 6, CodeType.ItemType);
+	}
+
+	public static async Task<string> GenerateItemCategoryCode()
+	{
+		var itemCategories = await CommonData.LoadTableData<ItemCategoryModel>(TableNames.ItemCategory);
+		var itemCategoryPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.ItemCategoryCodePrefix)).Value;
+
+		var lastItemCategory = itemCategories.OrderByDescending(r => r.Id).FirstOrDefault();
+		if (lastItemCategory is not null)
+		{
+			var lastItemCategoryCode = lastItemCategory.Code;
+			if (lastItemCategoryCode.StartsWith(itemCategoryPrefix))
+			{
+				var lastNumberPart = lastItemCategoryCode[itemCategoryPrefix.Length..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{itemCategoryPrefix}{nextNumber:D6}", 6, CodeType.ItemCategory);
+				}
+			}
+		}
+
+		return await CheckDuplicateCode($"{itemCategoryPrefix}000001", 6, CodeType.ItemCategory);
+	}
+
+	public static async Task<string> GenerateManufacturerCode()
+	{
+		var manufacturers = await CommonData.LoadTableData<ManufacturerModel>(TableNames.Manufacturer);
+		var manufacturerPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.ManufacturerCodePrefix)).Value;
+
+		var lastManufacturer = manufacturers.OrderByDescending(r => r.Id).FirstOrDefault();
+		if (lastManufacturer is not null)
+		{
+			var lastManufacturerCode = lastManufacturer.Code;
+			if (lastManufacturerCode.StartsWith(manufacturerPrefix))
+			{
+				var lastNumberPart = lastManufacturerCode[manufacturerPrefix.Length..];
+				if (int.TryParse(lastNumberPart, out int lastNumber))
+				{
+					int nextNumber = lastNumber + 1;
+					return await CheckDuplicateCode($"{manufacturerPrefix}{nextNumber:D6}", 6, CodeType.Manufacturer);
+				}
+			}
+		}
+
+		return await CheckDuplicateCode($"{manufacturerPrefix}000001", 6, CodeType.Manufacturer);
 	}
 }

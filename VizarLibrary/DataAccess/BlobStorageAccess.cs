@@ -47,7 +47,7 @@ public static class BlobStorageAccess
 		return fileUrls;
 	}
 
-	public static async Task<(MemoryStream fileStream, string contentType)> DownloadFileFromBlobStorage(string url, BlobStorageContainers container)
+	public static async Task<(MemoryStream fileStream, string contentType)> DownloadFileFromBlobStorage(string url)
 	{
 		Uri blobUri = new(url);
 

@@ -20,7 +20,7 @@ public partial class LoginWithCodeRedirect
 		{
 			if (string.IsNullOrEmpty(Id) || string.IsNullOrEmpty(Code))
 			{
-				NavigationManager.NavigateTo("/login");
+				NavigationManager.NavigateTo(PageRouteNames.Login);
 				return;
 			}
 
@@ -29,7 +29,7 @@ public partial class LoginWithCodeRedirect
 
 			if (!isLoginWithCodeEnabled)
 			{
-				NavigationManager.NavigateTo("/login");
+				NavigationManager.NavigateTo(PageRouteNames.Login);
 				return;
 			}
 
@@ -38,7 +38,7 @@ public partial class LoginWithCodeRedirect
 
 			if (user is null || user.LastCode != int.Parse(Code) || user.LastCodeDateTime is null || user.LastCodeDateTime.Value.AddMinutes(codeExpiryMinutes) < currentDateTime)
 			{
-				NavigationManager.NavigateTo("/login");
+				NavigationManager.NavigateTo(PageRouteNames.Login);
 				return;
 			}
 
@@ -49,11 +49,11 @@ public partial class LoginWithCodeRedirect
 			await UserData.InsertUser(user);
 
 			await DataStorageService.SecureSaveAsync(StorageFileNames.UserDataFileName, System.Text.Json.JsonSerializer.Serialize(user));
-			NavigationManager.NavigateTo("/", true);
+			NavigationManager.NavigateTo(PageRouteNames.Dashboard, true);
 		}
 		catch
 		{
-			NavigationManager.NavigateTo("/login");
+			NavigationManager.NavigateTo(PageRouteNames.Login);
 		}
 	}
 }

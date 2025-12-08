@@ -1,5 +1,6 @@
 using Syncfusion.Blazor.Inputs;
-using Syncfusion.Blazor.Notifications;
+
+using Vizar.Shared.Components.Dialog;
 
 using VizarLibrary.Data.Common;
 using VizarLibrary.DataAccess;
@@ -39,14 +40,7 @@ public partial class LoginWithCodePage
 	private SfTextBox _newPasswordTextBox;
 	private SfOtpInput _otpInput;
 
-	private string _errorTitle = string.Empty;
-	private string _errorMessage = string.Empty;
-
-	private string _successTitle = string.Empty;
-	private string _successMessage = string.Empty;
-
-	private SfToast _sfSuccessToast;
-	private SfToast _sfErrorToast;
+	private ToastNotification _toastNotification;
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
@@ -57,12 +51,13 @@ public partial class LoginWithCodePage
 		{
 			await DataStorageService.SecureRemoveAll();
 			await _phoneEmailTextBox.FocusAsync();
+			
 			_users = await CommonData.LoadTableData<UserModel>(TableNames.User);
 
 			_isLoginWithCodeEnabled = bool.Parse((await SettingsData.LoadSettingsByKey(SettingsKeys.EnableLoginWithCode)).Value);
 
 			if (!_isLoginWithCodeEnabled)
-				NavigationManager.NavigateTo("/login", true);
+				NavigationManager.NavigateTo(PageRouteNames.Login, true);
 
 			_isEnabledUsersResetPassword = bool.Parse((await SettingsData.LoadSettingsByKey(SettingsKeys.EnableUsersToResetPassword)).Value);
 			_maxLoginAttempts = int.Parse((await SettingsData.LoadSettingsByKey(SettingsKeys.MaxLoginAttempts)).Value);
@@ -71,7 +66,7 @@ public partial class LoginWithCodePage
 		}
 		catch (Exception ex)
 		{
-			await ShowToast("An Error Occurred While Initializing Login Page", ex.Message, "error");
+			await _toastNotification.ShowAsync("An Error Occurred While Initializing Login Page", ex.Message, ToastType.Error);
 		}
 	}
 
@@ -82,17 +77,17 @@ public partial class LoginWithCodePage
 
 		if (string.IsNullOrEmpty(_phoneEmail))
 		{
-			await ShowToast("Invalid Input", "Please enter a valid phone number or email address.", "error");
+			await _toastNotification.ShowAsync("Invalid Input", "Please enter a valid phone number or email address.", ToastType.Error);
 			return;
 		}
 
-		_isEmail = _phoneEmail.Contains('@');
+		_isEmail = _phoneEmail.Contains('@') && _phoneEmail.Contains('.');
 		VibrationService.VibrateHapticLongPress();
 
 		var user = _users.FirstOrDefault(u => u.Phone == _phoneEmail || u.Email == _phoneEmail);
 		if (user is null || user.Status == false)
 		{
-			await ShowToast("No User Found", "No user found with the provided phone number or email.", "error");
+			await _toastNotification.ShowAsync("No User Found", "No user found with the provided phone number or email.", ToastType.Error);
 			_codePlaceholder = "Enter Code";
 			_user = new();
 		}
@@ -114,8 +109,8 @@ public partial class LoginWithCodePage
 					{
 						_user.Status = false;
 						await UserData.InsertUser(_user);
-						await ShowToast("Resend Limit Exceeded", "You have exceeded the maximum number of code resends. Your account has been locked. Please contact support.", "error");
-						NavigationManager.NavigateTo("/login", true);
+						await _toastNotification.ShowAsync("Resend Limit Exceeded", "You have exceeded the maximum number of code resends. Your account has been locked. Please contact support.", ToastType.Error);
+						NavigationManager.NavigateTo(PageRouteNames.Login, true);
 						return;
 					}
 
@@ -123,7 +118,9 @@ public partial class LoginWithCodePage
 					_user.LastCodeDateTime = await CommonData.LoadCurrentDateTime();
 					await UserData.InsertUser(_user);
 
-					await Mailing.SendMailCodeToUser(_user, _verificationCode.ToString(), _codeExpiryMinutes);
+					var redirectLink = NavigationManager.BaseUri + PageRouteNames.LoginWithCodeRedirect + $"/{_user.Id}/{_verificationCode}";
+
+					await Mailing.SendMailCodeToUser(_user, _verificationCode.ToString(), redirectLink, _codeExpiryMinutes);
 					_codeSentTime = await CommonData.LoadCurrentDateTime();
 					_codePlaceholder = $"Enter Code sent to {_user.Email} for {_user.Name}. The code is valid till {_codeSentTime.AddMinutes(_codeExpiryMinutes):hh:mm tt}";
 				}
@@ -134,14 +131,14 @@ public partial class LoginWithCodePage
 					// _codePlaceholder = $"Enter Code sent to {_user.Phone} for {_user.Name}";
 				}
 
-				await ShowToast("Code Sent Successfully", _isEmail ? $"A code has been sent to {_user.Email}" : $"A code has been sent to {_user.Phone}", "success");
+				await _toastNotification.ShowAsync("Code Sent Successfully", _isEmail ? $"A code has been sent to {_user.Email}" : $"A code has been sent to {_user.Phone}", ToastType.Success);
 
-				_otpInput.FocusAsync();
+				_otpInput?.FocusAsync();
 				_isCodeSent = true;
 			}
 			catch (Exception ex)
 			{
-				await ShowToast("An Error Occurred While Sending Code", ex.Message, "error");
+				await _toastNotification.ShowAsync("An Error Occurred While Sending Code", ex.Message, ToastType.Error);
 				_codePlaceholder = "Enter Code";
 			}
 			finally
@@ -162,28 +159,28 @@ public partial class LoginWithCodePage
 
 			if (!_isCodeSent)
 			{
-				await ShowToast("Code Not Sent", "Please send the code before attempting to log in.", "error");
+				await _toastNotification.ShowAsync("Code Not Sent", "Please send the code before attempting to log in.", ToastType.Error);
 				return;
 			}
 
 			if (string.IsNullOrEmpty(_otpCode) || _otpCode.Length != _otpInput.Length)
 			{
 				_otpInput.FocusAsync();
-				await ShowToast("Invalid Code", "Please enter the complete code sent to you.", "error");
+				await _toastNotification.ShowAsync("Invalid Code", "Please enter the complete code sent to you.", ToastType.Error);
 				return;
 			}
 
 			if (_user.Id == 0)
 			{
 				await _phoneEmailTextBox.FocusAsync();
-				await ShowToast("No User Selected", "Please enter a valid phone number or email address to send the code.", "error");
+				await _toastNotification.ShowAsync("No User Selected", "Please enter a valid phone number or email address to send the code.", ToastType.Error);
 				return;
 			}
 
 			if (!_user.Status)
 			{
 				await _phoneEmailTextBox.FocusAsync();
-				await ShowToast("Login Failed", "This account is inactive. Please contact support.", "error");
+				await _toastNotification.ShowAsync("Login Failed", "This account is inactive. Please contact support.", ToastType.Error);
 				return;
 			}
 
@@ -197,22 +194,22 @@ public partial class LoginWithCodePage
 				{
 					_user.Status = false;
 					await UserData.InsertUser(_user);
-					await ShowToast("Account Locked", "Your account has been locked due to multiple failed login attempts. Please contact support.", "error");
-					NavigationManager.NavigateTo("/login", true);
+					await _toastNotification.ShowAsync("Account Locked", "Your account has been locked due to multiple failed login attempts. Please contact support.", ToastType.Error);
+					NavigationManager.NavigateTo(PageRouteNames.Login, true);
 					return;
 				}
 
 				await UserData.InsertUser(_user);
 
 				_otpInput.FocusAsync();
-				await ShowToast("Login Failed", "Incorrect code. Please try again.", "error");
+				await _toastNotification.ShowAsync("Login Failed", "Incorrect code. Please try again.", ToastType.Error);
 				return;
 			}
 
 			if (_codeSentTime.AddMinutes(_codeExpiryMinutes) < await CommonData.LoadCurrentDateTime())
 			{
 				_otpInput.FocusAsync();
-				await ShowToast("Code Expired", "The code you entered has expired. Please request a new code.", "error");
+				await _toastNotification.ShowAsync("Code Expired", "The code you entered has expired. Please request a new code.", ToastType.Error);
 				return;
 			}
 
@@ -226,14 +223,14 @@ public partial class LoginWithCodePage
 				if (!_isEnabledUsersResetPassword)
 				{
 					await _newPasswordTextBox.FocusAsync();
-					await ShowToast("Password Reset Disabled", "Password reset functionality is disabled. Please contact support.", "error");
+					await _toastNotification.ShowAsync("Password Reset Disabled", "Password reset functionality is disabled. Please contact support.", ToastType.Error);
 				}
 				else
 				{
 					if (_newPassword.Length < 6)
 					{
 						await _newPasswordTextBox.FocusAsync();
-						await ShowToast("Weak Password", "The new password must be at least 6 characters long.", "error");
+						await _toastNotification.ShowAsync("Weak Password", "The new password must be at least 6 characters long.", ToastType.Error);
 						return;
 					}
 				}
@@ -245,42 +242,15 @@ public partial class LoginWithCodePage
 
 			await DataStorageService.SecureSaveAsync(StorageFileNames.UserDataFileName, System.Text.Json.JsonSerializer.Serialize(_user));
 			VibrationService.VibrateWithTime(500);
-			NavigationManager.NavigateTo("/");
+			NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 		}
 		catch (Exception ex)
 		{
-			await ShowToast("An Error Occurred While Logging In", ex.Message, "error");
+			await _toastNotification.ShowAsync("An Error Occurred While Logging In", ex.Message, ToastType.Error);
 		}
 		finally
 		{
 			_isVerifying = false;
-		}
-	}
-
-	private async Task ShowToast(string title, string message, string type)
-	{
-		VibrationService.VibrateWithTime(200);
-
-		if (type == "error")
-		{
-			_errorTitle = title;
-			_errorMessage = message;
-			await _sfErrorToast.ShowAsync(new()
-			{
-				Title = _errorTitle,
-				Content = _errorMessage
-			});
-		}
-
-		else if (type == "success")
-		{
-			_successTitle = title;
-			_successMessage = message;
-			await _sfSuccessToast.ShowAsync(new()
-			{
-				Title = _successTitle,
-				Content = _successMessage
-			});
 		}
 	}
 }

@@ -38,7 +38,8 @@ public static class AuthenticationService
 		var hasPermission = userRoles switch
 		{
 			UserRoles.Admin => user.Admin,
-			UserRoles.Inventory => user.Inventory,
+			UserRoles.Accounts => user.Accounts,
+			UserRoles.Purchase => user.Purchase,
 			_ => false
 		};
 
@@ -52,6 +53,6 @@ public static class AuthenticationService
 	{
 		await dataStorageService.SecureRemoveAll();
 		vibrationService.VibrateWithTime(500);
-		navigationManager.NavigateTo("/login", forceLoad: true);
+		navigationManager.NavigateTo(PageRouteNames.Login, true);
 	}
 }

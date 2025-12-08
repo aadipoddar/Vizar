@@ -29,14 +29,14 @@ public static class Mailing
 		await client.DisconnectAsync(true);
 	}
 
-	public static async Task SendMailCodeToUser(UserModel user, string code, int codeExpiryMinutes)
+	public static async Task SendMailCodeToUser(UserModel user, string code, string redirectLink, int codeExpiryMinutes)
 	{
 		var subject = "Your Login Code for Vizar";
-		var htmlBody = GenerateLoginCodeEmailHtml(user, code, codeExpiryMinutes);
+		var htmlBody = GenerateLoginCodeEmailHtml(user, code, codeExpiryMinutes, redirectLink);
 		await SendEmail(user.Name, user.Email, subject, htmlBody);
 	}
 
-	private static string GenerateLoginCodeEmailHtml(UserModel user, string code, int codeExpiryMinutes)
+	private static string GenerateLoginCodeEmailHtml(UserModel user, string code, int codeExpiryMinutes, string redirectLink)
 	{
 		return $@"
 <!DOCTYPE html>
@@ -83,7 +83,7 @@ public static class Mailing
                             <table role=""presentation"" style=""width: 100%; border-collapse: collapse; margin: 20px 0;"">
                                 <tr>
                                     <td align=""center"">
-                                        <a href=""https://vizar.azurewebsites.net/login-with-code-redirect/{user.Id}/{code}"" style=""display: inline-block; padding: 14px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);"">Go to Vizar Login</a>
+                                        <a href=""{redirectLink}"" style=""display: inline-block; padding: 14px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);"">Go to Vizar Login</a>
                                     </td>
                                 </tr>
                             </table>

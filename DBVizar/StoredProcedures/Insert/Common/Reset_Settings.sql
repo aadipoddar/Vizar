@@ -12,10 +12,16 @@ BEGIN
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'PrimaryCompanyLinkingId'			, N'1'		, N'Company Id for the Primary Company Account')
 
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'LedgerCodePrefix'				, N'LD'		, N'Prefix for Ledger Codes')
-	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ItemCategoryCodePrefix'			, N'ITCT'	, N'Prefix for Item Category Codes')
-	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ItemTypeCodePrefix'				, N'ITTY'	, N'Prefix for Item Type Codes')
+	
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ItemCodePrefix'					, N'IT'		, N'Prefix for Item Codes')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ItemTypeCodePrefix'				, N'ITTY'	, N'Prefix for Item Type Codes')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ItemCategoryCodePrefix'			, N'ITCT'	, N'Prefix for Item Category Codes')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ManufacturerCodePrefix'			, N'MFR'	, N'Prefix for Manufacturer Codes')
+
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ItemStockAdjustmentTransactionPrefix' , N'ISA'	, N'Prefix for Item Stock Adjustment Transaction Numbers')
+
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'FinancialAccountingTransactionPrefix'	, N'FAT'	, N'Prefix for Financial Accounting Transaction Numbers')
+	
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'PurchaseTransactionPrefix'		, N'PUR'	, N'Prefix for Purchase Transaction Numbers')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'PurchaseReturnTransactionPrefix'	, N'PURRET'	, N'Prefix for Purchase Return Transaction Numbers')
 

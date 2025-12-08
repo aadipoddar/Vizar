@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
@@ -11,20 +11,25 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.10" />
-    <PackageReference Include="Syncfusion.Blazor.Buttons" Version="31.2.4" />
-    <PackageReference Include="Syncfusion.Blazor.Calendars" Version="31.2.4" />
-    <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="31.2.4" />
-    <PackageReference Include="Syncfusion.Blazor.Grid" Version="31.2.4" />
-    <PackageReference Include="Syncfusion.Blazor.Inputs" Version="31.2.4" />
-    <PackageReference Include="Syncfusion.Blazor.Notifications" Version="31.2.4" />
-    <PackageReference Include="Syncfusion.Blazor.Popups" Version="31.2.4" />
-    <PackageReference Include="Syncfusion.Blazor.Spinner" Version="31.2.4" />
-    <PackageReference Include="Syncfusion.Blazor.Themes" Version="31.2.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.0" />
+    <PackageReference Include="Syncfusion.Blazor.Calendars" Version="31.2.16" />
+    <PackageReference Include="Syncfusion.Blazor.DropDowns" Version="31.2.16" />
+    <PackageReference Include="Syncfusion.Blazor.Grid" Version="31.2.16" />
+    <PackageReference Include="Syncfusion.Blazor.Inputs" Version="31.2.16" />
+    <PackageReference Include="Syncfusion.Blazor.Notifications" Version="31.2.16" />
+    <PackageReference Include="Syncfusion.Blazor.Popups" Version="31.2.16" />
+    <PackageReference Include="Syncfusion.Blazor.Spinner" Version="31.2.16" />
+    <PackageReference Include="Syncfusion.Blazor.Themes" Version="31.2.16" />
+    <PackageReference Include="Toolbelt.Blazor.HotKeys2" Version="6.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\VizarLibrary\VizarLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Toolbelt.Blazor.HotKeys2" />
+    <Using Include="Vizar.Shared.Services" />
   </ItemGroup>
 
 </Project>

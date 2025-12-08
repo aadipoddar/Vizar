@@ -1,0 +1,39 @@
+using Microsoft.AspNetCore.Components;
+
+using VizarLibrary.Models.Common;
+
+namespace Vizar.Shared.Pages.Accounts;
+
+public partial class AccountingDashboard : IAsyncDisposable
+{
+	private HotKeysContext _hotKeysContext;
+	private bool _isLoading = true;
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (!firstRender)
+			return;
+
+		await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, UserRoles.Accounts);
+
+		_hotKeysContext = HotKeys.CreateContext()
+			.Add(ModCode.Ctrl, Code.L, Logout, "Logout", Exclude.None)
+			.Add(ModCode.Ctrl, Code.B, NavigateToDashboard, "Back", Exclude.None)
+			.Add(ModCode.Ctrl, Code.D, NavigateToDashboard, "Dashboard", Exclude.None);
+
+		_isLoading = false;
+		StateHasChanged();
+	}
+
+	private async Task NavigateToDashboard() =>
+		NavigationManager.NavigateTo(PageRouteNames.Dashboard);
+
+	private async Task Logout() =>
+		await AuthenticationService.Logout(DataStorageService, NavigationManager, VibrationService);
+
+	public async ValueTask DisposeAsync()
+	{
+		if (_hotKeysContext is not null)
+			await _hotKeysContext.DisposeAsync();
+	}
+}

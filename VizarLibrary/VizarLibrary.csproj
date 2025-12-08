@@ -1,19 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="DataAccess\" />
+    <Folder Include="Data\Inventory\Purchase\" />
+    <Folder Include="Exporting\Accounts\FinancialAccounting\" />
+    <Folder Include="Exporting\Utils\" />
+    <Folder Include="Models\Accounts\" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.26.0" />
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="MailKit" Version="4.14.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.2" />
-    <PackageReference Include="Syncfusion.Pdf.Net.Core" Version="31.2.4" />
-    <PackageReference Include="Syncfusion.XlsIO.Net.Core" Version="31.2.4" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.3" />
+    <PackageReference Include="MimeKit" Version="4.14.0" />
+    <PackageReference Include="NumericWordsConversion" Version="2.1.1" />
+    <PackageReference Include="Syncfusion.Pdf.Net.Core" Version="31.2.16" />
+    <PackageReference Include="Syncfusion.XlsIO.Net.Core" Version="31.2.16" />
   </ItemGroup>
 
 </Project>

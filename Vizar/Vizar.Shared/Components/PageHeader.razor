@@ -1,0 +1,123 @@
+<div class="page-header">
+    <div class="header-left">
+        <img src="images/logo.png" alt="PrimeBakes" class="header-logo" />
+        <div class="header-divider"></div>
+        <div class="header-text">
+            <span class="app-name">Vizar</span>
+        </div>
+    </div>
+    <div class="header-center">
+        <h1 class="page-title">@Title</h1>
+        <p class="page-subtitle">@Subtitle</p>
+    </div>
+    <div class="header-right">
+        @if (!string.IsNullOrEmpty(UserName))
+        {
+            <span class="user-name">@UserName</span>
+        }
+        @if (RightContent != null)
+        {
+            @RightContent
+        }
+        @if (ShowLogout)
+        {
+            <IconButton Icon="IconType.Logout" Title="Logout (Ctrl + L)" OnClick="OnLogoutClick" />
+        }
+        @if (ShowHome)
+        {
+            <IconButton Icon="IconType.Home" Title="Home (Ctrl + D)" OnClick="OnHomeClick" />
+        }
+        @if (ShowBack)
+        {
+            <IconButton Icon="IconType.Back" Title="Back (Ctrl + B)" OnClick="OnBackClick" />
+        }
+    </div>
+</div>
+
+<style>
+    /* Professional Header Section */
+    .page-header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: #ffffff;
+        border-bottom: 2px solid #e2e8f0;
+        padding: 16px 32px;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 24px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        min-height: 72px;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .header-logo {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+    }
+
+    .header-divider {
+        width: 1px;
+        height: 32px;
+        background: #e2e8f0;
+        flex-shrink: 0;
+    }
+
+    .header-text {
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+        color: #0f172a;
+        font-weight: 600;
+    }
+
+    .app-name {
+        color: #0f172a;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .header-center {
+        text-align: center;
+    }
+
+    .page-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #0f172a;
+        margin: 0;
+        letter-spacing: -0.3px;
+    }
+
+    .page-subtitle {
+        font-size: 13px;
+        color: #64748b;
+        margin: 4px 0 0 0;
+        font-weight: 400;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .user-name {
+        font-size: 14px;
+        font-weight: 500;
+        color: #0f172a;
+        padding: 8px 12px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+</style>

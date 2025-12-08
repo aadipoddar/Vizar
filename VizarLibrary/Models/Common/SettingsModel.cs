@@ -15,16 +15,30 @@ public static class SettingsKeys
 	public static string CodeResendLimit => "CodeResendLimit";
 	public static string CodeExpiryMinutes => "CodeExpiryMinutes";
 
-	public static string PrimaryCompanyLinkingId => "PrimaryCompanyLinkingId";
-
 	public static string LedgerCodePrefix => "LedgerCodePrefix";
-	public static string ItemCategoryCodePrefix => "ItemCategoryCodePrefix";
-	public static string ItemTypeCodePrefix => "ItemTypeCodePrefix";
+	
 	public static string ItemCodePrefix => "ItemCodePrefix";
+	public static string ItemTypeCodePrefix => "ItemTypeCodePrefix";
+	public static string ItemCategoryCodePrefix => "ItemCategoryCodePrefix";
 	public static string ManufacturerCodePrefix => "ManufacturerCodePrefix";
+
+	public static string ItemStockAdjustmentTransactionPrefix => "ItemStockAdjustmentTransactionPrefix";
+
+	public static string FinancialAccountingTransactionPrefix => "FinancialAccountingTransactionPrefix";
+
 	public static string PurchaseTransactionPrefix => "PurchaseTransactionPrefix";
 	public static string PurchaseReturnTransactionPrefix => "PurchaseReturnTransactionPrefix";
 
 	public static string UpdateItemMasterRateOnPurchase => "UpdateItemMasterRateOnPurchase";
 	public static string UpdateItemMasterUOMOnPurchase => "UpdateItemMasterUOMOnPurchase";
+
+	public static string PrimaryCompanyLinkingId => "PrimaryCompanyLinkingId";
+
+	public static string PurchaseVoucherId => "PurchaseVoucherId";
+	public static string PurchaseReturnVoucherId => "PurchaseReturnVoucherId";
+	public static string PurchaseLedgerId => "PurchaseLedgerId";
+	public static string CashLedgerId => "CashLedgerId";
+	public static string GSTLedgerId => "GSTLedgerId";
+
+	public static string AutoRefreshReportTimer => "AutoRefreshReportTimer";
 }

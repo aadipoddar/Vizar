@@ -1,5 +1,7 @@
 using Syncfusion.Blazor;
 
+using Toolbelt.Blazor.Extensions.DependencyInjection;
+
 using Vizar.Shared.Services;
 using Vizar.Web.Components;
 using Vizar.Web.Services;
@@ -12,10 +14,11 @@ Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(Secrets.Syncfusio
 Dapper.SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
 
 // Add services to the container.
-builder.Services.AddRazorComponents()
+builder.Services
+	.AddSyncfusionBlazor()
+	.AddHotKeys2()
+	.AddRazorComponents()
 	.AddInteractiveServerComponents();
-
-builder.Services.AddSyncfusionBlazor();
 
 // Add device-specific services used by the Vizar.Shared project
 builder.Services.AddSingleton<IFormFactor, FormFactor>();
@@ -36,14 +39,16 @@ if (!app.Environment.IsDevelopment())
 	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 	app.UseHsts();
 }
-
+app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
 
-app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.MapStaticAssets();
 
 app.MapRazorComponents<App>()
 	.AddInteractiveServerRenderMode()
-	.AddAdditionalAssemblies(typeof(Vizar.Shared._Imports).Assembly);
+	.AddAdditionalAssemblies(
+		typeof(Vizar.Shared._Imports).Assembly);
 
 app.Run();

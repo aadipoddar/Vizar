@@ -1,662 +1,435 @@
 ﻿@page "/login-with-code"
-<PageTitle>Login With Code - Vizar</PageTitle>
+
+<PageTitle>Login with Code - Vizar</PageTitle>
 
 <div class="login-container">
-	<div class="login-card">
-		<!-- Header Section -->
-		<div class="login-header">
-			<div class="logo-container">
-				<img src="images/logo.png" alt="Vizar Logo" class="company-logo" />
-				<h1 class="logo-text">Vizar</h1>
-			</div>
-			<h2 class="welcome-text">Secure Login</h2>
-			<p class="subtitle">Enter your email or phone to receive a verification code</p>
-		</div>
+    <div class="login-card">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <img src="images/logo_full.png" alt="Vizar Logo" class="login-logo" />
+        </div>
 
-		<!-- Form Section -->
-		<div class="login-form">
-			<!-- Phone/Email Input -->
-			<div class="form-group">
-				<SfTextBox Placeholder="Email or Phone Number"
-						   FloatLabelType="FloatLabelType.Auto"
-						   @bind-Value="@_phoneEmail"
-						   @ref="_phoneEmailTextBox"
-						   CssClass="custom-input" />
-			</div>
+        <!-- Title Section -->
+        <div class="title-section">
+            <p class="login-subtitle">Login with verification code</p>
+        </div>
 
-			<!-- Send Code Button -->
-			<div class="form-group">
-				<SfButton Content="@(_isCodeSent ? "Resend Code" : "Send Verification Code")"
-						  OnClick="OnSendCodeClick"
-						  Disabled="_isVerifying"
-						  CssClass="@(_isCodeSent ? "btn-secondary" : "btn-primary")" />
-			</div>
+        <!-- Login Form -->
+        <div class="form-section">
+            @if (!_isCodeSent)
+            {
+                <!-- Phone/Email Input -->
+                <div class="input-group">
+                    <label class="input-label">Phone / Email</label>
+                    <SfTextBox @ref="_phoneEmailTextBox" @bind-Value="_phoneEmail" Placeholder="Enter phone number or email"
+                        CssClass="custom-textbox" ShowClearButton="true">
+                    </SfTextBox>
+                </div>
 
-			<!-- Code Placeholder Info -->
-			@if (_isCodeSent)
-			{
-				<div class="info-box">
-					<svg class="info-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<circle cx="12" cy="12" r="10"></circle>
-						<line x1="12" y1="16" x2="12" y2="12"></line>
-						<line x1="12" y1="8" x2="12.01" y2="8"></line>
-					</svg>
-					<p class="info-text">@_codePlaceholder</p>
-				</div>
-			}
+                <!-- Send Code Button -->
+                <div class="button-group">
+                    <button class="btn-login" @onclick="OnSendCodeClick" disabled="@_isVerifying">
+                        @if (_isVerifying)
+                        {
+                            <span class="spinner"></span>
+                            <span>Sending Code...</span>
+                        }
+                        else
+                        {
+                            <span>Send Verification Code</span>
+                        }
+                    </button>
+                </div>
+            }
+            else
+            {
+                <!-- OTP Input -->
+                <div class="input-group">
+                    <label class="input-label">Verification Code</label>
+                    <div class="otp-container">
+                        <SfOtpInput @ref="_otpInput" @bind-Value="_otpCode" Length="6" CssClass="custom-otp"
+                            Placeholder="@_codePlaceholder">
+                        </SfOtpInput>
+                    </div>
+                    <p class="code-hint">@_codePlaceholder</p>
+                </div>
 
-			<!-- OTP Input -->
-			<div class="form-group otp-section">
-				<label class="form-label">Enter Verification Code</label>
-				<SfOtpInput Length="6"
-							Placeholder="000000"
-							@bind-Value="_otpCode"
-							@ref="_otpInput"
-							Type="OtpInputType.Number"
-							Disabled="!_isCodeSent"
-							CssClass="custom-otp" />
-			</div>
+                @if (_isEnabledUsersResetPassword)
+                {
+                    <!-- New Password Input (Optional) -->
+                    <div class="input-group">
+                        <label class="input-label">New Password (Optional)</label>
+                        <SfTextBox @ref="_newPasswordTextBox" @bind-Value="_newPassword" Type="InputType.Password"
+                            Placeholder="Enter new password (min 6 characters)" CssClass="custom-textbox" ShowClearButton="true">
+                        </SfTextBox>
+                    </div>
+                }
 
-			<!-- Password Reset (Optional) -->
-			@if (_isEnabledUsersResetPassword && _isCodeSent)
-			{
-				<div class="form-group">
-					<SfTextBox Placeholder="New Password (Optional)"
-							   FloatLabelType="FloatLabelType.Auto"
-							   @bind-Value="@_newPassword"
-							   Type="InputType.Password"
-							   @ref="_newPasswordTextBox"
-							   CssClass="custom-input" />
-					<small class="helper-text">Leave empty to keep your current password</small>
-				</div>
-			}
+                <!-- Login Button -->
+                <div class="button-group">
+                    <button class="btn-login" @onclick="OnLoginWithCodeClick" disabled="@_isVerifying">
+                        @if (_isVerifying)
+                        {
+                            <span class="spinner"></span>
+                            <span>Verifying...</span>
+                        }
+                        else
+                        {
+                            <span>Verify & Login</span>
+                        }
+                    </button>
+                </div>
 
-			<!-- Login Button -->
-			<div class="form-group">
-				<SfButton Content="@(_isVerifying ? "Verifying..." : "Login to Vizar")"
-						  OnClick="OnLoginWithCodeClick"
-						  Disabled="!_isCodeSent || _otpCode.Length < 6 || _isVerifying"
-						  CssClass="btn-login" />
-			</div>
+                <!-- Resend Code Link -->
+                <div class="forgot-password-section">
+                    <a class="forgot-password-link" @onclick="OnSendCodeClick">
+                        Resend Code
+                    </a>
+                </div>
+            }
 
-			<!-- Back to Password Login -->
-			<div class="form-footer">
-				<p class="back-link" @onclick='() => NavigationManager.NavigateTo("/login")'>
-					<svg class="back-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<line x1="19" y1="12" x2="5" y2="12"></line>
-						<polyline points="12 19 5 12 12 5"></polyline>
-					</svg>
-					Back to Password Login
-				</p>
-			</div>
-		</div>
-	</div>
+            <!-- Back to Login Link -->
+            <div class="forgot-password-section" style="margin-top: 8px;">
+                <a class="forgot-password-link" href="/login">
+                    Back to Login
+                </a>
+            </div>
+        </div>
 
-	<!-- Footer -->
-	<div class="login-footer">
-		<p>© @DateTime.Now.Year A Product By <a href="https://aadisoft.vercel.app" target="_blank">AadiSoft</a>. All rights reserved.</p>
-	</div>
+        <!-- Footer -->
+        <div class="footer-section">
+            <p class="copyright">
+                &copy; @DateTime.Now.Year A Product By
+                <a href="https://aadisoft.vercel.app" target="_blank" class="footer-link">AadiSoft</a>.
+                All rights reserved.
+            </p>
+        </div>
+    </div>
 </div>
 
-<!-- Toast Notifications -->
-<SfToast @ref="_sfErrorToast"
-		 ID="_sfErrorToast"
-		 Title="@_errorTitle"
-		 Content="@_errorMessage"
-		 Timeout="5000"
-		 CssClass="error-toast">
-	<ToastPosition X="Right" Y="Top" />
-	<ToastShowAnimationSettings Effect="ToastEffect.SlideLeftIn" />
-	<ToastHideAnimationSettings Effect="ToastEffect.SlideRightOut" />
-</SfToast>
-
-<SfToast @ref="_sfSuccessToast"
-		 ID="_sfSuccessToast"
-		 Title="@_successTitle"
-		 Content="@_successMessage"
-		 Timeout="5000"
-		 CssClass="success-toast">
-	<ToastPosition X="Right" Y="Top" />
-	<ToastShowAnimationSettings Effect="ToastEffect.SlideLeftIn" />
-	<ToastHideAnimationSettings Effect="ToastEffect.SlideRightOut" />
-</SfToast>
+<ToastNotification @ref="_toastNotification" />
 
 <style>
-	* {
-		box-sizing: border-box;
-	}
-
-	body {
-		margin: 0;
-		padding: 0;
-	}
-
-	.login-container {
-		min-height: 100vh;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-		padding: 20px;
-		font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif;
-		position: relative;
-		overflow: hidden;
-	}
-
-		.login-container::before {
-			content: '';
-			position: absolute;
-			top: -50%;
-			right: -50%;
-			width: 100%;
-			height: 100%;
-			background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
-			pointer-events: none;
-		}
-
-		.login-container::after {
-			content: '';
-			position: absolute;
-			bottom: -50%;
-			left: -50%;
-			width: 100%;
-			height: 100%;
-			background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
-			pointer-events: none;
-		}
-
-	.login-card {
-		width: 100%;
-		max-width: 520px;
-		background: #ffffff;
-		border-radius: 12px;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
-		overflow: hidden;
-		animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-		position: relative;
-		z-index: 1;
-		border: 1px solid rgba(0, 0, 0, 0.06);
-	}
-
-	@@keyframes slideUp {
-		from {
-			opacity: 0;
-			transform: translateY(20px);
-		}
-
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
-
-	.login-header {
-		background: #ffffff;
-		padding: 48px 40px 32px;
-		text-align: center;
-		color: #1e293b;
-		border-bottom: 1px solid #f1f5f9;
-	}
-
-	.logo-container {
-		margin-bottom: 24px;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 12px;
-	}
-
-	.company-logo {
-		width: 64px;
-		height: 64px;
-		animation: logoFloat 3s ease-in-out infinite;
-	}
-
-	@@keyframes logoFloat {
-		0%, 100% {
-			transform: translateY(0px);
-		}
-
-		50% {
-			transform: translateY(-8px);
-		}
-	}
-
-	.logo-text {
-		font-size: 32px;
-		font-weight: 600;
-		margin: 0;
-		letter-spacing: -0.5px;
-		color: #3b82f6;
-		background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-clip: text;
-	}
-
-	.welcome-text {
-		font-size: 22px;
-		font-weight: 600;
-		margin: 0 0 8px 0;
-		color: #0f172a;
-	}
-
-	.subtitle {
-		font-size: 14px;
-		color: #64748b;
-		margin: 0;
-		font-weight: 400;
-		line-height: 1.5;
-	}
-
-	.login-form {
-		padding: 40px 40px 48px;
-		background: #ffffff;
-	}
-
-	.form-group {
-		margin-bottom: 20px;
-	}
-
-		.form-group:last-of-type {
-			margin-bottom: 0;
-		}
-
-	.form-label {
-		display: block;
-		font-size: 14px;
-		font-weight: 600;
-		color: #334155;
-		margin-bottom: 10px;
-	}
-
-	.otp-section {
-		margin-top: 24px;
-		margin-bottom: 24px;
-	}
-
-	.info-box {
-		display: flex;
-		align-items: flex-start;
-		gap: 12px;
-		padding: 16px 18px;
-		background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
-		border-radius: 8px;
-		border-left: 3px solid #3b82f6;
-		margin-bottom: 20px;
-		animation: slideIn 0.3s ease-out;
-	}
-
-	@@keyframes slideIn {
-		from {
-			opacity: 0;
-			transform: translateX(-10px);
-		}
-
-		to {
-			opacity: 1;
-			transform: translateX(0);
-		}
-	}
-
-	.info-icon {
-		width: 20px;
-		height: 20px;
-		color: #3b82f6;
-		flex-shrink: 0;
-		margin-top: 2px;
-	}
-
-	.info-text {
-		margin: 0;
-		font-size: 13px;
-		color: #1e40af;
-		line-height: 1.6;
-		font-weight: 500;
-	}
-
-	.helper-text {
-		display: block;
-		margin-top: 8px;
-		font-size: 12px;
-		color: #64748b;
-		font-style: italic;
-	}
-
-	.form-footer {
-		text-align: center;
-		margin-top: 32px;
-		padding-top: 24px;
-		border-top: 1px solid #f1f5f9;
-	}
-
-	.back-link {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		color: #3b82f6;
-		font-size: 14px;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		margin: 0;
-		padding: 4px 0;
-	}
-
-		.back-link:hover {
-			color: #2563eb;
-			gap: 8px;
-		}
-
-		.back-link:active {
-			transform: scale(0.98);
-		}
-
-	.back-icon {
-		width: 16px;
-		height: 16px;
-		transition: transform 0.2s ease;
-	}
-
-	.back-link:hover .back-icon {
-		transform: translateX(-2px);
-	}
-
-	.login-footer {
-		margin-top: 32px;
-		text-align: center;
-		color: #64748b;
-		font-size: 13px;
-		position: relative;
-		z-index: 1;
-	}
-
-		.login-footer p {
-			margin: 0;
-		}
-
-		.login-footer a {
-			color: #3b82f6;
-			font-weight: 500;
-			text-decoration: none;
-			transition: color 0.2s ease;
-		}
-
-			.login-footer a:hover {
-				color: #2563eb;
-				text-decoration: none;
-			}
-
-	/* Syncfusion Component Overrides */
-	::deep .custom-input,
-	::deep .custom-input .e-input-group,
-	::deep .custom-input .e-input-group input {
-		height: 44px;
-		font-size: 14px;
-		border-radius: 6px;
-	}
-
-	::deep .custom-input .e-input-group {
-		border: 1px solid #e2e8f0;
-		background: #ffffff;
-		transition: all 0.2s ease;
-	}
-
-		::deep .custom-input .e-input-group:hover {
-			border-color: #cbd5e1;
-		}
-
-		::deep .custom-input .e-input-group:focus-within {
-			border-color: #3b82f6;
-			box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-		}
-
-	::deep .custom-input .e-input-group input {
-		color: #1e293b;
-		font-weight: 400;
-	}
-
-		::deep .custom-input .e-input-group input::placeholder {
-			color: #94a3b8;
-		}
-
-	::deep .custom-input .e-float-text {
-		color: #64748b;
-		font-weight: 500;
-		font-size: 13px;
-	}
-
-	::deep .custom-input .e-input-group.e-input-focus .e-float-text,
-	::deep .custom-input .e-input-group.e-valid-input .e-float-text {
-		color: #3b82f6;
-	}
-
-	/* OTP Input Styling */
-	::deep .custom-otp .e-otp-input-container {
-		gap: 10px;
-		justify-content: center;
-	}
-
-	::deep .custom-otp input {
-		width: 52px;
-		height: 60px;
-		font-size: 24px;
-		font-weight: 600;
-		border: 1px solid #e2e8f0;
-		border-radius: 8px;
-		text-align: center;
-		transition: all 0.2s ease;
-		color: #1e293b;
-		background: #ffffff;
-	}
-
-		::deep .custom-otp input:hover:not(:disabled) {
-			border-color: #cbd5e1;
-		}
-
-		::deep .custom-otp input:focus {
-			border-color: #3b82f6;
-			box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-			outline: none;
-			transform: scale(1.05);
-		}
-
-		::deep .custom-otp input:disabled {
-			background-color: #f8fafc;
-			cursor: not-allowed;
-			opacity: 0.6;
-		}
-
-	/* Button Styles */
-	::deep .btn-primary,
-	::deep .btn-secondary,
-	::deep .btn-login {
-		width: 100%;
-		height: 48px;
-		font-size: 15px;
-		font-weight: 600;
-		border: none;
-		border-radius: 8px;
-		cursor: pointer;
-		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-		text-transform: none;
-		letter-spacing: 0.5px;
-		position: relative;
-		overflow: hidden;
-	}
-
-	::deep .btn-primary {
-		background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-		color: #ffffff;
-		box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.4);
-	}
-
-		::deep .btn-primary::before {
-			content: '';
-			position: absolute;
-			top: 0;
-			left: -100%;
-			width: 100%;
-			height: 100%;
-			background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-			transition: left 0.5s;
-		}
-
-		::deep .btn-primary:hover:not(:disabled) {
-			box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5), 0 2px 8px rgba(0, 0, 0, 0.1);
-			transform: translateY(-2px);
-			background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
-		}
-
-		::deep .btn-primary:hover:not(:disabled)::before {
-			left: 100%;
-		}
-
-		::deep .btn-primary:active:not(:disabled) {
-			transform: translateY(0);
-			box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
-			transition: all 0.1s;
-		}
-
-	::deep .btn-secondary {
-		background: #ffffff;
-		color: #3b82f6;
-		border: 2px solid #3b82f6;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-	}
-
-		::deep .btn-secondary:hover:not(:disabled) {
-			background: #eff6ff;
-			box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-			transform: translateY(-1px);
-		}
-
-		::deep .btn-secondary:active:not(:disabled) {
-			transform: translateY(0);
-			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-		}
-
-	::deep .btn-login {
-		background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-		color: #ffffff;
-		box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.4);
-		margin-top: 10px;
-	}
-
-		::deep .btn-login::before {
-			content: '';
-			position: absolute;
-			top: 0;
-			left: -100%;
-			width: 100%;
-			height: 100%;
-			background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-			transition: left 0.5s;
-		}
-
-		::deep .btn-login:hover:not(:disabled) {
-			box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5), 0 2px 8px rgba(0, 0, 0, 0.1);
-			transform: translateY(-2px);
-			background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
-		}
-
-		::deep .btn-login:hover:not(:disabled)::before {
-			left: 100%;
-		}
-
-		::deep .btn-login:active:not(:disabled) {
-			transform: translateY(0);
-			box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
-			transition: all 0.1s;
-		}
-
-	::deep button:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
-		transform: none !important;
-		box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2) !important;
-	}
-
-	/* Toast Styles */
-	::deep .error-toast .e-toast {
-		background: #ef4444;
-		color: #ffffff;
-		border-radius: 8px;
-		box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
-	}
-
-	::deep .success-toast .e-toast {
-		background: #10b981;
-		color: #ffffff;
-		border-radius: 8px;
-		box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
-	}
-
-	/* Responsive Design */
-	@@media (max-width: 640px) {
-		.login-container {
-			padding: 16px;
-		}
-
-		.login-card {
-			border-radius: 10px;
-			max-width: 100%;
-		}
-
-		.login-header {
-			padding: 36px 24px 24px;
-		}
-
-		.logo-text {
-			font-size: 28px;
-		}
-
-		.welcome-text {
-			font-size: 20px;
-		}
-
-		.subtitle {
-			font-size: 13px;
-		}
-
-		.login-form {
-			padding: 32px 24px 36px;
-		}
-
-		::deep .custom-otp input {
-			width: 46px;
-			height: 54px;
-			font-size: 22px;
-		}
-
-		::deep .custom-otp .e-otp-input-container {
-			gap: 8px;
-		}
-
-		.login-footer {
-			margin-top: 24px;
-			font-size: 12px;
-		}
-	}
-
-	@@media (max-width: 400px) {
-		.login-header {
-			padding: 32px 20px 20px;
-		}
-
-		.login-form {
-			padding: 28px 20px 32px;
-		}
-
-		::deep .custom-otp input {
-			width: 42px;
-			height: 50px;
-			font-size: 20px;
-		}
-
-		::deep .custom-otp .e-otp-input-container {
-			gap: 6px;
-		}
-	}
+    * {
+        box-sizing: border-box;
+    }
+
+    /* Color Variables - Matching Dashboard Theme */
+    :root {
+        --primary-color: #3b82f6;
+        --primary-dark: #2563eb;
+        --primary-light: #60a5fa;
+        --secondary-color: #f8fafc;
+        --text-dark: #1e293b;
+        --text-light: #64748b;
+        --white: #ffffff;
+        --border-color: #e2e8f0;
+        --shadow: 0 10px 40px rgba(59, 130, 246, 0.15);
+        --shadow-hover: 0 15px 50px rgba(59, 130, 246, 0.25);
+        --border-radius: 16px;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    /* Login Container */
+    .login-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+        background: var(--secondary-color);
+        position: relative;
+    }
+
+    /* Login Card */
+    .login-card {
+        background: var(--white);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 48px 40px;
+        width: 100%;
+        max-width: 450px;
+        position: relative;
+        z-index: 10;
+        animation: slideUp 0.4s ease;
+    }
+
+    @@keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Logo Section */
+    .logo-section {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+
+    .login-logo {
+        width: 400px;
+        height: auto;
+        object-fit: contain;
+    }
+
+    /* Title Section */
+    .title-section {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .login-subtitle {
+        font-size: 16px;
+        color: var(--text-light);
+        margin: 0;
+        font-weight: 400;
+    }
+
+    /* Form Section */
+    .form-section {
+        margin-bottom: 24px;
+    }
+
+    .input-group {
+        margin-bottom: 24px;
+    }
+
+    .input-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 8px;
+    }
+
+    /* Syncfusion TextBox Styling */
+    :deep(.custom-textbox) {
+        width: 100%;
+    }
+
+    :deep(.custom-textbox .e-input-group) {
+        border-radius: 12px;
+        border: 2px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+
+    :deep(.custom-textbox .e-input-group:focus-within) {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    :deep(.custom-textbox .e-input-group input) {
+        padding: 12px 16px;
+        font-size: 15px;
+        color: var(--text-dark);
+    }
+
+    :deep(.custom-textbox .e-input-group input::placeholder) {
+        color: var(--text-light);
+    }
+
+    /* OTP Input Styling */
+    .otp-container {
+        margin-bottom: 8px;
+    }
+
+    :deep(.custom-otp) {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    :deep(.custom-otp .e-input-group) {
+        flex: 1;
+        border-radius: 12px;
+        border: 2px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+
+    :deep(.custom-otp .e-input-group:focus-within) {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    :deep(.custom-otp .e-input-group input) {
+        padding: 12px;
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-dark);
+        text-align: center;
+    }
+
+    .code-hint {
+        font-size: 12px;
+        color: var(--text-light);
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    /* Button Group */
+    .button-group {
+        margin-top: 32px;
+    }
+
+    .btn-login {
+        width: 100%;
+        padding: 14px 24px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        color: var(--white);
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-login:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-login:active:not(:disabled) {
+        transform: translateY(0);
+    }
+
+    .btn-login:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    /* Spinner */
+    .spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-left: 2px solid var(--white);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Forgot Password Section */
+    .forgot-password-section {
+        text-align: center;
+        margin-top: 16px;
+    }
+
+    .forgot-password-link {
+        color: var(--primary-color);
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+
+    .forgot-password-link:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
+    }
+
+    /* Footer Section */
+    .footer-section {
+        text-align: center;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .copyright {
+        font-size: 13px;
+        color: var(--text-light);
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    .footer-link {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s ease;
+    }
+
+    .footer-link:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
+    }
+
+    .footer-link:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+        border-radius: 2px;
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 480px) {
+        .login-card {
+            padding: 32px 24px;
+        }
+
+        .login-logo {
+            width: 150px;
+        }
+
+        :deep(.custom-otp) {
+            gap: 4px;
+        }
+
+        :deep(.custom-otp .e-input-group input) {
+            padding: 10px;
+            font-size: 16px;
+        }
+    }
+
+    /* Accessibility */
+    @@media (prefers-reduced-motion: reduce) {
+
+        .spinner,
+        .login-card {
+            animation: none;
+        }
+
+        .btn-login:hover:not(:disabled) {
+            transform: none;
+        }
+    }
+
+    /* High contrast mode support */
+    @@media (prefers-contrast: high) {
+        .login-card {
+            border: 2px solid var(--text-dark);
+        }
+
+        :deep(.custom-textbox .e-input-group),
+        :deep(.custom-otp .e-input-group) {
+            border-width: 3px;
+        }
+    }
 </style>
+

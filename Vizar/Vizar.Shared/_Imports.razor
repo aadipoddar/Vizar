@@ -6,20 +6,32 @@
 @using static Microsoft.AspNetCore.Components.Web.RenderMode
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.JSInterop
+@using Vizar
+@using Vizar.Shared
+@using Vizar.Shared.Layout
 
+@using Vizar.Shared.Components
 @using Vizar.Shared.Services
+@using Vizar.Shared.Components.Dialog
+@using Vizar.Shared.Components.Button
+@using static Vizar.Shared.Components.Button.ButtonSize
+@using static Vizar.Shared.Components.Button.ButtonVariant
+@using static Vizar.Shared.Components.Button.IconType
 
 @using Syncfusion.Blazor.Buttons
-@using Syncfusion.Blazor.Inputs
-@using Syncfusion.Blazor.Notifications
+@using Syncfusion.Blazor.Calendars
 @using Syncfusion.Blazor.DropDowns
 @using Syncfusion.Blazor.Grids
-@using Syncfusion.Blazor.Calendars
-@using Syncfusion.Blazor.Spinner
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Notifications
 @using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Spinner
+
+@using Toolbelt.Blazor.HotKeys2
 
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject HotKeys HotKeys
 
 @inject IFormFactor FormFactor
 @inject ISaveAndViewService SaveAndViewService
