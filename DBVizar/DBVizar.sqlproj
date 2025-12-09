@@ -161,7 +161,4 @@
     <Build Include="StoredProcedures\Delete\Delete_ItemStock_By_Type_TransactionId.sql" />
     <Build Include="StoredProcedures\Delete\Delete_ItemStock_By_Id.sql" />
   </ItemGroup>
-  <ItemGroup>
-    <RefactorLog Include="DBVizar.refactorlog" />
-  </ItemGroup>
 </Project>
