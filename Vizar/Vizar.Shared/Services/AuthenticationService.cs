@@ -42,7 +42,7 @@ public static class AuthenticationService
 		{
 			UserRoles.Admin => user.Admin,
 			UserRoles.Accounts => user.Accounts,
-			UserRoles.Purchase => user.Purchase,
+			UserRoles.Inventory => user.Inventory,
 			_ => false
 		};
 

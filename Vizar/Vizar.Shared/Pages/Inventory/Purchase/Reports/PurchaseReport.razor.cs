@@ -2,20 +2,21 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 using Syncfusion.Blazor.Grids;
+using Syncfusion.XlsIO.Implementation;
 
 using Vizar.Shared.Components.Dialog;
 
-using VizarLibrary.Data.Accounts.FinancialAccounting;
 using VizarLibrary.Data.Common;
+using VizarLibrary.Data.Inventory.Purchase;
 using VizarLibrary.DataAccess;
-using VizarLibrary.Exporting.Accounts.FinancialAccounting;
-using VizarLibrary.Models.Accounts.FinancialAccounting;
+using VizarLibrary.Exporting.Inventory.Purchase;
 using VizarLibrary.Models.Accounts.Masters;
 using VizarLibrary.Models.Common;
+using VizarLibrary.Models.Inventory.Purchase;
 
-namespace Vizar.Shared.Pages.Accounts.Reports;
+namespace Vizar.Shared.Pages.Inventory.Purchase.Reports;
 
-public partial class FinancialAccountingReport : IAsyncDisposable
+public partial class PurchaseReport : IAsyncDisposable
 {
 	private HotKeysContext _hotKeysContext;
 	private PeriodicTimer _autoRefreshTimer;
@@ -26,26 +27,29 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
 	private bool _showAllColumns = false;
+	private bool _showSummary = false;
+	private bool _showTransactionReturns = false;
 	private bool _showDeleted = false;
 
 	private DateTime _fromDate = DateTime.Now.Date;
 	private DateTime _toDate = DateTime.Now.Date;
 
 	private CompanyModel _selectedCompany = new();
-	private VoucherModel _selectedVoucher = new();
+	private LedgerModel _selectedParty = new();
 
 	private List<CompanyModel> _companies = [];
-	private List<VoucherModel> _vouchers = [];
-	private List<AccountingOverviewModel> _transactionOverviews = [];
+	private List<LedgerModel> _parties = [];
+	private List<PurchaseOverviewModel> _transactionOverviews = [];
+	private List<PurchaseReturnOverviewModel> _transactionReturnOverviews = [];
 
-	private SfGrid<AccountingOverviewModel> _sfGrid;
-	private ToastNotification _toastNotification;
+	private SfGrid<PurchaseOverviewModel> _sfGrid;
 
 	private string _deleteTransactionNo = string.Empty;
 	private int _deleteTransactionId = 0;
 	private string _recoverTransactionNo = string.Empty;
 	private int _recoverTransactionId = 0;
 
+	private ToastNotification _toastNotification;
 	private DeleteConfirmationDialog _deleteConfirmationDialog;
 	private RecoverConfirmationDialog _recoverConfirmationDialog;
 
@@ -55,7 +59,7 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 		if (!firstRender)
 			return;
 
-		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, UserRoles.Accounts);
+		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, UserRoles.Inventory);
 		await LoadData();
 		_isLoading = false;
 		StateHasChanged();
@@ -69,7 +73,6 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export to Excel", Exclude.None)
 			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export to PDF", Exclude.None)
 			.Add(ModCode.Ctrl, Code.I, NavigateToItemReport, "Open item report", Exclude.None)
-			.Add(ModCode.Ctrl, Code.T, NavigateToTrialBalance, "Open trial balance report", Exclude.None)
 			.Add(ModCode.Ctrl, Code.N, NavigateToTransactionPage, "New Transaction", Exclude.None)
 			.Add(ModCode.Ctrl, Code.D, NavigateToDashboard, "Go to dashboard", Exclude.None)
 			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
@@ -81,7 +84,7 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 
 		await LoadDates();
 		await LoadCompanies();
-		await LoadVouchers();
+		await LoadParties();
 		await LoadTransactionOverviews();
 		await StartAutoRefresh();
 	}
@@ -104,16 +107,16 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 		_selectedCompany = _companies.FirstOrDefault(_ => _.Id == 0);
 	}
 
-	private async Task LoadVouchers()
+	private async Task LoadParties()
 	{
-		_vouchers = await CommonData.LoadTableDataByStatus<VoucherModel>(TableNames.Voucher);
-		_vouchers.Add(new()
+		_parties = await CommonData.LoadTableDataByStatus<LedgerModel>(TableNames.Ledger);
+		_parties.Add(new()
 		{
 			Id = 0,
-			Name = "All Vouchers"
+			Name = "All Parties"
 		});
-		_vouchers = [.. _vouchers.OrderBy(s => s.Name)];
-		_selectedVoucher = _vouchers.FirstOrDefault(_ => _.Id == 0);
+		_parties = [.. _parties.OrderBy(s => s.Name)];
+		_selectedParty = _parties.FirstOrDefault(_ => _.Id == 0);
 	}
 
 	private async Task LoadTransactionOverviews()
@@ -127,8 +130,8 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Loading", "Fetching transactions...", ToastType.Info);
 
-			_transactionOverviews = await CommonData.LoadTableDataByDate<AccountingOverviewModel>(
-				ViewNames.AccountingOverview,
+			_transactionOverviews = await CommonData.LoadTableDataByDate<PurchaseOverviewModel>(
+				ViewNames.PurchaseOverview,
 				DateOnly.FromDateTime(_fromDate).ToDateTime(TimeOnly.MinValue),
 				DateOnly.FromDateTime(_toDate).ToDateTime(TimeOnly.MaxValue));
 
@@ -138,10 +141,33 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 			if (_selectedCompany?.Id > 0)
 				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.CompanyId == _selectedCompany.Id)];
 
-			if (_selectedVoucher?.Id > 0)
-				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.VoucherId == _selectedVoucher.Id)];
+			if (_selectedParty?.Id > 0)
+				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.PartyId == _selectedParty.Id)];
 
 			_transactionOverviews = [.. _transactionOverviews.OrderBy(_ => _.TransactionDateTime)];
+
+			if (_showTransactionReturns)
+				await LoadTransactionReturnOverviews();
+
+			if (_showSummary)
+				_transactionOverviews = [.. _transactionOverviews
+					.GroupBy(t => t.PartyName)
+					.Select(g => new PurchaseOverviewModel
+					{
+						PartyName = g.Key,
+						TotalItems = g.Sum(t => t.TotalItems),
+						TotalQuantity = g.Sum(t => t.TotalQuantity),
+						BaseTotal = g.Sum(t => t.BaseTotal),
+						ItemDiscountAmount = g.Sum(t => t.ItemDiscountAmount),
+						TotalAfterItemDiscount = g.Sum(t => t.TotalAfterItemDiscount),
+						TotalInclusiveTaxAmount = g.Sum(t => t.TotalInclusiveTaxAmount),
+						TotalExtraTaxAmount = g.Sum(t => t.TotalExtraTaxAmount),
+						TotalAfterTax = g.Sum(t => t.TotalAfterTax),
+						CashDiscountAmount = g.Sum(t => t.CashDiscountAmount),
+						OtherChargesAmount = g.Sum(t => t.OtherChargesAmount),
+						RoundOffAmount = g.Sum(t => t.RoundOffAmount),
+						TotalAmount = g.Sum(t => t.TotalAmount)
+					})];
 		}
 		catch (Exception ex)
 		{
@@ -154,6 +180,70 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 			_isProcessing = false;
 			StateHasChanged();
 		}
+	}
+
+	private async Task LoadTransactionReturnOverviews()
+	{
+		_transactionReturnOverviews = await CommonData.LoadTableDataByDate<PurchaseReturnOverviewModel>(
+			ViewNames.PurchaseReturnOverview,
+			DateOnly.FromDateTime(_fromDate).ToDateTime(TimeOnly.MinValue),
+			DateOnly.FromDateTime(_toDate).ToDateTime(TimeOnly.MaxValue));
+
+		if (!_showDeleted)
+			_transactionReturnOverviews = [.. _transactionReturnOverviews.Where(_ => _.Status)];
+
+		if (_selectedCompany?.Id > 0)
+			_transactionReturnOverviews = [.. _transactionReturnOverviews.Where(_ => _.CompanyId == _selectedCompany.Id)];
+
+		if (_selectedParty?.Id > 0)
+			_transactionReturnOverviews = [.. _transactionReturnOverviews.Where(_ => _.PartyId == _selectedParty.Id)];
+
+		_transactionReturnOverviews = [.. _transactionReturnOverviews.OrderBy(_ => _.TransactionDateTime)];
+
+		MergeTransactionAndReturns();
+	}
+
+	private void MergeTransactionAndReturns()
+	{
+		_transactionOverviews.AddRange(_transactionReturnOverviews.Select(pr => new PurchaseOverviewModel
+		{
+			Id = pr.Id * -1, // Negative ID to differentiate returns
+			CompanyId = pr.CompanyId,
+			CompanyName = pr.CompanyName,
+			PartyId = pr.PartyId,
+			PartyName = pr.PartyName,
+			TransactionDateTime = pr.TransactionDateTime,
+			CashDiscountAmount = -pr.CashDiscountAmount,
+			OtherChargesAmount = -pr.OtherChargesAmount,
+			RoundOffAmount = -pr.RoundOffAmount,
+			TotalAmount = -pr.TotalAmount,
+			BaseTotal = -pr.BaseTotal,
+			CashDiscountPercent = pr.CashDiscountPercent,
+			CreatedAt = pr.CreatedAt,
+			CreatedBy = pr.CreatedBy,
+			CreatedByName = pr.CreatedByName,
+			CreatedFromPlatform = pr.CreatedFromPlatform,
+			DocumentUrl = pr.DocumentUrl,
+			FinancialYear = pr.FinancialYear,
+			FinancialYearId = pr.FinancialYearId,
+			Remarks = pr.Remarks,
+			LastModifiedAt = pr.LastModifiedAt,
+			LastModifiedBy = pr.LastModifiedBy,
+			LastModifiedByUserName = pr.LastModifiedByUserName,
+			LastModifiedFromPlatform = pr.LastModifiedFromPlatform,
+			ItemDiscountAmount = -pr.ItemDiscountAmount,
+			TotalAfterItemDiscount = -pr.TotalAfterItemDiscount,
+			TotalExtraTaxAmount = -pr.TotalExtraTaxAmount,
+			TotalInclusiveTaxAmount = -pr.TotalInclusiveTaxAmount,
+			TotalAfterTax = -pr.TotalAfterTax,
+			TotalItems = pr.TotalItems,
+			TotalQuantity = -pr.TotalQuantity,
+			TransactionNo = pr.TransactionNo,
+			OtherChargesPercent = pr.OtherChargesPercent,
+			Status = pr.Status
+		}));
+
+		_transactionOverviews = [.. _transactionOverviews.OrderBy(_ => _.TransactionDateTime)];
 	}
 	#endregion
 
@@ -171,9 +261,9 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnPartyChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<VoucherModel, VoucherModel> args)
+	private async Task OnPartyChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<LedgerModel, LedgerModel> args)
 	{
-		_selectedVoucher = args.Value;
+		_selectedParty = args.Value;
 		await LoadTransactionOverviews();
 	}
 
@@ -200,17 +290,16 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 			DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
 			DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-			var stream = await AccountingReportExcelExport.ExportAccountingReport(
-					_transactionOverviews.Where(_ => _.Status),
+			var stream = await PurchaseReportExcelExport.ExportPurchaseReport(
+					_transactionOverviews,
 					dateRangeStart,
 					dateRangeEnd,
 					_showAllColumns,
-					_user.Admin,
-					_selectedCompany?.Id > 0 ? _selectedCompany?.Name : null,
-					_selectedVoucher?.Id > 0 ? _selectedVoucher?.Name : null
+					_selectedParty?.Id > 0 ? _selectedParty?.Name : null,
+					_showSummary
 				);
 
-			string fileName = $"ACCOUNTING_REPORT";
+			string fileName = $"PURCHASE_REPORT";
 			if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
 				fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
 			fileName += ".xlsx";
@@ -243,17 +332,16 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 			DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
 			DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-			var stream = await AccountingReportPdfExport.ExportAccountingReport(
-					_transactionOverviews.Where(_ => _.Status),
+			var stream = await PurchaseReportPDFExport.ExportPurchaseReport(
+					_transactionOverviews,
 					dateRangeStart,
 					dateRangeEnd,
 					_showAllColumns,
-					_user.Admin,
-					_selectedCompany?.Id > 0 ? _selectedCompany?.Name : null,
-					_selectedVoucher?.Id > 0 ? _selectedVoucher?.Name : null
+					_selectedParty?.Id > 0 ? _selectedParty?.Name : null,
+					_showSummary
 				);
 
-			string fileName = $"ACCOUNTING_REPORT";
+			string fileName = $"PURCHASE_REPORT";
 			if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
 				fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
 			fileName += ".pdf";
@@ -287,10 +375,21 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 	{
 		try
 		{
-			if (FormFactor.GetFormFactor() == "Web")
-				await JSRuntime.InvokeVoidAsync("open", $"{PageRouteNames.FinancialAccounting}/{transactionId}", "_blank");
+			if (transactionId < 0)
+			{
+				int actualId = Math.Abs(transactionId);
+				if (FormFactor.GetFormFactor() == "Web")
+					await JSRuntime.InvokeVoidAsync("open", $"{PageRouteNames.PurchaseReturn}/{actualId}", "_blank");
+				else
+					NavigationManager.NavigateTo($"{PageRouteNames.PurchaseReturn}/{actualId}");
+			}
 			else
-				NavigationManager.NavigateTo($"{PageRouteNames.FinancialAccounting}/{transactionId}");
+			{
+				if (FormFactor.GetFormFactor() == "Web")
+					await JSRuntime.InvokeVoidAsync("open", $"{PageRouteNames.Purchase}/{transactionId}", "_blank");
+				else
+					NavigationManager.NavigateTo($"{PageRouteNames.Purchase}/{transactionId}");
+			}
 		}
 		catch (Exception ex)
 		{
@@ -327,13 +426,25 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating PDF invoice...", ToastType.Info);
 
-			var (pdfStream, fileName) = await AccountingData.GenerateAndDownloadInvoice(transactionId);
-			await SaveAndViewService.SaveAndView(fileName, pdfStream);
-			await _toastNotification.ShowAsync("Success", "PDF invoice downloaded successfully.", ToastType.Success);
+			bool isPurchaseReturn = transactionId < 0;
+			int actualId = Math.Abs(transactionId);
+
+			if (isPurchaseReturn)
+			{
+				var (pdfStream, fileName) = await PurchaseReturnData.GenerateAndDownloadInvoice(actualId);
+				await SaveAndViewService.SaveAndView(fileName, pdfStream);
+			}
+			else
+			{
+				var (pdfStream, fileName) = await PurchaseData.GenerateAndDownloadInvoice(actualId);
+				await SaveAndViewService.SaveAndView(fileName, pdfStream);
+			}
+
+			await _toastNotification.ShowAsync("Success", "PDF invoice generated successfully.", ToastType.Success);
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error", $"An error occurred while generating PDF invoice: {ex.Message}", ToastType.Error);
+			await _toastNotification.ShowAsync("Error", $"PDF invoice generation failed: {ex.Message}", ToastType.Error);
 		}
 		finally
 		{
@@ -353,13 +464,55 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating Excel invoice...", ToastType.Info);
 
-			var (excelStream, fileName) = await AccountingData.GenerateAndDownloadExcelInvoice(transactionId);
-			await SaveAndViewService.SaveAndView(fileName, excelStream);
-			await _toastNotification.ShowAsync("Success", "Excel invoice downloaded successfully.", ToastType.Success);
+			bool isPurchaseReturn = transactionId < 0;
+			int actualId = Math.Abs(transactionId);
+
+			if (isPurchaseReturn)
+			{
+				var (excelStream, fileName) = await PurchaseReturnData.GenerateAndDownloadExcelInvoice(actualId);
+				await SaveAndViewService.SaveAndView(fileName, excelStream);
+			}
+			else
+			{
+				var (excelStream, fileName) = await PurchaseData.GenerateAndDownloadExcelInvoice(actualId);
+				await SaveAndViewService.SaveAndView(fileName, excelStream);
+			}
+
+			await _toastNotification.ShowAsync("Success", "Excel invoice generated successfully.", ToastType.Success);
 		}
 		catch (Exception ex)
 		{
-			await _toastNotification.ShowAsync("Error", $"An error occurred while generating Excel invoice: {ex.Message}", ToastType.Error);
+			await _toastNotification.ShowAsync("Error", $"Excel invoice generation failed: {ex.Message}", ToastType.Error);
+		}
+		finally
+		{
+			_isProcessing = false;
+			StateHasChanged();
+		}
+	}
+
+	private async Task DownloadOriginalInvoice(string documentUrl)
+	{
+		if (_isProcessing)
+			return;
+
+		try
+		{
+			if (string.IsNullOrEmpty(documentUrl))
+			{
+				await _toastNotification.ShowAsync("Warning", "No original document available for this transaction.", ToastType.Warning);
+				return;
+			}
+
+			_isProcessing = true;
+
+			var (fileStream, contentType) = await BlobStorageAccess.DownloadFileFromBlobStorage(documentUrl);
+			var fileName = documentUrl.Split('/').Last();
+			await SaveAndViewService.SaveAndView(fileName, fileStream);
+		}
+		catch (Exception ex)
+		{
+			await _toastNotification.ShowAsync("Error", $"An error occurred while downloading original invoice: {ex.Message}", ToastType.Error);
 		}
 		finally
 		{
@@ -397,8 +550,11 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 
 			await _toastNotification.ShowAsync("Processing", "Deleting transaction...", ToastType.Info);
 
-			await AccountingData.DeleteAccounting(_deleteTransactionId);
-			
+			if (_deleteTransactionId < 0)
+				await PurchaseReturnData.DeletePurchaseReturn(Math.Abs(_deleteTransactionId));
+			else
+				await PurchaseData.DeletePurchase(_deleteTransactionId);
+
 			await _toastNotification.ShowAsync("Success", $"Transaction {_deleteTransactionNo} has been deleted successfully.", ToastType.Success);
 
 			_deleteTransactionId = 0;
@@ -425,9 +581,21 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 			await _sfGrid.Refresh();
 	}
 
+	private async Task ToggleTransactionReturns()
+	{
+		_showTransactionReturns = !_showTransactionReturns;
+		await LoadTransactionOverviews();
+	}
+
 	private async Task ToggleDeleted()
 	{
 		_showDeleted = !_showDeleted;
+		await LoadTransactionOverviews();
+	}
+
+	private async Task ToggleSummary()
+	{
+		_showSummary = !_showSummary;
 		await LoadTransactionOverviews();
 	}
 
@@ -447,20 +615,16 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 
 			await _toastNotification.ShowAsync("Processing", "Recovering transaction...", ToastType.Info);
 
-			var accounting = await CommonData.LoadTableDataById<AccountingModel>(TableNames.Accounting, _recoverTransactionId);
-			if (accounting is null)
+			if (_recoverTransactionId == 0)
 			{
-				await _toastNotification.ShowAsync("Error", "Transaction not found.", ToastType.Error);
+				await _toastNotification.ShowAsync("Error", "Invalid transaction selected for recovery.", ToastType.Error);
 				return;
 			}
 
-			// Update the Status to true (active)
-			accounting.Status = true;
-			accounting.LastModifiedBy = _user.Id;
-			accounting.LastModifiedAt = await CommonData.LoadCurrentDateTime();
-			accounting.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
-
-			await AccountingData.RecoverAccountingTransaction(accounting);
+			if (_recoverTransactionId < 0)
+				await RecoverReturnTransaction(Math.Abs(_recoverTransactionId));
+			else
+				await RecoverTransaction(_recoverTransactionId);
 
 			await _toastNotification.ShowAsync("Success", $"Transaction {_recoverTransactionNo} has been recovered successfully.", ToastType.Success);
 
@@ -478,38 +642,66 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 			await LoadTransactionOverviews();
 		}
 	}
+
+	private async Task RecoverTransaction(int recoverTransactionId)
+	{
+		var purchase = await CommonData.LoadTableDataById<PurchaseModel>(TableNames.Purchase, recoverTransactionId);
+		if (purchase is null)
+		{
+			await _toastNotification.ShowAsync("Error", "Transaction not found.", ToastType.Error);
+			return;
+		}
+
+		// Update the Status to true (active)
+		purchase.Status = true;
+		purchase.LastModifiedBy = _user.Id;
+		purchase.LastModifiedAt = await CommonData.LoadCurrentDateTime();
+		purchase.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
+
+		await PurchaseData.RecoverPurchaseTransaction(purchase);
+	}
+
+	private async Task RecoverReturnTransaction(int recoverTransactionId)
+	{
+		var purchaseReturn = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, recoverTransactionId);
+		if (purchaseReturn is null)
+		{
+			await _toastNotification.ShowAsync("Error", "Transaction not found.", ToastType.Error);
+			return;
+		}
+
+		// Update the Status to true (active)
+		purchaseReturn.Status = true;
+		purchaseReturn.LastModifiedBy = _user.Id;
+		purchaseReturn.LastModifiedAt = await CommonData.LoadCurrentDateTime();
+		purchaseReturn.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
+
+		await PurchaseReturnData.RecoverPurchaseReturnTransaction(purchaseReturn);
+	}
 	#endregion
 
 	#region Utilities
 	private async Task NavigateToTransactionPage()
 	{
 		if (FormFactor.GetFormFactor() == "Web")
-			await JSRuntime.InvokeVoidAsync("open", PageRouteNames.FinancialAccounting, "_blank");
+			await JSRuntime.InvokeVoidAsync("open", PageRouteNames.Purchase, "_blank");
 		else
-			NavigationManager.NavigateTo(PageRouteNames.FinancialAccounting);
+			NavigationManager.NavigateTo(PageRouteNames.Purchase);
 	}
 
 	private async Task NavigateToItemReport()
 	{
 		if (FormFactor.GetFormFactor() == "Web")
-			await JSRuntime.InvokeVoidAsync("open", PageRouteNames.ReportAccountingLedger, "_blank");
+			await JSRuntime.InvokeVoidAsync("open", PageRouteNames.ReportPurchaseItem, "_blank");
 		else
-			NavigationManager.NavigateTo(PageRouteNames.ReportAccountingLedger);
-	}
-
-	private async Task NavigateToTrialBalance()
-	{
-		if (FormFactor.GetFormFactor() == "Web")
-			await JSRuntime.InvokeVoidAsync("open", PageRouteNames.ReportTrialBalance, "_blank");
-		else
-			NavigationManager.NavigateTo(PageRouteNames.ReportTrialBalance);
+			NavigationManager.NavigateTo(PageRouteNames.ReportPurchaseItem);
 	}
 
 	private async Task NavigateToDashboard() =>
 		NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 
 	private async Task NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
+		NavigationManager.NavigateTo(PageRouteNames.InventoryDashboard);
 
 	private async Task Logout() =>
 		await AuthenticationService.Logout(DataStorageService, NavigationManager, VibrationService);
@@ -518,6 +710,7 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 	{
 		_deleteTransactionId = id;
 		_deleteTransactionNo = transactionNo;
+		StateHasChanged();
 		await _deleteConfirmationDialog.ShowAsync();
 	}
 
@@ -532,6 +725,7 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 	{
 		_recoverTransactionId = id;
 		_recoverTransactionNo = transactionNo;
+		StateHasChanged();
 		await _recoverConfirmationDialog.ShowAsync();
 	}
 

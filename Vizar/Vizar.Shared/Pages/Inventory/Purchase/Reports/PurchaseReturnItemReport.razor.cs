@@ -5,18 +5,17 @@ using Syncfusion.Blazor.Grids;
 
 using Vizar.Shared.Components.Dialog;
 
-using VizarLibrary.Data;
-using VizarLibrary.Data.Accounts.FinancialAccounting;
 using VizarLibrary.Data.Common;
+using VizarLibrary.Data.Inventory.Purchase;
 using VizarLibrary.DataAccess;
-using VizarLibrary.Exporting.Accounts.FinancialAccounting;
-using VizarLibrary.Models.Accounts.FinancialAccounting;
+using VizarLibrary.Exporting.Inventory.Purchase;
 using VizarLibrary.Models.Accounts.Masters;
 using VizarLibrary.Models.Common;
+using VizarLibrary.Models.Inventory.Purchase;
 
-namespace Vizar.Shared.Pages.Accounts.Reports;
+namespace Vizar.Shared.Pages.Inventory.Purchase.Reports;
 
-public partial class AccountingLedgerReport : IAsyncDisposable
+public partial class PurchaseReturnItemReport : IAsyncDisposable
 {
 	private HotKeysContext _hotKeysContext;
 	private PeriodicTimer _autoRefreshTimer;
@@ -27,19 +26,20 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 	private bool _isLoading = true;
 	private bool _isProcessing = false;
 	private bool _showAllColumns = false;
+	private bool _showSummary = false;
 
 	private DateTime _fromDate = DateTime.Now.Date;
 	private DateTime _toDate = DateTime.Now.Date;
 
 	private CompanyModel _selectedCompany = new();
-	private LedgerModel _selectedLedger = new();
-	private TrialBalanceModel _selectedTrialBalance = new();
+	private LedgerModel _selectedParty = new();
 
 	private List<CompanyModel> _companies = [];
-	private List<LedgerModel> _ledgers = [];
-	private List<AccountingLedgerOverviewModel> _transactionOverviews = [];
+	private List<LedgerModel> _parties = [];
+	private List<PurchaseReturnItemOverviewModel> _transactionOverviews = [];
 
-	private SfGrid<AccountingLedgerOverviewModel> _sfGrid;
+	private SfGrid<PurchaseReturnItemOverviewModel> _sfGrid;
+
 	private ToastNotification _toastNotification;
 
 	#region Load Data
@@ -48,7 +48,7 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 		if (!firstRender)
 			return;
 
-		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, UserRoles.Accounts);
+		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, UserRoles.Inventory);
 		await LoadData();
 		_isLoading = false;
 		StateHasChanged();
@@ -62,7 +62,6 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 			.Add(ModCode.Ctrl, Code.E, ExportExcel, "Export to Excel", Exclude.None)
 			.Add(ModCode.Ctrl, Code.P, ExportPdf, "Export to PDF", Exclude.None)
 			.Add(ModCode.Ctrl, Code.H, NavigateToTransactionHistory, "Open transaction history", Exclude.None)
-			.Add(ModCode.Ctrl, Code.T, NavigateToTrialBalance, "Open trial balance report", Exclude.None)
 			.Add(ModCode.Ctrl, Code.N, NavigateToTransactionPage, "New Transaction", Exclude.None)
 			.Add(ModCode.Ctrl, Code.D, NavigateToDashboard, "Go to dashboard", Exclude.None)
 			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
@@ -73,7 +72,7 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 
 		await LoadDates();
 		await LoadCompanies();
-		await LoadLedgers();
+		await LoadParties();
 		await LoadTransactionOverviews();
 		await StartAutoRefresh();
 	}
@@ -96,17 +95,16 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 		_selectedCompany = _companies.FirstOrDefault(_ => _.Id == 0);
 	}
 
-	private async Task LoadLedgers()
+	private async Task LoadParties()
 	{
-		_ledgers = await CommonData.LoadTableDataByStatus<LedgerModel>(TableNames.Ledger);
-		_ledgers.Add(new()
+		_parties = await CommonData.LoadTableDataByStatus<LedgerModel>(TableNames.Ledger);
+		_parties.Add(new()
 		{
 			Id = 0,
-			Name = "All Ledgers"
+			Name = "All Parties"
 		});
-
-		_ledgers = [.. _ledgers.OrderBy(s => s.Name)];
-		_selectedLedger = _ledgers.FirstOrDefault(_ => _.Id == 0);
+		_parties = [.. _parties.OrderBy(s => s.Name)];
+		_selectedParty = _parties.FirstOrDefault(_ => _.Id == 0);
 	}
 
 	private async Task LoadTransactionOverviews()
@@ -120,42 +118,40 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Loading", "Fetching transactions...", ToastType.Info);
 
-			_transactionOverviews = await CommonData.LoadTableDataByDate<AccountingLedgerOverviewModel>(
-				ViewNames.AccountingLedgerOverview,
+			_transactionOverviews = await CommonData.LoadTableDataByDate<PurchaseReturnItemOverviewModel>(
+				ViewNames.PurchaseReturnItemOverview,
 				DateOnly.FromDateTime(_fromDate).ToDateTime(TimeOnly.MinValue),
-				DateOnly.FromDateTime(_toDate).ToDateTime(TimeOnly.MaxValue));
+				DateOnly.FromDateTime(_toDate).ToDateTime(TimeOnly.MaxValue)
+			);
 
 			if (_selectedCompany?.Id > 0)
 				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.CompanyId == _selectedCompany.Id)];
 
-			// Filter by ledger with contra ledger details
-			if (_selectedLedger?.Id > 0)
-			{
-				List<AccountingLedgerOverviewModel> filteredOverviews = [];
-				var partyLedgers = _transactionOverviews.Where(l => l.Id == _selectedLedger.Id).ToList();
-
-				foreach (var item in partyLedgers)
-				{
-					var referenceLedgers = _transactionOverviews
-						.Where(l => l.MasterId == item.MasterId && l.Id != _selectedLedger.Id)
-						.ToList();
-
-					var referenceLedgerNamesWithAmount = string.Join("\n",
-						referenceLedgers.Select(l =>
-						$"{l.LedgerName}\t({(l.Debit.HasValue && l.Debit.Value > 0 ? "Dr " + l.Debit.Value.FormatIndianCurrency() : l.Credit.HasValue && l.Credit.Value > 0 ? "Cr " + l.Credit.Value.FormatIndianCurrency() : "0.00")})")); item.LedgerName = referenceLedgerNamesWithAmount;
-					filteredOverviews.Add(item);
-				}
-
-				_transactionOverviews = filteredOverviews;
-
-				var trialBalances = await AccountingData.LoadTrialBalanceByDate(
-					DateOnly.FromDateTime(_fromDate).ToDateTime(TimeOnly.MinValue),
-					DateOnly.FromDateTime(_toDate).ToDateTime(TimeOnly.MaxValue));
-
-				_selectedTrialBalance = trialBalances.FirstOrDefault(tb => tb.LedgerId == _selectedLedger.Id);
-			}
+			if (_selectedParty?.Id > 0)
+				_transactionOverviews = [.. _transactionOverviews.Where(_ => _.PartyId == _selectedParty.Id)];
 
 			_transactionOverviews = [.. _transactionOverviews.OrderBy(_ => _.TransactionDateTime)];
+
+			if (_showSummary)
+				_transactionOverviews = [.. _transactionOverviews
+					.GroupBy(t => t.ItemName)
+					.Select(g => new PurchaseReturnItemOverviewModel
+					{
+						ItemName = g.Key,
+						ItemCode = g.First().ItemCode,
+						ItemCategoryName = g.First().ItemCategoryName,
+						Quantity = g.Sum(t => t.Quantity),
+						BaseTotal = g.Sum(t => t.BaseTotal),
+						DiscountAmount = g.Sum(t => t.DiscountAmount),
+						AfterDiscount = g.Sum(t => t.AfterDiscount),
+						SGSTAmount = g.Sum(t => t.SGSTAmount),
+						CGSTAmount = g.Sum(t => t.CGSTAmount),
+						IGSTAmount = g.Sum(t => t.IGSTAmount),
+						TotalTaxAmount = g.Sum(t => t.TotalTaxAmount),
+						Total = g.Sum(t => t.Total),
+						NetTotal = g.Sum(t => t.NetTotal)
+					})
+					.OrderBy(t => t.ItemName)];
 		}
 		catch (Exception ex)
 		{
@@ -185,9 +181,9 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 		await LoadTransactionOverviews();
 	}
 
-	private async Task OnLedgerChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<LedgerModel, LedgerModel> args)
+	private async Task OnPartyChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<LedgerModel, LedgerModel> args)
 	{
-		_selectedLedger = args.Value;
+		_selectedParty = args.Value;
 		await LoadTransactionOverviews();
 	}
 
@@ -214,22 +210,21 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 			DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
 			DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-			var stream = await AccountingLedgerReportExcelExport.ExportAccountingLedgerReport(
+			var stream = await PurchaseReturnItemReportExcelExport.ExportPurchaseReturnItemReport(
 					_transactionOverviews,
 					dateRangeStart,
 					dateRangeEnd,
 					_showAllColumns,
-					_selectedCompany?.Id > 0 ? _selectedCompany?.Name : null,
-					_selectedLedger?.Id > 0 ? _selectedLedger?.Name : null,
-					_selectedLedger?.Id > 0 ? _selectedTrialBalance : null
+					_showSummary
 				);
 
-			string fileName = $"LEDGER_REPORT";
+			string fileName = $"PURCHASE_RETURN_ITEM_REPORT";
 			if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
 				fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
 			fileName += ".xlsx";
 
 			await SaveAndViewService.SaveAndView(fileName, stream);
+
 			await _toastNotification.ShowAsync("Exported", "Excel file downloaded successfully.", ToastType.Success);
 		}
 		catch (Exception ex)
@@ -257,22 +252,21 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 			DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
 			DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-			var stream = await AccountingLedgerReportPdfExport.ExportAccountingLedgerReport(
+			var stream = await PurchaseReturnItemReportPDFExport.ExportPurchaseReturnItemReport(
 					_transactionOverviews,
 					dateRangeStart,
 					dateRangeEnd,
 					_showAllColumns,
-					_selectedCompany?.Id > 0 ? _selectedCompany?.Name : null,
-					_selectedLedger?.Id > 0 ? _selectedLedger?.Name : null,
-					_selectedLedger?.Id > 0 ? _selectedTrialBalance : null
+					_showSummary
 				);
 
-			string fileName = $"LEDGER_REPORT";
+			string fileName = $"PURCHASE_RETURN_ITEM_REPORT";
 			if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
 				fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
 			fileName += ".pdf";
 
 			await SaveAndViewService.SaveAndView(fileName, stream);
+
 			await _toastNotification.ShowAsync("Exported", "PDF file downloaded successfully.", ToastType.Success);
 		}
 		catch (Exception ex)
@@ -297,14 +291,15 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 		await ViewTransaction(selectedCartItem.MasterId);
 	}
 
+
 	private async Task ViewTransaction(int transactionId)
 	{
 		try
 		{
 			if (FormFactor.GetFormFactor() == "Web")
-				await JSRuntime.InvokeVoidAsync("open", $"{PageRouteNames.FinancialAccounting}/{transactionId}", "_blank");
+				await JSRuntime.InvokeVoidAsync("open", $"{PageRouteNames.PurchaseReturn}/{transactionId}", "_blank");
 			else
-				NavigationManager.NavigateTo($"{PageRouteNames.FinancialAccounting}/{transactionId}");
+				NavigationManager.NavigateTo($"{PageRouteNames.PurchaseReturn}/{transactionId}");
 		}
 		catch (Exception ex)
 		{
@@ -341,7 +336,7 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating PDF invoice...", ToastType.Info);
 
-			var (pdfStream, fileName) = await AccountingData.GenerateAndDownloadInvoice(transactionId);
+			var (pdfStream, fileName) = await PurchaseReturnData.GenerateAndDownloadInvoice(transactionId);
 			await SaveAndViewService.SaveAndView(fileName, pdfStream);
 			await _toastNotification.ShowAsync("Success", "PDF invoice downloaded successfully.", ToastType.Success);
 		}
@@ -367,7 +362,7 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 			StateHasChanged();
 			await _toastNotification.ShowAsync("Processing", "Generating Excel invoice...", ToastType.Info);
 
-			var (excelStream, fileName) = await AccountingData.GenerateAndDownloadExcelInvoice(transactionId);
+			var (excelStream, fileName) = await PurchaseReturnData.GenerateAndDownloadExcelInvoice(transactionId);
 			await SaveAndViewService.SaveAndView(fileName, excelStream);
 			await _toastNotification.ShowAsync("Success", "Excel invoice downloaded successfully.", ToastType.Success);
 		}
@@ -390,38 +385,36 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 		if (_sfGrid is not null)
 			await _sfGrid.Refresh();
 	}
+
+	private async Task ToggleSummary()
+	{
+		_showSummary = !_showSummary;
+		await LoadTransactionOverviews();
+	}
 	#endregion
 
 	#region Utilities
 	private async Task NavigateToTransactionPage()
 	{
 		if (FormFactor.GetFormFactor() == "Web")
-			await JSRuntime.InvokeVoidAsync("open", PageRouteNames.FinancialAccounting, "_blank");
+			await JSRuntime.InvokeVoidAsync("open", PageRouteNames.PurchaseReturn, "_blank");
 		else
-			NavigationManager.NavigateTo(PageRouteNames.FinancialAccounting);
+			NavigationManager.NavigateTo(PageRouteNames.PurchaseReturn);
 	}
 
 	private async Task NavigateToTransactionHistory()
 	{
 		if (FormFactor.GetFormFactor() == "Web")
-			await JSRuntime.InvokeVoidAsync("open", PageRouteNames.ReportFinancialAccounting, "_blank");
+			await JSRuntime.InvokeVoidAsync("open", PageRouteNames.ReportPurchaseReturn, "_blank");
 		else
-			NavigationManager.NavigateTo(PageRouteNames.ReportFinancialAccounting);
-	}
-
-	private async Task NavigateToTrialBalance()
-	{
-		if (FormFactor.GetFormFactor() == "Web")
-			await JSRuntime.InvokeVoidAsync("open", PageRouteNames.ReportTrialBalance, "_blank");
-		else
-			NavigationManager.NavigateTo(PageRouteNames.ReportTrialBalance);
+			NavigationManager.NavigateTo(PageRouteNames.ReportPurchaseReturn);
 	}
 
 	private async Task NavigateToDashboard() =>
 		NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 
 	private async Task NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
+		NavigationManager.NavigateTo(PageRouteNames.InventoryDashboard);
 
 	private async Task Logout() =>
 		await AuthenticationService.Logout(DataStorageService, NavigationManager, VibrationService);

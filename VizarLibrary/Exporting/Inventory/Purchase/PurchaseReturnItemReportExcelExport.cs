@@ -40,6 +40,7 @@ public static class PurchaseReturnItemReportExcelExport
 			[nameof(PurchaseReturnItemOverviewModel.TransactionNo)] = new() { DisplayName = "Trans No", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignLeft },
 			[nameof(PurchaseReturnItemOverviewModel.CompanyName)] = new() { DisplayName = "Company", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignLeft },
 			[nameof(PurchaseReturnItemOverviewModel.PartyName)] = new() { DisplayName = "Party", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignLeft },
+			[nameof(PurchaseReturnItemOverviewModel.IdentificationNo)] = new() { DisplayName = "Identification No", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignLeft },
 			[nameof(PurchaseReturnItemOverviewModel.PurchaseReturnRemarks)] = new() { DisplayName = "Purchase Return Remarks", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignLeft },
 			[nameof(PurchaseReturnItemOverviewModel.Remarks)] = new() { DisplayName = "Item Remarks", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignLeft },
 
@@ -123,6 +124,8 @@ public static class PurchaseReturnItemReportExcelExport
 				nameof(PurchaseReturnItemOverviewModel.InclusiveTax),
 				nameof(PurchaseReturnItemOverviewModel.Total),
 				nameof(PurchaseReturnItemOverviewModel.NetRate),
+				nameof(PurchaseReturnItemOverviewModel.NetTotal),
+				nameof(PurchaseReturnItemOverviewModel.IdentificationNo),
 				nameof(PurchaseReturnItemOverviewModel.PurchaseReturnRemarks),
 				nameof(PurchaseReturnItemOverviewModel.Remarks),
 			];

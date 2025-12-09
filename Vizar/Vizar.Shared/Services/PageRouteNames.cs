@@ -25,7 +25,7 @@ public static class PageRouteNames
 	public static string ReportPurchaseReturnItem => "/report/purchase-return-item";
 
 	public static string AdminDashboard => "/admin";
-	public static string AdminProduct => "/admin/item";
+	public static string AdminItem => "/admin/item";
 	public static string AdminUser => "/admin/user";
 	public static string AdminTax => "/admin/tax";
 	public static string AdminCompany => "/admin/company";

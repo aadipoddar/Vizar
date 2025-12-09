@@ -78,6 +78,7 @@ public static class PurchaseReturnItemReportPDFExport
 				nameof(PurchaseReturnItemOverviewModel.Total),
 				nameof(PurchaseReturnItemOverviewModel.NetRate),
 				nameof(PurchaseReturnItemOverviewModel.NetTotal),
+				nameof(PurchaseReturnItemOverviewModel.IdentificationNo),
 				nameof(PurchaseReturnItemOverviewModel.PurchaseReturnRemarks),
 				nameof(PurchaseReturnItemOverviewModel.Remarks)
 			];
@@ -104,6 +105,7 @@ public static class PurchaseReturnItemReportPDFExport
 		columnSettings[nameof(PurchaseReturnItemOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy hh:mm", IncludeInTotal = false };
 		columnSettings[nameof(PurchaseReturnItemOverviewModel.CompanyName)] = new() { DisplayName = "Company", IncludeInTotal = false };
 		columnSettings[nameof(PurchaseReturnItemOverviewModel.PartyName)] = new() { DisplayName = "Party", IncludeInTotal = false };
+		columnSettings[nameof(PurchaseReturnItemOverviewModel.IdentificationNo)] = new() { DisplayName = "Identification No", IncludeInTotal = false };
 		columnSettings[nameof(PurchaseReturnItemOverviewModel.PurchaseReturnRemarks)] = new() { DisplayName = "Purchase Return Remarks", IncludeInTotal = false };
 		columnSettings[nameof(PurchaseReturnItemOverviewModel.Remarks)] = new() { DisplayName = "Item Remarks", IncludeInTotal = false };
 		columnSettings[nameof(PurchaseReturnItemOverviewModel.InclusiveTax)] = new() { DisplayName = "Incl Tax", IncludeInTotal = false };

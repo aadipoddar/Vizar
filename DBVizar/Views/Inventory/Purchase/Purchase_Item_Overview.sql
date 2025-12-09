@@ -21,6 +21,7 @@ SELECT
 	[p].[Remarks] AS PurchaseRemarks,
 
 	[pd].[IdentificationNo],
+	[pd].[UnitOfMeasurement],
 	[pd].[Quantity],
 	[pd].[Rate],
 	[pd].[BaseTotal],

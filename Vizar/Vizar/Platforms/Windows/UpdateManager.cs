@@ -90,12 +90,12 @@ public static class AadiSoftUpdater
 
     private static void RunUpdateScript(string zipPath, string extractPath, string appPath)
     {
-        var batchFilePath = Path.Combine(Path.GetTempPath(), "primebakes_update.bat");
-        var exePath = Path.Combine(appPath, "PrimeBakes.exe");
+        var batchFilePath = Path.Combine(Path.GetTempPath(), "vizar_update.bat");
+        var exePath = Path.Combine(appPath, "Vizar.exe");
 
         var batchScript = $@"
 @echo off
-echo Updating Prime Bakes...
+echo Updating Vizar...
 echo.
 timeout /t 2 /nobreak >nul
 echo Extracting update...

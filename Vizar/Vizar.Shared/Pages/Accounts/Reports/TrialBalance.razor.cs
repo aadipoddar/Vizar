@@ -304,10 +304,7 @@ public partial class TrialBalance : IAsyncDisposable
 		try
 		{
 			while (await _autoRefreshTimer.WaitForNextTickAsync(cancellationToken))
-				await InvokeAsync(async () =>
-				{
-					await LoadTrialBalance();
-				});
+				await InvokeAsync(LoadTrialBalance);
 		}
 		catch (OperationCanceledException)
 		{

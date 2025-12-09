@@ -78,6 +78,7 @@ public static class PurchaseItemReportPDFExport
 				nameof(PurchaseItemOverviewModel.Total),
 				nameof(PurchaseItemOverviewModel.NetRate),
 				nameof(PurchaseItemOverviewModel.NetTotal),
+				nameof(PurchaseItemOverviewModel.IdentificationNo),
 				nameof(PurchaseItemOverviewModel.PurchaseRemarks),
 				nameof(PurchaseItemOverviewModel.Remarks)
 			];
@@ -103,6 +104,7 @@ public static class PurchaseItemReportPDFExport
 		columnSettings[nameof(PurchaseItemOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy hh:mm", IncludeInTotal = false };
 		columnSettings[nameof(PurchaseItemOverviewModel.CompanyName)] = new() { DisplayName = "Company", IncludeInTotal = false };
 		columnSettings[nameof(PurchaseItemOverviewModel.PartyName)] = new() { DisplayName = "Party", IncludeInTotal = false };
+		columnSettings[nameof(PurchaseItemOverviewModel.IdentificationNo)] = new() { DisplayName = "Identification No", IncludeInTotal = false };
 		columnSettings[nameof(PurchaseItemOverviewModel.PurchaseRemarks)] = new() { DisplayName = "Purchase Remarks", IncludeInTotal = false };
 		columnSettings[nameof(PurchaseItemOverviewModel.Remarks)] = new() { DisplayName = "Item Remarks", IncludeInTotal = false };
 		columnSettings[nameof(PurchaseItemOverviewModel.InclusiveTax)] = new() { DisplayName = "Incl Tax", IncludeInTotal = false };

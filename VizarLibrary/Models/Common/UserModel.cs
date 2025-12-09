@@ -8,7 +8,7 @@ public class UserModel
 	public string Password { get; set; }
 	public string? Email { get; set; }
 	public bool Accounts { get; set; }
-	public bool Purchase { get; set; }
+	public bool Inventory { get; set; }
 	public bool Admin { get; set; }
 	public string? Remarks { get; set; }
 	public bool Status { get; set; }
@@ -22,6 +22,6 @@ public class UserModel
 public enum UserRoles
 {
 	Admin,
-	Purchase,
-	Accounts
+	Accounts,
+	Inventory
 }

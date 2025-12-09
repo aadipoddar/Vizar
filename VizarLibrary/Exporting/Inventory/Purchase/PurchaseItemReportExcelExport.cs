@@ -41,6 +41,7 @@ public static class PurchaseItemReportExcelExport
 			[nameof(PurchaseItemOverviewModel.TransactionNo)] = new() { DisplayName = "Trans No", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignLeft },
 			[nameof(PurchaseItemOverviewModel.CompanyName)] = new() { DisplayName = "Company", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignLeft },
 			[nameof(PurchaseItemOverviewModel.PartyName)] = new() { DisplayName = "Party", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignLeft },
+			[nameof(PurchaseItemOverviewModel.IdentificationNo)] = new() { DisplayName = "Identification No", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignLeft },
 			[nameof(PurchaseItemOverviewModel.PurchaseRemarks)] = new() { DisplayName = "Purchase Remarks", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignLeft },
 			[nameof(PurchaseItemOverviewModel.Remarks)] = new() { DisplayName = "Item Remarks", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignLeft },
 
@@ -124,6 +125,7 @@ public static class PurchaseItemReportExcelExport
 				nameof(PurchaseItemOverviewModel.Total),
 				nameof(PurchaseItemOverviewModel.NetRate),
 				nameof(PurchaseItemOverviewModel.NetTotal),
+				nameof(PurchaseItemOverviewModel.IdentificationNo),
 				nameof(PurchaseItemOverviewModel.PurchaseRemarks),
 				nameof(PurchaseItemOverviewModel.Remarks)
 			];

@@ -10,7 +10,7 @@ using VizarLibrary.DataAccess;
 namespace VizarLibrary.Exporting.Utils;
 
 /// <summary>
-/// Generic Excel exporter for all report types in the Prime Bakes application
+/// Generic Excel exporter for all report types in the Vizar application
 /// </summary>
 public static class ExcelReportExportUtil
 {

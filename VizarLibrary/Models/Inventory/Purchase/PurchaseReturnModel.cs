@@ -149,6 +149,7 @@ public class PurchaseReturnItemOverviewModel
     public string? PurchaseReturnRemarks { get; set; }
 
     public string? IdentificationNo { get; set; }
+	public string UnitOfMeasurement { get; set; }
 	public decimal Quantity { get; set; }
     public decimal Rate { get; set; }
     public decimal BaseTotal { get; set; }
