@@ -547,11 +547,13 @@ public static class ExcelInvoiceExportUtil
 		var columns = new List<(string Header, double Width, ExcelHAlign Align, string Format, bool IsNumeric)>
 		{
 			("#", 5, ExcelHAlign.HAlignCenter, null, true),
-			("Item Description", 30, ExcelHAlign.HAlignLeft, null, false),
-			("Qty", 10, ExcelHAlign.HAlignRight, "#,##0.00", true)
+			("Item Description", 30, ExcelHAlign.HAlignLeft, null, false)
 		};
 
 		if (hasIdentificationNo) columns.Add(("Identification", 15, ExcelHAlign.HAlignLeft, null, false));
+		
+		columns.Add(("Qty", 10, ExcelHAlign.HAlignRight, "#,##0.00", true));
+
 		if (hasUOM) columns.Add(("UOM", 8, ExcelHAlign.HAlignCenter, null, false));
 		if (hasRate) columns.Add(("Rate", 12, ExcelHAlign.HAlignRight, "#,##0.00", true));
 		if (hasDiscount)
