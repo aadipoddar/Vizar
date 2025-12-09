@@ -10,7 +10,7 @@
     [PANNo] VARCHAR(MAX) NULL,
     [CINNo] VARCHAR(MAX) NULL,
     [Alias] VARCHAR(MAX) NULL, 
-    [Phone] VARCHAR(10) NULL UNIQUE, 
+    [Phone] VARCHAR(10) NULL, 
     [Email] VARCHAR(MAX) NULL, 
     [Address] VARCHAR(MAX) NULL, 
     [Remarks] VARCHAR(MAX) NULL, 
