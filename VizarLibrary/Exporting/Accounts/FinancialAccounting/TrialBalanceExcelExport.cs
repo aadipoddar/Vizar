@@ -58,10 +58,10 @@ public static class TrialBalanceExcelExport
                 nameof(TrialBalanceModel.ClosingCredit),
             ];
 
-			if (!string.IsNullOrWhiteSpace(groupName))
+			if (string.IsNullOrWhiteSpace(groupName))
 				columnOrder.Insert(2, nameof(TrialBalanceModel.GroupName));
 
-			if (!string.IsNullOrWhiteSpace(accountTypeName))
+			if (string.IsNullOrWhiteSpace(accountTypeName))
 				columnOrder.Insert(3, nameof(TrialBalanceModel.AccountTypeName));
 		}
 

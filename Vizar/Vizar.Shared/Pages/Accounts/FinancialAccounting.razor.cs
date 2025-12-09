@@ -74,6 +74,7 @@ public partial class FinancialAccounting : IAsyncDisposable
 			.Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
 			.Add(ModCode.Ctrl, Code.D, NavigateToDashboard, "Go to dashboard", Exclude.None)
 			.Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
+			.Add(ModCode.Ctrl, Code.L, Logout, "Logout", Exclude.None)
 			.Add(Code.Delete, RemoveSelectedCartItem, "Delete selected cart item", Exclude.None)
 			.Add(Code.Insert, EditSelectedCartItem, "Edit selected cart item", Exclude.None);
 
@@ -291,7 +292,7 @@ public partial class FinancialAccounting : IAsyncDisposable
 		await SaveTransactionFile();
 	}
 
-	private async Task OnPartyChanged(ChangeEventArgs<VoucherModel, VoucherModel> args)
+	private async Task OnVoucherChanged(ChangeEventArgs<VoucherModel, VoucherModel> args)
 	{
 		if (args.Value is null)
 			return;
@@ -1015,10 +1016,15 @@ public partial class FinancialAccounting : IAsyncDisposable
 	private async Task NavigateBack() =>
 		NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
 
+	private async Task Logout() =>
+		await AuthenticationService.Logout(DataStorageService, NavigationManager, VibrationService);
+
 	public async ValueTask DisposeAsync()
 	{
 		if (_hotKeysContext is not null)
 			await _hotKeysContext.DisposeAsync();
+
+		GC.SuppressFinalize(this);
 	}
 	#endregion
 }

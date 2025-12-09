@@ -35,5 +35,7 @@ public partial class AccountingDashboard : IAsyncDisposable
 	{
 		if (_hotKeysContext is not null)
 			await _hotKeysContext.DisposeAsync();
+
+		GC.SuppressFinalize(this);
 	}
 }

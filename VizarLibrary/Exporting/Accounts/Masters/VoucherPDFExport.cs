@@ -20,7 +20,7 @@ public static class VoucherPDFExport
 		{
 			voucher.Id,
 			voucher.Name,
-			voucher.PrefixCode,
+			voucher.Code,
 			voucher.Remarks,
 			Status = voucher.Status ? "Active" : "Deleted"
 		});
@@ -40,7 +40,7 @@ public static class VoucherPDFExport
 			},
 
 			[nameof(VoucherModel.Name)] = new() { DisplayName = "Voucher Name", IncludeInTotal = false },
-			[nameof(VoucherModel.PrefixCode)] = new() { DisplayName = "Prefix Code", IncludeInTotal = false },
+			[nameof(VoucherModel.Code)] = new() { DisplayName = "Prefix Code", IncludeInTotal = false },
 			[nameof(VoucherModel.Remarks)] = new() { DisplayName = "Remarks", IncludeInTotal = false },
 
 			[nameof(VoucherModel.Status)] = new()
@@ -60,7 +60,7 @@ public static class VoucherPDFExport
 		[
 			nameof(VoucherModel.Id),
 			nameof(VoucherModel.Name),
-			nameof(VoucherModel.PrefixCode),
+			nameof(VoucherModel.Code),
 			nameof(VoucherModel.Remarks),
 			nameof(VoucherModel.Status)
 		];

@@ -90,10 +90,10 @@ public static class AccountingReportExcelExport
                 nameof(AccountingOverviewModel.LastModifiedFromPlatform)
             ];
 
-			if (!string.IsNullOrWhiteSpace(companyName))
+			if (string.IsNullOrWhiteSpace(companyName))
 				columnOrder.Insert(6, nameof(AccountingOverviewModel.CompanyName));
 
-            if (!string.IsNullOrWhiteSpace(voucherName))
+            if (string.IsNullOrWhiteSpace(voucherName))
                 columnOrder.Insert(7, nameof(AccountingOverviewModel.VoucherName));
 		}
 

@@ -21,4 +21,28 @@ public static class Helper
 
     public static string FormatDecimalWithTwoDigits(this decimal value) =>
         value.ToString("0.00", CultureInfo.InvariantCulture);
+
+    public static bool ValidatePhoneNumber(this string phoneNumber)
+    {
+        if (string.IsNullOrWhiteSpace(phoneNumber))
+            return false;
+        if (phoneNumber.Length != 10)
+            return false;
+        return long.TryParse(phoneNumber, out _);
+	}
+
+    public static bool ValidateEmail(this string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return false;
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(email);
+            return addr.Address == email;
+        }
+        catch
+        {
+            return false;
+		}
+	}
 }

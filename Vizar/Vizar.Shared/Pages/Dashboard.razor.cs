@@ -115,6 +115,8 @@ public partial class Dashboard : IAsyncDisposable
 	{
 		if (_hotKeysContext is not null)
 			await _hotKeysContext.DisposeAsync();
+
+		GC.SuppressFinalize(this);
 	}
 	#endregion
 }

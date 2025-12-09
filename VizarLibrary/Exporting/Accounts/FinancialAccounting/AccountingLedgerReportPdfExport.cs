@@ -39,7 +39,7 @@ public static class AccountingLedgerReportPdfExport
 				nameof(AccountingLedgerOverviewModel.Remarks)
 			];
 
-			if (!string.IsNullOrWhiteSpace(companyName))
+			if (string.IsNullOrWhiteSpace(companyName))
 				columnOrder.Insert(6, nameof(AccountingLedgerOverviewModel.CompanyName));
 		}
 

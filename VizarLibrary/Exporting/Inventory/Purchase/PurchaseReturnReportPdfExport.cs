@@ -83,7 +83,7 @@ public static class PurchaseReturnReportPdfExport
             ];
 
             // Add party column only if not filtering by party
-            if (!string.IsNullOrEmpty(partyName))
+            if (string.IsNullOrEmpty(partyName))
                 columnOrder.Insert(3, nameof(PurchaseReturnOverviewModel.PartyName));
         }
         
@@ -102,7 +102,7 @@ public static class PurchaseReturnReportPdfExport
             ];
 
             // Add party column only if not filtering by party
-            if (!string.IsNullOrEmpty(partyName))
+            if (string.IsNullOrEmpty(partyName))
                 columnOrder.Insert(2, nameof(PurchaseReturnOverviewModel.PartyName));
         }
 

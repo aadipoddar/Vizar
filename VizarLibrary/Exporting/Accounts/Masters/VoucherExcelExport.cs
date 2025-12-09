@@ -20,7 +20,7 @@ public static class VoucherExcelExport
 		{
 			voucher.Id,
 			voucher.Name,
-			voucher.PrefixCode,
+			voucher.Code,
 			voucher.Remarks,
 			Status = voucher.Status ? "Active" : "Deleted"
 		});
@@ -33,7 +33,7 @@ public static class VoucherExcelExport
 
 			// Text fields - Left aligned
 			[nameof(VoucherModel.Name)] = new() { DisplayName = "Voucher Name", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignLeft, IsRequired = true },
-			[nameof(VoucherModel.PrefixCode)] = new() { DisplayName = "Prefix Code", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignLeft, IsRequired = true },
+			[nameof(VoucherModel.Code)] = new() { DisplayName = "Prefix Code", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignLeft, IsRequired = true },
 			[nameof(VoucherModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignLeft },
 
 			// Status - Center aligned
@@ -45,7 +45,7 @@ public static class VoucherExcelExport
 		[
 			nameof(VoucherModel.Id),
 			nameof(VoucherModel.Name),
-			nameof(VoucherModel.PrefixCode),
+			nameof(VoucherModel.Code),
 			nameof(VoucherModel.Remarks),
 			nameof(VoucherModel.Status)
 		];

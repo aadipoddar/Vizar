@@ -84,7 +84,7 @@ public static class PurchaseReportPDFExport
 			];
 
 			// Add party column only if not filtering by party
-			if (!string.IsNullOrEmpty(partyName))
+			if (string.IsNullOrEmpty(partyName))
 				columnOrder.Insert(3, nameof(PurchaseOverviewModel.PartyName));
 		}
 
@@ -103,7 +103,7 @@ public static class PurchaseReportPDFExport
 			];
 
 			// Add party column only if not filtering by party
-			if (!string.IsNullOrEmpty(partyName))
+			if (string.IsNullOrEmpty(partyName))
 				columnOrder.Insert(2, nameof(PurchaseOverviewModel.PartyName));
 		}
 

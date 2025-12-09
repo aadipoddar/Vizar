@@ -17,8 +17,7 @@ public class UpdateService : IUpdateService
 #endif
     }
 
-    public async Task UpdateAppAsync(string githubRepoOwner, string githubRepoName, string setupFileName, IProgress<int> progress = null)
-    {
+    public async Task UpdateAppAsync(string githubRepoOwner, string githubRepoName, string setupFileName, IProgress<int> progress = null) =>
 #if ANDROID
         await Android.AadiSoftUpdater.UpdateApp(githubRepoOwner, githubRepoName, setupFileName, progress);
 #elif WINDOWS
@@ -26,5 +25,5 @@ public class UpdateService : IUpdateService
 #else
         await Task.CompletedTask;
 #endif
-    }
+
 }

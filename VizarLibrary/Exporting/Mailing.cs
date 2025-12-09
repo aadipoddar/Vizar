@@ -36,9 +36,7 @@ public static class Mailing
 		await SendEmail(user.Name, user.Email, subject, htmlBody);
 	}
 
-	private static string GenerateLoginCodeEmailHtml(UserModel user, string code, int codeExpiryMinutes, string redirectLink)
-	{
-		return $@"
+    private static string GenerateLoginCodeEmailHtml(UserModel user, string code, int codeExpiryMinutes, string redirectLink) => $@"
 <!DOCTYPE html>
 <html lang=""en"">
 <head>
@@ -131,5 +129,4 @@ public static class Mailing
     </table>
 </body>
 </html>";
-	}
 }
