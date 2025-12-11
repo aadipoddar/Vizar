@@ -77,7 +77,7 @@ public static class AccountingInvoicePDFExport
         {
             new("#", "#", 25, PdfTextAlignment.Center),
             new(nameof(AccountingItemCartModel.LedgerName), "Ledger", 0, PdfTextAlignment.Left),
-            new(nameof(AccountingItemCartModel.ReferenceNo), "Ref", 80, PdfTextAlignment.Left),
+            new(nameof(AccountingItemCartModel.ReferenceNo), "Ref No", 80, PdfTextAlignment.Left),
             new(nameof(AccountingItemCartModel.Debit), "Dr", 70, PdfTextAlignment.Right, "#,##0.00"),
             new(nameof(AccountingItemCartModel.Credit), "Cr", 70, PdfTextAlignment.Right, "#,##0.00"),
             new(nameof(AccountingItemCartModel.Remarks), "Remarks", 100, PdfTextAlignment.Left)

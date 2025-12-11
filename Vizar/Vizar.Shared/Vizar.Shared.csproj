@@ -40,8 +40,4 @@
     <Using Include="Vizar.Shared.Services" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Pages\Inventory\ItemIssue\Reports\" />
-  </ItemGroup>
-
 </Project>

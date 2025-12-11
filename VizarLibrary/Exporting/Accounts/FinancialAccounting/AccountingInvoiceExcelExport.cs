@@ -50,29 +50,10 @@ public static class AccountingInvoiceExcelExport
 			};
 		}).ToList();
 
-		// Define column settings with # column first
-		var columnSettings = new List<ExcelInvoiceExportUtil.InvoiceColumnSetting>
-		{
-			new("#", "#", 5, Syncfusion.XlsIO.ExcelHAlign.HAlignCenter),
-			new("LedgerName", "Ledger", 35, Syncfusion.XlsIO.ExcelHAlign.HAlignLeft),
-			new("ReferenceNo", "Ref No", 15, Syncfusion.XlsIO.ExcelHAlign.HAlignLeft),
-			new("Debit", "Debit", 15, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
-			new("Credit", "Credit", 15, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
-			new("Remarks", "Remarks", 25, Syncfusion.XlsIO.ExcelHAlign.HAlignLeft)
-		};
-
 		// Calculate totals
 		decimal totalDebit = cartItems.Sum(i => i.Debit ?? 0);
 		decimal totalCredit = cartItems.Sum(i => i.Credit ?? 0);
 		decimal difference = totalDebit - totalCredit;
-
-		// Define summary fields
-		var summaryFields = new Dictionary<string, string>
-		{
-			{ "Total Debit:", totalDebit.ToString() },
-			{ "Total Credit:", totalCredit.ToString() },
-			{ "Difference:", difference.ToString() }
-		};
 
 		// Map invoice header data
 		var invoiceData = new ExcelInvoiceExportUtil.InvoiceData
@@ -90,6 +71,25 @@ public static class AccountingInvoiceExcelExport
 		string voucherInvoiceType = !string.IsNullOrWhiteSpace(voucher?.Name)
 			? $"{voucher.Name.ToUpper()}"
 			: invoiceType;
+
+		// Define column settings with # column first
+		var columnSettings = new List<ExcelInvoiceExportUtil.InvoiceColumnSetting>
+		{
+			new("#", "#", 5, Syncfusion.XlsIO.ExcelHAlign.HAlignCenter),
+			new(nameof(AccountingItemCartModel.LedgerName), "Ledger", 35, Syncfusion.XlsIO.ExcelHAlign.HAlignLeft),
+			new(nameof(AccountingItemCartModel.ReferenceNo), "Ref No", 15, Syncfusion.XlsIO.ExcelHAlign.HAlignLeft),
+			new(nameof(AccountingItemCartModel.Debit), "Dr", 15, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
+			new(nameof(AccountingItemCartModel.Credit), "Cr", 15, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
+			new(nameof(AccountingItemCartModel.Remarks), "Remarks", 25, Syncfusion.XlsIO.ExcelHAlign.HAlignLeft)
+		};
+
+		// Define summary fields
+		var summaryFields = new Dictionary<string, string>
+		{
+			{ "Total Debit:", totalDebit.ToString() },
+			{ "Total Credit:", totalCredit.ToString() },
+			{ "Difference:", difference.ToString() }
+		};
 
 		// Generate voucher Excel with generic method
 		return await ExcelInvoiceExportUtil.ExportInvoiceToExcel(
