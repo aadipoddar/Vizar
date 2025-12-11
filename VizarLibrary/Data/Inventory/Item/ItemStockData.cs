@@ -10,8 +10,8 @@ public static class ItemStockData
 	public static async Task<int> InsertItemStock(ItemStockModel stock) =>
 		(await SqlDataAccess.LoadData<int, dynamic>(StoredProcedureNames.InsertItemStock, stock)).FirstOrDefault();
 
-	public static async Task<List<ItemStockSummaryModel>> LoadItemStockSummaryByDate(DateTime FromDate, DateTime ToDate) =>
-		await SqlDataAccess.LoadData<ItemStockSummaryModel, dynamic>(StoredProcedureNames.LoadItemStockSummaryByDate, new { FromDate = DateOnly.FromDateTime(FromDate), ToDate = DateOnly.FromDateTime(ToDate) });
+	public static async Task<List<ItemStockSummaryModel>> LoadItemStockSummaryByDate(DateTime StartDate, DateTime EndDate) =>
+		await SqlDataAccess.LoadData<ItemStockSummaryModel, dynamic>(StoredProcedureNames.LoadItemStockSummaryByDate, new { StartDate, EndDate });
 
 	public static async Task DeleteItemStockByTypeTransactionId(string Type, int TransactionId) =>
 		await SqlDataAccess.SaveData(StoredProcedureNames.DeleteItemStockByTypeTransactionId, new { Type, TransactionId });

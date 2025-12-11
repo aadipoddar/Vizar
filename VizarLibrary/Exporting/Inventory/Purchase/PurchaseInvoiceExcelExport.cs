@@ -1,3 +1,4 @@
+using VizarLibrary.Data;
 using VizarLibrary.Data.Common;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Utils;
@@ -33,13 +34,13 @@ public static class PurchaseInvoiceExcelExport
 		// Load all items to get names
 		var allItems = await CommonData.LoadTableData<ItemModel>(TableNames.Item);
 
-		// Map line items with actual item names
-		var lineItems = purchaseDetails.Select(detail =>
+		// Map to cart items with actual item names
+		var cartItems = purchaseDetails.Select(detail =>
 		{
 			var item = allItems.FirstOrDefault(i => i.Id == detail.ItemId);
 			string itemName = item?.Name ?? $"Item #{detail.ItemId}";
 
-			return new ExcelInvoiceExportUtil.InvoiceLineItem
+			return new PurchaseItemCartModel
 			{
 				ItemId = detail.ItemId,
 				ItemName = itemName,
@@ -57,30 +58,53 @@ public static class PurchaseInvoiceExcelExport
 			};
 		}).ToList();
 
-		// Map invoice header data
+		// Map invoice header data with payment modes dictionary
 		var invoiceData = new ExcelInvoiceExportUtil.InvoiceData
 		{
 			TransactionNo = purchaseHeader.TransactionNo,
 			TransactionDateTime = purchaseHeader.TransactionDateTime,
-			ItemsTotalAmount = purchaseHeader.TotalAfterTax,
-			OtherChargesAmount = purchaseHeader.OtherChargesAmount,
-			OtherChargesPercent = purchaseHeader.OtherChargesPercent,
-			CashDiscountAmount = purchaseHeader.CashDiscountAmount,
-			CashDiscountPercent = purchaseHeader.CashDiscountPercent,
-			RoundOffAmount = purchaseHeader.RoundOffAmount,
 			TotalAmount = purchaseHeader.TotalAmount,
 			Remarks = purchaseHeader.Remarks,
-			Status = purchaseHeader.Status
+			Status = purchaseHeader.Status,
+			PaymentModes = null // Purchase invoices typically don't show payment breakdown
 		};
 
-		// Generate invoice Excel with generic models
+		// Define custom summary fields for purchase invoice
+		var summaryFields = new Dictionary<string, string>
+		{
+			["Items Total"] = purchaseHeader.TotalAfterTax.FormatIndianCurrency(),
+			["Other Charges"] = $"({purchaseHeader.OtherChargesPercent:0.00}%) {purchaseHeader.OtherChargesAmount.FormatIndianCurrency()}",
+			["Cash Discount"] = $"({purchaseHeader.CashDiscountPercent:0.00}%) -{purchaseHeader.CashDiscountAmount.FormatIndianCurrency()}",
+			["Round Off"] = purchaseHeader.RoundOffAmount.FormatIndianCurrency(),
+			["Grand Total"] = purchaseHeader.TotalAmount.FormatIndianCurrency()
+		};
+
+		// Define column settings with # column first
+		var columnSettings = new List<ExcelInvoiceExportUtil.InvoiceColumnSetting>
+		{
+			new("#", "#", 5, Syncfusion.XlsIO.ExcelHAlign.HAlignCenter),
+			new(nameof(PurchaseItemCartModel.ItemName), "Item", 30, Syncfusion.XlsIO.ExcelHAlign.HAlignLeft),
+			new(nameof(PurchaseItemCartModel.IdentificationNo), "Identification", 15, Syncfusion.XlsIO.ExcelHAlign.HAlignLeft),
+			new(nameof(PurchaseItemCartModel.UnitOfMeasurement), "UOM", 8, Syncfusion.XlsIO.ExcelHAlign.HAlignCenter),
+			new(nameof(PurchaseItemCartModel.Quantity), "Qty", 10, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
+			new(nameof(PurchaseItemCartModel.Rate), "Rate", 12, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
+			new(nameof(PurchaseItemCartModel.DiscountPercent), "Disc %", 8, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
+			new(nameof(PurchaseItemCartModel.AfterDiscount), "Taxable", 12, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
+			new(nameof(PurchaseItemCartModel.TotalTaxAmount), "Tax Amt", 12, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
+			new(nameof(PurchaseItemCartModel.Total), "Total", 15, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00")
+		};
+
+		// Generate invoice Excel with generic method
 		return await ExcelInvoiceExportUtil.ExportInvoiceToExcel(
 			invoiceData,
-			lineItems,
+			cartItems,
 			company,
 			party,
 			logoPath,
-			invoiceType
+			invoiceType,
+			columnSettings,
+			null,
+			summaryFields
 		);
 	}
 }

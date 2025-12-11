@@ -1,4 +1,5 @@
-﻿using VizarLibrary.Data.Common;
+﻿using VizarLibrary.Data;
+using VizarLibrary.Data.Common;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
@@ -30,19 +31,16 @@ public static class PurchaseInvoicePDFExport
         string logoPath = null,
         string invoiceType = "PURCHASE INVOICE")
     {
-        // Load all items to get names
+        // Load all items to get names and create enriched line items
         var allItems = await CommonData.LoadTableData<ItemModel>(TableNames.Item);
 
-        // Map line items with actual item names
         var lineItems = purchaseDetails.Select(detail =>
         {
             var item = allItems.FirstOrDefault(i => i.Id == detail.ItemId);
-            string itemName = item?.Name ?? $"Item #{detail.ItemId}";
-
-            return new PDFInvoiceExportUtil.InvoiceLineItem
+            return new PurchaseItemCartModel
             {
                 ItemId = detail.ItemId,
-                ItemName = itemName,
+                ItemName = item?.Name ?? $"Item #{detail.ItemId}",
                 IdentificationNo = detail.IdentificationNo,
                 Quantity = detail.Quantity,
                 UnitOfMeasurement = detail.UnitOfMeasurement,
@@ -57,30 +55,53 @@ public static class PurchaseInvoicePDFExport
             };
         }).ToList();
 
-        // Map invoice header data
+        // Map invoice header data with payment modes dictionary
         var invoiceData = new PDFInvoiceExportUtil.InvoiceData
         {
             TransactionNo = purchaseHeader.TransactionNo,
             TransactionDateTime = purchaseHeader.TransactionDateTime,
-            ItemsTotalAmount = purchaseHeader.TotalAfterTax,
-            OtherChargesAmount = purchaseHeader.OtherChargesAmount,
-            OtherChargesPercent = purchaseHeader.OtherChargesPercent,
-            CashDiscountAmount = purchaseHeader.CashDiscountAmount,
-            CashDiscountPercent = purchaseHeader.CashDiscountPercent,
-            RoundOffAmount = purchaseHeader.RoundOffAmount,
             TotalAmount = purchaseHeader.TotalAmount,
             Remarks = purchaseHeader.Remarks,
-            Status = purchaseHeader.Status
+            Status = purchaseHeader.Status,
+            PaymentModes = null // Purchase invoices typically don't show payment breakdown
         };
 
-        // Generate invoice PDF with generic models
+        // Define custom summary fields for purchase invoice
+        var summaryFields = new Dictionary<string, string>
+        {
+            ["Items Total"] = purchaseHeader.TotalAfterTax.FormatIndianCurrency(),
+            ["Other Charges"] = $"({purchaseHeader.OtherChargesPercent:0.00}%) {purchaseHeader.OtherChargesAmount.FormatIndianCurrency()}",
+            ["Cash Discount"] = $"({purchaseHeader.CashDiscountPercent:0.00}%) -{purchaseHeader.CashDiscountAmount.FormatIndianCurrency()}",
+            ["Round Off"] = purchaseHeader.RoundOffAmount.FormatIndianCurrency(),
+            ["Grand Total"] = purchaseHeader.TotalAmount.FormatIndianCurrency()
+		};
+
+        // Define custom column settings with proper display names
+        var columnSettings = new List<PDFInvoiceExportUtil.InvoiceColumnSetting>
+        {
+			new("#", "#", 25, Syncfusion.Pdf.Graphics.PdfTextAlignment.Center),
+			new(nameof(PurchaseItemCartModel.ItemName), "Item", 0, Syncfusion.Pdf.Graphics.PdfTextAlignment.Left),
+			new(nameof(PurchaseItemCartModel.IdentificationNo), "Identification", 70, Syncfusion.Pdf.Graphics.PdfTextAlignment.Center),
+			new(nameof(PurchaseItemCartModel.UnitOfMeasurement), "UOM", 40, Syncfusion.Pdf.Graphics.PdfTextAlignment.Center),
+			new(nameof(PurchaseItemCartModel.Quantity), "Qty", 40, Syncfusion.Pdf.Graphics.PdfTextAlignment.Right, "#,##0.00"),
+			new(nameof(PurchaseItemCartModel.Rate), "Rate", 50, Syncfusion.Pdf.Graphics.PdfTextAlignment.Right, "#,##0.00"),
+			new(nameof(PurchaseItemCartModel.DiscountPercent), "Disc %", 45, Syncfusion.Pdf.Graphics.PdfTextAlignment.Right, "#,##0.00"),
+			new(nameof(PurchaseItemCartModel.AfterDiscount), "Taxable", 55, Syncfusion.Pdf.Graphics.PdfTextAlignment.Right, "#,##0.00"),
+			new(nameof(PurchaseItemCartModel.TotalTaxAmount), "Tax", 50, Syncfusion.Pdf.Graphics.PdfTextAlignment.Right, "#,##0.00"),
+			new(nameof(PurchaseItemCartModel.Total), "Total", 55, Syncfusion.Pdf.Graphics.PdfTextAlignment.Right, "#,##0.00")
+		};
+
+        // Generate invoice PDF with custom columns and summary
         return await PDFInvoiceExportUtil.ExportInvoiceToPdf(
             invoiceData,
             lineItems,
             company,
             party,
             logoPath,
-            invoiceType
+            invoiceType,
+            columnSettings,
+            null, // Column order derived from settings
+            summaryFields
         );
     }
 }

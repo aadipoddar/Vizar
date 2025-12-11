@@ -1,0 +1,10 @@
+﻿CREATE TABLE [dbo].[VehicleModel]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [Name] VARCHAR(500) NOT NULL UNIQUE,
+    [Code] VARCHAR(50) NOT NULL UNIQUE, 
+    [ManufacturerId] INT NOT NULL,
+    [Remarks] VARCHAR(MAX) NULL, 
+    [Status] BIT NOT NULL DEFAULT 1, 
+    CONSTRAINT [FK_VehicleModel_ToManufacturer] FOREIGN KEY ([ManufacturerId]) REFERENCES [Manufacturer]([Id])
+)

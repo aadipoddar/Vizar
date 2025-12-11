@@ -29,16 +29,16 @@ public static class AccountingInvoiceExcelExport
 		string logoPath = null,
 		string invoiceType = "ACCOUNTING VOUCHER")
 	{
-        // Load all ledgers to get names
-        var allLedgers = await CommonData.LoadTableData<LedgerModel>(TableNames.Ledger);
+		// Load all ledgers to get names
+		var allLedgers = await CommonData.LoadTableData<LedgerModel>(TableNames.Ledger);
 
-		// Map to accounting line items with proper Debit/Credit columns
-		var accountingLineItems = accountingDetails.Select(detail =>
+		// Map to cart items with actual ledger names
+		var cartItems = accountingDetails.Select(detail =>
 		{
 			var ledger = allLedgers.FirstOrDefault(l => l.Id == detail.LedgerId);
 			string ledgerName = ledger?.Name ?? $"Ledger #{detail.LedgerId}";
 
-			return new ExcelInvoiceExportUtil.AccountingLineItem
+			return new AccountingItemCartModel
 			{
 				LedgerId = detail.LedgerId,
 				LedgerName = ledgerName,
@@ -50,64 +50,29 @@ public static class AccountingInvoiceExcelExport
 			};
 		}).ToList();
 
-		// Map invoice header data
-		var invoiceData = new ExcelInvoiceExportUtil.InvoiceData
+		// Define column settings with # column first
+		var columnSettings = new List<ExcelInvoiceExportUtil.InvoiceColumnSetting>
 		{
-			TransactionNo = accountingHeader.TransactionNo,
-			TransactionDateTime = accountingHeader.TransactionDateTime,
-			ReferenceTransactionNo = accountingHeader.ReferenceNo,
-			ItemsTotalAmount = Math.Max(accountingHeader.TotalDebitAmount, accountingHeader.TotalCreditAmount),
-			OtherChargesAmount = 0,
-			OtherChargesPercent = 0,
-			CashDiscountAmount = 0,
-			CashDiscountPercent = 0,
-			RoundOffAmount = 0,
-			TotalAmount = Math.Max(accountingHeader.TotalDebitAmount, accountingHeader.TotalCreditAmount),
-			Cash = 0,
-			Card = 0,
-			UPI = 0,
-			Credit = 0,
-			Remarks = accountingHeader.Remarks,
-			Status = accountingHeader.Status
+			new("#", "#", 5, Syncfusion.XlsIO.ExcelHAlign.HAlignCenter),
+			new("LedgerName", "Ledger", 35, Syncfusion.XlsIO.ExcelHAlign.HAlignLeft),
+			new("ReferenceNo", "Ref No", 15, Syncfusion.XlsIO.ExcelHAlign.HAlignLeft),
+			new("Debit", "Debit", 15, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
+			new("Credit", "Credit", 15, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
+			new("Remarks", "Remarks", 25, Syncfusion.XlsIO.ExcelHAlign.HAlignLeft)
 		};
 
-		// Use voucher name as invoice type
-		string voucherInvoiceType = !string.IsNullOrWhiteSpace(voucher?.Name)
-			? $"{voucher.Name.ToUpper()}"
-			: invoiceType;
+		// Calculate totals
+		decimal totalDebit = cartItems.Sum(i => i.Debit ?? 0);
+		decimal totalCredit = cartItems.Sum(i => i.Credit ?? 0);
+		decimal difference = totalDebit - totalCredit;
 
-		// Generate specialized accounting voucher Excel
-		return await ExcelInvoiceExportUtil.ExportAccountingVoucherToExcel(
-			invoiceData,
-			accountingLineItems,
-			company,
-			logoPath,
-			voucherInvoiceType
-		);
-	}
-
-	/// <summary>
-	/// Export Accounting with ledger names (requires additional data)
-	/// </summary>
-	public static async Task<MemoryStream> ExportAccountingInvoiceWithItems(
-		AccountingModel accountingHeader,
-		List<AccountingItemCartModel> accountingItems,
-		CompanyModel company,
-		VoucherModel voucher,
-		string logoPath = null,
-		string invoiceType = "ACCOUNTING VOUCHER")
-	{
-		// Map to accounting line items with proper Debit/Credit columns
-		var accountingLineItems = accountingItems.Select(item => new ExcelInvoiceExportUtil.AccountingLineItem
+		// Define summary fields
+		var summaryFields = new Dictionary<string, string>
 		{
-			LedgerId = item.LedgerId,
-			LedgerName = item.LedgerName,
-			ReferenceNo = item.ReferenceNo,
-			ReferenceType = item.ReferenceType,
-			Debit = item.Debit,
-			Credit = item.Credit,
-			Remarks = item.Remarks
-		}).ToList();
+			{ "Total Debit:", totalDebit.ToString() },
+			{ "Total Credit:", totalCredit.ToString() },
+			{ "Difference:", difference.ToString() }
+		};
 
 		// Map invoice header data
 		var invoiceData = new ExcelInvoiceExportUtil.InvoiceData
@@ -115,19 +80,10 @@ public static class AccountingInvoiceExcelExport
 			TransactionNo = accountingHeader.TransactionNo,
 			TransactionDateTime = accountingHeader.TransactionDateTime,
 			ReferenceTransactionNo = accountingHeader.ReferenceNo,
-			ItemsTotalAmount = Math.Max(accountingHeader.TotalDebitAmount, accountingHeader.TotalCreditAmount),
-			OtherChargesAmount = 0,
-			OtherChargesPercent = 0,
-			CashDiscountAmount = 0,
-			CashDiscountPercent = 0,
-			RoundOffAmount = 0,
 			TotalAmount = Math.Max(accountingHeader.TotalDebitAmount, accountingHeader.TotalCreditAmount),
-			Cash = 0,
-			Card = 0,
-			UPI = 0,
-			Credit = 0,
 			Remarks = accountingHeader.Remarks,
-			Status = accountingHeader.Status
+			Status = accountingHeader.Status,
+			PaymentModes = null // No payment modes for accounting vouchers
 		};
 
 		// Use voucher name as invoice type
@@ -135,13 +91,17 @@ public static class AccountingInvoiceExcelExport
 			? $"{voucher.Name.ToUpper()}"
 			: invoiceType;
 
-		// Generate specialized accounting voucher Excel
-		return await ExcelInvoiceExportUtil.ExportAccountingVoucherToExcel(
+		// Generate voucher Excel with generic method
+		return await ExcelInvoiceExportUtil.ExportInvoiceToExcel(
 			invoiceData,
-			accountingLineItems,
+			cartItems,
 			company,
+			null, // No billTo for accounting vouchers
 			logoPath,
-			voucherInvoiceType
+			voucherInvoiceType,
+			columnSettings,
+			null,
+			summaryFields
 		);
 	}
 }

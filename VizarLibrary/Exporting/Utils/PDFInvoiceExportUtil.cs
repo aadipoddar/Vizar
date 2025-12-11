@@ -1,4 +1,7 @@
-﻿using NumericWordsConversion;
+﻿using System.Reflection;
+using System.Text.RegularExpressions;
+
+using NumericWordsConversion;
 
 using Syncfusion.Drawing;
 using Syncfusion.Pdf;
@@ -29,19 +32,13 @@ public static class PDFInvoiceExportUtil
 		public DateTime TransactionDateTime { get; set; }
 		public string ReferenceTransactionNo { get; set; }
 		public DateTime? ReferenceDateTime { get; set; }
-		public decimal ItemsTotalAmount { get; set; }
-		public decimal OtherChargesAmount { get; set; }
-		public decimal OtherChargesPercent { get; set; }
-		public decimal CashDiscountAmount { get; set; }
-		public decimal CashDiscountPercent { get; set; }
-		public decimal RoundOffAmount { get; set; }
 		public decimal TotalAmount { get; set; }
-		public decimal Cash { get; set; }
-		public decimal Card { get; set; }
-		public decimal UPI { get; set; }
-		public decimal Credit { get; set; }
 		public string Remarks { get; set; }
 		public bool Status { get; set; } = true; // True = Active, False = Deleted
+		/// <summary>
+		/// Payment modes breakdown (e.g., "Cash" => 1000.00, "Card" => 500.00)
+		/// </summary>
+		public Dictionary<string, decimal> PaymentModes { get; set; }
 	}
 
 	/// <summary>
@@ -58,40 +55,6 @@ public static class PDFInvoiceExportUtil
 		public bool ShowOnlyIfHasValue { get; set; } = showOnlyIfHasValue;
 	}
 
-	/// <summary>
-	/// Generic invoice line item that works with any transaction type
-	/// </summary>
-	public class InvoiceLineItem
-	{
-		public int ItemId { get; set; }
-		public string ItemName { get; set; }
-		public string IdentificationNo { get; set; }
-		public decimal Quantity { get; set; }
-		public string UnitOfMeasurement { get; set; }
-		public decimal Rate { get; set; }
-		public decimal DiscountPercent { get; set; }
-		public decimal AfterDiscount { get; set; }
-		public decimal CGSTPercent { get; set; }
-		public decimal SGSTPercent { get; set; }
-		public decimal IGSTPercent { get; set; }
-		public decimal TotalTaxAmount { get; set; }
-		public decimal Total { get; set; }
-	}
-
-	/// <summary>
-	/// Accounting voucher line item for ledger entries
-	/// </summary>
-	public class AccountingLineItem
-	{
-		public int LedgerId { get; set; }
-		public string LedgerName { get; set; }
-		public string ReferenceNo { get; set; }
-		public string ReferenceType { get; set; }
-		public decimal? Debit { get; set; }
-		public decimal? Credit { get; set; }
-		public string Remarks { get; set; }
-	}
-
 	#endregion
 
 	#region Public Methods
@@ -99,21 +62,27 @@ public static class PDFInvoiceExportUtil
 	/// <summary>
 	/// Export invoice to PDF with professional layout (unified method for all transaction types)
 	/// </summary>
+	/// <typeparam name="T">Type of line item (must be a class)</typeparam>
 	/// <param name="invoiceData">Generic invoice header data</param>
-	/// <param name="lineItems">Generic invoice line items</param>
+	/// <param name="lineItems">Generic invoice line items of any type</param>
 	/// <param name="company">Company information (Bill From)</param>
-	/// <param name="billTo">Customer/Party information (Bill To)</param>
+	/// <param name="billTo">Customer/Party information (Bill To) - can be null</param>
 	/// <param name="logoPath">Optional: Path to company logo</param>
 	/// <param name="invoiceType">Type of invoice (INVOICE, PURCHASE RETURN, SALES INVOICE, etc.)</param>
-	/// <param name="outlet">Optional: Outlet/Location name</param>
+	/// <param name="columnSettings">Optional: Custom column settings for line items table</param>
+	/// <param name="columnOrder">Optional: Custom column order for line items table</param>
+	/// <param name="summaryFields">Optional: Custom summary fields to display (key=label, value=formatted value)</param>
 	/// <returns>MemoryStream containing the PDF file</returns>
-	public static async Task<MemoryStream> ExportInvoiceToPdf(
+	public static async Task<MemoryStream> ExportInvoiceToPdf<T>(
 		InvoiceData invoiceData,
-		List<InvoiceLineItem> lineItems,
+		List<T> lineItems,
 		CompanyModel company,
-		LedgerModel billTo,
+		LedgerModel billTo = null,
 		string logoPath = null,
-		string invoiceType = "INVOICE")
+		string invoiceType = "INVOICE",
+		List<InvoiceColumnSetting> columnSettings = null,
+		List<string> columnOrder = null,
+		Dictionary<string, string> summaryFields = null) where T : class
 	{
 		MemoryStream ms = new();
 
@@ -152,8 +121,17 @@ public static class PDFInvoiceExportUtil
 			// 3. Company and Customer Information (Two Columns)
 			currentY = DrawCompanyInfo(graphics, company, billTo, invoiceData, leftMargin, pageWidth, currentY);
 
+			// Get column settings dynamically if not provided
+			columnSettings ??= GetDefaultInvoiceColumnSettings<T>();
+
+			// Determine column order
+			List<string> effectiveColumnOrder = DetermineColumnOrder<T>(columnSettings, columnOrder);
+
+			// Filter out columns that have no data
+			effectiveColumnOrder = FilterEmptyColumns(lineItems, effectiveColumnOrder, columnSettings);
+
 			// 4. Line Items Table
-			PdfGridLayoutResult gridResult = DrawLineItemsTableWithResult(page, lineItems, leftMargin, rightMargin, pageWidth, currentY);
+			PdfGridLayoutResult gridResult = DrawLineItemsTableWithResult(page, lineItems, effectiveColumnOrder, columnSettings, leftMargin, rightMargin, pageWidth, currentY);
 
 			// Get the last page where the grid ended
 			PdfPage lastPage = gridResult.Page;
@@ -161,7 +139,7 @@ public static class PDFInvoiceExportUtil
 			currentY = gridResult.Bounds.Bottom + 8;
 
 			// 5. Summary Section with Remarks (two-column layout on the last page)
-			currentY = DrawSummaryAndRemarks(lastPageGraphics, invoiceData, leftMargin, pageWidth, currentY);
+			currentY = DrawSummaryAndRemarks(lastPageGraphics, invoiceData, summaryFields, leftMargin, pageWidth, currentY);
 
 			// 6. Amount in Words and Payment Methods side by side (on the last page)
 			float amountInWordsStartY = currentY;
@@ -176,85 +154,6 @@ public static class PDFInvoiceExportUtil
 		catch (Exception ex)
 		{
 			Console.WriteLine($"Error exporting invoice to PDF: {ex.Message}");
-			throw;
-		}
-
-		return ms;
-	}
-
-	/// <summary>
-	/// Export accounting voucher to PDF with specialized layout for ledger entries
-	/// </summary>
-	/// <param name="invoiceData">Accounting voucher header data</param>
-	/// <param name="accountingItems">Accounting ledger line items</param>
-	/// <param name="company">Company information</param>
-	/// <param name="logoPath">Optional: Path to company logo</param>
-	/// <param name="invoiceType">Type of voucher (JOURNAL VOUCHER, PAYMENT VOUCHER, etc.)</param>
-	/// <returns>MemoryStream containing the PDF file</returns>
-	public static async Task<MemoryStream> ExportAccountingVoucherToPdf(
-		InvoiceData invoiceData,
-		List<AccountingLineItem> accountingItems,
-		CompanyModel company,
-		string logoPath = null,
-		string invoiceType = "ACCOUNTING VOUCHER")
-	{
-		MemoryStream ms = new();
-
-		try
-		{
-			using PdfDocument pdfDocument = new();
-			PdfPage page = pdfDocument.Pages.Add();
-			PdfGraphics graphics = page.Graphics;
-
-			// Add footer template first
-			await AddBrandingFooter(pdfDocument);
-
-			// Initialize layout format for proper pagination
-			_layoutFormat = new()
-			{
-				Layout = PdfLayoutType.Paginate,
-				Break = PdfLayoutBreakType.FitPage
-			};
-
-			float pageWidth = page.GetClientSize().Width;
-			float leftMargin = 20;
-			float rightMargin = 20;
-			float currentY = 15;
-
-			// 1. Header Section with Logo and Company Info
-			currentY = DrawInvoiceHeader(graphics, logoPath, leftMargin, pageWidth, currentY);
-
-			// 2. Invoice Type and Number
-			currentY = DrawInvoiceTitle(graphics, invoiceType, invoiceData.TransactionNo, invoiceData.TransactionDateTime, leftMargin, pageWidth, currentY);
-
-			// 2.5. Draw DELETED status badge if Status is false
-			if (!invoiceData.Status)
-				currentY = DrawDeletedStatusBadge(graphics, pageWidth, currentY);
-
-			// 3. Company Information (Single Column - no Bill To for accounting)
-			currentY = DrawCompanyInfo(graphics, company, null, invoiceData, leftMargin, pageWidth, currentY);
-
-			// 4. Accounting Line Items Table
-			PdfGridLayoutResult gridResult = DrawAccountingLineItemsTable(page, pdfDocument, accountingItems, leftMargin, rightMargin, pageWidth, currentY);
-
-			// Get the last page where the grid ended
-			PdfPage lastPage = gridResult.Page;
-			PdfGraphics lastPageGraphics = lastPage.Graphics;
-			currentY = gridResult.Bounds.Bottom + 8;
-
-			// 5. Accounting Summary Section (Total Debit, Total Credit, Remarks)
-			currentY = DrawAccountingSummary(lastPageGraphics, accountingItems, invoiceData, leftMargin, pageWidth, currentY);
-
-			// 6. Amount in Words
-			currentY = DrawAmountInWords(lastPageGraphics, invoiceData.TotalAmount, leftMargin, pageWidth, currentY);
-
-			// Save PDF document to stream
-			pdfDocument.Save(ms);
-			ms.Position = 0;
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"Error exporting accounting voucher to PDF: {ex.Message}");
 			throw;
 		}
 
@@ -515,35 +414,47 @@ public static class PDFInvoiceExportUtil
 	}
 
 	/// <summary>
-	/// Draw line items table
+	/// Draw line items table with dynamic column detection
 	/// </summary>
-	private static PdfGridLayoutResult DrawLineItemsTableWithResult(PdfPage page, List<InvoiceLineItem> lineItems,
-		float leftMargin, float rightMargin, float pageWidth, float startY)
+	private static PdfGridLayoutResult DrawLineItemsTableWithResult<T>(PdfPage page, List<T> lineItems,
+		List<string> columnOrder, List<InvoiceColumnSetting> columnSettings,
+		float leftMargin, float rightMargin, float pageWidth, float startY) where T : class
 	{
 		PdfGrid pdfGrid = new();
 
-		// Check if any item has discount, tax, rate, total, or UOM
-		bool hasIdentificationNo = lineItems.Any(i => !string.IsNullOrWhiteSpace(i.IdentificationNo));
-		bool hasDiscount = lineItems.Any(i => i.DiscountPercent > 0);
-		bool hasTax = lineItems.Any(i => i.CGSTPercent > 0 || i.SGSTPercent > 0 || i.IGSTPercent > 0 || i.TotalTaxAmount > 0);
-		bool hasUOM = lineItems.Any(i => !string.IsNullOrWhiteSpace(i.UnitOfMeasurement));
-		bool hasRate = lineItems.Any(i => i.Rate > 0);
-		bool hasTotal = lineItems.Any(i => i.Total > 0);
+		// Get column settings list in the correct order
+		var orderedColumnSettings = columnOrder.Select(col => columnSettings.First(c => c.PropertyName == col)).ToList();
 
-		// Define column settings
-		var columnSettings = GetInvoiceColumnSettings(hasIdentificationNo, hasDiscount, hasTax, hasUOM, hasRate, hasTotal);
-
-		// Calculate available width and adjust description column
+		// Calculate available width and adjust column widths to fit within page
 		float availableWidth = pageWidth - leftMargin - rightMargin;
-		float fixedWidths = columnSettings.Where(c => c.PropertyName != "ItemName").Sum(c => c.Width);
-		var descColumn = columnSettings.First(c => c.PropertyName == "ItemName");
-		descColumn.Width = availableWidth - fixedWidths;
+		float fixedWidths = orderedColumnSettings.Where(c => c.Width > 0).Sum(c => c.Width);
+
+		// Find first column with width 0 (auto-size column, typically description)
+		var autoSizeColumn = orderedColumnSettings.FirstOrDefault(c => c.Width == 0);
+		if (autoSizeColumn != null)
+		{
+			// Calculate remaining width for auto-size column
+			float remainingWidth = availableWidth - fixedWidths;
+			autoSizeColumn.Width = Math.Max(remainingWidth, 80); // Minimum 80 points
+		}
+
+		// Check if total width exceeds available width - if so, scale proportionally
+		float totalWidth = orderedColumnSettings.Sum(c => c.Width);
+		if (totalWidth > availableWidth)
+		{
+			// Scale all columns proportionally to fit within available width
+			float scaleFactor = availableWidth / totalWidth;
+			foreach (var column in orderedColumnSettings)
+			{
+				column.Width *= scaleFactor;
+			}
+		}
 
 		// Add columns to grid
-		pdfGrid.Columns.Add(columnSettings.Count);
-		for (int i = 0; i < columnSettings.Count; i++)
+		pdfGrid.Columns.Add(orderedColumnSettings.Count);
+		for (int i = 0; i < orderedColumnSettings.Count; i++)
 		{
-			pdfGrid.Columns[i].Width = columnSettings[i].Width;
+			pdfGrid.Columns[i].Width = orderedColumnSettings[i].Width;
 		}
 
 		pdfGrid.Style.AllowHorizontalOverflow = false;
@@ -552,19 +463,19 @@ public static class PDFInvoiceExportUtil
 
 		// Add header row
 		PdfGridRow headerRow = pdfGrid.Headers.Add(1)[0];
-		for (int i = 0; i < columnSettings.Count; i++)
+		for (int i = 0; i < orderedColumnSettings.Count; i++)
 		{
-			headerRow.Cells[i].Value = columnSettings[i].DisplayName;
+			headerRow.Cells[i].Value = orderedColumnSettings[i].DisplayName;
 			headerRow.Cells[i].Style.BackgroundBrush = new PdfSolidBrush(new PdfColor(59, 130, 246));
 			headerRow.Cells[i].Style.TextBrush = PdfBrushes.White;
-			headerRow.Cells[i].Style.Font = new PdfStandardFont(PdfFontFamily.Helvetica, 8f, PdfFontStyle.Bold);
+			headerRow.Cells[i].Style.Font = new PdfStandardFont(PdfFontFamily.Helvetica, 7f, PdfFontStyle.Bold);
 			headerRow.Cells[i].Style.StringFormat = new PdfStringFormat
 			{
 				Alignment = PdfTextAlignment.Center,
 				LineAlignment = PdfVerticalAlignment.Middle,
 				WordWrap = PdfWordWrapType.Word
 			};
-			headerRow.Cells[i].Style.CellPadding = new PdfPaddings(1.5f, 1.5f, 1.5f, 1.5f);
+			headerRow.Cells[i].Style.CellPadding = new PdfPaddings(1f, 1f, 1f, 1f);
 		}
 
 		// Add data rows
@@ -574,32 +485,32 @@ public static class PDFInvoiceExportUtil
 			PdfGridRow row = pdfGrid.Rows.Add();
 
 			// Populate cells based on column settings
+			for (int i = 0; i < orderedColumnSettings.Count; i++)
+			{
+				var column = orderedColumnSettings[i];
+				string cellValue = GetCellValueDynamic(item, column, rowNumber);
+			row.Cells[i].Value = cellValue;
+
+			// Apply styling
+			row.Cells[i].Style.Font = new PdfStandardFont(PdfFontFamily.Helvetica, 7f);
+			row.Cells[i].Style.Borders.All = new PdfPen(new PdfColor(220, 220, 220), 0.5f);
+			row.Cells[i].Style.CellPadding = new PdfPaddings(1f, 1f, 1f, 1f);
+			row.Cells[i].Style.StringFormat = new PdfStringFormat
+			{
+				Alignment = column.Alignment,
+				LineAlignment = PdfVerticalAlignment.Middle,
+				WordWrap = PdfWordWrapType.Word
+			};
+		}
+
+		// Alternating row colors
+		if (rowNumber % 2 == 0)
+		{
 			for (int i = 0; i < columnSettings.Count; i++)
 			{
-				var column = columnSettings[i];
-				string cellValue = GetCellValue(item, column, rowNumber);
-				row.Cells[i].Value = cellValue;
-
-				// Apply styling
-				row.Cells[i].Style.Font = new PdfStandardFont(PdfFontFamily.Helvetica, 8.5f);
-				row.Cells[i].Style.Borders.All = new PdfPen(new PdfColor(220, 220, 220), 0.5f);
-				row.Cells[i].Style.CellPadding = new PdfPaddings(1.5f, 1.5f, 1.5f, 1.5f);
-				row.Cells[i].Style.StringFormat = new PdfStringFormat
-				{
-					Alignment = column.Alignment,
-					LineAlignment = PdfVerticalAlignment.Middle,
-					WordWrap = PdfWordWrapType.Word
-				};
+				row.Cells[i].Style.BackgroundBrush = new PdfSolidBrush(new PdfColor(249, 250, 251));
 			}
-
-			// Alternating row colors
-			if (rowNumber % 2 == 0)
-			{
-				for (int i = 0; i < columnSettings.Count; i++)
-				{
-					row.Cells[i].Style.BackgroundBrush = new PdfSolidBrush(new PdfColor(249, 250, 251));
-				}
-			}
+		}
 
 			rowNumber++;
 		}
@@ -614,72 +525,9 @@ public static class PDFInvoiceExportUtil
 	}
 
 	/// <summary>
-	/// Get invoice column settings based on whether items have discount/tax/UOM
-	/// </summary>
-	private static List<InvoiceColumnSetting> GetInvoiceColumnSettings(bool hasIdentificationNo, bool hasDiscount, bool hasTax, bool hasUOM, bool hasRate, bool hasTotal)
-	{
-		var settings = new List<InvoiceColumnSetting>
-		{
-			new("RowNumber", "#", 25, PdfTextAlignment.Center),
-			new("ItemName", "Item Description", 0, PdfTextAlignment.Left), // Width calculated dynamically
-			new("Quantity", "Qty", 40, PdfTextAlignment.Right, "#,##0.00")
-		};
-
-		if (hasIdentificationNo)
-			settings.Add(new("IdentificationNo", "Identification", 60, PdfTextAlignment.Center, null, true));
-
-		if (hasUOM)
-			settings.Add(new("UnitOfMeasurement", "UOM", 40, PdfTextAlignment.Center, null, true));
-
-		if (hasRate)
-			settings.Add(new("Rate", "Rate", 55, PdfTextAlignment.Right, "#,##0.00"));
-
-		if (hasDiscount)
-			settings.Add(new("DiscountPercent", "Disc %", 45, PdfTextAlignment.Right, "#,##0.00", true));
-
-		if (hasTax)
-		{
-			settings.Add(new("AfterDiscount", "Taxable", 60, PdfTextAlignment.Right, "#,##0.00"));
-			settings.Add(new("TotalTaxPercent", "Tax %", 45, PdfTextAlignment.Right, "#,##0.00", true));
-			settings.Add(new("TotalTaxAmount", "Tax Amt", 55, PdfTextAlignment.Right, "#,##0.00", true));
-		}
-
-		if (hasTotal)
-			settings.Add(new("Total", "Total", 65, PdfTextAlignment.Right, "#,##0.00"));
-
-		return settings;
-	}
-
-	/// <summary>
-	/// Get cell value based on column property name
-	/// </summary>
-	private static string GetCellValue(InvoiceLineItem item, InvoiceColumnSetting column, int rowNumber)
-	{
-		string value = column.PropertyName switch
-		{
-			"RowNumber" => rowNumber.ToString(),
-			"ItemName" => item.ItemName,
-			"IdentificationNo" => item.IdentificationNo ?? "-",
-			"Quantity" => item.Quantity.ToString(column.Format ?? "#,##0.00"),
-			"UnitOfMeasurement" => item.UnitOfMeasurement,
-			"Rate" => item.Rate.ToString(column.Format ?? "#,##0.00"),
-			"DiscountPercent" => item.DiscountPercent > 0 ? item.DiscountPercent.ToString(column.Format ?? "#,##0.00") : "-",
-			"AfterDiscount" => item.AfterDiscount.ToString(column.Format ?? "#,##0.00"),
-			"TotalTaxPercent" => (item.CGSTPercent + item.SGSTPercent + item.IGSTPercent) > 0
-				? (item.CGSTPercent + item.SGSTPercent + item.IGSTPercent).ToString(column.Format ?? "#,##0.00")
-				: "-",
-			"TotalTaxAmount" => item.TotalTaxAmount > 0 ? item.TotalTaxAmount.ToString(column.Format ?? "#,##0.00") : "-",
-			"Total" => item.Total.ToString(column.Format ?? "#,##0.00"),
-			_ => ""
-		};
-
-		return value;
-	}
-
-	/// <summary>
 	/// Draw invoice summary (subtotal, taxes, total) on the right and remarks on the left
 	/// </summary>
-	private static float DrawSummaryAndRemarks(PdfGraphics graphics, InvoiceData invoiceData, float leftMargin, float pageWidth, float startY)
+	private static float DrawSummaryAndRemarks(PdfGraphics graphics, InvoiceData invoiceData, Dictionary<string, string> summaryFields, float leftMargin, float pageWidth, float startY)
 	{
 		float summaryStartY = startY;
 		float remarksStartY = startY;
@@ -724,10 +572,6 @@ public static class PDFInvoiceExportUtil
 			if (remarksBoxHeight < 30)
 				remarksBoxHeight = 30;
 
-			// No border - removed for cleaner look
-			// PdfPen remarksBorderPen = new(new PdfColor(200, 200, 200), 0.5f);
-			// graphics.DrawRectangle(remarksBorderPen, new RectangleF(leftMargin, remarksStartY, remarksBoxWidth, remarksBoxHeight));
-
 			// Draw remarks text with padding (no box)
 			RectangleF remarksTextRect = new(leftMargin + 5, remarksStartY + 5, remarksBoxWidth - 10, remarksBoxHeight - 10);
 			DrawWrappedText(graphics, invoiceData.Remarks, remarksValueFont, remarksBrush, remarksTextRect);
@@ -736,61 +580,49 @@ public static class PDFInvoiceExportUtil
 		}
 
 		// ===== RIGHT SIDE: SUMMARY =====
-		// Subtotal
-		graphics.DrawString("Subtotal:", labelFont, labelBrush, new PointF(summaryColumnX, summaryStartY));
-		string subtotalText = invoiceData.ItemsTotalAmount.FormatIndianCurrency();
-		SizeF subtotalSize = valueFont.MeasureString(subtotalText);
-		graphics.DrawString(subtotalText, valueFont, valueBrush, new PointF(pageWidth - rightMargin - subtotalSize.Width, summaryStartY));
-		summaryStartY += 10;
-
-		// Other charges
-		if (invoiceData.OtherChargesAmount > 0)
+		// Use custom summary fields if provided, otherwise show just total
+		if (summaryFields != null && summaryFields.Count > 0)
 		{
-			string otherChargesLabel = invoiceData.OtherChargesPercent > 0
-				? $"Other Charges ({invoiceData.OtherChargesPercent:N2}%):"
-				: "Other Charges:";
-			graphics.DrawString(otherChargesLabel, labelFont, labelBrush, new PointF(summaryColumnX, summaryStartY));
-			string otherChargesText = invoiceData.OtherChargesAmount.FormatIndianCurrency();
-			SizeF otherChargesSize = valueFont.MeasureString(otherChargesText);
-			graphics.DrawString(otherChargesText, valueFont, valueBrush, new PointF(pageWidth - rightMargin - otherChargesSize.Width, summaryStartY));
-			summaryStartY += 10;
-		}
+			bool isLastField;
+			int fieldIndex = 0;
+			foreach (var field in summaryFields)
+			{
+				fieldIndex++;
+				isLastField = fieldIndex == summaryFields.Count;
 
-		// Cash Discount (if available)
-		if (invoiceData.CashDiscountAmount > 0)
+				// Draw line before last field (typically Grand Total)
+				if (isLastField && summaryFields.Count > 1)
+				{
+					PdfPen linePen = new(new PdfColor(59, 130, 246), 1f);
+					graphics.DrawLine(linePen, new PointF(summaryColumnX - 10, summaryStartY), new PointF(pageWidth - 20, summaryStartY));
+					summaryStartY += 4;
+				}
+
+				// Use bold font and blue color for last field (total)
+				var currentLabelFont = isLastField ? totalFont : labelFont;
+				var currentValueFont = isLastField ? totalFont : valueFont;
+				var currentBrush = isLastField ? new PdfSolidBrush(new PdfColor(59, 130, 246)) : valueBrush;
+
+				graphics.DrawString($"{field.Key}:", currentLabelFont, isLastField ? currentBrush : labelBrush, new PointF(summaryColumnX, summaryStartY));
+				SizeF valueSize = currentValueFont.MeasureString(field.Value);
+				graphics.DrawString(field.Value, currentValueFont, currentBrush, new PointF(pageWidth - rightMargin - valueSize.Width, summaryStartY));
+				summaryStartY += isLastField ? 15 : 10;
+			}
+		}
+		else
 		{
-			string cashDiscountLabel = invoiceData.CashDiscountPercent > 0
-				? $"Discount ({invoiceData.CashDiscountPercent:N2}%):"
-				: "Discount:";
-			graphics.DrawString(cashDiscountLabel, labelFont, labelBrush, new PointF(summaryColumnX, summaryStartY));
-			string cashDiscountText = $"- {invoiceData.CashDiscountAmount.FormatIndianCurrency()}";
-			SizeF cashDiscountSize = valueFont.MeasureString(cashDiscountText);
-			graphics.DrawString(cashDiscountText, valueFont, valueBrush, new PointF(pageWidth - rightMargin - cashDiscountSize.Width, summaryStartY));
-			summaryStartY += 10;
+			// Fallback: Just show total amount
+			PdfPen linePen = new(new PdfColor(59, 130, 246), 1f);
+			graphics.DrawLine(linePen, new PointF(summaryColumnX - 10, summaryStartY), new PointF(pageWidth - 20, summaryStartY));
+			summaryStartY += 4;
+
+			PdfBrush totalBrush = new PdfSolidBrush(new PdfColor(59, 130, 246));
+			graphics.DrawString("TOTAL:", totalFont, totalBrush, new PointF(summaryColumnX, summaryStartY));
+			string totalText = invoiceData.TotalAmount.FormatIndianCurrency();
+			SizeF totalSize = totalFont.MeasureString(totalText);
+			graphics.DrawString(totalText, totalFont, totalBrush, new PointF(pageWidth - rightMargin - totalSize.Width, summaryStartY));
+			summaryStartY += 15;
 		}
-
-		// Round off
-		if (invoiceData.RoundOffAmount != 0)
-		{
-			graphics.DrawString("Round Off:", labelFont, labelBrush, new PointF(summaryColumnX, summaryStartY));
-			string roundOffText = $"{(invoiceData.RoundOffAmount >= 0 ? "+" : "")} {invoiceData.RoundOffAmount.FormatIndianCurrency()}";
-			SizeF roundOffSize = valueFont.MeasureString(roundOffText);
-			graphics.DrawString(roundOffText, valueFont, valueBrush, new PointF(pageWidth - rightMargin - roundOffSize.Width, summaryStartY));
-			summaryStartY += 10;
-		}
-
-		// Draw line above total
-		PdfPen linePen = new(new PdfColor(59, 130, 246), 1f);
-		graphics.DrawLine(linePen, new PointF(summaryColumnX - 10, summaryStartY), new PointF(pageWidth - 20, summaryStartY));
-		summaryStartY += 4;
-
-		// Total Amount
-		PdfBrush totalBrush = new PdfSolidBrush(new PdfColor(59, 130, 246));
-		graphics.DrawString("TOTAL:", totalFont, totalBrush, new PointF(summaryColumnX, summaryStartY));
-		string totalText = invoiceData.TotalAmount.FormatIndianCurrency();
-		SizeF totalSize = totalFont.MeasureString(totalText);
-		graphics.DrawString(totalText, totalFont, totalBrush, new PointF(pageWidth - rightMargin - totalSize.Width, summaryStartY));
-		summaryStartY += 15;
 
 		// Return the maximum Y position of both columns
 		return Math.Max(remarksStartY, summaryStartY);
@@ -823,13 +655,12 @@ public static class PDFInvoiceExportUtil
 	}
 
 	/// <summary>
-	/// Draw payment methods breakdown
+	/// Draw payment methods breakdown from dictionary
 	/// </summary>
 	private static float DrawPaymentMethods(PdfGraphics graphics, InvoiceData invoiceData, float leftMargin, float pageWidth, float startY)
 	{
-		// Check if any payment method has value
-		bool hasPayments = invoiceData.Cash > 0 || invoiceData.Card > 0 || invoiceData.UPI > 0 || invoiceData.Credit > 0;
-		if (!hasPayments)
+		// Check if payment modes dictionary has any values
+		if (invoiceData.PaymentModes == null || !invoiceData.PaymentModes.Any(p => p.Value > 0))
 			return startY;
 
 		PdfStandardFont labelFont = new(PdfFontFamily.Helvetica, 8, PdfFontStyle.Bold);
@@ -848,31 +679,10 @@ public static class PDFInvoiceExportUtil
 		float methodX = rightColumnX + 10;
 		float amountX = rightColumnX + 80;
 
-		if (invoiceData.Cash > 0)
+		foreach (var paymentMode in invoiceData.PaymentModes.Where(p => p.Value > 0))
 		{
-			graphics.DrawString("Cash:", valueFont, labelBrush, new PointF(methodX, currentY));
-			graphics.DrawString(invoiceData.Cash.FormatIndianCurrency(), valueFont, valueBrush, new PointF(amountX, currentY));
-			currentY += 10;
-		}
-
-		if (invoiceData.Card > 0)
-		{
-			graphics.DrawString("Card:", valueFont, labelBrush, new PointF(methodX, currentY));
-			graphics.DrawString(invoiceData.Card.FormatIndianCurrency(), valueFont, valueBrush, new PointF(amountX, currentY));
-			currentY += 10;
-		}
-
-		if (invoiceData.UPI > 0)
-		{
-			graphics.DrawString("UPI:", valueFont, labelBrush, new PointF(methodX, currentY));
-			graphics.DrawString(invoiceData.UPI.FormatIndianCurrency(), valueFont, valueBrush, new PointF(amountX, currentY));
-			currentY += 10;
-		}
-
-		if (invoiceData.Credit > 0)
-		{
-			graphics.DrawString("Credit:", valueFont, labelBrush, new PointF(methodX, currentY));
-			graphics.DrawString(invoiceData.Credit.FormatIndianCurrency(), valueFont, valueBrush, new PointF(amountX, currentY));
+			graphics.DrawString($"{paymentMode.Key}:", valueFont, labelBrush, new PointF(methodX, currentY));
+			graphics.DrawString(paymentMode.Value.FormatIndianCurrency(), valueFont, valueBrush, new PointF(amountX, currentY));
 			currentY += 10;
 		}
 
@@ -975,264 +785,192 @@ public static class PDFInvoiceExportUtil
 		}
 	}
 
+	#endregion
+
+	#region Dynamic Column Detection
+
 	/// <summary>
-	/// Draw accounting line items table with Debit and Credit columns
+	/// Get default column settings based on type properties using reflection
 	/// </summary>
-	private static PdfGridLayoutResult DrawAccountingLineItemsTable(PdfPage page, PdfDocument document,
-		List<AccountingLineItem> accountingItems, float leftMargin, float rightMargin, float pageWidth, float startY)
+	private static List<InvoiceColumnSetting> GetDefaultInvoiceColumnSettings<T>()
 	{
-		PdfGrid pdfGrid = new();
+		var settings = new List<InvoiceColumnSetting>();
+		var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-		// Check if any item has reference number or remarks
-		bool hasReference = accountingItems.Any(i => !string.IsNullOrWhiteSpace(i.ReferenceNo));
-		bool hasRemarks = accountingItems.Any(i => !string.IsNullOrWhiteSpace(i.Remarks));
-
-		// Define columns: # | Ledger Account | Reference No | Debit | Credit | Remarks
-		int columnCount = 4; // # + Ledger + Debit + Credit (always present)
-		if (hasReference) columnCount++;
-		if (hasRemarks) columnCount++;
-
-		pdfGrid.Columns.Add(columnCount);
-
-		// Set column widths
-		float availableWidth = pageWidth - leftMargin - rightMargin;
-		int colIndex = 0;
-
-		pdfGrid.Columns[colIndex++].Width = 30; // #
-
-		float ledgerWidth = availableWidth - 30 - 80 - 80; // Remaining after # and Debit/Credit
-		if (hasReference) ledgerWidth -= 100; // Subtract reference column width
-		if (hasRemarks) ledgerWidth -= 120; // Subtract remarks column width
-
-		pdfGrid.Columns[colIndex++].Width = ledgerWidth; // Ledger Account
-
-		if (hasReference)
-			pdfGrid.Columns[colIndex++].Width = 100; // Reference No
-
-		pdfGrid.Columns[colIndex++].Width = 80; // Debit
-		pdfGrid.Columns[colIndex++].Width = 80; // Credit
-
-		if (hasRemarks)
-			pdfGrid.Columns[colIndex++].Width = 120; // Remarks
-
-		pdfGrid.Style.AllowHorizontalOverflow = false;
-		pdfGrid.RepeatHeader = true;
-		pdfGrid.AllowRowBreakAcrossPages = true;
-
-		// Add header row
-		PdfGridRow headerRow = pdfGrid.Headers.Add(1)[0];
-		colIndex = 0;
-
-		headerRow.Cells[colIndex++].Value = "#";
-		headerRow.Cells[colIndex++].Value = "Ledger Account";
-		if (hasReference)
-			headerRow.Cells[colIndex++].Value = "Reference No";
-		headerRow.Cells[colIndex++].Value = "Debit";
-		headerRow.Cells[colIndex++].Value = "Credit";
-		if (hasRemarks)
-			headerRow.Cells[colIndex++].Value = "Remarks";
-
-		// Style header row
-		for (int i = 0; i < headerRow.Cells.Count; i++)
+		foreach (var prop in properties)
 		{
-			headerRow.Cells[i].Style.BackgroundBrush = new PdfSolidBrush(new PdfColor(59, 130, 246));
-			headerRow.Cells[i].Style.TextBrush = PdfBrushes.White;
-			headerRow.Cells[i].Style.Font = new PdfStandardFont(PdfFontFamily.Helvetica, 8f, PdfFontStyle.Bold);
-			headerRow.Cells[i].Style.StringFormat = new PdfStringFormat
-			{
-				Alignment = i == 0 || i >= columnCount - 2 ? PdfTextAlignment.Center : PdfTextAlignment.Left,
-				LineAlignment = PdfVerticalAlignment.Middle,
-				WordWrap = PdfWordWrapType.Word
-			};
-			headerRow.Cells[i].Style.CellPadding = new PdfPaddings(2f, 2f, 2f, 2f);
-		}
+			string displayName = Regex.Replace(prop.Name, "(\\B[A-Z])", " $1");
+			float width = 50;
+			PdfTextAlignment alignment = PdfTextAlignment.Right;
+			string format = null;
 
-		// Add data rows
-		int rowNumber = 1;
-		foreach (var item in accountingItems)
-		{
-			PdfGridRow row = pdfGrid.Rows.Add();
-			colIndex = 0;
-
-			// Row number
-			row.Cells[colIndex].Value = rowNumber.ToString();
-			row.Cells[colIndex].Style.StringFormat = new PdfStringFormat
+			// Determine width and alignment based on property type and name
+			if (prop.PropertyType == typeof(string))
 			{
-				Alignment = PdfTextAlignment.Center,
-				LineAlignment = PdfVerticalAlignment.Middle
-			};
-			colIndex++;
-
-			// Ledger Account
-			row.Cells[colIndex].Value = item.LedgerName;
-			row.Cells[colIndex].Style.StringFormat = new PdfStringFormat
-			{
-				Alignment = PdfTextAlignment.Left,
-				LineAlignment = PdfVerticalAlignment.Middle,
-				WordWrap = PdfWordWrapType.Word
-			};
-			colIndex++;
-
-			// Reference No (if column exists)
-			if (hasReference)
-			{
-				row.Cells[colIndex].Value = item.ReferenceNo ?? "-";
-				row.Cells[colIndex].Style.StringFormat = new PdfStringFormat
+				// Name/Description columns get auto-width (0), others get smaller fixed width
+				if (prop.Name.Contains("name", StringComparison.CurrentCultureIgnoreCase) || prop.Name.Contains("description", StringComparison.CurrentCultureIgnoreCase))
 				{
-					Alignment = PdfTextAlignment.Left,
-					LineAlignment = PdfVerticalAlignment.Middle
-				};
-				colIndex++;
-			}
-
-			// Debit
-			row.Cells[colIndex].Value = (item.Debit ?? 0) > 0 ? (item.Debit ?? 0).ToString("#,##0.00") : "-";
-			row.Cells[colIndex].Style.StringFormat = new PdfStringFormat
-			{
-				Alignment = PdfTextAlignment.Right,
-				LineAlignment = PdfVerticalAlignment.Middle
-			};
-			colIndex++;
-
-			// Credit
-			row.Cells[colIndex].Value = (item.Credit ?? 0) > 0 ? (item.Credit ?? 0).ToString("#,##0.00") : "-";
-			row.Cells[colIndex].Style.StringFormat = new PdfStringFormat
-			{
-				Alignment = PdfTextAlignment.Right,
-				LineAlignment = PdfVerticalAlignment.Middle
-			};
-			colIndex++;
-
-			// Remarks (if column exists)
-			if (hasRemarks)
-			{
-				row.Cells[colIndex].Value = item.Remarks ?? "-";
-				row.Cells[colIndex].Style.StringFormat = new PdfStringFormat
-				{
-					Alignment = PdfTextAlignment.Left,
-					LineAlignment = PdfVerticalAlignment.Middle,
-					WordWrap = PdfWordWrapType.Word
-				};
-				colIndex++;
-			}
-
-			// Apply styling to all cells
-			for (int i = 0; i < row.Cells.Count; i++)
-			{
-				row.Cells[i].Style.Font = new PdfStandardFont(PdfFontFamily.Helvetica, 7.5f);
-				row.Cells[i].Style.Borders.All = new PdfPen(new PdfColor(220, 220, 220), 0.5f);
-				row.Cells[i].Style.CellPadding = new PdfPaddings(2f, 2f, 2f, 2f);
-			}
-
-			// Alternating row colors
-			if (rowNumber % 2 == 0)
-			{
-				for (int i = 0; i < row.Cells.Count; i++)
-				{
-					row.Cells[i].Style.BackgroundBrush = new PdfSolidBrush(new PdfColor(249, 250, 251));
+					width = 0; // Auto-width for description columns
 				}
+				else if (prop.Name.Contains("code", StringComparison.CurrentCultureIgnoreCase) || prop.Name.Contains("id", StringComparison.CurrentCultureIgnoreCase))
+				{
+					width = 50; // Compact for codes/IDs
+				}
+				else
+				{
+					width = 70; // Moderate width for other strings
+				}
+				alignment = PdfTextAlignment.Left;
+			}
+			else if (prop.PropertyType == typeof(decimal) || prop.PropertyType == typeof(decimal?))
+			{
+				// Smaller width for decimal columns to fit more
+				width = 50;
+				format = "#,##0.00";
+				alignment = PdfTextAlignment.Right;
+			}
+			else if (prop.PropertyType == typeof(int) || prop.PropertyType == typeof(int?))
+			{
+				width = 35;
+				alignment = PdfTextAlignment.Center;
+			}
+			else if (prop.PropertyType == typeof(DateTime) || prop.PropertyType == typeof(DateTime?))
+			{
+				width = 70;
+				alignment = PdfTextAlignment.Center;
+			}
+			else if (prop.PropertyType == typeof(DateOnly) || prop.PropertyType == typeof(DateOnly?))
+			{
+				width = 60;
+				alignment = PdfTextAlignment.Center;
 			}
 
-			rowNumber++;
+			settings.Add(new InvoiceColumnSetting(prop.Name, displayName, width, alignment, format));
 		}
 
-		// Draw grid
-		PdfLayoutResult result = pdfGrid.Draw(page, new PointF(leftMargin, startY), _layoutFormat);
-		return new PdfGridLayoutResult(result.Page, result.Bounds);
+		return settings;
 	}
 
 	/// <summary>
-	/// Draw accounting summary (Total Debit, Total Credit, Remarks)
+	/// Determine the effective column order
 	/// </summary>
-	private static float DrawAccountingSummary(PdfGraphics graphics, List<AccountingLineItem> accountingItems,
-		InvoiceData invoiceData, float leftMargin, float pageWidth, float startY)
+	private static List<string> DetermineColumnOrder<T>(
+		List<InvoiceColumnSetting> columnSettings,
+		List<string> columnOrder)
 	{
-		float currentY = startY;
-		float summaryStartY = startY;
-		float remarksStartY = startY;
+		if (columnOrder != null && columnOrder.Count > 0)
+			return columnOrder;
 
-		// Calculate totals
-		decimal totalDebit = accountingItems.Sum(i => i.Debit ?? 0);
-		decimal totalCredit = accountingItems.Sum(i => i.Credit ?? 0);
+		// Use column order from settings if available
+		if (columnSettings != null && columnSettings.Count > 0)
+			return [.. columnSettings.Select(c => c.PropertyName)];
 
-		// Define column boundaries
-		float remarksColumnWidth = pageWidth - 240; // Left side for remarks
-		float summaryColumnX = pageWidth - 200; // Right side for summary
-		float rightMargin = 20;
+		// Use all properties if no order specified
+		var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+		return [.. properties.Select(p => p.Name)];
+	}
 
-		PdfStandardFont labelFont = new(PdfFontFamily.Helvetica, 8, PdfFontStyle.Regular);
-		PdfStandardFont valueFont = new(PdfFontFamily.Helvetica, 8, PdfFontStyle.Regular);
-		PdfStandardFont totalFont = new(PdfFontFamily.Helvetica, 10, PdfFontStyle.Bold);
-		PdfBrush labelBrush = new PdfSolidBrush(new PdfColor(80, 80, 80));
-		PdfBrush valueBrush = new PdfSolidBrush(new PdfColor(0, 0, 0));
+	/// <summary>
+	/// Filter out columns that have all null or zero values
+	/// </summary>
+	private static List<string> FilterEmptyColumns<T>(
+		List<T> data,
+		List<string> columnOrder,
+		List<InvoiceColumnSetting> columnSettings = null)
+	{
+		if (data == null || data.Count == 0)
+			return columnOrder;
 
-		// ===== LEFT SIDE: REMARKS =====
-		if (!string.IsNullOrWhiteSpace(invoiceData.Remarks))
+		var filteredColumns = new List<string>();
+
+		foreach (var columnName in columnOrder)
 		{
-			PdfStandardFont remarksLabelFont = new(PdfFontFamily.Helvetica, 8, PdfFontStyle.Bold);
-			PdfStandardFont remarksValueFont = new(PdfFontFamily.Helvetica, 8, PdfFontStyle.Regular);
-			PdfBrush remarksBrush = new PdfSolidBrush(new PdfColor(60, 60, 60));
-
-			graphics.DrawString("Remarks:", remarksLabelFont, new PdfSolidBrush(new PdfColor(0, 0, 0)), new PointF(leftMargin, remarksStartY));
-			remarksStartY += 12;
-
-			float remarksBoxWidth = remarksColumnWidth - 30;
-			float textWidth = remarksBoxWidth - 10;
-
-			PdfStringFormat format = new()
+			var propInfo = typeof(T).GetProperty(columnName);
+			if (propInfo == null)
 			{
-				LineAlignment = PdfVerticalAlignment.Top,
-				Alignment = PdfTextAlignment.Left,
-				WordWrap = PdfWordWrapType.Word
-			};
+				filteredColumns.Add(columnName);
+				continue;
+			}
 
-			SizeF textSize = remarksValueFont.MeasureString(invoiceData.Remarks, textWidth, format);
-			float remarksBoxHeight = textSize.Height + 10;
+			// Check if column is marked to show only if has value
+			var setting = columnSettings?.FirstOrDefault(c => c.PropertyName == columnName);
+			if (setting != null && !setting.ShowOnlyIfHasValue)
+			{
+				filteredColumns.Add(columnName);
+				continue;
+			}
 
-			if (remarksBoxHeight < 30)
-				remarksBoxHeight = 30;
+			bool hasNonEmptyValue = false;
 
-			RectangleF remarksTextRect = new(leftMargin + 5, remarksStartY + 5, remarksBoxWidth - 10, remarksBoxHeight - 10);
-			DrawWrappedText(graphics, invoiceData.Remarks, remarksValueFont, remarksBrush, remarksTextRect);
+			foreach (var item in data)
+			{
+				var value = propInfo.GetValue(item);
 
-			remarksStartY += remarksBoxHeight + 5;
+				if (value != null)
+				{
+					if (value is decimal decValue && decValue != 0)
+					{
+						hasNonEmptyValue = true;
+						break;
+					}
+					else if (value is int intValue && intValue != 0)
+					{
+						hasNonEmptyValue = true;
+						break;
+					}
+					else if (value is double dblValue && dblValue != 0)
+					{
+						hasNonEmptyValue = true;
+						break;
+					}
+					else if (value is string strValue && !string.IsNullOrWhiteSpace(strValue))
+					{
+						hasNonEmptyValue = true;
+						break;
+					}
+					else if (!(value is decimal || value is int || value is double))
+					{
+						hasNonEmptyValue = true;
+						break;
+					}
+				}
+			}
+
+			if (hasNonEmptyValue)
+				filteredColumns.Add(columnName);
 		}
 
-		// ===== RIGHT SIDE: TOTALS =====
-		// Total Debit
-		graphics.DrawString("Total Debit:", labelFont, labelBrush, new PointF(summaryColumnX, summaryStartY));
-		string totalDebitText = totalDebit.FormatIndianCurrency();
-		SizeF debitSize = valueFont.MeasureString(totalDebitText);
-		graphics.DrawString(totalDebitText, valueFont, valueBrush, new PointF(pageWidth - rightMargin - debitSize.Width, summaryStartY));
-		summaryStartY += 10;
+		return filteredColumns;
+	}
 
-		// Total Credit
-		graphics.DrawString("Total Credit:", labelFont, labelBrush, new PointF(summaryColumnX, summaryStartY));
-		string totalCreditText = totalCredit.FormatIndianCurrency();
-		SizeF creditSize = valueFont.MeasureString(totalCreditText);
-		graphics.DrawString(totalCreditText, valueFont, valueBrush, new PointF(pageWidth - rightMargin - creditSize.Width, summaryStartY));
-		summaryStartY += 10;
+	/// <summary>
+	/// Get cell value using reflection
+	/// </summary>
+	private static string GetCellValueDynamic<T>(T item, InvoiceColumnSetting column, int rowNumber = 0)
+	{
+		// Special handling for row number column
+		if (column.PropertyName == "#" || column.PropertyName == "RowNumber")
+			return rowNumber.ToString();
 
-		// Draw line above difference
-		PdfPen linePen = new(new PdfColor(59, 130, 246), 1f);
-		graphics.DrawLine(linePen, new PointF(summaryColumnX - 10, summaryStartY), new PointF(pageWidth - 20, summaryStartY));
-		summaryStartY += 4;
+		var propInfo = typeof(T).GetProperty(column.PropertyName);
+		if (propInfo == null)
+			return "-";
 
-		// Difference (should be 0 for balanced vouchers)
-		decimal difference = totalDebit - totalCredit;
-		PdfBrush diffBrush = difference == 0
-			? new PdfSolidBrush(new PdfColor(16, 185, 129)) // Green if balanced
-			: new PdfSolidBrush(new PdfColor(220, 38, 38)); // Red if unbalanced
+		var value = propInfo.GetValue(item);
+		if (value == null)
+			return "-";
 
-		graphics.DrawString("Difference:", totalFont, diffBrush, new PointF(summaryColumnX, summaryStartY));
-		string differenceText = difference.FormatIndianCurrency();
-		SizeF diffSize = totalFont.MeasureString(differenceText);
-		graphics.DrawString(differenceText, totalFont, diffBrush, new PointF(pageWidth - rightMargin - diffSize.Width, summaryStartY));
-		summaryStartY += 15;
-
-		// Return the maximum Y position of both columns
-		currentY = Math.Max(remarksStartY, summaryStartY);
-		return currentY;
+		// Format based on type
+		if (value is decimal decValue)
+			return decValue.ToString(column.Format ?? "#,##0.00");
+		else if (value is double dblValue)
+			return dblValue.ToString(column.Format ?? "#,##0.00");
+		else if (value is DateTime dtValue)
+			return dtValue.ToString(column.Format ?? "dd-MMM-yyyy");
+		else if (value is DateOnly doValue)
+			return doValue.ToString(column.Format ?? "dd-MMM-yyyy");
+		else
+			return value.ToString();
 	}
 
 	#endregion

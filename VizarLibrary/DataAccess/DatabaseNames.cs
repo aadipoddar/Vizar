@@ -15,19 +15,27 @@ public static class TableNames
 
 	public static string Accounting => "Accounting";
 	public static string AccountingDetail => "AccountingDetail";
-
-	public static string Purchase => "Purchase";
-	public static string PurchaseDetail => "PurchaseDetail";
-	public static string PurchaseReturn => "PurchaseReturn";
-	public static string PurchaseReturnDetail => "PurchaseReturnDetail";
-
-	public static string ItemStock => "ItemStock";
 	
 	public static string Item => "Item";
 	public static string ItemCategory => "ItemCategory";
 	public static string ItemType => "ItemType";
 	public static string Manufacturer => "Manufacturer";
 	public static string Tax => "Tax";
+	public static string ItemStock => "ItemStock";
+
+	public static string Purchase => "Purchase";
+	public static string PurchaseDetail => "PurchaseDetail";
+	public static string PurchaseReturn => "PurchaseReturn";
+	public static string PurchaseReturnDetail => "PurchaseReturnDetail";
+	
+	public static string ItemIssue => "ItemIssue";
+	public static string ItemIssueDetail => "ItemIssueDetail";
+
+	public static string Vehicle => "Vehicle";
+	public static string VehicleModel => "VehicleModel";
+	public static string VehicleType => "VehicleType";
+	
+	public static string Garage => "Garage";
 }
 
 public static class StoredProcedureNames
@@ -77,6 +85,9 @@ public static class StoredProcedureNames
 	public static string InsertPurchaseDetail => "Insert_PurchaseDetail";
 	public static string InsertPurchaseReturn => "Insert_PurchaseReturn";
 	public static string InsertPurchaseReturnDetail => "Insert_PurchaseReturnDetail";
+	
+	public static string InsertItemIssue => "Insert_ItemIssue";
+	public static string InsertItemIssueDetail => "Insert_ItemIssueDetail";
 
 	public static string DeleteItemStockById => "Delete_ItemStock_By_Id";
 	public static string DeleteItemStockByTypeTransactionId => "Delete_ItemStock_By_Type_TransactionId";
@@ -93,4 +104,7 @@ public static class ViewNames
 	public static string PurchaseItemOverview => "Purchase_Item_Overview";
 	public static string PurchaseReturnOverview => "PurchaseReturn_Overview";
 	public static string PurchaseReturnItemOverview => "PurchaseReturn_Item_Overview";
+
+	public static string ItemIssueOverview => "ItemIssue_Overview";
+	public static string ItemIssueItemOverview => "ItemIssue_Item_Overview";
 }

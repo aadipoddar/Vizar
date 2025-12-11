@@ -13,7 +13,8 @@ public static class PageRouteNames
 	public static string InventoryDashboard => "/inventory";
 	public static string Purchase => "/inventory/purchase";
 	public static string PurchaseReturn => "/inventory/purchase-return";
-	public static string ProductStockAdjustment => "/inventory/item-stock-adjustment";
+	public static string ItemIssue => "/inventory/item-issue";
+	public static string ItemStockAdjustment => "/inventory/item-stock-adjustment";
 
 	public static string ReportDashboard => "/report";
 	public static string ReportFinancialAccounting => "/report/financial-accounting";
@@ -23,9 +24,11 @@ public static class PageRouteNames
 	public static string ReportPurchaseReturn => "/report/purchase-return";
 	public static string ReportPurchaseItem => "/report/purchase-item";
 	public static string ReportPurchaseReturnItem => "/report/purchase-return-item";
+	public static string ReportItemIssue => "/report/item-issue";
+	public static string ReportItemIssueItem => "/report/item-issue-item";
+	public static string ReportItemStock => "/report/item-stock";
 
 	public static string AdminDashboard => "/admin";
-	public static string AdminItem => "/admin/item";
 	public static string AdminUser => "/admin/user";
 	public static string AdminTax => "/admin/tax";
 	public static string AdminCompany => "/admin/company";
@@ -36,4 +39,9 @@ public static class PageRouteNames
 	public static string AdminFinancialYear => "/admin/financial-year";
 	public static string AdminStateUT => "/admin/state-ut";
 	public static string AdminSettings => "/admin/settings";
+	public static string AdminItem => "/admin/item";
+	public static string AdminItemCategory => "/admin/item-category";
+	public static string AdminItemType => "/admin/item-type";
+	public static string AdminGarage => "/admin/garage";
+	public static string AdminVehicle => "/admin/vehicle";
 }

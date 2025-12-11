@@ -17,6 +17,7 @@ public enum StockType
 {
 	Purchase,
 	PurchaseReturn,
+	ItemIssue,
 	Adjustment
 }
 
