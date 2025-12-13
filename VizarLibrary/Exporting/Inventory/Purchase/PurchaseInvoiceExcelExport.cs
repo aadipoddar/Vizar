@@ -13,98 +13,104 @@ namespace VizarLibrary.Exporting.Inventory.Purchase;
 /// </summary>
 public static class PurchaseInvoiceExcelExport
 {
-	/// <summary>
-	/// Export Purchase as a professional invoice Excel (automatically loads item names)
-	/// </summary>
-	/// <param name="purchaseHeader">Purchase header data</param>
-	/// <param name="purchaseDetails">Purchase detail line items</param>
-	/// <param name="company">Company information</param>
-	/// <param name="party">Party/Supplier information</param>
-	/// <param name="logoPath">Optional: Path to company logo</param>
-	/// <param name="invoiceType">Type of document (PURCHASE INVOICE, PURCHASE ORDER, etc.)</param>
-	/// <returns>MemoryStream containing the Excel file</returns>
-	public static async Task<MemoryStream> ExportPurchaseInvoice(
-		PurchaseModel purchaseHeader,
-		List<PurchaseDetailModel> purchaseDetails,
-		CompanyModel company,
-		LedgerModel party,
-		string logoPath = null,
-		string invoiceType = "PURCHASE INVOICE")
-	{
-		// Load all items to get names
-		var allItems = await CommonData.LoadTableData<ItemModel>(TableNames.Item);
+    /// <summary>
+    /// Export Purchase as a professional invoice Excel (automatically loads item names)
+    /// </summary>
+    /// <param name="transactionId">Transaction ID</param>
+    /// <returns>MemoryStream containing the Excel file</returns>
+    public static async Task<(MemoryStream stream, string fileName)> ExportInvoice(int transactionId)
+    {
+        // Load saved purchase details (since _purchase now has the Id)
+        var transaction = await CommonData.LoadTableDataById<PurchaseModel>(TableNames.Purchase, transactionId) ??
+            throw new InvalidOperationException("Transaction not found.");
 
-		// Map to cart items with actual item names
-		var cartItems = purchaseDetails.Select(detail =>
-		{
-			var item = allItems.FirstOrDefault(i => i.Id == detail.ItemId);
-			string itemName = item?.Name ?? $"Item #{detail.ItemId}";
+        // Load purchase details from database
+        var transactionDetails = await CommonData.LoadTableDataByMasterId<PurchaseDetailModel>(TableNames.PurchaseDetail, transaction.Id);
+        if (transactionDetails is null || transactionDetails.Count == 0)
+            throw new InvalidOperationException("No transaction details found for the transaction.");
 
-			return new PurchaseItemCartModel
-			{
-				ItemId = detail.ItemId,
-				ItemName = itemName,
-				IdentificationNo = detail.IdentificationNo,
-				Quantity = detail.Quantity,
-				UnitOfMeasurement = detail.UnitOfMeasurement,
-				Rate = detail.Rate,
-				DiscountPercent = detail.DiscountPercent,
-				AfterDiscount = detail.AfterDiscount,
-				CGSTPercent = detail.InclusiveTax ? 0 : detail.CGSTPercent,
-				SGSTPercent = detail.InclusiveTax ? 0 : detail.SGSTPercent,
-				IGSTPercent = detail.InclusiveTax ? 0 : detail.IGSTPercent,
-				TotalTaxAmount = detail.InclusiveTax ? 0 : detail.TotalTaxAmount,
-				Total = detail.Total
-			};
-		}).ToList();
+        // Load company and party information
+        var company = await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId);
+        var party = await CommonData.LoadTableDataById<LedgerModel>(TableNames.Ledger, transaction.PartyId);
+        if (company is null || party is null)
+            throw new InvalidOperationException("Company or party information is missing.");
 
-		// Map invoice header data with payment modes dictionary
-		var invoiceData = new ExcelInvoiceExportUtil.InvoiceData
-		{
-			TransactionNo = purchaseHeader.TransactionNo,
-			TransactionDateTime = purchaseHeader.TransactionDateTime,
-			TotalAmount = purchaseHeader.TotalAmount,
-			Remarks = purchaseHeader.Remarks,
-			Status = purchaseHeader.Status,
-			PaymentModes = null // Purchase invoices typically don't show payment breakdown
-		};
+        // Load all items to get names
+        var allItems = await CommonData.LoadTableData<ItemModel>(TableNames.Item);
 
-		// Define custom summary fields for purchase invoice
-		var summaryFields = new Dictionary<string, string>
-		{
-			["Items Total"] = purchaseHeader.TotalAfterTax.FormatIndianCurrency(),
-			["Other Charges"] = $"({purchaseHeader.OtherChargesPercent:0.00}%) {purchaseHeader.OtherChargesAmount.FormatIndianCurrency()}",
-			["Cash Discount"] = $"({purchaseHeader.CashDiscountPercent:0.00}%) -{purchaseHeader.CashDiscountAmount.FormatIndianCurrency()}",
-			["Round Off"] = purchaseHeader.RoundOffAmount.FormatIndianCurrency(),
-			["Grand Total"] = purchaseHeader.TotalAmount.FormatIndianCurrency()
-		};
+        // Map to cart items with actual item names
+        var cartItems = transactionDetails.Select(detail =>
+        {
+            var item = allItems.FirstOrDefault(i => i.Id == detail.ItemId);
+            return new PurchaseItemCartModel
+            {
+                ItemId = detail.ItemId,
+                ItemName = item?.Name ?? $"Item #{detail.ItemId}",
+                IdentificationNo = detail.IdentificationNo,
+                Quantity = detail.Quantity,
+                UnitOfMeasurement = detail.UnitOfMeasurement,
+                Rate = detail.Rate,
+                DiscountPercent = detail.DiscountPercent,
+                AfterDiscount = detail.AfterDiscount,
+                CGSTPercent = detail.InclusiveTax ? 0 : detail.CGSTPercent,
+                SGSTPercent = detail.InclusiveTax ? 0 : detail.SGSTPercent,
+                IGSTPercent = detail.InclusiveTax ? 0 : detail.IGSTPercent,
+                TotalTaxAmount = detail.InclusiveTax ? 0 : detail.TotalTaxAmount,
+                Total = detail.Total
+            };
+        }).ToList();
 
-		// Define column settings with # column first
-		var columnSettings = new List<ExcelInvoiceExportUtil.InvoiceColumnSetting>
-		{
-			new("#", "#", 5, Syncfusion.XlsIO.ExcelHAlign.HAlignCenter),
-			new(nameof(PurchaseItemCartModel.ItemName), "Item", 30, Syncfusion.XlsIO.ExcelHAlign.HAlignLeft),
-			new(nameof(PurchaseItemCartModel.IdentificationNo), "Identification", 15, Syncfusion.XlsIO.ExcelHAlign.HAlignLeft),
-			new(nameof(PurchaseItemCartModel.UnitOfMeasurement), "UOM", 8, Syncfusion.XlsIO.ExcelHAlign.HAlignCenter),
-			new(nameof(PurchaseItemCartModel.Quantity), "Qty", 10, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
-			new(nameof(PurchaseItemCartModel.Rate), "Rate", 12, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
-			new(nameof(PurchaseItemCartModel.DiscountPercent), "Disc %", 8, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
-			new(nameof(PurchaseItemCartModel.AfterDiscount), "Taxable", 12, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
-			new(nameof(PurchaseItemCartModel.TotalTaxAmount), "Tax Amt", 12, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
-			new(nameof(PurchaseItemCartModel.Total), "Total", 15, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00")
-		};
+        // Map invoice header data with payment modes dictionary
+        var invoiceData = new ExcelInvoiceExportUtil.InvoiceData
+        {
+            TransactionNo = transaction.TransactionNo,
+            TransactionDateTime = transaction.TransactionDateTime,
+            TotalAmount = transaction.TotalAmount,
+            Remarks = transaction.Remarks,
+            Status = transaction.Status,
+            PaymentModes = null
+        };
 
-		// Generate invoice Excel with generic method
-		return await ExcelInvoiceExportUtil.ExportInvoiceToExcel(
-			invoiceData,
-			cartItems,
-			company,
-			party,
-			logoPath,
-			invoiceType,
-			columnSettings,
-			null,
-			summaryFields
-		);
-	}
+        // Define custom summary fields
+        var summaryFields = new Dictionary<string, string>
+        {
+            ["Items Total"] = transaction.TotalAfterTax.FormatIndianCurrency(),
+            ["Other Charges"] = $"({transaction.OtherChargesPercent:0.00}%) {transaction.OtherChargesAmount.FormatIndianCurrency()}",
+            ["Cash Discount"] = $"({transaction.CashDiscountPercent:0.00}%) -{transaction.CashDiscountAmount.FormatIndianCurrency()}",
+            ["Round Off"] = transaction.RoundOffAmount.FormatIndianCurrency(),
+            ["Grand Total"] = transaction.TotalAmount.FormatIndianCurrency()
+        };
+
+        // Define column settings with # column first
+        var columnSettings = new List<ExcelInvoiceExportUtil.InvoiceColumnSetting>
+        {
+            new("#", "#", 5, Syncfusion.XlsIO.ExcelHAlign.HAlignCenter),
+            new(nameof(PurchaseItemCartModel.ItemName), "Item", 30, Syncfusion.XlsIO.ExcelHAlign.HAlignLeft),
+            new(nameof(PurchaseItemCartModel.IdentificationNo), "Identification", 15, Syncfusion.XlsIO.ExcelHAlign.HAlignLeft),
+            new(nameof(PurchaseItemCartModel.UnitOfMeasurement), "UOM", 8, Syncfusion.XlsIO.ExcelHAlign.HAlignCenter),
+            new(nameof(PurchaseItemCartModel.Quantity), "Qty", 10, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
+            new(nameof(PurchaseItemCartModel.Rate), "Rate", 12, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
+            new(nameof(PurchaseItemCartModel.DiscountPercent), "Disc %", 8, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
+            new(nameof(PurchaseItemCartModel.AfterDiscount), "Taxable", 12, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
+            new(nameof(PurchaseItemCartModel.TotalTaxAmount), "Tax Amt", 12, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00"),
+            new(nameof(PurchaseItemCartModel.Total), "Total", 15, Syncfusion.XlsIO.ExcelHAlign.HAlignRight, "#,##0.00")
+        };
+
+        // Generate invoice Excel with generic method
+        var stream = await ExcelInvoiceExportUtil.ExportInvoiceToExcel(
+            invoiceData,
+            cartItems,
+            company,
+            party,
+            "PURCHASE INVOICE",
+            columnSettings,
+            null,
+            summaryFields
+        );
+
+        // Generate file name
+        var currentDateTime = await CommonData.LoadCurrentDateTime();
+        string fileName = $"PURCHASE_INVOICE_{transaction.TransactionNo}_{currentDateTime:yyyyMMdd_HHmmss}.xlsx";
+        return (stream, fileName);
+    }
 }

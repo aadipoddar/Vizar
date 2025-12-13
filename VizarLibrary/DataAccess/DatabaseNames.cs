@@ -106,5 +106,6 @@ public static class ViewNames
 	public static string PurchaseReturnItemOverview => "PurchaseReturn_Item_Overview";
 
 	public static string ItemIssueOverview => "ItemIssue_Overview";
-	public static string ItemIssueItemOverview => "ItemIssue_Item_Overview";
+	public static string GarageIssueItemOverview => "GarageIssue_Item_Overview";
+	public static string VehicleIssueItemOverview => "VehicleIssue_Item_Overview";
 }

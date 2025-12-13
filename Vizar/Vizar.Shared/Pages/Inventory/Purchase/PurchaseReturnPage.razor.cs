@@ -13,6 +13,7 @@ using VizarLibrary.Data.Accounts.Masters;
 using VizarLibrary.Data.Common;
 using VizarLibrary.Data.Inventory.Purchase;
 using VizarLibrary.DataAccess;
+using VizarLibrary.Exporting.Inventory.Purchase;
 using VizarLibrary.Models.Accounts.Masters;
 using VizarLibrary.Models.Common;
 using VizarLibrary.Models.Inventory.Item;
@@ -79,8 +80,8 @@ public partial class PurchaseReturnPage : IAsyncDisposable
             .Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
             .Add(ModCode.Ctrl, Code.D, NavigateToDashboard, "Go to dashboard", Exclude.None)
             .Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
-			.Add(ModCode.Ctrl, Code.L, Logout, "Logout", Exclude.None)
-			.Add(Code.Delete, RemoveSelectedCartItem, "Delete selected cart item", Exclude.None)
+            .Add(ModCode.Ctrl, Code.L, Logout, "Logout", Exclude.None)
+            .Add(Code.Delete, RemoveSelectedCartItem, "Delete selected cart item", Exclude.None)
             .Add(Code.Insert, EditSelectedCartItem, "Edit selected cart item", Exclude.None);
 
         await LoadCompanies();
@@ -649,10 +650,10 @@ public partial class PurchaseReturnPage : IAsyncDisposable
             if (string.IsNullOrWhiteSpace(item.Remarks))
                 item.Remarks = null;
 
-			item.IdentificationNo = item.IdentificationNo?.Trim();
-			if (string.IsNullOrWhiteSpace(item.IdentificationNo))
-				item.IdentificationNo = null;
-		}
+            item.IdentificationNo = item.IdentificationNo?.Trim();
+            if (string.IsNullOrWhiteSpace(item.IdentificationNo))
+                item.IdentificationNo = null;
+        }
 
         _purchaseReturn.TotalItems = _cart.Count;
         _purchaseReturn.TotalQuantity = _cart.Sum(x => x.Quantity);
@@ -828,7 +829,7 @@ public partial class PurchaseReturnPage : IAsyncDisposable
         {
             _isProcessing = true;
 
-			await SaveTransactionFile(true);
+            await SaveTransactionFile(true);
 
             if (!await ValidateForm())
             {
@@ -836,7 +837,7 @@ public partial class PurchaseReturnPage : IAsyncDisposable
                 return;
             }
 
-			await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
             _purchaseReturn.Status = true;
             var currentDateTime = await CommonData.LoadCurrentDateTime();
@@ -848,7 +849,7 @@ public partial class PurchaseReturnPage : IAsyncDisposable
             _purchaseReturn.LastModifiedBy = _user.Id;
 
             _purchaseReturn.Id = await PurchaseReturnData.SavePurchaseReturnTransaction(_purchaseReturn, _cart);
-            var (pdfStream, fileName) = await PurchaseReturnData.GenerateAndDownloadInvoice(_purchaseReturn.Id);
+            var (pdfStream, fileName) = await PurchaseReturnInvoicePDFExport.ExportInvoice(_purchaseReturn.Id);
             await SaveAndViewService.SaveAndView(fileName, pdfStream);
             await DeleteLocalFiles();
             NavigationManager.NavigateTo(PageRouteNames.PurchaseReturn, true);
@@ -979,7 +980,7 @@ public partial class PurchaseReturnPage : IAsyncDisposable
             _isProcessing = true;
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Generating PDF invoice...", ToastType.Info);
-            var (pdfStream, fileName) = await PurchaseReturnData.GenerateAndDownloadInvoice(Id.Value);
+            var (pdfStream, fileName) = await PurchaseReturnInvoicePDFExport.ExportInvoice(Id.Value);
             await SaveAndViewService.SaveAndView(fileName, pdfStream);
             await _toastNotification.ShowAsync("Invoice Downloaded", "The PDF invoice has been downloaded successfully.", ToastType.Success);
         }
@@ -1009,7 +1010,7 @@ public partial class PurchaseReturnPage : IAsyncDisposable
             _isProcessing = true;
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Generating Excel invoice...", ToastType.Info);
-            var (excelStream, fileName) = await PurchaseReturnData.GenerateAndDownloadExcelInvoice(Id.Value);
+            var (excelStream, fileName) = await PurchaseReturnInvoiceExcelExport.ExportInvoice(Id.Value);
             await SaveAndViewService.SaveAndView(fileName, excelStream);
             await _toastNotification.ShowAsync("Invoice Downloaded", "The Excel invoice has been downloaded successfully.", ToastType.Success);
         }
@@ -1045,21 +1046,21 @@ public partial class PurchaseReturnPage : IAsyncDisposable
             NavigationManager.NavigateTo(PageRouteNames.ReportPurchaseReturnItem);
     }
 
-    private async Task NavigateToDashboard() =>
+    private void NavigateToDashboard() =>
         NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 
     private async Task NavigateBack() =>
         NavigationManager.NavigateTo(PageRouteNames.InventoryDashboard);
 
-	private async Task Logout() =>
-		await AuthenticationService.Logout(DataStorageService, NavigationManager, VibrationService);
+    private async Task Logout() =>
+        await AuthenticationService.Logout(DataStorageService, NavigationManager, VibrationService);
 
-	public async ValueTask DisposeAsync()
-	{
-		if (_hotKeysContext is not null)
-			await _hotKeysContext.DisposeAsync();
+    public async ValueTask DisposeAsync()
+    {
+        if (_hotKeysContext is not null)
+            await _hotKeysContext.DisposeAsync();
 
-		GC.SuppressFinalize(this);
-	}
-	#endregion
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }

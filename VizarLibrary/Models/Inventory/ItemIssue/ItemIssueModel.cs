@@ -85,13 +85,13 @@ public class ItemIssueOverviewModel
     public bool Status { get; set; }
 }
 
-public class ItemIssueItemOverviewModel
+public class GarageIssueItemOverviewModel
 {
 	public int Id { get; set; }
 	public string ItemName { get; set; }
 	public string ItemCode { get; set; }
-	public int ItemItemId { get; set; }
-	public string ItemItemName { get; set; }
+	public int ItemTypeId { get; set; }
+	public string ItemTypeName { get; set; }
 	public int ItemCategoryId { get; set; }
 	public string ItemCategoryName { get; set; }
 	public int ManufacturerId { get; set; }
@@ -102,22 +102,52 @@ public class ItemIssueItemOverviewModel
     public DateTime TransactionDateTime { get; set; }
     public int CompanyId { get; set; }
     public string CompanyName { get; set; }
-    public string? ItemIssueRemarks { get; set; }
-
-    public int? VehicleId { get; set; }
-    public string? VehicleCode { get; set; }
-    public string? VehicleShortCode { get; set; }
-    public decimal? CurrentHour { get; set; }
-    public decimal? CurrentKM { get; set; }
-	public string? IdentificationNo { get; set; }
+	public int GarageId { get; set; }
+	public string GarageName { get; set; }
+	public string? ItemIssueRemarks { get; set; }
+	
+    public string? IdentificationNo { get; set; }
 	public string UnitOfMeasurement { get; set; }
 	public decimal Quantity { get; set; }
     public decimal Rate { get; set; }
     public decimal Total { get; set; }
 
     public string? Remarks { get; set; }
+}
 
-    public decimal? PreviousHour { get; set; }
-    public decimal? PreviousKM { get; set; }
-    public decimal? Average { get; set; }
+public class VehicleIssueItemOverviewModel
+{
+	public int Id { get; set; }
+	public string ItemName { get; set; }
+	public string ItemCode { get; set; }
+	public int ItemTypeId { get; set; }
+	public string ItemTypeName { get; set; }
+	public int ItemCategoryId { get; set; }
+	public string ItemCategoryName { get; set; }
+	public int ManufacturerId { get; set; }
+	public string ManufacturerName { get; set; }
+
+	public int MasterId { get; set; }
+	public string TransactionNo { get; set; }
+	public DateTime TransactionDateTime { get; set; }
+	public int CompanyId { get; set; }
+	public string CompanyName { get; set; }
+	public string? ItemIssueRemarks { get; set; }
+
+	public int VehicleId { get; set; }
+	public string VehicleCode { get; set; }
+	public string VehicleShortCode { get; set; }
+	public decimal? CurrentHour { get; set; }
+	public decimal? CurrentKM { get; set; }
+	public string? IdentificationNo { get; set; }
+	public string UnitOfMeasurement { get; set; }
+	public decimal Quantity { get; set; }
+	public decimal Rate { get; set; }
+	public decimal Total { get; set; }
+
+	public string? Remarks { get; set; }
+
+	public decimal? PreviousHour { get; set; }
+	public decimal? PreviousKM { get; set; }
+	public decimal? Average { get; set; }
 }

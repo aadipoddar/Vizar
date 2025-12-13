@@ -459,7 +459,7 @@ public partial class LedgerPage : IAsyncDisposable
 	private async Task NavigateBack() =>
 		NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
 
-	private async Task NavigateToDashboard() =>
+	private void NavigateToDashboard() =>
 		NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 
 	private async Task Logout() =>

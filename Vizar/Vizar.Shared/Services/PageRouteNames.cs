@@ -25,7 +25,8 @@ public static class PageRouteNames
 	public static string ReportPurchaseItem => "/report/purchase-item";
 	public static string ReportPurchaseReturnItem => "/report/purchase-return-item";
 	public static string ReportItemIssue => "/report/item-issue";
-	public static string ReportItemIssueItem => "/report/item-issue-item";
+	public static string ReportGarageIssueItem => "/report/garage-issue-item";
+	public static string ReportVehicleIssueItem => "/report/vehicle-issue-item";
 	public static string ReportItemStock => "/report/item-stock";
 
 	public static string AdminDashboard => "/admin";

@@ -280,7 +280,7 @@ public partial class TrialBalance : IAsyncDisposable
             NavigationManager.NavigateTo(PageRouteNames.ReportAccountingLedger);
     }
 
-	private async Task NavigateToDashboard() =>
+	private void NavigateToDashboard() =>
 		NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 
 	private async Task NavigateBack() =>

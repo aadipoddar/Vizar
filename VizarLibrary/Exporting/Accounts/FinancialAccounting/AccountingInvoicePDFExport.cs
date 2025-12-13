@@ -17,25 +17,30 @@ public static class AccountingInvoicePDFExport
     /// <summary>
     /// Export Accounting voucher as a professional accounting voucher PDF (automatically loads ledger names)
     /// </summary>
-    /// <param name="accountingHeader">Accounting header data</param>
-    /// <param name="accountingDetails">Accounting detail line items (ledger entries)</param>
-    /// <param name="company">Company information</param>
-    /// <param name="voucher">Voucher type information</param>
-    /// <param name="logoPath">Optional: Path to company logo</param>
-    /// <param name="invoiceType">Type of document (JOURNAL VOUCHER, PAYMENT VOUCHER, etc.)</param>
+    /// <param name="transactionId">Transaction Id</param>
     /// <returns>MemoryStream containing the PDF file</returns>
-    public static async Task<MemoryStream> ExportAccountingInvoice(
-        AccountingModel accountingHeader,
-        List<AccountingDetailModel> accountingDetails,
-        CompanyModel company,
-        VoucherModel voucher,
-        string logoPath = null,
-        string invoiceType = "ACCOUNTING VOUCHER")
+    public static async Task<(MemoryStream stream, string fileName)> ExportInvoice(int transactionId)
     {
-        // Load all ledgers to get names and create enriched cart items
+        // Load saved purchase details (since _purchase now has the Id)
+        var transaction = await CommonData.LoadTableDataById<AccountingModel>(TableNames.Accounting, transactionId) ??
+            throw new InvalidOperationException("Transaction not found.");
+
+        // Load purchase details from database
+        var transactionDetails = await CommonData.LoadTableDataByMasterId<AccountingDetailModel>(TableNames.AccountingDetail, transaction.Id);
+        if (transactionDetails is null || transactionDetails.Count == 0)
+            throw new InvalidOperationException("No transaction details found for the transaction.");
+
+        // Load company information
+        var company = await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId) ?? throw new InvalidOperationException("Company information is missing.");
+
+        // Use voucher name as invoice type
+        var voucher = await CommonData.LoadTableDataById<VoucherModel>(TableNames.Voucher, transaction.VoucherId);
+
+        // Load all ledgers to get names
         var allLedgers = await CommonData.LoadTableData<LedgerModel>(TableNames.Ledger);
 
-        var accountingItems = accountingDetails.Select(detail =>
+        // Map to cart items with actual ledger names
+        var cartItems = transactionDetails.Select(detail =>
         {
             var ledger = allLedgers.FirstOrDefault(l => l.Id == detail.LedgerId);
             return new AccountingItemCartModel
@@ -51,26 +56,21 @@ public static class AccountingInvoicePDFExport
         }).ToList();
 
         // Calculate totals
-        decimal totalDebit = accountingItems.Sum(i => i.Debit ?? 0);
-        decimal totalCredit = accountingItems.Sum(i => i.Credit ?? 0);
+        decimal totalDebit = cartItems.Sum(i => i.Debit ?? 0);
+        decimal totalCredit = cartItems.Sum(i => i.Credit ?? 0);
         decimal difference = totalDebit - totalCredit;
 
         // Map invoice header data
         var invoiceData = new PDFInvoiceExportUtil.InvoiceData
         {
-            TransactionNo = accountingHeader.TransactionNo,
-            TransactionDateTime = accountingHeader.TransactionDateTime,
-            ReferenceTransactionNo = accountingHeader.ReferenceNo,
-            TotalAmount = Math.Max(accountingHeader.TotalDebitAmount, accountingHeader.TotalCreditAmount),
-            Remarks = accountingHeader.Remarks,
-            Status = accountingHeader.Status,
-            PaymentModes = null // Accounting vouchers don't have payment breakdown
+            TransactionNo = transaction.TransactionNo,
+            TransactionDateTime = transaction.TransactionDateTime,
+            ReferenceTransactionNo = transaction.ReferenceNo,
+            TotalAmount = Math.Max(transaction.TotalDebitAmount, transaction.TotalCreditAmount),
+            Remarks = transaction.Remarks,
+            Status = transaction.Status,
+            PaymentModes = null
         };
-
-        // Use voucher name as invoice type
-        string voucherInvoiceType = !string.IsNullOrWhiteSpace(voucher?.Name)
-            ? $"{voucher.Name.ToUpper()}"
-            : invoiceType;
 
         // Define custom column settings for accounting vouchers
         var columnSettings = new List<PDFInvoiceExportUtil.InvoiceColumnSetting>
@@ -92,16 +92,20 @@ public static class AccountingInvoicePDFExport
         };
 
         // Use generic invoice export with custom columns
-        return await PDFInvoiceExportUtil.ExportInvoiceToPdf(
+        var stream = await PDFInvoiceExportUtil.ExportInvoiceToPdf(
             invoiceData,
-            accountingItems,
+            cartItems,
             company,
-            null, // No bill-to for accounting
-            logoPath,
-            voucherInvoiceType,
+            null, // No billTo for accounting vouchers
+            voucher.Name.ToUpper(),
             columnSettings,
-            null, // Column order derived from settings
+            null,
             summaryFields
         );
+
+        // Generate file name
+        var currentDateTime = await CommonData.LoadCurrentDateTime();
+        string fileName = $"ACCOUNTING_INVOICE_{transaction.TransactionNo}_{currentDateTime:yyyyMMdd_HHmmss}.pdf";
+        return (stream, fileName);
     }
 }

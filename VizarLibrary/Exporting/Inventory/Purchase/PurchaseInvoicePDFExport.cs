@@ -16,25 +16,29 @@ public static class PurchaseInvoicePDFExport
     /// <summary>
     /// Export Purchase as a professional invoice PDF (automatically loads item names)
     /// </summary>
-    /// <param name="purchaseHeader">Purchase header data</param>
-    /// <param name="purchaseDetails">Purchase detail line items</param>
-    /// <param name="company">Company information</param>
-    /// <param name="party">Party/Supplier information</param>
-    /// <param name="logoPath">Optional: Path to company logo</param>
-    /// <param name="invoiceType">Type of document (PURCHASE INVOICE, PURCHASE ORDER, etc.)</param>
+    /// <param name="transactionId">Transaction ID</param>
     /// <returns>MemoryStream containing the PDF file</returns>
-    public static async Task<MemoryStream> ExportPurchaseInvoice(
-        PurchaseModel purchaseHeader,
-        List<PurchaseDetailModel> purchaseDetails,
-        CompanyModel company,
-        LedgerModel party,
-        string logoPath = null,
-        string invoiceType = "PURCHASE INVOICE")
+    public static async Task<(MemoryStream stream, string fileName)> ExportInvoice(int transactionId)
     {
+        // Load saved transaction details
+        var transaction = await CommonData.LoadTableDataById<PurchaseModel>(TableNames.Purchase, transactionId) ??
+            throw new InvalidOperationException("Transaction not found.");
+
+        // Load transaction details from database
+        var transactionDetails = await CommonData.LoadTableDataByMasterId<PurchaseDetailModel>(TableNames.PurchaseDetail, transaction.Id);
+        if (transactionDetails is null || transactionDetails.Count == 0)
+            throw new InvalidOperationException("No transaction details found for the transaction.");
+
+        // Load company and party information
+        var company = await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId);
+        var party = await CommonData.LoadTableDataById<LedgerModel>(TableNames.Ledger, transaction.PartyId);
+        if (company is null || party is null)
+            throw new InvalidOperationException("Company or party information is missing.");
+
         // Load all items to get names and create enriched line items
         var allItems = await CommonData.LoadTableData<ItemModel>(TableNames.Item);
 
-        var lineItems = purchaseDetails.Select(detail =>
+        var lineItems = transactionDetails.Select(detail =>
         {
             var item = allItems.FirstOrDefault(i => i.Id == detail.ItemId);
             return new PurchaseItemCartModel
@@ -58,50 +62,54 @@ public static class PurchaseInvoicePDFExport
         // Map invoice header data with payment modes dictionary
         var invoiceData = new PDFInvoiceExportUtil.InvoiceData
         {
-            TransactionNo = purchaseHeader.TransactionNo,
-            TransactionDateTime = purchaseHeader.TransactionDateTime,
-            TotalAmount = purchaseHeader.TotalAmount,
-            Remarks = purchaseHeader.Remarks,
-            Status = purchaseHeader.Status,
-            PaymentModes = null // Purchase invoices typically don't show payment breakdown
+            TransactionNo = transaction.TransactionNo,
+            TransactionDateTime = transaction.TransactionDateTime,
+            TotalAmount = transaction.TotalAmount,
+            Remarks = transaction.Remarks,
+            Status = transaction.Status,
+            PaymentModes = null
         };
 
         // Define custom summary fields for purchase invoice
         var summaryFields = new Dictionary<string, string>
         {
-            ["Items Total"] = purchaseHeader.TotalAfterTax.FormatIndianCurrency(),
-            ["Other Charges"] = $"({purchaseHeader.OtherChargesPercent:0.00}%) {purchaseHeader.OtherChargesAmount.FormatIndianCurrency()}",
-            ["Cash Discount"] = $"({purchaseHeader.CashDiscountPercent:0.00}%) -{purchaseHeader.CashDiscountAmount.FormatIndianCurrency()}",
-            ["Round Off"] = purchaseHeader.RoundOffAmount.FormatIndianCurrency(),
-            ["Grand Total"] = purchaseHeader.TotalAmount.FormatIndianCurrency()
-		};
+            ["Items Total"] = transaction.TotalAfterTax.FormatIndianCurrency(),
+            ["Other Charges"] = $"({transaction.OtherChargesPercent:0.00}%) {transaction.OtherChargesAmount.FormatIndianCurrency()}",
+            ["Cash Discount"] = $"({transaction.CashDiscountPercent:0.00}%) -{transaction.CashDiscountAmount.FormatIndianCurrency()}",
+            ["Round Off"] = transaction.RoundOffAmount.FormatIndianCurrency(),
+            ["Grand Total"] = transaction.TotalAmount.FormatIndianCurrency()
+        };
 
         // Define custom column settings with proper display names
         var columnSettings = new List<PDFInvoiceExportUtil.InvoiceColumnSetting>
         {
-			new("#", "#", 25, Syncfusion.Pdf.Graphics.PdfTextAlignment.Center),
-			new(nameof(PurchaseItemCartModel.ItemName), "Item", 0, Syncfusion.Pdf.Graphics.PdfTextAlignment.Left),
-			new(nameof(PurchaseItemCartModel.IdentificationNo), "Identification", 70, Syncfusion.Pdf.Graphics.PdfTextAlignment.Center),
-			new(nameof(PurchaseItemCartModel.UnitOfMeasurement), "UOM", 40, Syncfusion.Pdf.Graphics.PdfTextAlignment.Center),
-			new(nameof(PurchaseItemCartModel.Quantity), "Qty", 40, Syncfusion.Pdf.Graphics.PdfTextAlignment.Right, "#,##0.00"),
-			new(nameof(PurchaseItemCartModel.Rate), "Rate", 50, Syncfusion.Pdf.Graphics.PdfTextAlignment.Right, "#,##0.00"),
-			new(nameof(PurchaseItemCartModel.DiscountPercent), "Disc %", 45, Syncfusion.Pdf.Graphics.PdfTextAlignment.Right, "#,##0.00"),
-			new(nameof(PurchaseItemCartModel.AfterDiscount), "Taxable", 55, Syncfusion.Pdf.Graphics.PdfTextAlignment.Right, "#,##0.00"),
-			new(nameof(PurchaseItemCartModel.TotalTaxAmount), "Tax", 50, Syncfusion.Pdf.Graphics.PdfTextAlignment.Right, "#,##0.00"),
-			new(nameof(PurchaseItemCartModel.Total), "Total", 55, Syncfusion.Pdf.Graphics.PdfTextAlignment.Right, "#,##0.00")
-		};
+            new("#", "#", 25, Syncfusion.Pdf.Graphics.PdfTextAlignment.Center),
+            new(nameof(PurchaseItemCartModel.ItemName), "Item", 0, Syncfusion.Pdf.Graphics.PdfTextAlignment.Left),
+            new(nameof(PurchaseItemCartModel.IdentificationNo), "Identification", 70, Syncfusion.Pdf.Graphics.PdfTextAlignment.Center),
+            new(nameof(PurchaseItemCartModel.UnitOfMeasurement), "UOM", 40, Syncfusion.Pdf.Graphics.PdfTextAlignment.Center),
+            new(nameof(PurchaseItemCartModel.Quantity), "Qty", 40, Syncfusion.Pdf.Graphics.PdfTextAlignment.Right, "#,##0.00"),
+            new(nameof(PurchaseItemCartModel.Rate), "Rate", 50, Syncfusion.Pdf.Graphics.PdfTextAlignment.Right, "#,##0.00"),
+            new(nameof(PurchaseItemCartModel.DiscountPercent), "Disc %", 45, Syncfusion.Pdf.Graphics.PdfTextAlignment.Right, "#,##0.00"),
+            new(nameof(PurchaseItemCartModel.AfterDiscount), "Taxable", 55, Syncfusion.Pdf.Graphics.PdfTextAlignment.Right, "#,##0.00"),
+            new(nameof(PurchaseItemCartModel.TotalTaxAmount), "Tax", 50, Syncfusion.Pdf.Graphics.PdfTextAlignment.Right, "#,##0.00"),
+            new(nameof(PurchaseItemCartModel.Total), "Total", 55, Syncfusion.Pdf.Graphics.PdfTextAlignment.Right, "#,##0.00")
+        };
 
         // Generate invoice PDF with custom columns and summary
-        return await PDFInvoiceExportUtil.ExportInvoiceToPdf(
+        var stream = await PDFInvoiceExportUtil.ExportInvoiceToPdf(
             invoiceData,
             lineItems,
             company,
             party,
-            logoPath,
-            invoiceType,
+            "PURCHASE INVOICE",
             columnSettings,
             null, // Column order derived from settings
             summaryFields
         );
+
+        // Generate file name
+        var currentDateTime = await CommonData.LoadCurrentDateTime();
+        string fileName = $"PURCHASE_INVOICE_{transaction.TransactionNo}_{currentDateTime:yyyyMMdd_HHmmss}.pdf";
+        return (stream, fileName);
     }
 }

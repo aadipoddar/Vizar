@@ -365,7 +365,7 @@ public partial class VoucherPage : IAsyncDisposable
 	private async Task NavigateBack() =>
 		NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
 
-	private async Task NavigateToDashboard() =>
+	private void NavigateToDashboard() =>
 		NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 
 	private async Task Logout() =>

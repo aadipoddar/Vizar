@@ -57,7 +57,7 @@ public static class ItemStockData
 					Quantity = adjustmentQuantity,
 					NetRate = null,
 					TransactionId = null,
-					Type = StockType.Adjustment.ToString(),
+					Type = nameof(StockType.Adjustment),
 					TransactionNo = transactionNo,
 					TransactionDateTime = transactionDateTime
 				});

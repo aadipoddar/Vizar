@@ -2,7 +2,6 @@
 using VizarLibrary.Data.Common;
 using VizarLibrary.Data.Inventory.Item;
 using VizarLibrary.DataAccess;
-using VizarLibrary.Exporting.Inventory.Purchase;
 using VizarLibrary.Models.Accounts.FinancialAccounting;
 using VizarLibrary.Models.Accounts.Masters;
 using VizarLibrary.Models.Common;
@@ -13,112 +12,28 @@ namespace VizarLibrary.Data.Inventory.Purchase;
 
 public static class PurchaseReturnData
 {
-    public static async Task<int> InsertPurchaseReturn(PurchaseReturnModel purchaseReturn) =>
+    private static async Task<int> InsertPurchaseReturn(PurchaseReturnModel purchaseReturn) =>
         (await SqlDataAccess.LoadData<int, dynamic>(StoredProcedureNames.InsertPurchaseReturn, purchaseReturn)).FirstOrDefault();
 
-    public static async Task<int> InsertPurchaseReturnDetail(PurchaseReturnDetailModel purchaseReturnDetail) =>
+    private static async Task<int> InsertPurchaseReturnDetail(PurchaseReturnDetailModel purchaseReturnDetail) =>
         (await SqlDataAccess.LoadData<int, dynamic>(StoredProcedureNames.InsertPurchaseReturnDetail, purchaseReturnDetail)).FirstOrDefault();
 
-    public static async Task<(MemoryStream pdfStream, string fileName)> GenerateAndDownloadInvoice(int purchaseReturnId)
+    public static async Task DeleteTransaction(PurchaseReturnModel purchaseReturn)
     {
-        try
-        {
-            // Load saved purchase return details (since _purchaseReturn now has the Id)
-            var transaction = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, purchaseReturnId) ??
-                throw new InvalidOperationException("Transaction not found.");
-
-            // Load purchase return details from database
-            var transactionDetails = await CommonData.LoadTableDataByMasterId<PurchaseReturnDetailModel>(TableNames.PurchaseReturnDetail, purchaseReturnId);
-            if (transactionDetails is null || transactionDetails.Count == 0)
-                throw new InvalidOperationException("No transaction details found for the transaction.");
-
-            // Load company and party
-            var company = await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId);
-            var party = await CommonData.LoadTableDataById<LedgerModel>(TableNames.Ledger, transaction.PartyId);
-            if (company is null || party is null)
-                throw new InvalidOperationException("Invoice generation skipped - company or party not found.");
-
-            // Generate invoice PDF
-            var pdfStream = await PurchaseReturnInvoicePDFExport.ExportPurchaseReturnInvoice(
-                    transaction,
-                    transactionDetails,
-                    company,
-                    party,
-                    null, // logo path - uses default
-                    "PURCHASE RETURN INVOICE"
-                );
-
-            // Generate file name
-            var currentDateTime = await CommonData.LoadCurrentDateTime();
-            string fileName = $"PURCHASE_RETURN_INVOICE_{transaction.TransactionNo}_{currentDateTime:yyyyMMdd_HHmmss}.pdf";
-            return (pdfStream, fileName);
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException($"Invoice generation failed: {ex.Message}", ex);
-        }
-    }
-
-    public static async Task<(MemoryStream excelStream, string fileName)> GenerateAndDownloadExcelInvoice(int purchaseReturnId)
-    {
-        try
-        {
-            // Load saved purchase return details
-            var transaction = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, purchaseReturnId) ??
-                throw new InvalidOperationException("Transaction not found.");
-
-            // Load purchase return details from database
-            var transactionDetails = await CommonData.LoadTableDataByMasterId<PurchaseReturnDetailModel>(TableNames.PurchaseReturnDetail, purchaseReturnId);
-            if (transactionDetails is null || transactionDetails.Count == 0)
-                throw new InvalidOperationException("No transaction details found for the transaction.");
-
-            // Load company and party
-            var company = await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId);
-            var party = await CommonData.LoadTableDataById<LedgerModel>(TableNames.Ledger, transaction.PartyId);
-            if (company is null || party is null)
-                throw new InvalidOperationException("Invoice generation skipped - company or party not found.");
-
-            // Generate invoice Excel
-            var excelStream = await PurchaseReturnInvoiceExcelExport.ExportPurchaseReturnInvoice(
-                transaction,
-                transactionDetails,
-                company,
-                party,
-                null, // logo path - uses default
-                "PURCHASE RETURN INVOICE"
-            );
-
-            // Generate file name
-            var currentDateTime = await CommonData.LoadCurrentDateTime();
-            string fileName = $"PURCHASE_RETURN_INVOICE_{transaction.TransactionNo}_{currentDateTime:yyyyMMdd_HHmmss}.xlsx";
-            return (excelStream, fileName);
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException($"Excel invoice generation failed: {ex.Message}", ex);
-        }
-    }
-
-    public static async Task DeletePurchaseReturn(int purchaseReturnId)
-    {
-        var purchaseReturn = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, purchaseReturnId);
         var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, purchaseReturn.FinancialYearId);
         if (financialYear is null || financialYear.Locked || financialYear.Status == false)
             throw new InvalidOperationException("Cannot delete transaction as the financial year is locked.");
 
-        if (purchaseReturn is not null)
-        {
-            purchaseReturn.Status = false;
-            await InsertPurchaseReturn(purchaseReturn);
-            await ItemStockData.DeleteItemStockByTypeTransactionId(StockType.PurchaseReturn.ToString(), purchaseReturn.Id);
+        purchaseReturn.Status = false;
+        await InsertPurchaseReturn(purchaseReturn);
+        await ItemStockData.DeleteItemStockByTypeTransactionId(nameof(StockType.PurchaseReturn), purchaseReturn.Id);
 
-            var purchaseReturnVoucher = await SettingsData.LoadSettingsByKey(SettingsKeys.PurchaseReturnVoucherId);
-            var existingAccounting = await AccountingData.LoadAccountingByVoucherReference(int.Parse(purchaseReturnVoucher.Value), purchaseReturn.Id, purchaseReturn.TransactionNo);
-            if (existingAccounting is not null && existingAccounting.Id > 0)
-            {
-                existingAccounting.Status = false;
-                await AccountingData.InsertAccounting(existingAccounting);
-            }
+        var purchaseReturnVoucher = await SettingsData.LoadSettingsByKey(SettingsKeys.PurchaseReturnVoucherId);
+        var existingAccounting = await AccountingData.LoadAccountingByVoucherReference(int.Parse(purchaseReturnVoucher.Value), purchaseReturn.Id, purchaseReturn.TransactionNo);
+        if (existingAccounting is not null && existingAccounting.Id > 0)
+        {
+            existingAccounting.Status = false;
+            await AccountingData.InsertAccounting(existingAccounting);
         }
     }
 
@@ -134,7 +49,7 @@ public static class PurchaseReturnData
                 ItemName = "",
                 IdentificationNo = item.IdentificationNo,
                 Quantity = item.Quantity,
-				UnitOfMeasurement = item.UnitOfMeasurement,
+                UnitOfMeasurement = item.UnitOfMeasurement,
                 Rate = item.Rate,
                 BaseTotal = item.BaseTotal,
                 DiscountPercent = item.DiscountPercent,
@@ -199,7 +114,7 @@ public static class PurchaseReturnData
                 MasterId = purchaseReturn.Id,
                 ItemId = item.ItemId,
                 IdentificationNo = item.IdentificationNo,
-				Quantity = item.Quantity,
+                Quantity = item.Quantity,
                 UnitOfMeasurement = item.UnitOfMeasurement,
                 Rate = item.Rate,
                 BaseTotal = item.BaseTotal,
@@ -224,18 +139,18 @@ public static class PurchaseReturnData
     private static async Task SaveRawMaterialStock(PurchaseReturnModel purchaseReturn, List<PurchaseReturnItemCartModel> cart, bool update)
     {
         if (update)
-            await ItemStockData.DeleteItemStockByTypeTransactionId(StockType.PurchaseReturn.ToString(), purchaseReturn.Id);
+            await ItemStockData.DeleteItemStockByTypeTransactionId(nameof(StockType.PurchaseReturn), purchaseReturn.Id);
 
         foreach (var item in cart)
             await ItemStockData.InsertItemStock(new()
             {
                 Id = 0,
                 ItemId = item.ItemId,
-				IdentificationNo = item.IdentificationNo,
-				Quantity = -item.Quantity,
+                IdentificationNo = item.IdentificationNo,
+                Quantity = -item.Quantity,
                 NetRate = item.NetRate,
                 TransactionId = purchaseReturn.Id,
-                Type = StockType.PurchaseReturn.ToString(),
+                Type = nameof(StockType.PurchaseReturn),
                 TransactionNo = purchaseReturn.TransactionNo,
                 TransactionDateTime = purchaseReturn.TransactionDateTime
             });
@@ -267,7 +182,7 @@ public static class PurchaseReturnData
             accountingCart.Add(new()
             {
                 ReferenceId = purchaseReturnOverview.Id,
-                ReferenceType = ReferenceTypes.PurchaseReturn.ToString(),
+                ReferenceType = nameof(ReferenceTypes.PurchaseReturn),
                 ReferenceNo = purchaseReturnOverview.TransactionNo,
                 LedgerId = purchaseReturnOverview.PartyId,
                 Debit = purchaseReturnOverview.TotalAmount,
@@ -281,7 +196,7 @@ public static class PurchaseReturnData
             accountingCart.Add(new()
             {
                 ReferenceId = purchaseReturnOverview.Id,
-                ReferenceType = ReferenceTypes.PurchaseReturn.ToString(),
+                ReferenceType = nameof(ReferenceTypes.PurchaseReturn),
                 ReferenceNo = purchaseReturnOverview.TransactionNo,
                 LedgerId = int.Parse(purchaseLedger.Value),
                 Debit = null,
@@ -296,7 +211,7 @@ public static class PurchaseReturnData
             accountingCart.Add(new()
             {
                 ReferenceId = purchaseReturnOverview.Id,
-                ReferenceType = ReferenceTypes.PurchaseReturn.ToString(),
+                ReferenceType = nameof(ReferenceTypes.PurchaseReturn),
                 ReferenceNo = purchaseReturnOverview.TransactionNo,
                 LedgerId = int.Parse(gstLedger.Value),
                 Debit = null,
@@ -305,28 +220,28 @@ public static class PurchaseReturnData
             });
         }
 
-		var voucher = await SettingsData.LoadSettingsByKey(SettingsKeys.PurchaseReturnVoucherId);
-		var accounting = new AccountingModel
-		{
-			Id = 0,
-			TransactionNo = "",
-			CompanyId = purchaseReturnOverview.CompanyId,
-			VoucherId = int.Parse(voucher.Value),
-			ReferenceId = purchaseReturnOverview.Id,
-			ReferenceNo = purchaseReturnOverview.TransactionNo,
-			TransactionDateTime = purchaseReturnOverview.TransactionDateTime,
-			FinancialYearId = purchaseReturnOverview.FinancialYearId,
-			TotalDebitLedgers = accountingCart.Count(a => a.Debit.HasValue),
-			TotalCreditLedgers = accountingCart.Count(a => a.Credit.HasValue),
-			TotalDebitAmount = accountingCart.Sum(a => a.Debit ?? 0),
-			TotalCreditAmount = accountingCart.Sum(a => a.Credit ?? 0),
-			Remarks = purchaseReturnOverview.Remarks,
-			CreatedBy = purchaseReturnOverview.CreatedBy,
-			CreatedAt = purchaseReturnOverview.CreatedAt,
-			CreatedFromPlatform = purchaseReturnOverview.CreatedFromPlatform,
-			Status = true
-		};
+        var voucher = await SettingsData.LoadSettingsByKey(SettingsKeys.PurchaseReturnVoucherId);
+        var accounting = new AccountingModel
+        {
+            Id = 0,
+            TransactionNo = "",
+            CompanyId = purchaseReturnOverview.CompanyId,
+            VoucherId = int.Parse(voucher.Value),
+            ReferenceId = purchaseReturnOverview.Id,
+            ReferenceNo = purchaseReturnOverview.TransactionNo,
+            TransactionDateTime = purchaseReturnOverview.TransactionDateTime,
+            FinancialYearId = purchaseReturnOverview.FinancialYearId,
+            TotalDebitLedgers = accountingCart.Count(a => a.Debit.HasValue),
+            TotalCreditLedgers = accountingCart.Count(a => a.Credit.HasValue),
+            TotalDebitAmount = accountingCart.Sum(a => a.Debit ?? 0),
+            TotalCreditAmount = accountingCart.Sum(a => a.Credit ?? 0),
+            Remarks = purchaseReturnOverview.Remarks,
+            CreatedBy = purchaseReturnOverview.CreatedBy,
+            CreatedAt = purchaseReturnOverview.CreatedAt,
+            CreatedFromPlatform = purchaseReturnOverview.CreatedFromPlatform,
+            Status = true
+        };
 
-		await AccountingData.SaveAccountingTransaction(accounting, accountingCart);
+        await AccountingData.SaveAccountingTransaction(accounting, accountingCart);
     }
 }

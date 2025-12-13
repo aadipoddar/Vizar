@@ -1,4 +1,4 @@
-﻿CREATE VIEW [dbo].[ItemIssue_Item_Overview]
+﻿CREATE VIEW [dbo].[VehicleIssue_Item_Overview]
 	AS
 SELECT
 	[i].[Id],
@@ -16,8 +16,6 @@ SELECT
 	[ii].[TransactionDateTime],
 	[c].[Id] AS CompanyId,
 	[c].[Name] AS CompanyName,
-	[ii].[GarageId],
-	[g].[Name] AS GarageName,
 	[ii].[Remarks] AS ItemIssueRemarks,
 
 	[iid].[VehicleId],
@@ -55,9 +53,8 @@ LEFT JOIN
 	[dbo].[Vehicle] v ON iid.VehicleId = v.Id
 INNER JOIN
 	[dbo].[Company] c ON ii.CompanyId = c.Id
-LEFT JOIN
-	[dbo].[Garage] g ON ii.GarageId = g.Id
 
 WHERE
+	[ii].[GarageId] IS NULL AND
 	[ii].[Status] = 1 AND
 	[iid].[Status] = 1;

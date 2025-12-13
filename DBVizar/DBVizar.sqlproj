@@ -170,11 +170,12 @@
     <Build Include="Tables\Inventory\ItemIssue\ItemIssueDetail.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\ItemIssue\Insert_ItemIssueDetail.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\ItemIssue\Insert_ItemIssue.sql" />
-    <Build Include="Views\Inventory\ItemIssue\ItemIssue_Item_Overview.sql" />
+    <Build Include="Views\Inventory\ItemIssue\GarageIssue_Item_Overview.sql" />
     <Build Include="Views\Inventory\ItemIssue\ItemIssue_Overview.sql" />
     <Build Include="Tables\Fleet\Vehicle\Vehicle.sql" />
     <Build Include="Tables\Fleet\Vehicle\VehicleModel.sql" />
     <Build Include="Tables\Fleet\Vehicle\VehicleType.sql" />
     <Build Include="Tables\Fleet\Service\Garage.sql" />
+    <Build Include="Views\Inventory\ItemIssue\VehicleIssue_Item_Overview.sql" />
   </ItemGroup>
 </Project>
