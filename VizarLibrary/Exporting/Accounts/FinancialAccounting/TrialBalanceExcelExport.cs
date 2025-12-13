@@ -5,7 +5,7 @@ namespace VizarLibrary.Exporting.Accounts.FinancialAccounting;
 
 public static class TrialBalanceExcelExport
 {
-    public static async Task<MemoryStream> ExportTrialBalance(
+    public static async Task<(MemoryStream stream, string fileName)> ExportReport(
         IEnumerable<TrialBalanceModel> trialBalanceData,
         DateOnly? dateRangeStart = null,
         DateOnly? dateRangeEnd = null,
@@ -58,12 +58,12 @@ public static class TrialBalanceExcelExport
                 nameof(TrialBalanceModel.ClosingCredit),
             ];
 
-			if (string.IsNullOrWhiteSpace(groupName))
-				columnOrder.Insert(2, nameof(TrialBalanceModel.GroupName));
+            if (string.IsNullOrWhiteSpace(groupName))
+                columnOrder.Insert(2, nameof(TrialBalanceModel.GroupName));
 
-			if (string.IsNullOrWhiteSpace(accountTypeName))
-				columnOrder.Insert(3, nameof(TrialBalanceModel.AccountTypeName));
-		}
+            if (string.IsNullOrWhiteSpace(accountTypeName))
+                columnOrder.Insert(3, nameof(TrialBalanceModel.AccountTypeName));
+        }
 
         // Summary view - essential columns only
         else
@@ -77,7 +77,7 @@ public static class TrialBalanceExcelExport
             ];
 
         // Call the generic Excel export utility
-        return await ExcelReportExportUtil.ExportToExcel(
+        var stream = await ExcelReportExportUtil.ExportToExcel(
             trialBalanceData,
             "TRIAL BALANCE REPORT",
             "Trial Balance",
@@ -85,7 +85,14 @@ public static class TrialBalanceExcelExport
             dateRangeEnd,
             columnSettings,
             columnOrder,
-			new() { ["Group Name"] = groupName ?? null, ["Account Type"] = accountTypeName ?? null }
-		);
+            new() { ["Group Name"] = groupName ?? null, ["Account Type"] = accountTypeName ?? null }
+        );
+
+        string fileName = $"TRIAL_BALANCE";
+        if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
+            fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
+        fileName += ".xlsx";
+
+        return (stream, fileName);
     }
 }

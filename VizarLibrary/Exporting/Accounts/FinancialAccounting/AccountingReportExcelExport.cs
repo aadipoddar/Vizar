@@ -19,7 +19,7 @@ public static class AccountingReportExcelExport
     /// <param name="companyName">Name of the company for report header</param>
     /// <param name="voucherName">Name of the voucher for report header</param>
     /// <returns>MemoryStream containing the Excel file</returns>
-    public static async Task<MemoryStream> ExportAccountingReport(
+    public static async Task<(MemoryStream stream, string fileName)> ExportReport(
         IEnumerable<AccountingOverviewModel> accountingData,
         DateOnly? dateRangeStart = null,
         DateOnly? dateRangeEnd = null,
@@ -90,12 +90,12 @@ public static class AccountingReportExcelExport
                 nameof(AccountingOverviewModel.LastModifiedFromPlatform)
             ];
 
-			if (string.IsNullOrWhiteSpace(companyName))
-				columnOrder.Insert(6, nameof(AccountingOverviewModel.CompanyName));
+            if (string.IsNullOrWhiteSpace(companyName))
+                columnOrder.Insert(6, nameof(AccountingOverviewModel.CompanyName));
 
             if (string.IsNullOrWhiteSpace(voucherName))
                 columnOrder.Insert(7, nameof(AccountingOverviewModel.VoucherName));
-		}
+        }
 
         // Summary columns - key fields only
         else
@@ -103,14 +103,14 @@ public static class AccountingReportExcelExport
             [
                 nameof(AccountingOverviewModel.TransactionNo),
                 nameof(AccountingOverviewModel.TransactionDateTime),
-				nameof(AccountingOverviewModel.ReferenceNo),
-				nameof(AccountingOverviewModel.TotalDebitAmount),
+                nameof(AccountingOverviewModel.ReferenceNo),
+                nameof(AccountingOverviewModel.TotalDebitAmount),
                 nameof(AccountingOverviewModel.TotalCreditAmount),
                 nameof(AccountingOverviewModel.TotalAmount)
             ];
 
         // Call the generic Excel export utility
-        return await ExcelReportExportUtil.ExportToExcel(
+        var stream = await ExcelReportExportUtil.ExportToExcel(
             accountingData,
             "FINANCIAL ACCOUNTING REPORT",
             "Accounting Transactions",
@@ -118,7 +118,14 @@ public static class AccountingReportExcelExport
             dateRangeEnd,
             columnSettings,
             columnOrder,
-			new() { ["Company"] = companyName ?? null, ["Voucher"] = voucherName ?? null }
+            new() { ["Company"] = companyName ?? null, ["Voucher"] = voucherName ?? null }
         );
+
+        string fileName = $"ACCOUNTING_REPORT";
+        if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
+            fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
+        fileName += ".xlsx";
+
+        return (stream, fileName);
     }
 }

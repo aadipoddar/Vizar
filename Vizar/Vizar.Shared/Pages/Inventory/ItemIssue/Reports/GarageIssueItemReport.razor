@@ -213,11 +213,11 @@ else
 						<GridColumn Field="@nameof(GarageIssueItemOverviewModel.IdentificationNo)" HeaderText="Identification" Width="200" Visible="@(!_showSummary)" />
 						<GridColumn Field="@nameof(GarageIssueItemOverviewModel.UnitOfMeasurement)" HeaderText="UOM" Width="120" Visible="@(!_showSummary)" />
 						<GridColumn Field="@nameof(GarageIssueItemOverviewModel.Quantity)" HeaderText="Qty" Width="200" Format="N2" TextAlign="TextAlign.Right" />
-						<GridColumn Field="@nameof(VehicleIssueItemOverviewModel.Rate)" HeaderText="Rate" Width="150" TextAlign="TextAlign.Right" Visible="@(!_showSummary)" />
-						<GridColumn Field="@nameof(VehicleIssueItemOverviewModel.Total)" HeaderText="Total" Width="200" TextAlign="TextAlign.Right">
+						<GridColumn Field="@nameof(GarageIssueItemOverviewModel.Rate)" HeaderText="Rate" Width="150" TextAlign="TextAlign.Right" Visible="@(!_showSummary)" />
+						<GridColumn Field="@nameof(GarageIssueItemOverviewModel.Total)" HeaderText="Total" Width="200" TextAlign="TextAlign.Right">
 							<Template>
 								@{
-									var detailItem = (context as VehicleIssueItemOverviewModel);
+									var detailItem = (context as GarageIssueItemOverviewModel);
 									<span class="grid-total">@detailItem.Total.ToString("N2")</span>
 								}
 							</Template>

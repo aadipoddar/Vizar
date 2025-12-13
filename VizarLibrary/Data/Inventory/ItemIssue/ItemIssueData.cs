@@ -13,15 +13,11 @@ public static class ItemIssueData
         (await SqlDataAccess.LoadData<int, dynamic>(StoredProcedureNames.InsertItemIssue, itemIssue)).FirstOrDefault();
 
     private static async Task<int> InsertItemIssueDetail(ItemIssueDetailModel itemIssueDetail) =>
-        (await SqlDataAccess.LoadData<int, dynamic>(StoredProcedureNames.InsertItemIssueDetail, itemIssueDetail))
-        .FirstOrDefault();
+        (await SqlDataAccess.LoadData<int, dynamic>(StoredProcedureNames.InsertItemIssueDetail, itemIssueDetail)).FirstOrDefault();
 
-    public static async Task DeleteTransaction(int transactionId)
+    public static async Task DeleteTransaction(ItemIssueModel transaction)
     {
-        var transaction = await CommonData.LoadTableDataById<ItemIssueModel>(TableNames.ItemIssue, transactionId);
-        var financialYear =
-            await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear,
-                transaction.FinancialYearId);
+        var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, transaction.FinancialYearId);
         if (financialYear is null || financialYear.Locked || !financialYear.Status)
             throw new InvalidOperationException("Cannot delete transaction as the financial year is locked.");
 
@@ -30,10 +26,9 @@ public static class ItemIssueData
         await ItemStockData.DeleteItemStockByTypeTransactionId(nameof(StockType.ItemIssue), transaction.Id);
     }
 
-    public static async Task RecoverTransaction(ItemIssueModel itemIssue)
+    public static async Task RecoverTransaction(ItemIssueModel transaction)
     {
-        var transactionDetails =
-            await CommonData.LoadTableDataByMasterId<ItemIssueDetailModel>(TableNames.ItemIssueDetail, itemIssue.Id);
+        var transactionDetails = await CommonData.LoadTableDataByMasterId<ItemIssueDetailModel>(TableNames.ItemIssueDetail, transaction.Id);
         List<ItemIssueItemCartModel> itemIssueItemCarts = [];
 
         itemIssueItemCarts.AddRange(transactionDetails.Select(item => new ItemIssueItemCartModel()
@@ -53,21 +48,17 @@ public static class ItemIssueData
             Remarks = item.Remarks
         }));
 
-        await SaveItemIssueTransaction(itemIssue, itemIssueItemCarts);
+        await SaveItemIssueTransaction(transaction, itemIssueItemCarts);
     }
 
-    public static async Task<int> SaveItemIssueTransaction(ItemIssueModel itemIssue,
-        List<ItemIssueItemCartModel> itemIssueDetails)
+    public static async Task<int> SaveItemIssueTransaction(ItemIssueModel itemIssue, List<ItemIssueItemCartModel> itemIssueDetails)
     {
         var update = itemIssue.Id > 0;
 
         if (update)
         {
-            var existingItemIssue =
-                await CommonData.LoadTableDataById<ItemIssueModel>(TableNames.ItemIssue, itemIssue.Id);
-            var updateFinancialYear =
-                await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear,
-                    existingItemIssue.FinancialYearId);
+            var existingItemIssue = await CommonData.LoadTableDataById<ItemIssueModel>(TableNames.ItemIssue, itemIssue.Id);
+            var updateFinancialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, existingItemIssue.FinancialYearId);
             if (updateFinancialYear is null || updateFinancialYear.Locked || updateFinancialYear.Status == false)
                 throw new InvalidOperationException("Cannot update transaction as the financial year is locked.");
 
@@ -76,8 +67,7 @@ public static class ItemIssueData
         else
             itemIssue.TransactionNo = await GenerateCodes.GenerateItemIssueTransactionNo(itemIssue);
 
-        var financialYear =
-            await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, itemIssue.FinancialYearId);
+        var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, itemIssue.FinancialYearId);
         if (financialYear is null || financialYear.Locked || financialYear.Status == false)
             throw new InvalidOperationException("Cannot update transaction as the financial year is locked.");
 
@@ -93,9 +83,7 @@ public static class ItemIssueData
     {
         if (update)
         {
-            var existingItemIssueDetails =
-                await CommonData.LoadTableDataByMasterId<ItemIssueDetailModel>(TableNames.ItemIssueDetail,
-                    itemIssue.Id);
+            var existingItemIssueDetails = await CommonData.LoadTableDataByMasterId<ItemIssueDetailModel>(TableNames.ItemIssueDetail, itemIssue.Id);
             foreach (var item in existingItemIssueDetails)
             {
                 item.Status = false;

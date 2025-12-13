@@ -289,20 +289,14 @@ public partial class PurchaseReport : IAsyncDisposable
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var stream = await PurchaseReportExcelExport.ExportPurchaseReport(
-                    _transactionOverviews,
-                    dateRangeStart,
-                    dateRangeEnd,
-                    _showAllColumns,
-                    _selectedParty?.Id > 0 ? _selectedParty?.Name : null,
-                    _showSummary
-                );
-
-            string fileName = $"PURCHASE_REPORT";
-            if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
-                fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
-            fileName += ".xlsx";
-
+            var (stream, fileName) = await PurchaseReportExcelExport.ExportReport(
+                _transactionOverviews,
+                dateRangeStart,
+                dateRangeEnd,
+                _showAllColumns,
+                _selectedParty?.Id > 0 ? _selectedParty?.Name : null,
+                _showSummary
+            );
             await SaveAndViewService.SaveAndView(fileName, stream);
             await _toastNotification.ShowAsync("Exported", "Excel file downloaded successfully.", ToastType.Success);
         }
@@ -331,7 +325,7 @@ public partial class PurchaseReport : IAsyncDisposable
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var stream = await PurchaseReportPDFExport.ExportPurchaseReport(
+            var (stream, fileName) = await PurchaseReportPDFExport.ExportReport(
                     _transactionOverviews,
                     dateRangeStart,
                     dateRangeEnd,
@@ -339,12 +333,6 @@ public partial class PurchaseReport : IAsyncDisposable
                     _selectedParty?.Id > 0 ? _selectedParty?.Name : null,
                     _showSummary
                 );
-
-            string fileName = $"PURCHASE_REPORT";
-            if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
-                fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
-            fileName += ".pdf";
-
             await SaveAndViewService.SaveAndView(fileName, stream);
             await _toastNotification.ShowAsync("Exported", "PDF file downloaded successfully.", ToastType.Success);
         }

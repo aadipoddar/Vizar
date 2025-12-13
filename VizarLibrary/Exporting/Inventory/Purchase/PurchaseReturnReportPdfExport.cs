@@ -18,7 +18,7 @@ public static class PurchaseReturnReportPdfExport
     /// <param name="partyName">Optional party name to display in header</param>
     /// <param name="showSummary">Whether to show summary view with grouped data</param>
     /// <returns>MemoryStream containing the PDF file</returns>
-    public static async Task<MemoryStream> ExportPurchaseReturnReport(
+    public static async Task<(MemoryStream stream, string fileName)> ExportReport(
         IEnumerable<PurchaseReturnOverviewModel> purchaseReturnData,
         DateOnly? dateRangeStart = null,
         DateOnly? dateRangeEnd = null,
@@ -86,7 +86,7 @@ public static class PurchaseReturnReportPdfExport
             if (string.IsNullOrEmpty(partyName))
                 columnOrder.Insert(3, nameof(PurchaseReturnOverviewModel.PartyName));
         }
-        
+
         // Summary columns - key fields only (matching Excel export)
         else
         {
@@ -287,7 +287,7 @@ public static class PurchaseReturnReportPdfExport
         };
 
         // Call the generic PDF export utility with landscape mode for all columns
-        return await PDFReportExportUtil.ExportToPdf(
+        var stream = await PDFReportExportUtil.ExportToPdf(
             purchaseReturnData,
             "PURCHASE RETURN REPORT",
             dateRangeStart,
@@ -295,7 +295,14 @@ public static class PurchaseReturnReportPdfExport
             columnSettings,
             columnOrder,
             useLandscape: showAllColumns || showSummary,  // Use landscape when showing all columns
-			headerMetadata: new() { { "Party", partyName } }
-		);
+            headerMetadata: new() { { "Party", partyName } }
+        );
+
+        string fileName = $"PURCHASE_RETURN_REPORT";
+        if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
+            fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
+        fileName += ".pdf";
+
+        return (stream, fileName);
     }
 }

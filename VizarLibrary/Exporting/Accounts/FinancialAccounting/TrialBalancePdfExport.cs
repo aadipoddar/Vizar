@@ -5,7 +5,7 @@ namespace VizarLibrary.Exporting.Accounts.FinancialAccounting;
 
 public static class TrialBalancePdfExport
 {
-    public static async Task<MemoryStream> ExportTrialBalance(
+    public static async Task<(MemoryStream stream, string fileName)> ExportReport(
         IEnumerable<TrialBalanceModel> trialBalanceData,
         DateOnly? dateRangeStart = null,
         DateOnly? dateRangeEnd = null,
@@ -33,12 +33,12 @@ public static class TrialBalancePdfExport
                 nameof(TrialBalanceModel.ClosingCredit)
             ];
 
-			if (string.IsNullOrWhiteSpace(groupName))
-				columnOrder.Insert(2, nameof(TrialBalanceModel.GroupName));
+            if (string.IsNullOrWhiteSpace(groupName))
+                columnOrder.Insert(2, nameof(TrialBalanceModel.GroupName));
 
-			if (string.IsNullOrWhiteSpace(accountTypeName))
-				columnOrder.Insert(3, nameof(TrialBalanceModel.AccountTypeName));
-		}
+            if (string.IsNullOrWhiteSpace(accountTypeName))
+                columnOrder.Insert(3, nameof(TrialBalanceModel.AccountTypeName));
+        }
 
         // Summary view - essential columns only
         else
@@ -160,7 +160,7 @@ public static class TrialBalancePdfExport
 
         // Call the generic PDF export utility
         // Use landscape for detailed view, portrait for summary view
-        return await PDFReportExportUtil.ExportToPdf(
+        var stream = await PDFReportExportUtil.ExportToPdf(
             trialBalanceData,
             "TRIAL BALANCE REPORT",
             dateRangeStart,
@@ -171,7 +171,14 @@ public static class TrialBalancePdfExport
             autoAdjustColumnWidth: true,
             logoPath: null,
             useLandscape: showAllColumns,
-			new() { ["Group Name"] = groupName ?? null, ["Account Type"] = accountTypeName ?? null }
+            new() { ["Group Name"] = groupName ?? null, ["Account Type"] = accountTypeName ?? null }
         );
+
+        string fileName = $"TRIAL_BALANCE";
+        if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
+            fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
+        fileName += ".pdf";
+
+        return (stream, fileName);
     }
 }

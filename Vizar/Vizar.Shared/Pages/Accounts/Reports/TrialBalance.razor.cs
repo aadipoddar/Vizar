@@ -17,11 +17,11 @@ namespace Vizar.Shared.Pages.Accounts.Reports;
 
 public partial class TrialBalance : IAsyncDisposable
 {
-	private HotKeysContext _hotKeysContext;
-	private PeriodicTimer _autoRefreshTimer;
-	private CancellationTokenSource _autoRefreshCts;
+    private HotKeysContext _hotKeysContext;
+    private PeriodicTimer _autoRefreshTimer;
+    private CancellationTokenSource _autoRefreshCts;
 
-	private UserModel _user;
+    private UserModel _user;
 
     private bool _isLoading = true;
     private bool _isProcessing = false;
@@ -46,7 +46,7 @@ public partial class TrialBalance : IAsyncDisposable
         if (!firstRender)
             return;
 
-		_user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, UserRoles.Accounts);
+        _user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, UserRoles.Accounts);
         await LoadData();
         _isLoading = false;
         StateHasChanged();
@@ -65,7 +65,7 @@ public partial class TrialBalance : IAsyncDisposable
             .Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
             .Add(ModCode.Ctrl, Code.L, Logout, "Logout", Exclude.None);
 
-		await LoadDates();
+        await LoadDates();
         await LoadGroups();
         await LoadAccountTypes();
         await LoadTrialBalance();
@@ -183,7 +183,7 @@ public partial class TrialBalance : IAsyncDisposable
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var stream = await TrialBalanceExcelExport.ExportTrialBalance(
+            var (stream, fileName) = await TrialBalanceExcelExport.ExportReport(
                     _trialBalance,
                     dateRangeStart,
                     dateRangeEnd,
@@ -191,14 +191,8 @@ public partial class TrialBalance : IAsyncDisposable
                     _selectedGroup?.Id > 0 ? _selectedGroup?.Name : null,
                     _selectedAccountType?.Id > 0 ? _selectedAccountType?.Name : null
                 );
-
-            string fileName = $"TRIAL_BALANCE";
-            if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
-                fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
-            fileName += ".xlsx";
-
             await SaveAndViewService.SaveAndView(fileName, stream);
-			await _toastNotification.ShowAsync("Exported", "Excel file downloaded successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Exported", "Excel file downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -225,7 +219,7 @@ public partial class TrialBalance : IAsyncDisposable
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var stream = await TrialBalancePdfExport.ExportTrialBalance(
+            var (stream, fileName) = await TrialBalancePdfExport.ExportReport(
                     _trialBalance,
                     dateRangeStart,
                     dateRangeEnd,
@@ -233,14 +227,8 @@ public partial class TrialBalance : IAsyncDisposable
                     _selectedGroup?.Id > 0 ? _selectedGroup?.Name : null,
                     _selectedAccountType?.Id > 0 ? _selectedAccountType?.Name : null
                 );
-
-            string fileName = $"TRIAL_BALANCE";
-            if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
-                fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
-            fileName += ".pdf";
-
             await SaveAndViewService.SaveAndView(fileName, stream);
-			await _toastNotification.ShowAsync("Exported", "PDF file downloaded successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Exported", "PDF file downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -280,52 +268,52 @@ public partial class TrialBalance : IAsyncDisposable
             NavigationManager.NavigateTo(PageRouteNames.ReportAccountingLedger);
     }
 
-	private void NavigateToDashboard() =>
-		NavigationManager.NavigateTo(PageRouteNames.Dashboard);
+    private void NavigateToDashboard() =>
+        NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 
-	private async Task NavigateBack() =>
-		NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
+    private async Task NavigateBack() =>
+        NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
 
-	private async Task Logout() =>
-		await AuthenticationService.Logout(DataStorageService, NavigationManager, VibrationService);
+    private async Task Logout() =>
+        await AuthenticationService.Logout(DataStorageService, NavigationManager, VibrationService);
 
-	private async Task StartAutoRefresh()
-	{
-		var timerSetting = await SettingsData.LoadSettingsByKey(SettingsKeys.AutoRefreshReportTimer);
-		var refreshMinutes = int.TryParse(timerSetting?.Value, out var minutes) ? minutes : 5;
+    private async Task StartAutoRefresh()
+    {
+        var timerSetting = await SettingsData.LoadSettingsByKey(SettingsKeys.AutoRefreshReportTimer);
+        var refreshMinutes = int.TryParse(timerSetting?.Value, out var minutes) ? minutes : 5;
 
-		_autoRefreshCts = new CancellationTokenSource();
-		_autoRefreshTimer = new PeriodicTimer(TimeSpan.FromMinutes(refreshMinutes));
-		_ = AutoRefreshLoop(_autoRefreshCts.Token);
-	}
+        _autoRefreshCts = new CancellationTokenSource();
+        _autoRefreshTimer = new PeriodicTimer(TimeSpan.FromMinutes(refreshMinutes));
+        _ = AutoRefreshLoop(_autoRefreshCts.Token);
+    }
 
-	private async Task AutoRefreshLoop(CancellationToken cancellationToken)
-	{
-		try
-		{
-			while (await _autoRefreshTimer.WaitForNextTickAsync(cancellationToken))
-				await InvokeAsync(LoadTrialBalance);
-		}
-		catch (OperationCanceledException)
-		{
-			// Timer was cancelled, expected on dispose
-		}
-	}
+    private async Task AutoRefreshLoop(CancellationToken cancellationToken)
+    {
+        try
+        {
+            while (await _autoRefreshTimer.WaitForNextTickAsync(cancellationToken))
+                await InvokeAsync(LoadTrialBalance);
+        }
+        catch (OperationCanceledException)
+        {
+            // Timer was cancelled, expected on dispose
+        }
+    }
 
-	public async ValueTask DisposeAsync()
-	{
-		if (_autoRefreshCts is not null)
-		{
-			await _autoRefreshCts.CancelAsync();
-			_autoRefreshCts.Dispose();
-		}
+    public async ValueTask DisposeAsync()
+    {
+        if (_autoRefreshCts is not null)
+        {
+            await _autoRefreshCts.CancelAsync();
+            _autoRefreshCts.Dispose();
+        }
 
-		_autoRefreshTimer?.Dispose();
+        _autoRefreshTimer?.Dispose();
 
-		if (_hotKeysContext is not null)
-			await _hotKeysContext.DisposeAsync();
+        if (_hotKeysContext is not null)
+            await _hotKeysContext.DisposeAsync();
 
-		GC.SuppressFinalize(this);
-	}
-	#endregion
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }

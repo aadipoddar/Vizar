@@ -209,21 +209,14 @@ public partial class PurchaseReturnItemReport : IAsyncDisposable
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var stream = await PurchaseReturnItemReportExcelExport.ExportPurchaseReturnItemReport(
+            var (stream, fileName) = await PurchaseReturnItemReportExcelExport.ExportReport(
                     _transactionOverviews,
                     dateRangeStart,
                     dateRangeEnd,
                     _showAllColumns,
                     _showSummary
                 );
-
-            string fileName = $"PURCHASE_RETURN_ITEM_REPORT";
-            if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
-                fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
-            fileName += ".xlsx";
-
             await SaveAndViewService.SaveAndView(fileName, stream);
-
             await _toastNotification.ShowAsync("Exported", "Excel file downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
@@ -251,21 +244,14 @@ public partial class PurchaseReturnItemReport : IAsyncDisposable
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var stream = await PurchaseReturnItemReportPDFExport.ExportPurchaseReturnItemReport(
+            var (stream, fileName) = await PurchaseReturnItemReportPDFExport.ExportReport(
                     _transactionOverviews,
                     dateRangeStart,
                     dateRangeEnd,
                     _showAllColumns,
                     _showSummary
                 );
-
-            string fileName = $"PURCHASE_RETURN_ITEM_REPORT";
-            if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
-                fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
-            fileName += ".pdf";
-
             await SaveAndViewService.SaveAndView(fileName, stream);
-
             await _toastNotification.ShowAsync("Exported", "PDF file downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)

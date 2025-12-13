@@ -191,85 +191,72 @@ public partial class VehicleIssueItemReport : IAsyncDisposable
     #region Exporting
     private async Task ExportExcel()
     {
-        //if (_isProcessing)
-        //	return;
+        if (_isProcessing)
+            return;
 
-        //try
-        //{
-        //	_isProcessing = true;
-        //	StateHasChanged();
-        //	await _toastNotification.ShowAsync("Exporting", "Generating Excel file...", ToastType.Info);
+        try
+        {
+            _isProcessing = true;
+            StateHasChanged();
+            await _toastNotification.ShowAsync("Exporting", "Generating Excel file...", ToastType.Info);
 
-        //	DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
-        //	DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
+            DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
+            DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-        //	var stream = await ItemIssueItemReportExcelExport.ExportItemIssueItemReport(
-        //			_transactionOverviews,
-        //			dateRangeStart,
-        //			dateRangeEnd,
-        //			_showAllColumns,
-        //			_showSummary
-        //		);
-
-        //	string fileName = $"ITEM_ISSUE_ITEM_REPORT";
-        //	if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
-        //		fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
-        //	fileName += ".xlsx";
-
-        //	await SaveAndViewService.SaveAndView(fileName, stream);
-        //	await _toastNotification.ShowAsync("Exported", "Excel file downloaded successfully.", ToastType.Success);
-        //}
-        //catch (Exception ex)
-        //{
-        //	await _toastNotification.ShowAsync("Error", $"Excel export failed: {ex.Message}", ToastType.Error);
-        //}
-        //finally
-        //{
-        //	_isProcessing = false;
-        //	StateHasChanged();
-        //}
+            var (stream, fileName) = await VehicleIssueItemReportExcelExport.ExportReport(
+                    _transactionOverviews,
+                    dateRangeStart,
+                    dateRangeEnd,
+                    _showAllColumns,
+                    _showSummary
+                );
+            await SaveAndViewService.SaveAndView(fileName, stream);
+            await _toastNotification.ShowAsync("Exported", "Excel file downloaded successfully.", ToastType.Success);
+        }
+        catch (Exception ex)
+        {
+            await _toastNotification.ShowAsync("Error", $"Excel export failed: {ex.Message}", ToastType.Error);
+        }
+        finally
+        {
+            _isProcessing = false;
+            StateHasChanged();
+        }
     }
 
     private async Task ExportPdf()
     {
-        //if (_isProcessing)
-        //	return;
+        if (_isProcessing)
+            return;
 
-        //try
-        //{
-        //	_isProcessing = true;
-        //	StateHasChanged();
-        //	await _toastNotification.ShowAsync("Exporting", "Generating PDF file...", ToastType.Info);
+        try
+        {
+            _isProcessing = true;
+            StateHasChanged();
+            await _toastNotification.ShowAsync("Exporting", "Generating PDF file...", ToastType.Info);
 
-        //	DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
-        //	DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
+            DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
+            DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-        //	var stream = await ItemIssueItemReportPDFExport.ExportItemIssueItemReport(
-        //			_transactionOverviews,
-        //			dateRangeStart,
-        //			dateRangeEnd,
-        //			_showAllColumns,
-        //			_showSummary
-        //		);
-
-        //	string fileName = $"ITEM_ISSUE_ITEM_REPORT";
-        //	if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
-        //		fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
-        //	fileName += ".pdf";
-
-        //	await SaveAndViewService.SaveAndView(fileName, stream);
-
-        //	await _toastNotification.ShowAsync("Exported", "PDF file downloaded successfully.", ToastType.Success);
-        //}
-        //catch (Exception ex)
-        //{
-        //	await _toastNotification.ShowAsync("Error", $"PDF export failed: {ex.Message}", ToastType.Error);
-        //}
-        //finally
-        //{
-        //	_isProcessing = false;
-        //	StateHasChanged();
-        //}
+            var (stream, fileName) = await VehicleIssueItemReportPDFExport.ExportReport(
+                    _transactionOverviews,
+                    dateRangeStart,
+                    dateRangeEnd,
+                    _showAllColumns,
+                    _showSummary
+                );
+            await SaveAndViewService.SaveAndView(fileName, stream);
+            await _toastNotification.ShowAsync("Exported", "PDF file downloaded successfully.", ToastType.Success);
+        }
+        catch (Exception ex)
+        {
+            await _toastNotification.ShowAsync("Error", $"PDF export failed: {ex.Message}", ToastType.Error);
+        }
+        finally
+        {
+            _isProcessing = false;
+            StateHasChanged();
+        }
     }
     #endregion
 
@@ -344,28 +331,28 @@ public partial class VehicleIssueItemReport : IAsyncDisposable
 
     private async Task DownloadExcelInvoice(int transactionId)
     {
-        //if (_isProcessing)
-        //	return;
+        if (_isProcessing)
+            return;
 
-        //try
-        //{
-        //	_isProcessing = true;
-        //	StateHasChanged();
-        //	await _toastNotification.ShowAsync("Processing", "Generating Excel invoice...", ToastType.Info);
+        try
+        {
+            _isProcessing = true;
+            StateHasChanged();
+            await _toastNotification.ShowAsync("Processing", "Generating Excel invoice...", ToastType.Info);
 
-        //	var (excelStream, fileName) = await ItemIssueData.GenerateAndDownloadExcelInvoice(transactionId);
-        //	await SaveAndViewService.SaveAndView(fileName, excelStream);
-        //	await _toastNotification.ShowAsync("Success", "Excel invoice downloaded successfully.", ToastType.Success);
-        //}
-        //catch (Exception ex)
-        //{
-        //	await _toastNotification.ShowAsync("Error", $"An error occurred while generating Excel invoice: {ex.Message}", ToastType.Error);
-        //}
-        //finally
-        //{
-        //	_isProcessing = false;
-        //	StateHasChanged();
-        //}
+            var (excelStream, fileName) = await ItemIssueInvoiceExcelExport.ExportInvoice(transactionId);
+            await SaveAndViewService.SaveAndView(fileName, excelStream);
+            await _toastNotification.ShowAsync("Success", "Excel invoice downloaded successfully.", ToastType.Success);
+        }
+        catch (Exception ex)
+        {
+            await _toastNotification.ShowAsync("Error", $"An error occurred while generating Excel invoice: {ex.Message}", ToastType.Error);
+        }
+        finally
+        {
+            _isProcessing = false;
+            StateHasChanged();
+        }
     }
 
     private async Task ToggleDetailsView()

@@ -277,19 +277,13 @@ public partial class PurchaseItemReport : IAsyncDisposable
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var stream = await PurchaseItemReportExcelExport.ExportPurchaseItemReport(
+            var (stream, fileName) = await PurchaseItemReportExcelExport.ExportReport(
                     _transactionOverviews,
                     dateRangeStart,
                     dateRangeEnd,
                     _showAllColumns,
                     _showSummary
                 );
-
-            string fileName = $"PURCHASE_ITEM_REPORT";
-            if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
-                fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
-            fileName += ".xlsx";
-
             await SaveAndViewService.SaveAndView(fileName, stream);
             await _toastNotification.ShowAsync("Exported", "Excel file downloaded successfully.", ToastType.Success);
         }
@@ -318,19 +312,13 @@ public partial class PurchaseItemReport : IAsyncDisposable
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var stream = await PurchaseItemReportPDFExport.ExportPurchaseItemReport(
+            var (stream, fileName) = await PurchaseItemReportPDFExport.ExportReport(
                     _transactionOverviews,
                     dateRangeStart,
                     dateRangeEnd,
                     _showAllColumns,
                     _showSummary
                 );
-
-            string fileName = $"PURCHASE_ITEM_REPORT";
-            if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
-                fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
-            fileName += ".pdf";
-
             await SaveAndViewService.SaveAndView(fileName, stream);
             await _toastNotification.ShowAsync("Exported", "PDF file downloaded successfully.", ToastType.Success);
         }

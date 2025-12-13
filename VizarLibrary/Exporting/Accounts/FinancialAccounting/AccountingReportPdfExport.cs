@@ -19,7 +19,7 @@ public static class AccountingReportPdfExport
     /// <param name="companyName">Name of the company for report header</param>
     /// <param name="voucherName">Name of the voucher for report header</param>
     /// <returns>MemoryStream containing the PDF file</returns>
-    public static async Task<MemoryStream> ExportAccountingReport(
+    public static async Task<(MemoryStream stream, string fileName)> ExportReport(
         IEnumerable<AccountingOverviewModel> accountingData,
         DateOnly? dateRangeStart = null,
         DateOnly? dateRangeEnd = null,
@@ -57,12 +57,12 @@ public static class AccountingReportPdfExport
                 nameof(AccountingOverviewModel.LastModifiedFromPlatform)
             ];
 
-			if (string.IsNullOrWhiteSpace(companyName))
-				columnOrder.Insert(6, nameof(AccountingOverviewModel.CompanyName));
+            if (string.IsNullOrWhiteSpace(companyName))
+                columnOrder.Insert(6, nameof(AccountingOverviewModel.CompanyName));
 
-			if (string.IsNullOrWhiteSpace(voucherName))
-				columnOrder.Insert(7, nameof(AccountingOverviewModel.VoucherName));
-		}
+            if (string.IsNullOrWhiteSpace(voucherName))
+                columnOrder.Insert(7, nameof(AccountingOverviewModel.VoucherName));
+        }
 
         // Summary columns - key fields only
         else
@@ -96,7 +96,7 @@ public static class AccountingReportPdfExport
             Format = "dd-MMM-yyyy hh:mm tt",
             IncludeInTotal = false
         };
-        
+
         columnSettings[nameof(AccountingOverviewModel.TotalDebitLedgers)] = new()
         {
             DisplayName = "Debit Ledgers",
@@ -154,7 +154,7 @@ public static class AccountingReportPdfExport
 
         // Call the generic PDF export utility
         // Use landscape only when showing all columns, portrait for summary view
-        return await PDFReportExportUtil.ExportToPdf(
+        var stream = await PDFReportExportUtil.ExportToPdf(
             accountingData,
             "FINANCIAL ACCOUNTING REPORT",
             dateRangeStart,
@@ -165,7 +165,14 @@ public static class AccountingReportPdfExport
             autoAdjustColumnWidth: true,
             logoPath: null,
             useLandscape: showAllColumns,
-			new() { ["Company"] = companyName ?? null, ["Voucher"] = voucherName ?? null }
+            new() { ["Company"] = companyName ?? null, ["Voucher"] = voucherName ?? null }
         );
+
+        string fileName = $"ACCOUNTING_REPORT";
+        if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
+            fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
+        fileName += ".pdf";
+
+        return (stream, fileName);
     }
 }

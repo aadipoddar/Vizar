@@ -5,7 +5,7 @@ namespace VizarLibrary.Exporting.Accounts.FinancialAccounting;
 
 public static class AccountingLedgerReportExcelExport
 {
-    public static async Task<MemoryStream> ExportAccountingLedgerReport(
+    public static async Task<(MemoryStream stream, string fileName)> ExportReport(
         IEnumerable<AccountingLedgerOverviewModel> ledgerData,
         DateOnly? dateRangeStart = null,
         DateOnly? dateRangeEnd = null,
@@ -73,7 +73,7 @@ public static class AccountingLedgerReportExcelExport
 
             if (string.IsNullOrWhiteSpace(companyName))
                 columnOrder.Insert(6, nameof(AccountingLedgerOverviewModel.CompanyName));
-		}
+        }
 
         // Summary view - essential columns only
         else
@@ -99,7 +99,7 @@ public static class AccountingLedgerReportExcelExport
         }
 
         // Call the generic Excel export utility
-        return await ExcelReportExportUtil.ExportToExcel(
+        var stream = await ExcelReportExportUtil.ExportToExcel(
             ledgerData,
             "FINANCIAL LEDGER REPORT",
             "Ledger Report",
@@ -107,8 +107,15 @@ public static class AccountingLedgerReportExcelExport
             dateRangeEnd,
             columnSettings,
             columnOrder,
-            new () { ["Company"] = companyName ?? null, ["Ledger"] = ledgerName ?? null },
+            new() { ["Company"] = companyName ?? null, ["Ledger"] = ledgerName ?? null },
             customSummaryFields
         );
+
+        string fileName = $"LEDGER_REPORT";
+        if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
+            fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
+        fileName += ".xlsx";
+
+        return (stream, fileName);
     }
 }

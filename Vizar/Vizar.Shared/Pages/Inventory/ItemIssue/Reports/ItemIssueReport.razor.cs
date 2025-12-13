@@ -200,88 +200,74 @@ public partial class ItemIssueReport : IAsyncDisposable
     #region Exporting
     private async Task ExportExcel()
     {
-        //if (_isProcessing)
-        //	return;
+        if (_isProcessing)
+            return;
 
-        //try
-        //{
-        //	_isProcessing = true;
-        //	StateHasChanged();
-        //	await _toastNotification.ShowAsync("Exporting", "Generating Excel file...", ToastType.Info);
+        try
+        {
+            _isProcessing = true;
+            StateHasChanged();
+            await _toastNotification.ShowAsync("Exporting", "Generating Excel file...", ToastType.Info);
 
-        //	DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
-        //	DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
+            DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
+            DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-        //	var stream = await ItemIssueReportExcelExport.ExportItemIssueReport(
-        //			_transactionOverviews,
-        //			dateRangeStart,
-        //			dateRangeEnd,
-        //			_showAllColumns,
-        //			_selectedGarage?.Id > 0 ? _selectedGarage?.Name : null,
-        //			_showSummary
-        //		);
-
-        //	string fileName = $"KITCHEN_ISSUE_REPORT";
-        //	if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
-        //		fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
-        //	fileName += ".xlsx";
-
-        //	await SaveAndViewService.SaveAndView(fileName, stream);
-
-        //	await _toastNotification.ShowAsync("Exported", "Excel file downloaded successfully.", ToastType.Success);
-        //}
-        //catch (Exception ex)
-        //{
-        //	await _toastNotification.ShowAsync("Error", $"Excel export failed: {ex.Message}", ToastType.Error);
-        //}
-        //finally
-        //{
-        //	_isProcessing = false;
-        //	StateHasChanged();
-        //}
+            var (stream, fileName) = await ItemIssueReportExcelExport.ExportReport(
+                    _transactionOverviews,
+                    dateRangeStart,
+                    dateRangeEnd,
+                    _showAllColumns,
+                    _selectedGarage?.Id > 0 ? _selectedGarage?.Name : null,
+                    _showSummary
+                );
+            await SaveAndViewService.SaveAndView(fileName, stream);
+            await _toastNotification.ShowAsync("Exported", "Excel file downloaded successfully.", ToastType.Success);
+        }
+        catch (Exception ex)
+        {
+            await _toastNotification.ShowAsync("Error", $"Excel export failed: {ex.Message}", ToastType.Error);
+        }
+        finally
+        {
+            _isProcessing = false;
+            StateHasChanged();
+        }
     }
 
     private async Task ExportPdf()
     {
-        //if (_isProcessing)
-        //	return;
+        if (_isProcessing)
+            return;
 
-        //try
-        //{
-        //	_isProcessing = true;
-        //	StateHasChanged();
-        //	await _toastNotification.ShowAsync("Exporting", "Generating PDF file...", ToastType.Info);
+        try
+        {
+            _isProcessing = true;
+            StateHasChanged();
+            await _toastNotification.ShowAsync("Exporting", "Generating PDF file...", ToastType.Info);
 
-        //	DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
-        //	DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
+            DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
+            DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-        //	var stream = await ItemIssueReportPDFExport.ExportItemIssueReport(
-        //			_transactionOverviews,
-        //			dateRangeStart,
-        //			dateRangeEnd,
-        //			_showAllColumns,
-        //			_selectedGarage?.Id > 0 ? _selectedGarage?.Name : null,
-        //			_showSummary
-        //		);
-
-        //	string fileName = $"KITCHEN_ISSUE_REPORT";
-        //	if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
-        //		fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
-        //	fileName += ".pdf";
-
-        //	await SaveAndViewService.SaveAndView(fileName, stream);
-
-        //	await _toastNotification.ShowAsync("Exported", "PDF file downloaded successfully.", ToastType.Success);
-        //}
-        //catch (Exception ex)
-        //{
-        //	await _toastNotification.ShowAsync("Error", $"PDF export failed: {ex.Message}", ToastType.Error);
-        //}
-        //finally
-        //{
-        //	_isProcessing = false;
-        //	StateHasChanged();
-        //}
+            var (stream, fileName) = await ItemIssueReportPDFExport.ExportReport(
+                    _transactionOverviews,
+                    dateRangeStart,
+                    dateRangeEnd,
+                    _showAllColumns,
+                    _selectedGarage?.Id > 0 ? _selectedGarage?.Name : null,
+                    _showSummary
+                );
+            await SaveAndViewService.SaveAndView(fileName, stream);
+            await _toastNotification.ShowAsync("Exported", "PDF file downloaded successfully.", ToastType.Success);
+        }
+        catch (Exception ex)
+        {
+            await _toastNotification.ShowAsync("Error", $"PDF export failed: {ex.Message}", ToastType.Error);
+        }
+        finally
+        {
+            _isProcessing = false;
+            StateHasChanged();
+        }
     }
     #endregion
 
@@ -409,7 +395,7 @@ public partial class ItemIssueReport : IAsyncDisposable
 
             await _toastNotification.ShowAsync("Processing", "Deleting transaction...", ToastType.Info);
 
-            await ItemIssueData.DeleteTransaction(_deleteTransactionId);
+            await DeleteTransaction(_deleteTransactionId);
 
             await _toastNotification.ShowAsync("Success", $"Transaction {_deleteTransactionNo} has been deleted successfully.", ToastType.Success);
 
@@ -428,26 +414,21 @@ public partial class ItemIssueReport : IAsyncDisposable
         }
     }
 
-    private async Task ToggleDetailsView()
+    private async Task DeleteTransaction(int deleteTransactionId)
     {
-        _showAllColumns = !_showAllColumns;
-        StateHasChanged();
+        var itemIssue = await CommonData.LoadTableDataById<ItemIssueModel>(TableNames.ItemIssue, deleteTransactionId);
+        if (itemIssue is null)
+        {
+            await _toastNotification.ShowAsync("Error", "Transaction not found.", ToastType.Error);
+            return;
+        }
 
-        if (_sfGrid is not null)
-            await _sfGrid.Refresh();
-    }
+        itemIssue.Status = false;
+        itemIssue.LastModifiedBy = _user.Id;
+        itemIssue.LastModifiedAt = await CommonData.LoadCurrentDateTime();
+        itemIssue.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
 
-    private async Task ToggleDeleted()
-    {
-        _showDeleted = !_showDeleted;
-        await LoadTransactionOverviews();
-        StateHasChanged();
-    }
-
-    private async Task ToggleSummary()
-    {
-        _showSummary = !_showSummary;
-        await LoadTransactionOverviews();
+        await ItemIssueData.DeleteTransaction(itemIssue);
     }
 
     private async Task ConfirmRecover()
@@ -500,7 +481,6 @@ public partial class ItemIssueReport : IAsyncDisposable
             return;
         }
 
-        // Update the Status to true (active)
         itemIssue.Status = true;
         itemIssue.LastModifiedBy = _user.Id;
         itemIssue.LastModifiedAt = await CommonData.LoadCurrentDateTime();
@@ -511,6 +491,28 @@ public partial class ItemIssueReport : IAsyncDisposable
     #endregion
 
     #region Utilities
+    private async Task ToggleDetailsView()
+    {
+        _showAllColumns = !_showAllColumns;
+        StateHasChanged();
+
+        if (_sfGrid is not null)
+            await _sfGrid.Refresh();
+    }
+
+    private async Task ToggleDeleted()
+    {
+        _showDeleted = !_showDeleted;
+        await LoadTransactionOverviews();
+        StateHasChanged();
+    }
+
+    private async Task ToggleSummary()
+    {
+        _showSummary = !_showSummary;
+        await LoadTransactionOverviews();
+    }
+
     private async Task NavigateToTransactionPage()
     {
         if (FormFactor.GetFormFactor() == "Web")

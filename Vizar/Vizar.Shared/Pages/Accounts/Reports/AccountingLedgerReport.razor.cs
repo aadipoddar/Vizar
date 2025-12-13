@@ -214,7 +214,7 @@ public partial class AccountingLedgerReport : IAsyncDisposable
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var stream = await AccountingLedgerReportExcelExport.ExportAccountingLedgerReport(
+            var (stream, fileName) = await AccountingLedgerReportExcelExport.ExportReport(
                     _transactionOverviews,
                     dateRangeStart,
                     dateRangeEnd,
@@ -223,12 +223,6 @@ public partial class AccountingLedgerReport : IAsyncDisposable
                     _selectedLedger?.Id > 0 ? _selectedLedger?.Name : null,
                     _selectedLedger?.Id > 0 ? _selectedTrialBalance : null
                 );
-
-            string fileName = $"LEDGER_REPORT";
-            if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
-                fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
-            fileName += ".xlsx";
-
             await SaveAndViewService.SaveAndView(fileName, stream);
             await _toastNotification.ShowAsync("Exported", "Excel file downloaded successfully.", ToastType.Success);
         }
@@ -257,7 +251,7 @@ public partial class AccountingLedgerReport : IAsyncDisposable
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var stream = await AccountingLedgerReportPdfExport.ExportAccountingLedgerReport(
+            var (stream, fileName) = await AccountingLedgerReportPdfExport.ExportReport(
                     _transactionOverviews,
                     dateRangeStart,
                     dateRangeEnd,
@@ -266,12 +260,6 @@ public partial class AccountingLedgerReport : IAsyncDisposable
                     _selectedLedger?.Id > 0 ? _selectedLedger?.Name : null,
                     _selectedLedger?.Id > 0 ? _selectedTrialBalance : null
                 );
-
-            string fileName = $"LEDGER_REPORT";
-            if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
-                fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
-            fileName += ".pdf";
-
             await SaveAndViewService.SaveAndView(fileName, stream);
             await _toastNotification.ShowAsync("Exported", "PDF file downloaded successfully.", ToastType.Success);
         }

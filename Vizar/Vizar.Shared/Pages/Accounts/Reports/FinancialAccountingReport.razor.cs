@@ -200,7 +200,7 @@ public partial class FinancialAccountingReport : IAsyncDisposable
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var stream = await AccountingReportExcelExport.ExportAccountingReport(
+            var (stream, fileName) = await AccountingReportExcelExport.ExportReport(
                     _transactionOverviews.Where(_ => _.Status),
                     dateRangeStart,
                     dateRangeEnd,
@@ -209,12 +209,6 @@ public partial class FinancialAccountingReport : IAsyncDisposable
                     _selectedCompany?.Id > 0 ? _selectedCompany?.Name : null,
                     _selectedVoucher?.Id > 0 ? _selectedVoucher?.Name : null
                 );
-
-            string fileName = $"ACCOUNTING_REPORT";
-            if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
-                fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
-            fileName += ".xlsx";
-
             await SaveAndViewService.SaveAndView(fileName, stream);
             await _toastNotification.ShowAsync("Exported", "Excel file downloaded successfully.", ToastType.Success);
         }
@@ -243,7 +237,7 @@ public partial class FinancialAccountingReport : IAsyncDisposable
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var stream = await AccountingReportPdfExport.ExportAccountingReport(
+            var (stream, fileName) = await AccountingReportPdfExport.ExportReport(
                     _transactionOverviews.Where(_ => _.Status),
                     dateRangeStart,
                     dateRangeEnd,
@@ -252,12 +246,6 @@ public partial class FinancialAccountingReport : IAsyncDisposable
                     _selectedCompany?.Id > 0 ? _selectedCompany?.Name : null,
                     _selectedVoucher?.Id > 0 ? _selectedVoucher?.Name : null
                 );
-
-            string fileName = $"ACCOUNTING_REPORT";
-            if (dateRangeStart.HasValue || dateRangeEnd.HasValue)
-                fileName += $"_{dateRangeStart?.ToString("yyyyMMdd") ?? "START"}_to_{dateRangeEnd?.ToString("yyyyMMdd") ?? "END"}";
-            fileName += ".pdf";
-
             await SaveAndViewService.SaveAndView(fileName, stream);
             await _toastNotification.ShowAsync("Exported", "PDF file downloaded successfully.", ToastType.Success);
         }
