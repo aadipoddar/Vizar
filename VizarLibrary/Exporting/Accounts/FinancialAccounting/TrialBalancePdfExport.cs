@@ -168,7 +168,6 @@ public static class TrialBalancePdfExport
             columnSettings,
             columnOrder,
             useBuiltInStyle: false,
-            autoAdjustColumnWidth: true,
             logoPath: null,
             useLandscape: showAllColumns,
             new() { ["Group Name"] = groupName ?? null, ["Account Type"] = accountTypeName ?? null }

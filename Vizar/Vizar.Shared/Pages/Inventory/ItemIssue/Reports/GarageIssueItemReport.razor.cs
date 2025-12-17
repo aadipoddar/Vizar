@@ -60,6 +60,7 @@ public partial class GarageIssueItemReport : IAsyncDisposable
             .Add(ModCode.Ctrl, Code.E, ExportExcel, "Export to Excel", Exclude.None)
             .Add(ModCode.Ctrl, Code.P, ExportPdf, "Export to PDF", Exclude.None)
             .Add(ModCode.Ctrl, Code.H, NavigateToTransactionHistory, "Open transaction history", Exclude.None)
+            .Add(ModCode.Alt, Code.V, NavigateToVehicleItemReport, "Open vehicle item report", Exclude.None)
             .Add(ModCode.Ctrl, Code.N, NavigateToTransactionPage, "New Transaction", Exclude.None)
             .Add(ModCode.Ctrl, Code.D, NavigateToDashboard, "Go to dashboard", Exclude.None)
             .Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
@@ -384,6 +385,14 @@ public partial class GarageIssueItemReport : IAsyncDisposable
             await JSRuntime.InvokeVoidAsync("open", PageRouteNames.ReportItemIssue, "_blank");
         else
             NavigationManager.NavigateTo(PageRouteNames.ReportItemIssue);
+    }
+
+    private async Task NavigateToVehicleItemReport()
+    {
+        if (FormFactor.GetFormFactor() == "Web")
+            await JSRuntime.InvokeVoidAsync("open", PageRouteNames.ReportVehicleIssueItem, "_blank");
+        else
+            NavigationManager.NavigateTo(PageRouteNames.ReportVehicleIssueItem);
     }
 
     private async Task NavigateToDashboard() =>

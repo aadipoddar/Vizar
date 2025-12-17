@@ -15,7 +15,6 @@ public static class AccountingReportPdfExport
     /// <param name="dateRangeStart">Start date of the report</param>
     /// <param name="dateRangeEnd">End date of the report</param>
     /// <param name="showAllColumns">Whether to include all columns or just summary columns</param>
-    /// <param name="isAdmin">Whether the user is admin (to include admin-only columns)</param>
     /// <param name="companyName">Name of the company for report header</param>
     /// <param name="voucherName">Name of the voucher for report header</param>
     /// <returns>MemoryStream containing the PDF file</returns>
@@ -24,7 +23,6 @@ public static class AccountingReportPdfExport
         DateOnly? dateRangeStart = null,
         DateOnly? dateRangeEnd = null,
         bool showAllColumns = true,
-        bool isAdmin = false,
         string companyName = null,
         string voucherName = null)
     {
@@ -162,7 +160,6 @@ public static class AccountingReportPdfExport
             columnSettings,
             columnOrder,
             useBuiltInStyle: false,
-            autoAdjustColumnWidth: true,
             logoPath: null,
             useLandscape: showAllColumns,
             new() { ["Company"] = companyName ?? null, ["Voucher"] = voucherName ?? null }

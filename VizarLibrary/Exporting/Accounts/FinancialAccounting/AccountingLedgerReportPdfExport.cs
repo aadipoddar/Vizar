@@ -131,7 +131,6 @@ public static class AccountingLedgerReportPdfExport
             columnSettings,
             columnOrder,
             useBuiltInStyle: false,
-            autoAdjustColumnWidth: true,
             logoPath: null,
             useLandscape: showAllColumns,
             new() { ["Company"] = companyName ?? null, ["Ledger"] = ledgerName ?? null },

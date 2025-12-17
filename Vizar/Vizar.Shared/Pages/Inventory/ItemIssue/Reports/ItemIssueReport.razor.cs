@@ -70,7 +70,8 @@ public partial class ItemIssueReport : IAsyncDisposable
             .Add(Code.F5, LoadTransactionOverviews, "Refresh Data", Exclude.None)
             .Add(ModCode.Ctrl, Code.E, ExportExcel, "Export to Excel", Exclude.None)
             .Add(ModCode.Ctrl, Code.P, ExportPdf, "Export to PDF", Exclude.None)
-            .Add(ModCode.Ctrl, Code.I, NavigateToItemReport, "Open item report", Exclude.None)
+            .Add(ModCode.Alt, Code.G, NavigateToGarageItemReport, "Open garage item report", Exclude.None)
+            .Add(ModCode.Alt, Code.V, NavigateToVehicleItemReport, "Open vehicle item report", Exclude.None)
             .Add(ModCode.Ctrl, Code.N, NavigateToTransactionPage, "New Transaction", Exclude.None)
             .Add(ModCode.Ctrl, Code.D, NavigateToDashboard, "Go to dashboard", Exclude.None)
             .Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
@@ -521,12 +522,20 @@ public partial class ItemIssueReport : IAsyncDisposable
             NavigationManager.NavigateTo(PageRouteNames.ItemIssue);
     }
 
-    private async Task NavigateToItemReport()
+    private async Task NavigateToGarageItemReport()
     {
         if (FormFactor.GetFormFactor() == "Web")
             await JSRuntime.InvokeVoidAsync("open", PageRouteNames.ReportGarageIssueItem, "_blank");
         else
             NavigationManager.NavigateTo(PageRouteNames.ReportGarageIssueItem);
+    }
+
+    private async Task NavigateToVehicleItemReport()
+    {
+        if (FormFactor.GetFormFactor() == "Web")
+            await JSRuntime.InvokeVoidAsync("open", PageRouteNames.ReportVehicleIssueItem, "_blank");
+        else
+            NavigationManager.NavigateTo(PageRouteNames.ReportVehicleIssueItem);
     }
 
     private void NavigateToDashboard() =>

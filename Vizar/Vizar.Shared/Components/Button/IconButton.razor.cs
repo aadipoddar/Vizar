@@ -103,7 +103,9 @@ public enum IconType
 	TrialBalance,
 	Generate,
 	Reset,
-	Recover
+	Recover,
+	VehicleIssueItem,
+	GarageIssueItem
 }
 
 public enum ButtonVariant

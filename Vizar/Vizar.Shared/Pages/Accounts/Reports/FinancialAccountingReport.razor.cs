@@ -242,7 +242,6 @@ public partial class FinancialAccountingReport : IAsyncDisposable
                     dateRangeStart,
                     dateRangeEnd,
                     _showAllColumns,
-                    _user.Admin,
                     _selectedCompany?.Id > 0 ? _selectedCompany?.Name : null,
                     _selectedVoucher?.Id > 0 ? _selectedVoucher?.Name : null
                 );
