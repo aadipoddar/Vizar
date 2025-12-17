@@ -52,6 +52,7 @@ public partial class IconButton
                 ButtonVariant.Delete => "icon-btn-delete",
                 ButtonVariant.Add => "icon-btn-add",
                 ButtonVariant.Recover => "icon-btn-recover",
+                ButtonVariant.Logout => "icon-btn-logout",
                 _ => string.Empty
             },
 
@@ -115,7 +116,8 @@ public enum ButtonVariant
 	Edit,
 	Delete,
 	Add,
-	Recover
+	Recover,
+	Logout
 }
 
 public enum ButtonSize

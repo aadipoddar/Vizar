@@ -31,10 +31,22 @@ SELECT
 
 	[iid].[Remarks] AS Remarks,
 
-	-- Mileage of the vehicle at the time of item issue can be calculated as CurrentKM - PreviousKM + CurrentHour - PreviousHour / Quantity where VehicleId can be null KM and Hr can be null as well
-	[iid].[CurrentHour] AS PreviousHour,
-	[iid].[CurrentKM] AS PreviousKM,
-	0 AS Average
+	-- Previous values from OUTER APPLY
+	[prev].[CurrentHour] AS PreviousHour,
+	[prev].[CurrentKM] AS PreviousKM,
+	
+	-- Calculate average based on distance traveled
+	CASE
+		WHEN [iid].[Quantity] > 0 AND (
+			(ISNULL([iid].[CurrentKM], 0) - ISNULL([prev].[CurrentKM], 0)) +
+			(ISNULL([iid].[CurrentHour], 0) - ISNULL([prev].[CurrentHour], 0))
+		) > 0
+		THEN [iid].[Quantity] / (
+			(ISNULL([iid].[CurrentKM], 0) - ISNULL([prev].[CurrentKM], 0)) +
+			(ISNULL([iid].[CurrentHour], 0) - ISNULL([prev].[CurrentHour], 0))
+		)
+		ELSE NULL
+	END AS Average
 
 FROM
 	[dbo].[ItemIssueDetail] iid
@@ -53,6 +65,23 @@ LEFT JOIN
 	[dbo].[Vehicle] v ON iid.VehicleId = v.Id
 INNER JOIN
 	[dbo].[Company] c ON ii.CompanyId = c.Id
+
+-- Get previous readings for the same vehicle and item
+OUTER APPLY (
+	SELECT TOP 1 
+		prevDetail.[CurrentHour],
+		prevDetail.[CurrentKM]
+	FROM [dbo].[ItemIssueDetail] prevDetail
+	INNER JOIN [dbo].[ItemIssue] prevMaster ON prevDetail.[MasterId] = prevMaster.Id
+	WHERE prevDetail.[VehicleId] = [iid].[VehicleId]
+		AND prevDetail.[ItemId] = [iid].[ItemId]
+		AND prevDetail.[VehicleId] IS NOT NULL
+		AND prevMaster.[TransactionDateTime] < [ii].[TransactionDateTime]
+		AND prevMaster.[Status] = 1
+		AND prevDetail.[Status] = 1
+		AND prevMaster.[GarageId] IS NULL
+	ORDER BY prevMaster.[TransactionDateTime] DESC, prevDetail.[Id] DESC
+) prev
 
 WHERE
 	[ii].[GarageId] IS NULL AND
