@@ -1,4 +1,5 @@
-﻿using VizarLibrary.Exporting.Utils;
+﻿using VizarLibrary.Data.Common;
+using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
 
 namespace VizarLibrary.Exporting.Accounts.Masters;
@@ -13,7 +14,7 @@ public static class FinancialYearExcelExport
     /// </summary>
     /// <param name="financialYearData">Collection of financial year records</param>
     /// <returns>MemoryStream containing the Excel file</returns>
-    public static async Task<MemoryStream> ExportFinancialYear(IEnumerable<FinancialYearModel> financialYearData)
+    public static async Task<(MemoryStream stream, string fileName)> ExportMaster(IEnumerable<FinancialYearModel> financialYearData)
     {
         // Create enriched data with status formatting
         var enrichedData = financialYearData.Select(fy => new
@@ -60,10 +61,10 @@ public static class FinancialYearExcelExport
             nameof(FinancialYearModel.Remarks),
             nameof(FinancialYearModel.Locked),
             nameof(FinancialYearModel.Status)
-		];
+        ];
 
         // Call the generic Excel export utility
-        return await ExcelReportExportUtil.ExportToExcel(
+        var stream = await ExcelReportExportUtil.ExportToExcel(
             enrichedData,
             "FINANCIAL YEAR",
             "Financial Year Data",
@@ -72,5 +73,9 @@ public static class FinancialYearExcelExport
             columnSettings,
             columnOrder
         );
+
+        var currentDateTime = await CommonData.LoadCurrentDateTime();
+        var fileName = $"FinancialYear_Master_{currentDateTime:yyyyMMdd_HHmmss}.xlsx";
+        return (stream, fileName);
     }
 }

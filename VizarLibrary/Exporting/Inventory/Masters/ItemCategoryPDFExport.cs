@@ -1,35 +1,27 @@
 ﻿using VizarLibrary.Data.Common;
 using VizarLibrary.Exporting.Utils;
-using VizarLibrary.Models.Accounts.Masters;
+using VizarLibrary.Models.Inventory.Item;
 
-namespace VizarLibrary.Exporting.Accounts.Masters;
+namespace VizarLibrary.Exporting.Inventory.Masters;
 
-/// <summary>
-/// PDF export functionality for Voucher
-/// </summary>
-public static class VoucherPDFExport
+public static class ItemCategoryPDFExport
 {
-    /// <summary>
-    /// Export voucher data to PDF with custom column order and formatting
-    /// </summary>
-    /// <param name="voucherData">Collection of voucher records</param>
-    /// <returns>MemoryStream containing the PDF file</returns>
-    public static async Task<(MemoryStream stream, string fileName)> ExportMaster(IEnumerable<VoucherModel> voucherData)
+    public static async Task<(MemoryStream stream, string fileName)> ExportMaster(IEnumerable<ItemCategoryModel> itemCategoryData)
     {
         // Create enriched data with status formatting
-        var enrichedData = voucherData.Select(voucher => new
+        var enrichedData = itemCategoryData.Select(itemCategory => new
         {
-            voucher.Id,
-            voucher.Name,
-            voucher.Code,
-            voucher.Remarks,
-            Status = voucher.Status ? "Active" : "Deleted"
+            itemCategory.Id,
+            itemCategory.Name,
+            itemCategory.Code,
+            itemCategory.Remarks,
+            Status = itemCategory.Status ? "Active" : "Deleted"
         });
 
         // Define custom column settings
         var columnSettings = new Dictionary<string, PDFReportExportUtil.ColumnSetting>
         {
-            [nameof(VoucherModel.Id)] = new()
+            [nameof(ItemCategoryModel.Id)] = new()
             {
                 DisplayName = "ID",
                 StringFormat = new Syncfusion.Pdf.Graphics.PdfStringFormat
@@ -40,11 +32,11 @@ public static class VoucherPDFExport
                 IncludeInTotal = false
             },
 
-            [nameof(VoucherModel.Name)] = new() { DisplayName = "Voucher Name", IncludeInTotal = false },
-            [nameof(VoucherModel.Code)] = new() { DisplayName = "Prefix Code", IncludeInTotal = false },
-            [nameof(VoucherModel.Remarks)] = new() { DisplayName = "Remarks", IncludeInTotal = false },
+            [nameof(ItemCategoryModel.Name)] = new() { DisplayName = "Name", IncludeInTotal = false },
+            [nameof(ItemCategoryModel.Code)] = new() { DisplayName = "Code", IncludeInTotal = false },
+            [nameof(ItemCategoryModel.Remarks)] = new() { DisplayName = "Remarks", IncludeInTotal = false },
 
-            [nameof(VoucherModel.Status)] = new()
+            [nameof(ItemCategoryModel.Status)] = new()
             {
                 DisplayName = "Status",
                 StringFormat = new Syncfusion.Pdf.Graphics.PdfStringFormat
@@ -59,17 +51,17 @@ public static class VoucherPDFExport
         // Define column order
         List<string> columnOrder =
         [
-            nameof(VoucherModel.Id),
-            nameof(VoucherModel.Name),
-            nameof(VoucherModel.Code),
-            nameof(VoucherModel.Remarks),
-            nameof(VoucherModel.Status)
+            nameof(ItemCategoryModel.Id),
+            nameof(ItemCategoryModel.Name),
+            nameof(ItemCategoryModel.Code),
+            nameof(ItemCategoryModel.Remarks),
+            nameof(ItemCategoryModel.Status)
         ];
 
         // Call the generic PDF export utility
         var stream = await PDFReportExportUtil.ExportToPdf(
             enrichedData,
-            "VOUCHER MASTER",
+            "Item Category MASTER",
             null,
             null,
             columnSettings,
@@ -78,7 +70,7 @@ public static class VoucherPDFExport
         );
 
         var currentDateTime = await CommonData.LoadCurrentDateTime();
-        var fileName = $"Voucher_Master_{currentDateTime:yyyyMMdd_HHmmss}.pdf";
+        var fileName = $"Item_Category_Master_{currentDateTime:yyyyMMdd_HHmmss}.pdf";
         return (stream, fileName);
     }
 }

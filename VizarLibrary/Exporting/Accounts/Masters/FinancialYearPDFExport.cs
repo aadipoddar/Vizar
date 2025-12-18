@@ -1,4 +1,5 @@
-﻿using VizarLibrary.Exporting.Utils;
+﻿using VizarLibrary.Data.Common;
+using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
 
 namespace VizarLibrary.Exporting.Accounts.Masters;
@@ -13,7 +14,7 @@ public static class FinancialYearPDFExport
     /// </summary>
     /// <param name="financialYearData">Collection of financial year records</param>
     /// <returns>MemoryStream containing the PDF file</returns>
-    public static async Task<MemoryStream> ExportFinancialYear(IEnumerable<FinancialYearModel> financialYearData)
+    public static async Task<(MemoryStream stream, string fileName)> ExportMaster(IEnumerable<FinancialYearModel> financialYearData)
     {
         // Create enriched data with status formatting
         var enrichedData = financialYearData.Select(fy => new
@@ -102,17 +103,17 @@ public static class FinancialYearPDFExport
         // Define column order
         List<string> columnOrder =
         [
-			nameof(FinancialYearModel.Id),
-			nameof(FinancialYearModel.StartDate),
-			nameof(FinancialYearModel.EndDate),
-			nameof(FinancialYearModel.YearNo),
-			nameof(FinancialYearModel.Remarks),
-			nameof(FinancialYearModel.Locked),
-			nameof(FinancialYearModel.Status)
+            nameof(FinancialYearModel.Id),
+            nameof(FinancialYearModel.StartDate),
+            nameof(FinancialYearModel.EndDate),
+            nameof(FinancialYearModel.YearNo),
+            nameof(FinancialYearModel.Remarks),
+            nameof(FinancialYearModel.Locked),
+            nameof(FinancialYearModel.Status)
         ];
 
         // Call the generic PDF export utility
-        return await PDFReportExportUtil.ExportToPdf(
+        var stream = await PDFReportExportUtil.ExportToPdf(
             enrichedData,
             "FINANCIAL YEAR MASTER",
             null,
@@ -121,5 +122,9 @@ public static class FinancialYearPDFExport
             columnOrder,
             useLandscape: false
         );
+
+        var currentDateTime = await CommonData.LoadCurrentDateTime();
+        var fileName = $"FinancialYear_Master_{currentDateTime:yyyyMMdd_HHmmss}.pdf";
+        return (stream, fileName);
     }
 }

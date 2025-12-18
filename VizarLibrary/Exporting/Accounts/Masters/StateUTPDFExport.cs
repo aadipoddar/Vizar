@@ -1,4 +1,5 @@
-﻿using VizarLibrary.Exporting.Utils;
+﻿using VizarLibrary.Data.Common;
+using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
 
 namespace VizarLibrary.Exporting.Accounts.Masters;
@@ -13,7 +14,7 @@ public static class StateUTPDFExport
     /// </summary>
     /// <param name="stateUTData">Collection of state/UT records</param>
     /// <returns>MemoryStream containing the PDF file</returns>
-    public static async Task<MemoryStream> ExportStateUT(IEnumerable<StateUTModel> stateUTData)
+    public static async Task<(MemoryStream stream, string fileName)> ExportMaster(IEnumerable<StateUTModel> stateUTData)
     {
         // Create enriched data with status formatting
         var enrichedData = stateUTData.Select(stateUT => new
@@ -71,9 +72,9 @@ public static class StateUTPDFExport
             nameof(StateUTModel.UnionTerritory),
             nameof(StateUTModel.Status)
         ];
-        
+
         // Call the generic PDF export utility
-        return await PDFReportExportUtil.ExportToPdf(
+        var stream = await PDFReportExportUtil.ExportToPdf(
             enrichedData,
             "STATE & UNION TERRITORY MASTER",
             null,
@@ -82,5 +83,9 @@ public static class StateUTPDFExport
             columnOrder,
             useLandscape: false
         );
+
+        var currentDateTime = await CommonData.LoadCurrentDateTime();
+        var fileName = $"StateUT_Master_{currentDateTime:yyyyMMdd_HHmmss}.pdf";
+        return (stream, fileName);
     }
 }

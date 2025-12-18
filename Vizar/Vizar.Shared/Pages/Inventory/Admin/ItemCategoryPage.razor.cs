@@ -2,35 +2,36 @@ using Syncfusion.Blazor.Grids;
 
 using Vizar.Shared.Components.Dialog;
 
-using VizarLibrary.Data.Accounts.Masters;
+using VizarLibrary.Data;
 using VizarLibrary.Data.Common;
+using VizarLibrary.Data.Inventory.Item;
 using VizarLibrary.DataAccess;
-using VizarLibrary.Exporting.Accounts.Masters;
-using VizarLibrary.Models.Accounts.Masters;
+using VizarLibrary.Exporting.Inventory.Masters;
 using VizarLibrary.Models.Common;
+using VizarLibrary.Models.Inventory.Item;
 
-namespace Vizar.Shared.Pages.Accounts.Admin;
+namespace Vizar.Shared.Pages.Inventory.Admin;
 
-public partial class AccountTypePage : IAsyncDisposable
+public partial class ItemCategoryPage : IAsyncDisposable
 {
     private HotKeysContext _hotKeysContext;
     private bool _isLoading = true;
     private bool _isProcessing = false;
     private bool _showDeleted = false;
 
-    private AccountTypeModel _accountType = new();
+    private ItemCategoryModel _itemCategory = new();
 
-    private List<AccountTypeModel> _accountTypes = [];
+    private List<ItemCategoryModel> _itemCategories = [];
 
-    private SfGrid<AccountTypeModel> _sfGrid;
+    private SfGrid<ItemCategoryModel> _sfGrid;
     private DeleteConfirmationDialog _deleteConfirmationDialog;
     private RecoverConfirmationDialog _recoverConfirmationDialog;
 
-    private int _deleteAccountTypeId = 0;
-    private string _deleteAccountTypeName = string.Empty;
+    private int _deleteItemCategoryId = 0;
+    private string _deleteItemCategoryName = string.Empty;
 
-    private int _recoverAccountTypeId = 0;
-    private string _recoverAccountTypeName = string.Empty;
+    private int _recoverItemCategoryId = 0;
+    private string _recoverItemCategoryName = string.Empty;
 
     private ToastNotification _toastNotification;
 
@@ -49,7 +50,7 @@ public partial class AccountTypePage : IAsyncDisposable
     private async Task LoadData()
     {
         _hotKeysContext = HotKeys.CreateContext()
-            .Add(ModCode.Ctrl, Code.S, SaveAccountType, "Save", Exclude.None)
+            .Add(ModCode.Ctrl, Code.S, SaveItemCategory, "Save", Exclude.None)
             .Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
             .Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
             .Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
@@ -59,10 +60,10 @@ public partial class AccountTypePage : IAsyncDisposable
             .Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
             .Add(Code.Delete, DeleteSelectedItem, "Delete selected", Exclude.None);
 
-        _accountTypes = await CommonData.LoadTableData<AccountTypeModel>(TableNames.AccountType);
+        _itemCategories = await CommonData.LoadTableData<ItemCategoryModel>(TableNames.ItemCategory);
 
         if (!_showDeleted)
-            _accountTypes = [.. _accountTypes.Where(at => at.Status)];
+            _itemCategories = [.. _itemCategories.Where(l => l.Status)];
 
         if (_sfGrid is not null)
             await _sfGrid.Refresh();
@@ -70,14 +71,15 @@ public partial class AccountTypePage : IAsyncDisposable
     #endregion
 
     #region Actions
-    private void OnEditAccountType(AccountTypeModel accountType)
+    private void OnEditItemCategory(ItemCategoryModel itemCategory)
     {
-        _accountType = new()
+        _itemCategory = new()
         {
-            Id = accountType.Id,
-            Name = accountType.Name,
-            Remarks = accountType.Remarks,
-            Status = accountType.Status
+            Id = itemCategory.Id,
+            Name = itemCategory.Name,
+            Code = itemCategory.Code,
+            Remarks = itemCategory.Remarks,
+            Status = itemCategory.Status
         };
 
         StateHasChanged();
@@ -85,15 +87,15 @@ public partial class AccountTypePage : IAsyncDisposable
 
     private async Task ShowDeleteConfirmation(int id, string name)
     {
-        _deleteAccountTypeId = id;
-        _deleteAccountTypeName = name;
+        _deleteItemCategoryId = id;
+        _deleteItemCategoryName = name;
         await _deleteConfirmationDialog.ShowAsync();
     }
 
     private async Task CancelDelete()
     {
-        _deleteAccountTypeId = 0;
-        _deleteAccountTypeName = string.Empty;
+        _deleteItemCategoryId = 0;
+        _deleteItemCategoryName = string.Empty;
         await _deleteConfirmationDialog.HideAsync();
     }
 
@@ -104,42 +106,42 @@ public partial class AccountTypePage : IAsyncDisposable
             _isProcessing = true;
             await _deleteConfirmationDialog.HideAsync();
 
-            var accountType = _accountTypes.FirstOrDefault(at => at.Id == _deleteAccountTypeId);
-            if (accountType == null)
+            var itemCategory = _itemCategories.FirstOrDefault(l => l.Id == _deleteItemCategoryId);
+            if (itemCategory == null)
             {
-                await _toastNotification.ShowAsync("Error", "Account Type not found.", ToastType.Error);
+                await _toastNotification.ShowAsync("Error", "Item Category not found.", ToastType.Error);
                 return;
             }
 
-            accountType.Status = false;
-            await AccountTypeData.InsertAccountType(accountType);
+            itemCategory.Status = false;
+            await ItemData.InsertItemCategory(itemCategory);
 
-            await _toastNotification.ShowAsync("Success", $"Account Type '{accountType.Name}' has been deleted successfully.", ToastType.Success);
-            NavigationManager.NavigateTo(PageRouteNames.AdminAccountType, true);
+            await _toastNotification.ShowAsync("Deleted", $"Item Category '{itemCategory.Name}' has been deleted successfully.", ToastType.Success);
+            NavigationManager.NavigateTo(PageRouteNames.AdminItemCategory, true);
         }
         catch (Exception ex)
         {
-            await _toastNotification.ShowAsync("Error", $"Failed to delete Account Type: {ex.Message}", ToastType.Error);
+            await _toastNotification.ShowAsync("Error", $"Failed to delete Item Category: {ex.Message}", ToastType.Error);
         }
         finally
         {
             _isProcessing = false;
-            _deleteAccountTypeId = 0;
-            _deleteAccountTypeName = string.Empty;
+            _deleteItemCategoryId = 0;
+            _deleteItemCategoryName = string.Empty;
         }
     }
 
     private async Task ShowRecoverConfirmation(int id, string name)
     {
-        _recoverAccountTypeId = id;
-        _recoverAccountTypeName = name;
+        _recoverItemCategoryId = id;
+        _recoverItemCategoryName = name;
         await _recoverConfirmationDialog.ShowAsync();
     }
 
     private async Task CancelRecover()
     {
-        _recoverAccountTypeId = 0;
-        _recoverAccountTypeName = string.Empty;
+        _recoverItemCategoryId = 0;
+        _recoverItemCategoryName = string.Empty;
         await _recoverConfirmationDialog.HideAsync();
     }
 
@@ -147,7 +149,6 @@ public partial class AccountTypePage : IAsyncDisposable
     {
         _showDeleted = !_showDeleted;
         await LoadData();
-        StateHasChanged();
     }
 
     private async Task ConfirmRecover()
@@ -157,28 +158,28 @@ public partial class AccountTypePage : IAsyncDisposable
             _isProcessing = true;
             await _recoverConfirmationDialog.HideAsync();
 
-            var accountType = _accountTypes.FirstOrDefault(at => at.Id == _recoverAccountTypeId);
-            if (accountType == null)
+            var itemCategory = _itemCategories.FirstOrDefault(l => l.Id == _recoverItemCategoryId);
+            if (itemCategory == null)
             {
-                await _toastNotification.ShowAsync("Error", "Account Type not found.", ToastType.Error);
+                await _toastNotification.ShowAsync("Error", "Item Category not found.", ToastType.Error);
                 return;
             }
 
-            accountType.Status = true;
-            await AccountTypeData.InsertAccountType(accountType);
+            itemCategory.Status = true;
+            await ItemData.InsertItemCategory(itemCategory);
 
-            await _toastNotification.ShowAsync("Success", $"Account Type '{accountType.Name}' has been recovered successfully.", ToastType.Success);
-            NavigationManager.NavigateTo(PageRouteNames.AdminAccountType, true);
+            await _toastNotification.ShowAsync("Recovered", $"Item Category '{itemCategory.Name}' has been recovered successfully.", ToastType.Success);
+            NavigationManager.NavigateTo(PageRouteNames.AdminItemCategory, true);
         }
         catch (Exception ex)
         {
-            await _toastNotification.ShowAsync("Error", $"Failed to recover Account Type: {ex.Message}", ToastType.Error);
+            await _toastNotification.ShowAsync("Error", $"Failed to recover Item Category: {ex.Message}", ToastType.Error);
         }
         finally
         {
             _isProcessing = false;
-            _recoverAccountTypeId = 0;
-            _recoverAccountTypeName = string.Empty;
+            _recoverItemCategoryId = 0;
+            _recoverItemCategoryName = string.Empty;
         }
     }
     #endregion
@@ -186,36 +187,40 @@ public partial class AccountTypePage : IAsyncDisposable
     #region Saving
     private async Task<bool> ValidateForm()
     {
-        _accountType.Name = _accountType.Name?.Trim() ?? "";
-        _accountType.Name = _accountType.Name?.ToUpper() ?? "";
+        _itemCategory.Name = _itemCategory.Name?.Trim() ?? "";
+        _itemCategory.Name = _itemCategory.Name?.ToUpper() ?? "";
 
-        _accountType.Remarks = _accountType.Remarks?.Trim() ?? "";
-        _accountType.Status = true;
+        _itemCategory.Remarks = _itemCategory.Remarks?.Trim() ?? "";
+        _itemCategory.Status = true;
 
-        if (string.IsNullOrWhiteSpace(_accountType.Name))
+
+        if (_itemCategory.Id == 0)
+            _itemCategory.Code = await GenerateCodes.GenerateItemCategoryCode();
+
+        if (string.IsNullOrWhiteSpace(_itemCategory.Name))
         {
-            await _toastNotification.ShowAsync("Error", "Account Type name is required. Please enter a valid account type name.", ToastType.Error);
+            await _toastNotification.ShowAsync("Validation", "Item Category name is required. Please enter a valid name.", ToastType.Warning);
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(_accountType.Remarks))
-            _accountType.Remarks = null;
+        if (string.IsNullOrWhiteSpace(_itemCategory.Remarks))
+            _itemCategory.Remarks = null;
 
-        if (_accountType.Id > 0)
+        if (_itemCategory.Id > 0)
         {
-            var existingAccountType = _accountTypes.FirstOrDefault(_ => _.Id != _accountType.Id && _.Name.Equals(_accountType.Name, StringComparison.OrdinalIgnoreCase));
-            if (existingAccountType is not null)
+            var existingRawMaterialCategory = _itemCategories.FirstOrDefault(_ => _.Id != _itemCategory.Id && _.Name.Equals(_itemCategory.Name, StringComparison.OrdinalIgnoreCase));
+            if (existingRawMaterialCategory is not null)
             {
-                await _toastNotification.ShowAsync("Error", $"Account Type name '{_accountType.Name}' already exists. Please choose a different name.", ToastType.Error);
+                await _toastNotification.ShowAsync("Duplicate", $"Item Category name '{_itemCategory.Name}' already exists. Please choose a different name.", ToastType.Warning);
                 return false;
             }
         }
         else
         {
-            var existingAccountType = _accountTypes.FirstOrDefault(_ => _.Name.Equals(_accountType.Name, StringComparison.OrdinalIgnoreCase));
-            if (existingAccountType is not null)
+            var existingRawMaterialCategory = _itemCategories.FirstOrDefault(_ => _.Name.Equals(_itemCategory.Name, StringComparison.OrdinalIgnoreCase));
+            if (existingRawMaterialCategory is not null)
             {
-                await _toastNotification.ShowAsync("Error", $"Account Type name '{_accountType.Name}' already exists. Please choose a different name.", ToastType.Error);
+                await _toastNotification.ShowAsync("Duplicate", $"Item Category name '{_itemCategory.Name}' already exists. Please choose a different name.", ToastType.Warning);
                 return false;
             }
         }
@@ -223,7 +228,7 @@ public partial class AccountTypePage : IAsyncDisposable
         return true;
     }
 
-    private async Task SaveAccountType()
+    private async Task SaveItemCategory()
     {
         if (_isProcessing)
             return;
@@ -239,16 +244,16 @@ public partial class AccountTypePage : IAsyncDisposable
                 return;
             }
 
-            await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing", "Please wait while the category is being saved...", ToastType.Info);
 
-            await AccountTypeData.InsertAccountType(_accountType);
+            await ItemData.InsertItemCategory(_itemCategory);
 
-            await _toastNotification.ShowAsync("Success", $"Account Type '{_accountType.Name}' has been saved successfully.", ToastType.Success);
-            NavigationManager.NavigateTo(PageRouteNames.AdminAccountType, true);
+            await _toastNotification.ShowAsync("Saved", $"Item Category '{_itemCategory.Name}' has been saved successfully.", ToastType.Success);
+            NavigationManager.NavigateTo(PageRouteNames.AdminItemCategory, true);
         }
         catch (Exception ex)
         {
-            await _toastNotification.ShowAsync("Error", $"Failed to save Account Type: {ex.Message}", ToastType.Error);
+            await _toastNotification.ShowAsync("Error", $"Failed to save Item Category: {ex.Message}", ToastType.Error);
         }
         finally
         {
@@ -267,11 +272,11 @@ public partial class AccountTypePage : IAsyncDisposable
         {
             _isProcessing = true;
             StateHasChanged();
-            await _toastNotification.ShowAsync("Processing", "Exporting to Excel...", ToastType.Info);
+            await _toastNotification.ShowAsync("Exporting", "Exporting to Excel...", ToastType.Info);
 
-            var (stream, fileName) = await AccountTypeExcelExport.ExportMaster(_accountTypes);
+            var (stream, fileName) = await ItemCategoryExcelExport.ExportMaster(_itemCategories);
             await SaveAndViewService.SaveAndView(fileName, stream);
-            await _toastNotification.ShowAsync("Success", "Account Type data exported to Excel successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Exported", "Item Category data exported to Excel successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -293,11 +298,11 @@ public partial class AccountTypePage : IAsyncDisposable
         {
             _isProcessing = true;
             StateHasChanged();
-            await _toastNotification.ShowAsync("Processing", "Exporting to PDF...", ToastType.Info);
+            await _toastNotification.ShowAsync("Exporting", "Exporting to PDF...", ToastType.Info);
 
-            var (stream, fileName) = await AccountTypePDFExport.ExportMaster(_accountTypes);
+            var (stream, fileName) = await ItemCategoryPDFExport.ExportMaster(_itemCategories);
             await SaveAndViewService.SaveAndView(fileName, stream);
-            await _toastNotification.ShowAsync("Success", "Account Type data exported to PDF successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Exported", "Item Category data exported to PDF successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -316,7 +321,7 @@ public partial class AccountTypePage : IAsyncDisposable
     {
         var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
         if (selectedRecords.Count > 0)
-            OnEditAccountType(selectedRecords[0]);
+            OnEditItemCategory(selectedRecords[0]);
     }
 
     private async Task DeleteSelectedItem()
@@ -332,7 +337,7 @@ public partial class AccountTypePage : IAsyncDisposable
     }
 
     private async Task ResetPage() =>
-        NavigationManager.NavigateTo(PageRouteNames.AdminAccountType, true);
+        NavigationManager.NavigateTo(PageRouteNames.AdminVoucher, true);
 
     private async Task NavigateBack() =>
         NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);

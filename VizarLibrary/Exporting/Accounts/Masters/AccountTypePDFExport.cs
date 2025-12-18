@@ -1,4 +1,5 @@
-﻿using VizarLibrary.Exporting.Utils;
+﻿using VizarLibrary.Data.Common;
+using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
 
 namespace VizarLibrary.Exporting.Accounts.Masters;
@@ -13,7 +14,7 @@ public static class AccountTypePDFExport
     /// </summary>
     /// <param name="accountTypeData">Collection of account type records</param>
     /// <returns>MemoryStream containing the PDF file</returns>
-    public static async Task<MemoryStream> ExportAccountType(IEnumerable<AccountTypeModel> accountTypeData)
+    public static async Task<(MemoryStream stream, string fileName)> ExportMaster(IEnumerable<AccountTypeModel> accountTypeData)
     {
         // Create enriched data with status formatting
         var enrichedData = accountTypeData.Select(accountType => new
@@ -63,7 +64,7 @@ public static class AccountTypePDFExport
         ];
 
         // Call the generic PDF export utility
-        return await PDFReportExportUtil.ExportToPdf(
+        var stream = await PDFReportExportUtil.ExportToPdf(
             enrichedData,
             "ACCOUNT TYPE MASTER",
             null,
@@ -72,5 +73,9 @@ public static class AccountTypePDFExport
             columnOrder,
             useLandscape: false
         );
+
+        var currentDateTime = CommonData.LoadCurrentDateTime();
+        var fileName = $"AccountType_Master_{currentDateTime:yyyyMMdd_HHmmss}.pdf";
+        return (stream, fileName);
     }
 }
