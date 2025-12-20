@@ -7,6 +7,7 @@
     [Email] VARCHAR(MAX) NULL, 
     [Accounts] BIT NOT NULL DEFAULT 0,
     [Inventory] BIT NOT NULL DEFAULT 0,
+    [Fleet] BIT NOT NULL DEFAULT 0,
     [Admin] BIT NOT NULL DEFAULT 0, 
     [Remarks] VARCHAR(MAX) NULL,
     [Status] BIT NOT NULL DEFAULT 1, 

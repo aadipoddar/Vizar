@@ -1,7 +1,7 @@
 ﻿CREATE VIEW [dbo].[VehicleIssue_Item_Overview]
 	AS
 SELECT
-	[i].[Id],
+	[i].[Id] AS ItemId,
 	[i].[Name] AS ItemName,
 	[i].[Code] AS ItemCode,
 	[it].[Id] AS ItemTypeId,
@@ -41,10 +41,8 @@ SELECT
 			(ISNULL([iid].[CurrentKM], 0) - ISNULL([prev].[CurrentKM], 0)) +
 			(ISNULL([iid].[CurrentHour], 0) - ISNULL([prev].[CurrentHour], 0))
 		) > 0
-		THEN [iid].[Quantity] / (
-			(ISNULL([iid].[CurrentKM], 0) - ISNULL([prev].[CurrentKM], 0)) +
-			(ISNULL([iid].[CurrentHour], 0) - ISNULL([prev].[CurrentHour], 0))
-		)
+		THEN  ((ISNULL([iid].[CurrentKM], 0) - ISNULL([prev].[CurrentKM], 0)) +
+				(ISNULL([iid].[CurrentHour], 0) - ISNULL([prev].[CurrentHour], 0))) / [iid].[Quantity]
 		ELSE NULL
 	END AS Average
 

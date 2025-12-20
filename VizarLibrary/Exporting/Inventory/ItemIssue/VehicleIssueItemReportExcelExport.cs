@@ -16,7 +16,7 @@ public static class VehicleIssueItemReportExcelExport
         var columnSettings = new Dictionary<string, ExcelReportExportUtil.ColumnSetting>
         {
             // IDs - Center aligned, no totals
-            [nameof(VehicleIssueItemOverviewModel.Id)] = new() { DisplayName = "ID", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignCenter, IncludeInTotal = false },
+            [nameof(VehicleIssueItemOverviewModel.ItemId)] = new() { DisplayName = "ID", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignCenter, IncludeInTotal = false },
             [nameof(VehicleIssueItemOverviewModel.MasterId)] = new() { DisplayName = "Master ID", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignCenter, IncludeInTotal = false },
             [nameof(VehicleIssueItemOverviewModel.ItemCategoryId)] = new() { DisplayName = "Category ID", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignCenter, IncludeInTotal = false },
             [nameof(VehicleIssueItemOverviewModel.CompanyId)] = new() { DisplayName = "Company ID", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignCenter, IncludeInTotal = false },
@@ -97,7 +97,6 @@ public static class VehicleIssueItemReportExcelExport
             columnOrder =
             [
                 nameof(VehicleIssueItemOverviewModel.ItemName),
-                nameof(VehicleIssueItemOverviewModel.ItemCode),
                 nameof(VehicleIssueItemOverviewModel.TransactionNo),
                 nameof(VehicleIssueItemOverviewModel.TransactionDateTime),
                 nameof(VehicleIssueItemOverviewModel.VehicleCode),

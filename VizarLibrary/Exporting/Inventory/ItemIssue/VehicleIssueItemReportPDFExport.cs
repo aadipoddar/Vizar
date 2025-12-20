@@ -90,9 +90,8 @@ public static class VehicleIssueItemReportPDFExport
         columnSettings[nameof(VehicleIssueItemOverviewModel.VehicleShortCode)] = new() { DisplayName = "Vehicle Short", IncludeInTotal = false };
         columnSettings[nameof(VehicleIssueItemOverviewModel.IdentificationNo)] = new() { DisplayName = "Identification No", IncludeInTotal = false };
         columnSettings[nameof(VehicleIssueItemOverviewModel.UnitOfMeasurement)] = new() { DisplayName = "UOM", IncludeInTotal = false };
-        columnSettings[nameof(VehicleIssueItemOverviewModel.ItemIssueRemarks)] = new() { DisplayName = "Purchase Return Remarks", IncludeInTotal = false };
+        columnSettings[nameof(VehicleIssueItemOverviewModel.ItemIssueRemarks)] = new() { DisplayName = "Item Issue Remarks", IncludeInTotal = false };
         columnSettings[nameof(VehicleIssueItemOverviewModel.Remarks)] = new() { DisplayName = "Item Remarks", IncludeInTotal = false };
-        columnSettings[nameof(VehicleIssueItemOverviewModel.IdentificationNo)] = new() { DisplayName = "Ident No", IncludeInTotal = false };
 
         columnSettings[nameof(VehicleIssueItemOverviewModel.CurrentHour)] = new()
         {

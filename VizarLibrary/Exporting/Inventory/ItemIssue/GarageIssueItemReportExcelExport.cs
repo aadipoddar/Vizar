@@ -16,7 +16,7 @@ public static class GarageIssueItemReportExcelExport
         var columnSettings = new Dictionary<string, ExcelReportExportUtil.ColumnSetting>
         {
             // IDs - Center aligned, no totals
-            [nameof(GarageIssueItemOverviewModel.Id)] = new() { DisplayName = "ID", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignCenter, IncludeInTotal = false },
+            [nameof(GarageIssueItemOverviewModel.ItemId)] = new() { DisplayName = "ID", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignCenter, IncludeInTotal = false },
             [nameof(GarageIssueItemOverviewModel.MasterId)] = new() { DisplayName = "Master ID", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignCenter, IncludeInTotal = false },
             [nameof(GarageIssueItemOverviewModel.ItemCategoryId)] = new() { DisplayName = "Category ID", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignCenter, IncludeInTotal = false },
             [nameof(GarageIssueItemOverviewModel.CompanyId)] = new() { DisplayName = "Company ID", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignCenter, IncludeInTotal = false },
@@ -82,7 +82,6 @@ public static class GarageIssueItemReportExcelExport
             columnOrder =
             [
                 nameof(GarageIssueItemOverviewModel.ItemName),
-                nameof(GarageIssueItemOverviewModel.ItemCode),
                 nameof(GarageIssueItemOverviewModel.TransactionNo),
                 nameof(GarageIssueItemOverviewModel.TransactionDateTime),
                 nameof(GarageIssueItemOverviewModel.GarageName),

@@ -6,6 +6,7 @@
 	@Email VARCHAR(250) = NULL,
 	@Accounts BIT = 0,
 	@Inventory BIT = 0,
+	@Fleet BIT = 0,
 	@Admin BIT = 0,
 	@Remarks VARCHAR(MAX) = NULL,
 	@Status BIT = 1,
@@ -26,6 +27,7 @@ BEGIN
 			[Email],
 			[Accounts],
 			[Inventory],
+			[Fleet],
 			[Admin],
 			[Remarks],
 			[Status]
@@ -38,6 +40,7 @@ BEGIN
 			@Email,
 			@Accounts,
 			@Inventory,
+			@Fleet,
 			@Admin,
 			@Remarks,
 			@Status
@@ -55,6 +58,7 @@ BEGIN
 			[Email] = @Email,
 			[Accounts] = @Accounts,
 			[Inventory] = @Inventory,
+			[Fleet] = @Fleet,
 			[Admin] = @Admin,
 			[Remarks] = @Remarks,
 			[Status] = @Status,

@@ -6,7 +6,7 @@ namespace VizarLibrary.Exporting.Inventory.ItemIssue;
 public static class GarageIssueItemReportPDFExport
 {
     public static async Task<(MemoryStream stream, string fileName)> ExportReport(
-        IEnumerable<GarageIssueItemOverviewModel> purchaseReturnItemData,
+        IEnumerable<GarageIssueItemOverviewModel> transactionData,
         DateOnly? dateRangeStart = null,
         DateOnly? dateRangeEnd = null,
         bool showAllColumns = true,
@@ -44,7 +44,6 @@ public static class GarageIssueItemReportPDFExport
                 nameof(GarageIssueItemOverviewModel.IdentificationNo),
                 nameof(GarageIssueItemOverviewModel.Quantity),
                 nameof(GarageIssueItemOverviewModel.Total),
-                nameof(GarageIssueItemOverviewModel.IdentificationNo),
                 nameof(GarageIssueItemOverviewModel.ItemIssueRemarks),
                 nameof(GarageIssueItemOverviewModel.Remarks)
             ];
@@ -54,7 +53,6 @@ public static class GarageIssueItemReportPDFExport
             columnOrder =
             [
                 nameof(GarageIssueItemOverviewModel.ItemName),
-                nameof(GarageIssueItemOverviewModel.ItemCode),
                 nameof(GarageIssueItemOverviewModel.TransactionNo),
                 nameof(GarageIssueItemOverviewModel.TransactionDateTime),
                 nameof(GarageIssueItemOverviewModel.GarageName),
@@ -75,7 +73,6 @@ public static class GarageIssueItemReportPDFExport
         columnSettings[nameof(GarageIssueItemOverviewModel.UnitOfMeasurement)] = new() { DisplayName = "UOM", IncludeInTotal = false };
         columnSettings[nameof(GarageIssueItemOverviewModel.ItemIssueRemarks)] = new() { DisplayName = "Purchase Return Remarks", IncludeInTotal = false };
         columnSettings[nameof(GarageIssueItemOverviewModel.Remarks)] = new() { DisplayName = "Item Remarks", IncludeInTotal = false };
-        columnSettings[nameof(GarageIssueItemOverviewModel.IdentificationNo)] = new() { DisplayName = "Ident No", IncludeInTotal = false };
 
         columnSettings[nameof(GarageIssueItemOverviewModel.Quantity)] = new()
         {
@@ -115,7 +112,7 @@ public static class GarageIssueItemReportPDFExport
 
         // Call the generic PDF export utility with landscape mode for all columns
         var stream = await PDFReportExportUtil.ExportToPdf(
-            purchaseReturnItemData,
+            transactionData,
             "GARAGE ITEM ISSUE REPORT",
             dateRangeStart,
             dateRangeEnd,

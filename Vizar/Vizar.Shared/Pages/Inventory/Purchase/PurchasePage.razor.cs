@@ -794,7 +794,6 @@ public partial class PurchasePage : IAsyncDisposable
 
         if (_purchase.Id > 0)
         {
-            var existingPurchase = await CommonData.LoadTableDataById<PurchaseModel>(TableNames.Purchase, _purchase.Id);
             var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, _purchase.FinancialYearId);
             if (financialYear is null || financialYear.Locked || financialYear.Status == false)
             {

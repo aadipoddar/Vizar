@@ -794,8 +794,7 @@ public partial class PurchaseReturnPage : IAsyncDisposable
 
         if (_purchaseReturn.Id > 0)
         {
-            var existingPurchaseReturn = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, _purchaseReturn.Id);
-            var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, existingPurchaseReturn.FinancialYearId);
+            var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, _purchaseReturn.FinancialYearId);
             if (financialYear is null || financialYear.Locked || financialYear.Status == false)
             {
                 await _toastNotification.ShowAsync("Financial Year Locked or Inactive", "The financial year for the selected transaction date is either locked or inactive. Please select a different date.", ToastType.Error);

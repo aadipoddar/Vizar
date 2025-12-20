@@ -1,0 +1,10 @@
+﻿using VizarLibrary.DataAccess;
+using VizarLibrary.Models.Fleet.Service;
+
+namespace VizarLibrary.Data.Fleet.Service;
+
+public static class GarageData
+{
+    private static async Task<int> InsertGarage(GarageModel garage) =>
+        (await SqlDataAccess.LoadData<int, dynamic>(StoredProcedureNames.InsertGarage, garage)).FirstOrDefault();
+}

@@ -92,6 +92,12 @@
     <Folder Include="StoredProcedures\Insert\Inventory\ItemIssue" />
     <Folder Include="Tables\Fleet\Vehicle" />
     <Folder Include="Tables\Fleet\Service" />
+    <Folder Include="StoredProcedures\Insert\Fleet" />
+    <Folder Include="StoredProcedures\Insert\Fleet\Service" />
+    <Folder Include="Views\Fleet" />
+    <Folder Include="Views\Fleet\Service" />
+    <Folder Include="StoredProcedures\LoadData\Fleet" />
+    <Folder Include="StoredProcedures\LoadData\Fleet\Service" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\AzureVizar.publish.xml" />
@@ -168,8 +174,6 @@
     <Build Include="StoredProcedures\Delete\Delete_ItemStock_By_Id.sql" />
     <Build Include="Tables\Inventory\ItemIssue\ItemIssue.sql" />
     <Build Include="Tables\Inventory\ItemIssue\ItemIssueDetail.sql" />
-    <Build Include="StoredProcedures\Insert\Inventory\ItemIssue\Insert_ItemIssueDetail.sql" />
-    <Build Include="StoredProcedures\Insert\Inventory\ItemIssue\Insert_ItemIssue.sql" />
     <Build Include="Views\Inventory\ItemIssue\GarageIssue_Item_Overview.sql" />
     <Build Include="Views\Inventory\ItemIssue\ItemIssue_Overview.sql" />
     <Build Include="Tables\Fleet\Vehicle\Vehicle.sql" />
@@ -177,5 +181,20 @@
     <Build Include="Tables\Fleet\Vehicle\VehicleType.sql" />
     <Build Include="Tables\Fleet\Service\Garage.sql" />
     <Build Include="Views\Inventory\ItemIssue\VehicleIssue_Item_Overview.sql" />
+    <Build Include="Tables\Fleet\Service\Service.sql" />
+    <Build Include="Tables\Fleet\Service\ServiceDetail.sql" />
+    <Build Include="Tables\Fleet\Service\ServiceType.sql" />
+    <Build Include="Tables\Fleet\Service\ServiceSchedule.sql" />
+    <Build Include="StoredProcedures\Insert\Inventory\ItemIssue\Insert_ItemIssueDetail.sql" />
+    <Build Include="StoredProcedures\Insert\Inventory\ItemIssue\Insert_ItemIssue.sql" />
+    <Build Include="StoredProcedures\Insert\Fleet\Service\Insert_Service.sql" />
+    <Build Include="StoredProcedures\Insert\Fleet\Service\Insert_ServiceDetail.sql" />
+    <Build Include="StoredProcedures\Insert\Fleet\Service\Insert_Garage.sql" />
+    <Build Include="StoredProcedures\Insert\Fleet\Service\Insert_ServiceType.sql" />
+    <Build Include="StoredProcedures\Insert\Fleet\Service\Insert_ServiceSchedule.sql" />
+    <Build Include="Views\Fleet\Service\VehicleService_Item_Overview.sql" />
+    <Build Include="StoredProcedures\LoadData\Fleet\Service\Load_Last_VehicleService_Item_By_Vehicle_ServiceType_Date.sql" />
+    <Build Include="Views\Fleet\Service\Service_Overview.sql" />
+    <Build Include="Views\Fleet\Service\GarageService_Item_Overview.sql" />
   </ItemGroup>
 </Project>

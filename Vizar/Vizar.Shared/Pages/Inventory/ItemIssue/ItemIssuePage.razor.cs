@@ -465,6 +465,9 @@ public partial class ItemIssuePage : IAsyncDisposable
         _selectedCart.ItemName = _selectedItem.Name;
         _selectedCart.Total = _selectedItem.Rate * _selectedCart.Quantity;
 
+        _selectedCart.VehicleCode = _selectedCart.VehicleId is not null ? _vehicles.FirstOrDefault(s => s.Id == _selectedCart.VehicleId)?.Code ?? null : null;
+        _selectedCart.VehicleShortCode = _selectedCart.VehicleId is not null ? _vehicles.FirstOrDefault(s => s.Id == _selectedCart.VehicleId)?.ShortCode ?? null : null;
+
         StateHasChanged();
     }
 
@@ -620,6 +623,9 @@ public partial class ItemIssuePage : IAsyncDisposable
                 await _toastNotification.ShowAsync("Vehicle Details Missing", "Please enter either the current hour or current KM for the selected vehicle.", ToastType.Error);
                 return;
             }
+
+            item.VehicleCode = item.VehicleId is not null ? _vehicles.FirstOrDefault(s => s.Id == item.VehicleId)?.Code ?? null : null;
+            item.VehicleShortCode = item.VehicleId is not null ? _vehicles.FirstOrDefault(s => s.Id == item.VehicleId)?.ShortCode ?? null : null;
         }
 
         _itemIssue.TotalItems = _cart.Count;
@@ -756,7 +762,6 @@ public partial class ItemIssuePage : IAsyncDisposable
 
         if (_itemIssue.Id > 0)
         {
-            var existingKitchenIssue = await CommonData.LoadTableDataById<ItemIssueModel>(TableNames.ItemIssue, _itemIssue.Id);
             var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, _itemIssue.FinancialYearId);
             if (financialYear is null || financialYear.Locked || financialYear.Status == false)
             {
@@ -806,7 +811,7 @@ public partial class ItemIssuePage : IAsyncDisposable
             _itemIssue.CreatedBy = _user.Id;
             _itemIssue.LastModifiedBy = _user.Id;
 
-            _itemIssue.Id = await ItemIssueData.SaveItemIssueTransaction(_itemIssue, _cart);
+            _itemIssue.Id = await ItemIssueData.SaveTransaction(_itemIssue, _cart);
             var (pdfStream, fileName) = await ItemIssueInvoicePDFExport.ExportInvoice(_itemIssue.Id);
             await SaveAndViewService.SaveAndView(fileName, pdfStream);
             await DeleteLocalFiles();

@@ -15,5 +15,5 @@
     CONSTRAINT [FK_Item_ToItemType] FOREIGN KEY ([ItemTypeId]) REFERENCES [dbo].[ItemType]([Id]), 
     CONSTRAINT [FK_Item_ToItemCategory] FOREIGN KEY ([ItemCategoryId]) REFERENCES [dbo].[ItemCategory]([Id]),
     CONSTRAINT [FK_Item_ToManufacturer] FOREIGN KEY ([ManufacturerId]) REFERENCES [dbo].[Manufacturer]([Id]), 
-    CONSTRAINT [FK_Item_ToTax] FOREIGN KEY ([TaxId]) REFERENCES [dbo].[Tax]([Id]),
+    CONSTRAINT [FK_Item_ToTax] FOREIGN KEY ([TaxId]) REFERENCES [dbo].[Tax]([Id])
 )

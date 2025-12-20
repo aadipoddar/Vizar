@@ -1,7 +1,7 @@
 ﻿CREATE VIEW [dbo].[GarageIssue_Item_Overview]
 	AS
 SELECT
-	[i].[Id],
+	[i].[Id] AS ItemId,
 	[i].[Name] AS ItemName,
 	[i].[Code] AS ItemCode,
 	[it].[Id] AS ItemTypeId,

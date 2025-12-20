@@ -48,10 +48,10 @@ public static class ItemIssueData
             Remarks = item.Remarks
         }));
 
-        await SaveItemIssueTransaction(transaction, itemIssueItemCarts);
+        await SaveTransaction(transaction, itemIssueItemCarts);
     }
 
-    public static async Task<int> SaveItemIssueTransaction(ItemIssueModel itemIssue, List<ItemIssueItemCartModel> itemIssueDetails)
+    public static async Task<int> SaveTransaction(ItemIssueModel itemIssue, List<ItemIssueItemCartModel> itemIssueDetails)
     {
         var update = itemIssue.Id > 0;
 

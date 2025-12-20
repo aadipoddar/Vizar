@@ -17,9 +17,9 @@
 	[LastModifiedBy] INT NULL,
 	[LastModifiedAt] DATETIME NULL, 
 	[LastModifiedFromPlatform] VARCHAR(MAX) NULL,
-    CONSTRAINT [FK_KitchenIssue_ToCompany] FOREIGN KEY ([CompanyId]) REFERENCES [Company]([Id]),
-    CONSTRAINT [FK_KitchenIssue_ToFinancialYear] FOREIGN KEY ([FinancialYearId]) REFERENCES [dbo].[FinancialYear]([Id]),
+    CONSTRAINT [FK_ItemIssue_ToCompany] FOREIGN KEY ([CompanyId]) REFERENCES [Company]([Id]),
+    CONSTRAINT [FK_ItemIssue_ToFinancialYear] FOREIGN KEY ([FinancialYearId]) REFERENCES [dbo].[FinancialYear]([Id]),
     CONSTRAINT [FK_ItemIssue_ToGarage] FOREIGN KEY ([GarageId]) REFERENCES [Garage]([Id]),
-    CONSTRAINT [FK_KitchenIssue_ToUser] FOREIGN KEY ([CreatedBy]) REFERENCES [User]([Id]),
-	CONSTRAINT [FK_KitchenIssue_LastModifiedBy_ToUser] FOREIGN KEY ([LastModifiedBy]) REFERENCES [User]([Id])
+    CONSTRAINT [FK_ItemIssue_ToUser] FOREIGN KEY ([CreatedBy]) REFERENCES [User]([Id]),
+	CONSTRAINT [FK_ItemIssue_LastModifiedBy_ToUser] FOREIGN KEY ([LastModifiedBy]) REFERENCES [User]([Id])
 )
