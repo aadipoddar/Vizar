@@ -8,7 +8,6 @@ public static class ItemCategoryExcelExport
 {
     public static async Task<(MemoryStream stream, string fileName)> ExportMaster(IEnumerable<ItemCategoryModel> itemCategoryData)
     {
-        // Create enriched data with status formatting
         var enrichedData = itemCategoryData.Select(itemCategory => new
         {
             itemCategory.Id,
@@ -33,15 +32,14 @@ public static class ItemCategoryExcelExport
             [nameof(ItemCategoryModel.Status)] = new() { DisplayName = "Status", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignCenter, IncludeInTotal = false }
         };
 
-        // Define column order
-        List<string> columnOrder =
-        [
+        List<string> columnOrder = new()
+        {
             nameof(ItemCategoryModel.Id),
             nameof(ItemCategoryModel.Name),
             nameof(ItemCategoryModel.Code),
             nameof(ItemCategoryModel.Remarks),
             nameof(ItemCategoryModel.Status)
-        ];
+        };
 
         // Call the generic Excel export utility
         var stream = await ExcelReportExportUtil.ExportToExcel(

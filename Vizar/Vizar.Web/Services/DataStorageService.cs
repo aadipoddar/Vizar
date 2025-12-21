@@ -21,18 +21,20 @@ public class DataStorageService(ProtectedLocalStorage protectedLocalStorage) : I
 
     public async Task SecureRemoveAll()
     {
-		await LocalRemove(StorageFileNames.UserDataFileName);
-		await LocalRemove(StorageFileNames.UserDeviceIdDataFileName);
-		await LocalRemove(StorageFileNames.FinancialAccountingDataFileName);
-		await LocalRemove(StorageFileNames.FinancialAccountingCartDataFileName);
-		await LocalRemove(StorageFileNames.PurchaseDataFileName);
-		await LocalRemove(StorageFileNames.PurchaseCartDataFileName);
-		await LocalRemove(StorageFileNames.PurchaseReturnDataFileName);
-		await LocalRemove(StorageFileNames.PurchaseReturnCartDataFileName);
-		await LocalRemove(StorageFileNames.ItemIssueDataFileName);
-		await LocalRemove(StorageFileNames.ItemIssueCartDataFileName);
-		await LocalRemove(StorageFileNames.ItemStockAdjustmentCartDataFileName);
-	}
+        await LocalRemove(StorageFileNames.UserDataFileName);
+        await LocalRemove(StorageFileNames.UserDeviceIdDataFileName);
+        await LocalRemove(StorageFileNames.FinancialAccountingDataFileName);
+        await LocalRemove(StorageFileNames.FinancialAccountingCartDataFileName);
+        await LocalRemove(StorageFileNames.PurchaseDataFileName);
+        await LocalRemove(StorageFileNames.PurchaseCartDataFileName);
+        await LocalRemove(StorageFileNames.PurchaseReturnDataFileName);
+        await LocalRemove(StorageFileNames.PurchaseReturnCartDataFileName);
+        await LocalRemove(StorageFileNames.ItemIssueDataFileName);
+        await LocalRemove(StorageFileNames.ItemIssueCartDataFileName);
+        await LocalRemove(StorageFileNames.ItemStockAdjustmentCartDataFileName);
+        await LocalRemove(StorageFileNames.ServiceDataFileName);
+        await LocalRemove(StorageFileNames.ServiceCartDataFileName);
+    }
 
 
     public async Task<bool> LocalExists(string key) =>

@@ -17,7 +17,8 @@ public static class PageRouteNames
     public static string ItemStockAdjustment => "/inventory/item-stock-adjustment";
 
     public static string FleetDashboard => "/fleet";
-    public static string Service => "/fleet/service/service";
+    public static string Service => "/fleet/service";
+    public static string Document => "/fleet/document";
 
     public static string ReportDashboard => "/report";
     public static string ReportFinancialAccounting => "/report/financial-accounting";

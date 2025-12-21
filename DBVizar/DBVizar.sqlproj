@@ -98,6 +98,9 @@
     <Folder Include="Views\Fleet\Service" />
     <Folder Include="StoredProcedures\LoadData\Fleet" />
     <Folder Include="StoredProcedures\LoadData\Fleet\Service" />
+    <Folder Include="Tables\Fleet\Document" />
+    <Folder Include="StoredProcedures\Insert\Fleet\Document" />
+    <Folder Include="Views\Fleet\Document" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\AzureVizar.publish.xml" />
@@ -196,5 +199,10 @@
     <Build Include="StoredProcedures\LoadData\Fleet\Service\Load_Last_VehicleService_Item_By_Vehicle_ServiceType_Date.sql" />
     <Build Include="Views\Fleet\Service\Service_Overview.sql" />
     <Build Include="Views\Fleet\Service\GarageService_Item_Overview.sql" />
+    <Build Include="Tables\Fleet\Document\DocumentType.sql" />
+    <Build Include="Tables\Fleet\Document\Document.sql" />
+    <Build Include="StoredProcedures\Insert\Fleet\Document\Insert_Document.sql" />
+    <Build Include="StoredProcedures\Insert\Fleet\Document\Insert_DocumentType.sql" />
+    <Build Include="Views\Fleet\Document\Document_Overview.sql" />
   </ItemGroup>
 </Project>

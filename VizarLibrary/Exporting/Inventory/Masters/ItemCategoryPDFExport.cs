@@ -8,7 +8,6 @@ public static class ItemCategoryPDFExport
 {
     public static async Task<(MemoryStream stream, string fileName)> ExportMaster(IEnumerable<ItemCategoryModel> itemCategoryData)
     {
-        // Create enriched data with status formatting
         var enrichedData = itemCategoryData.Select(itemCategory => new
         {
             itemCategory.Id,
@@ -18,7 +17,6 @@ public static class ItemCategoryPDFExport
             Status = itemCategory.Status ? "Active" : "Deleted"
         });
 
-        // Define custom column settings
         var columnSettings = new Dictionary<string, PDFReportExportUtil.ColumnSetting>
         {
             [nameof(ItemCategoryModel.Id)] = new()
@@ -48,17 +46,15 @@ public static class ItemCategoryPDFExport
             }
         };
 
-        // Define column order
-        List<string> columnOrder =
-        [
+        var columnOrder = new List<string>
+        {
             nameof(ItemCategoryModel.Id),
             nameof(ItemCategoryModel.Name),
             nameof(ItemCategoryModel.Code),
             nameof(ItemCategoryModel.Remarks),
             nameof(ItemCategoryModel.Status)
-        ];
+        };
 
-        // Call the generic PDF export utility
         var stream = await PDFReportExportUtil.ExportToPdf(
             enrichedData,
             "Item Category MASTER",

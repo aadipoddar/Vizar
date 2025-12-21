@@ -41,6 +41,8 @@ public static class TableNames
 
     public static string Service => "Service";
     public static string ServiceDetail => "ServiceDetail";
+    public static string DocumentType => "DocumentType";
+    public static string Document => "Document";
 }
 
 public static class StoredProcedureNames
@@ -106,6 +108,8 @@ public static class StoredProcedureNames
 
     public static string InsertService => "Insert_Service";
     public static string InsertServiceDetail => "Insert_ServiceDetail";
+    public static string InsertDocumentType => "Insert_DocumentType";
+    public static string InsertDocument => "Insert_Document";
 
     public static string DeleteItemStockById => "Delete_ItemStock_By_Id";
     public static string DeleteItemStockByTypeTransactionId => "Delete_ItemStock_By_Type_TransactionId";
@@ -130,4 +134,6 @@ public static class ViewNames
     public static string ServiceOverview => "Service_Overview";
     public static string GarageServiceItemOverview => "GarageService_Item_Overview";
     public static string VehicleServiceItemOverview => "VehicleService_Item_Overview";
+
+    public static string DocumentOverview => "Document_Overview";
 }

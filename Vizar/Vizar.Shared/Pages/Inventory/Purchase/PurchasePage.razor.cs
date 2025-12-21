@@ -4,7 +4,6 @@ using Microsoft.JSInterop;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Inputs;
-using Syncfusion.Blazor.Popups;
 
 using Vizar.Shared.Components.Dialog;
 
@@ -49,7 +48,7 @@ public partial class PurchasePage : IAsyncDisposable
 
     private SfAutoComplete<ItemModel?, ItemModel> _sfItemAutoComplete;
     private SfGrid<PurchaseItemCartModel> _sfCartGrid;
-    private SfDialog _uploadDocumentDialog;
+    private DocumentUploadDialog _uploadDocumentDialog;
     private SfUploader _sfDocumentUploader;
 
     private ToastNotification _toastNotification;
@@ -939,25 +938,14 @@ public partial class PurchasePage : IAsyncDisposable
                 await using var file = uploadedFiles[0].File.OpenReadStream(maxAllowedSize: 52428800); // 50 MB
                 var fileName = $"{Guid.NewGuid()}_{uploadedFiles[0].File.Name}";
                 var fileUrl = await BlobStorageAccess.UploadFileToBlobStorage(file, fileName, BlobStorageContainers.purchase);
-                _purchase.DocumentUrl = fileUrl; await SaveTransactionFile();
+                _purchase.DocumentUrl = fileUrl;
+                await SaveTransactionFile();
                 await _toastNotification.ShowAsync("Document Uploaded Successfully", "The document has been uploaded and linked to the transaction.", ToastType.Success);
             }
         }
         catch (Exception ex)
         {
             await _toastNotification.ShowAsync("An Error Occurred While Uploading Document", ex.Message, ToastType.Error);
-        }
-    }
-
-    private async Task InterpretFiles()
-    {
-        try
-        {
-            await _toastNotification.ShowAsync("Feature Not Implemented", "The interpret files feature is not yet implemented.", ToastType.Warning);
-        }
-        catch (Exception ex)
-        {
-            await _toastNotification.ShowAsync("An Error Occurred While Interpreting Files", ex.Message, ToastType.Error);
         }
     }
     #endregion

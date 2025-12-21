@@ -124,8 +124,8 @@ else
 }
 
 <DeleteConfirmationDialog @ref="_deleteConfirmationDialog"
-                          EntityName="Raw Material Category"
-                          IdentifierLabel="Raw Material Category Name"
+                          EntityName="Item Category"
+                          IdentifierLabel="Item Category Name"
                           IdentifierValue="@_deleteItemCategoryName"
                           IsPermanentDelete="false"
                           Disabled="@_isProcessing"
@@ -133,8 +133,8 @@ else
                           OnCancel="CancelDelete" />
 
 <RecoverConfirmationDialog @ref="_recoverConfirmationDialog"
-                           EntityName="Raw Material Category"
-                           IdentifierLabel="Raw Material Category Name"
+                           EntityName="Item Category"
+                           IdentifierLabel="Item Category Name"
                            IdentifierValue="@_recoverItemCategoryName"
                            Disabled="@_isProcessing"
                            OnConfirm="ConfirmRecover"

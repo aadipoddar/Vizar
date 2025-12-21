@@ -4,7 +4,6 @@ using Microsoft.JSInterop;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Inputs;
-using Syncfusion.Blazor.Popups;
 
 using Vizar.Shared.Components.Dialog;
 
@@ -49,7 +48,7 @@ public partial class PurchaseReturnPage : IAsyncDisposable
 
     private SfAutoComplete<ItemModel?, ItemModel> _sfItemAutoComplete;
     private SfGrid<PurchaseReturnItemCartModel> _sfCartGrid;
-    private SfDialog _uploadDocumentDialog;
+    private DocumentUploadDialog _uploadDocumentDialog;
     private SfUploader _sfDocumentUploader;
 
     private ToastNotification _toastNotification;
@@ -946,18 +945,6 @@ public partial class PurchaseReturnPage : IAsyncDisposable
         catch (Exception ex)
         {
             await _toastNotification.ShowAsync("An Error Occurred While Uploading Document", ex.Message, ToastType.Error);
-        }
-    }
-
-    private async Task InterpretFiles()
-    {
-        try
-        {
-            await _toastNotification.ShowAsync("Feature Not Implemented", "The interpret files feature is not yet implemented.", ToastType.Warning);
-        }
-        catch (Exception ex)
-        {
-            await _toastNotification.ShowAsync("An Error Occurred While Interpreting Files", ex.Message, ToastType.Error);
         }
     }
     #endregion

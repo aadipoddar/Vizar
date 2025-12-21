@@ -6,7 +6,7 @@
   <Project Path="Vizar/Vizar.Shared/Vizar.Shared.csproj" />
   <Project Path="Vizar/Vizar.Web/Vizar.Web.csproj" />
   <Project Path="Vizar/Vizar/Vizar.csproj">
-    <Deploy Solution="Debug|*" />
+    <Deploy />
   </Project>
   <Project Path="VizarLibrary/VizarLibrary.csproj" />
 </Solution>
