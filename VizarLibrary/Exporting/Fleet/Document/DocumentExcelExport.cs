@@ -29,8 +29,8 @@ public static class DocumentExcelExport
             [nameof(DocumentOverviewModel.LastModifiedFromPlatform)] = new() { DisplayName = "Modified Platform", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignCenter },
 
             // Date fields
-            [nameof(DocumentOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignCenter },
-            [nameof(DocumentOverviewModel.RenewalDate)] = new() { DisplayName = "Renewal Date", Format = "dd-MMM-yyyy", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignCenter },
+            [nameof(DocumentOverviewModel.TransactionDateTime)] = new() { DisplayName = "Renewal Date", Format = "dd-MMM-yyyy", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignCenter },
+            [nameof(DocumentOverviewModel.RenewalDate)] = new() { DisplayName = "Next Renewal Date", Format = "dd-MMM-yyyy", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignCenter },
             [nameof(DocumentOverviewModel.CreatedAt)] = new() { DisplayName = "Created At", Format = "dd-MMM-yyyy hh:mm tt", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignCenter },
             [nameof(DocumentOverviewModel.LastModifiedAt)] = new() { DisplayName = "Modified At", Format = "dd-MMM-yyyy hh:mm tt", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignCenter },
 

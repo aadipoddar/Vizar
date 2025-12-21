@@ -235,7 +235,7 @@ public partial class ServicePage : IAsyncDisposable
                 ShortCode = "New"
             });
 
-            _selectedCart.VehicleId = _vehicles.FirstOrDefault().Id;
+            _selectedCart.VehicleId = -1;
         }
         catch (Exception ex)
         {
@@ -370,24 +370,10 @@ public partial class ServicePage : IAsyncDisposable
         }
 
         _selectedServiceType = args.Value;
-
-        if (_selectedServiceType is null)
-            _selectedCart = new()
-            {
-                ServiceTypeId = 0,
-                ServiceTypeName = "",
-                Quantity = 1,
-                Rate = 0
-            };
-
-        else
-        {
-            _selectedCart.ServiceTypeId = _selectedServiceType.Id;
-            _selectedCart.ServiceTypeName = _selectedServiceType.Name;
-            _selectedCart.Quantity = 1;
-            _selectedCart.Rate = _selectedServiceType.Rate;
-        }
-
+        _selectedCart.ServiceTypeId = _selectedServiceType.Id;
+        _selectedCart.ServiceTypeName = _selectedServiceType.Name;
+        _selectedCart.Quantity = 1;
+        _selectedCart.Rate = _selectedServiceType.Rate;
         await UpdateItemFinancialDetails();
     }
 
@@ -489,7 +475,7 @@ public partial class ServicePage : IAsyncDisposable
         _selectedServiceType = null;
         _selectedCart = new()
         {
-            VehicleId = _vehicles.FirstOrDefault().Id
+            VehicleId = -1
         };
 
         await _sfItemAutoComplete.FocusAsync();

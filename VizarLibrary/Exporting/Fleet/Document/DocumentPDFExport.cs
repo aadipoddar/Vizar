@@ -12,31 +12,21 @@ public static class DocumentPDFExport
         {
             nameof(DocumentOverviewModel.TransactionNo),
             nameof(DocumentOverviewModel.TransactionDateTime),
-            nameof(DocumentOverviewModel.FinancialYear),
             nameof(DocumentOverviewModel.DocumentType),
             nameof(DocumentOverviewModel.Vehicle),
-            nameof(DocumentOverviewModel.CurrentHour),
-            nameof(DocumentOverviewModel.CurrentKM),
             nameof(DocumentOverviewModel.Rate),
             nameof(DocumentOverviewModel.RenewalDate),
-            nameof(DocumentOverviewModel.Remarks),
-            nameof(DocumentOverviewModel.CreatedByName),
-            nameof(DocumentOverviewModel.CreatedAt),
-            nameof(DocumentOverviewModel.CreatedFromPlatform),
-            nameof(DocumentOverviewModel.LastModifiedByUserName),
-            nameof(DocumentOverviewModel.LastModifiedAt),
-            nameof(DocumentOverviewModel.LastModifiedFromPlatform),
             nameof(DocumentOverviewModel.Status)
         };
 
         var columnSettings = new Dictionary<string, PDFReportExportUtil.ColumnSetting>
         {
             [nameof(DocumentOverviewModel.TransactionNo)] = new() { DisplayName = "Trans No", IncludeInTotal = false },
-            [nameof(DocumentOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy hh:mm tt", IncludeInTotal = false },
+            [nameof(DocumentOverviewModel.TransactionDateTime)] = new() { DisplayName = "Renewal", Format = "dd-MMM-yyyy", IncludeInTotal = false },
             [nameof(DocumentOverviewModel.FinancialYear)] = new() { DisplayName = "Financial Year", IncludeInTotal = false },
             [nameof(DocumentOverviewModel.DocumentType)] = new() { DisplayName = "Document Type", IncludeInTotal = false },
             [nameof(DocumentOverviewModel.Vehicle)] = new() { DisplayName = "Vehicle", IncludeInTotal = false },
-            [nameof(DocumentOverviewModel.RenewalDate)] = new() { DisplayName = "Renewal Date", Format = "dd-MMM-yyyy", IncludeInTotal = false },
+            [nameof(DocumentOverviewModel.RenewalDate)] = new() { DisplayName = "Next Renewal", Format = "dd-MMM-yyyy", IncludeInTotal = false },
             [nameof(DocumentOverviewModel.Remarks)] = new() { DisplayName = "Remarks", IncludeInTotal = false },
             [nameof(DocumentOverviewModel.CreatedByName)] = new() { DisplayName = "Created By", IncludeInTotal = false },
             [nameof(DocumentOverviewModel.CreatedAt)] = new() { DisplayName = "Created At", Format = "dd-MMM-yyyy hh:mm", IncludeInTotal = false },
@@ -98,7 +88,7 @@ public static class DocumentPDFExport
              null,
              columnSettings,
              columnOrder,
-             useLandscape: true
+             useLandscape: false
         );
 
         var currentDateTime = await CommonData.LoadCurrentDateTime();

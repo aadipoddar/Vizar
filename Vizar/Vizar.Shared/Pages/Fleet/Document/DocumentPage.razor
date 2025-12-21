@@ -50,10 +50,10 @@ else
                     <!-- Transaction Date Time -->
                     <div class="form-field">
                         <label class="field-label">
-                            Transaction Date <span class="required">*</span>
+                            Renewal Date <span class="required">*</span>
                         </label>
                         <SfDatePicker TValue="DateTime" @bind-Value="_document.TransactionDateTime"
-                                      Placeholder="Select transaction date" Format="dd-MM-yyyy"
+                                      Placeholder="Select Renewal Date" Format="dd-MM-yyyy"
                                       FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                     </div>
 
@@ -123,10 +123,10 @@ else
                     <!-- Renewal Date -->
                     <div class="form-field">
                         <label class="field-label">
-                            Renewal Date <span class="required">*</span>
+                            Next Renewal Date <span class="required">*</span>
                         </label>
                         <SfDatePicker TValue="DateTime" @bind-Value="_document.RenewalDate"
-                                      Placeholder="Select renewal date" Format="dd-MM-yyyy"
+                                      Placeholder="Select Next Renewal Date" Format="dd-MM-yyyy"
                                       FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                     </div>
 
@@ -183,14 +183,14 @@ else
                         </GridColumn>
                         <GridColumn Field="@nameof(DocumentOverviewModel.Id)" HeaderText="ID" Width="80" TextAlign="TextAlign.Center" />
                         <GridColumn Field="@nameof(DocumentOverviewModel.TransactionNo)" HeaderText="Document No" Width="200" />
-                        <GridColumn Field="@nameof(DocumentOverviewModel.TransactionDateTime)" HeaderText="Transaction Date" Width="150" Format="dd-MMM-yyyy" TextAlign="TextAlign.Center" />
+                        <GridColumn Field="@nameof(DocumentOverviewModel.TransactionDateTime)" HeaderText="Renewal Date" Width="150" Format="dd-MMM-yyyy" TextAlign="TextAlign.Center" />
                         <GridColumn Field="@nameof(DocumentOverviewModel.FinancialYear)" HeaderText="Financial Year" Width="180" TextAlign="TextAlign.Center" />
                         <GridColumn Field="@nameof(DocumentOverviewModel.DocumentType)" HeaderText="Type" Width="150" />
                         <GridColumn Field="@nameof(DocumentOverviewModel.Vehicle)" HeaderText="Vehicle" Width="150" />
                         <GridColumn Field="@nameof(DocumentOverviewModel.CurrentHour)" HeaderText="Hour" Width="120" Format="N2" TextAlign="TextAlign.Right" />
                         <GridColumn Field="@nameof(DocumentOverviewModel.CurrentKM)" HeaderText="KM" Width="120" Format="N2" TextAlign="TextAlign.Right" />
                         <GridColumn Field="@nameof(DocumentOverviewModel.Rate)" HeaderText="Rate" Width="100" Format="N2" TextAlign="TextAlign.Right" />
-                        <GridColumn Field="@nameof(DocumentOverviewModel.RenewalDate)" HeaderText="Renewal Date" Width="150" Format="dd-MMM-yyyy" TextAlign="TextAlign.Center" />
+                        <GridColumn Field="@nameof(DocumentOverviewModel.RenewalDate)" HeaderText="Next Renewal Date" Width="150" Format="dd-MMM-yyyy" TextAlign="TextAlign.Center" />
                         <GridColumn Field="@nameof(DocumentOverviewModel.Status)" HeaderText="Status" Width="100" TextAlign="TextAlign.Center">
                             <Template>
                                 @{
