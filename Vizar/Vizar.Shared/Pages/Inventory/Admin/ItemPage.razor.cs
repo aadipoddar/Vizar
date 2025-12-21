@@ -284,7 +284,7 @@ public partial class ItemPage : IAsyncDisposable
             return false;
         }
 
-        if (_item.Rate <= 0)
+        if (_item.Rate < 0)
         {
             await _toastNotification.ShowAsync("Validation", "Rate must be greater than 0. Please enter a valid rate.", ToastType.Warning);
             return false;

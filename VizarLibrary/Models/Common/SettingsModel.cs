@@ -21,6 +21,7 @@ public static class SettingsKeys
     public static string ItemTypeCodePrefix => "ItemTypeCodePrefix";
     public static string ItemCategoryCodePrefix => "ItemCategoryCodePrefix";
     public static string ManufacturerCodePrefix => "ManufacturerCodePrefix";
+    public static string VehicleTypeCodePrefix => "VehicleTypeCodePrefix";
 
     public static string FinancialAccountingTransactionPrefix => "FinancialAccountingTransactionPrefix";
 

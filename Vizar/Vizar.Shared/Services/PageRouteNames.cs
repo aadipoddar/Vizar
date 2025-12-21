@@ -53,5 +53,8 @@ public static class PageRouteNames
     public static string AdminTax => "/admin/tax";
     public static string AdminGarage => "/admin/garage";
     public static string AdminVehicle => "/admin/vehicle";
+    public static string AdminVehicleModel => "/admin/vehicle-model";
+    public static string AdminVehicleType => "/admin/vehicle-type";
     public static string AdminServiceType => "/admin/service-type";
 }
+

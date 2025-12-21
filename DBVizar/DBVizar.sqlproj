@@ -101,6 +101,7 @@
     <Folder Include="Tables\Fleet\Document" />
     <Folder Include="StoredProcedures\Insert\Fleet\Document" />
     <Folder Include="Views\Fleet\Document" />
+    <Folder Include="StoredProcedures\Insert\Fleet\Vehicle" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\AzureVizar.publish.xml" />
@@ -204,5 +205,8 @@
     <Build Include="StoredProcedures\Insert\Fleet\Document\Insert_Document.sql" />
     <Build Include="StoredProcedures\Insert\Fleet\Document\Insert_DocumentType.sql" />
     <Build Include="Views\Fleet\Document\Document_Overview.sql" />
+    <Build Include="StoredProcedures\Insert\Fleet\Vehicle\Insert_VehicleType.sql" />
+    <Build Include="StoredProcedures\Insert\Fleet\Vehicle\Insert_VehicleModel.sql" />
+    <Build Include="StoredProcedures\Insert\Fleet\Vehicle\Insert_Vehicle.sql" />
   </ItemGroup>
 </Project>

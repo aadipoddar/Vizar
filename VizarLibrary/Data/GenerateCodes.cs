@@ -5,6 +5,7 @@ using VizarLibrary.Models.Accounts.FinancialAccounting;
 using VizarLibrary.Models.Accounts.Masters;
 using VizarLibrary.Models.Common;
 using VizarLibrary.Models.Fleet.Service;
+using VizarLibrary.Models.Fleet.Vehicle;
 using VizarLibrary.Models.Inventory.Item;
 using VizarLibrary.Models.Inventory.ItemIssue;
 using VizarLibrary.Models.Inventory.Purchase;
@@ -20,11 +21,12 @@ public static class GenerateCodes
         Purchase,
         PurchaseReturn,
         ItemIssue,
+        Service,
         Item,
         ItemType,
         ItemCategory,
         Manufacturer,
-        Service
+        VehicleType
     }
 
     private static async Task<string> CheckDuplicateCode(string code, int numberLength, CodeType type)
@@ -74,6 +76,10 @@ public static class GenerateCodes
                 case CodeType.Item:
                     var item = await CommonData.LoadTableDataByCode<ItemModel>(TableNames.Item, code);
                     isDuplicate = item is not null;
+                    break;
+                case CodeType.VehicleType:
+                    var vehicleType = await CommonData.LoadTableDataByCode<VehicleTypeModel>(TableNames.VehicleType, code);
+                    isDuplicate = vehicleType is not null;
                     break;
             }
 
@@ -338,5 +344,28 @@ public static class GenerateCodes
         }
 
         return await CheckDuplicateCode($"{manufacturerPrefix}000001", 6, CodeType.Manufacturer);
+    }
+
+    public static async Task<string> GenerateVehicleTypeCode()
+    {
+        var vehicleTypes = await CommonData.LoadTableData<VehicleTypeModel>(TableNames.VehicleType);
+        var vehicleTypePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.VehicleTypeCodePrefix)).Value;
+
+        var lastVehicleType = vehicleTypes.OrderByDescending(r => r.Id).FirstOrDefault();
+        if (lastVehicleType is not null)
+        {
+            var lastVehicleTypeCode = lastVehicleType.Code;
+            if (lastVehicleTypeCode.StartsWith(vehicleTypePrefix))
+            {
+                var lastNumberPart = lastVehicleTypeCode[vehicleTypePrefix.Length..];
+                if (int.TryParse(lastNumberPart, out int lastNumber))
+                {
+                    int nextNumber = lastNumber + 1;
+                    return await CheckDuplicateCode($"{vehicleTypePrefix}{nextNumber:D6}", 6, CodeType.VehicleType);
+                }
+            }
+        }
+
+        return await CheckDuplicateCode($"{vehicleTypePrefix}000001", 6, CodeType.VehicleType);
     }
 }
