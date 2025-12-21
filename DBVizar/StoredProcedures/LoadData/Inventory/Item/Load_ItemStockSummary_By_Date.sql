@@ -70,6 +70,7 @@ BEGIN
 		ISNULL(sa.MonthlyStock, 0) AS MonthlyStock,
 		ISNULL(sa.ClosingStock, 0) AS ClosingStock,
 		
+		i.ReorderLevel,
 		i.Rate,
 		ISNULL(i.Rate * sa.ClosingStock, 0) AS ClosingValue,
 		

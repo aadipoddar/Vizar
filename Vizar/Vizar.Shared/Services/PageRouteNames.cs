@@ -38,7 +38,6 @@ public static class PageRouteNames
 
     public static string AdminDashboard => "/admin";
     public static string AdminUser => "/admin/user";
-    public static string AdminTax => "/admin/tax";
     public static string AdminCompany => "/admin/company";
     public static string AdminLedger => "/admin/ledger";
     public static string AdminVoucher => "/admin/voucher";
@@ -50,6 +49,8 @@ public static class PageRouteNames
     public static string AdminItem => "/admin/item";
     public static string AdminItemCategory => "/admin/item-category";
     public static string AdminItemType => "/admin/item-type";
+    public static string AdminManufacturer => "/admin/manufacturer";
+    public static string AdminTax => "/admin/tax";
     public static string AdminGarage => "/admin/garage";
     public static string AdminVehicle => "/admin/vehicle";
     public static string AdminServiceType => "/admin/service-type";

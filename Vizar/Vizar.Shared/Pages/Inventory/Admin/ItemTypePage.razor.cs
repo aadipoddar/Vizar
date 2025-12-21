@@ -12,26 +12,26 @@ using VizarLibrary.Models.Inventory.Item;
 
 namespace Vizar.Shared.Pages.Inventory.Admin;
 
-public partial class ItemCategoryPage : IAsyncDisposable
+public partial class ItemTypePage : IAsyncDisposable
 {
     private HotKeysContext _hotKeysContext;
     private bool _isLoading = true;
     private bool _isProcessing = false;
     private bool _showDeleted = false;
 
-    private ItemCategoryModel _itemCategory = new();
+    private ItemTypeModel _itemType = new();
 
-    private List<ItemCategoryModel> _itemCategories = [];
+    private List<ItemTypeModel> _itemTypes = [];
 
-    private SfGrid<ItemCategoryModel> _sfGrid;
+    private SfGrid<ItemTypeModel> _sfGrid;
     private DeleteConfirmationDialog _deleteConfirmationDialog;
     private RecoverConfirmationDialog _recoverConfirmationDialog;
 
-    private int _deleteItemCategoryId = 0;
-    private string _deleteItemCategoryName = string.Empty;
+    private int _deleteItemTypeId = 0;
+    private string _deleteItemTypeName = string.Empty;
 
-    private int _recoverItemCategoryId = 0;
-    private string _recoverItemCategoryName = string.Empty;
+    private int _recoverItemTypeId = 0;
+    private string _recoverItemTypeName = string.Empty;
 
     private ToastNotification _toastNotification;
 
@@ -50,7 +50,7 @@ public partial class ItemCategoryPage : IAsyncDisposable
     private async Task LoadData()
     {
         _hotKeysContext = HotKeys.CreateContext()
-            .Add(ModCode.Ctrl, Code.S, SaveItemCategory, "Save", Exclude.None)
+            .Add(ModCode.Ctrl, Code.S, SaveItemType, "Save", Exclude.None)
             .Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
             .Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
             .Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
@@ -60,10 +60,10 @@ public partial class ItemCategoryPage : IAsyncDisposable
             .Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
             .Add(Code.Delete, DeleteSelectedItem, "Delete selected", Exclude.None);
 
-        _itemCategories = await CommonData.LoadTableData<ItemCategoryModel>(TableNames.ItemCategory);
+        _itemTypes = await CommonData.LoadTableData<ItemTypeModel>(TableNames.ItemType);
 
         if (!_showDeleted)
-            _itemCategories = [.. _itemCategories.Where(l => l.Status)];
+            _itemTypes = [.. _itemTypes.Where(l => l.Status)];
 
         if (_sfGrid is not null)
             await _sfGrid.Refresh();
@@ -71,15 +71,15 @@ public partial class ItemCategoryPage : IAsyncDisposable
     #endregion
 
     #region Actions
-    private void OnEditItemCategory(ItemCategoryModel itemCategory)
+    private void OnEditItemType(ItemTypeModel itemType)
     {
-        _itemCategory = new()
+        _itemType = new()
         {
-            Id = itemCategory.Id,
-            Name = itemCategory.Name,
-            Code = itemCategory.Code,
-            Remarks = itemCategory.Remarks,
-            Status = itemCategory.Status
+            Id = itemType.Id,
+            Name = itemType.Name,
+            Code = itemType.Code,
+            Remarks = itemType.Remarks,
+            Status = itemType.Status
         };
 
         StateHasChanged();
@@ -87,15 +87,15 @@ public partial class ItemCategoryPage : IAsyncDisposable
 
     private async Task ShowDeleteConfirmation(int id, string name)
     {
-        _deleteItemCategoryId = id;
-        _deleteItemCategoryName = name;
+        _deleteItemTypeId = id;
+        _deleteItemTypeName = name;
         await _deleteConfirmationDialog.ShowAsync();
     }
 
     private async Task CancelDelete()
     {
-        _deleteItemCategoryId = 0;
-        _deleteItemCategoryName = string.Empty;
+        _deleteItemTypeId = 0;
+        _deleteItemTypeName = string.Empty;
         await _deleteConfirmationDialog.HideAsync();
     }
 
@@ -106,42 +106,42 @@ public partial class ItemCategoryPage : IAsyncDisposable
             _isProcessing = true;
             await _deleteConfirmationDialog.HideAsync();
 
-            var itemCategory = _itemCategories.FirstOrDefault(l => l.Id == _deleteItemCategoryId);
-            if (itemCategory == null)
+            var itemType = _itemTypes.FirstOrDefault(l => l.Id == _deleteItemTypeId);
+            if (itemType == null)
             {
-                await _toastNotification.ShowAsync("Error", "Item Category not found.", ToastType.Error);
+                await _toastNotification.ShowAsync("Error", "Item Type not found.", ToastType.Error);
                 return;
             }
 
-            itemCategory.Status = false;
-            await ItemData.InsertItemCategory(itemCategory);
+            itemType.Status = false;
+            await ItemData.InsertItemType(itemType);
 
-            await _toastNotification.ShowAsync("Deleted", $"Item Category '{itemCategory.Name}' has been deleted successfully.", ToastType.Success);
-            NavigationManager.NavigateTo(PageRouteNames.AdminItemCategory, true);
+            await _toastNotification.ShowAsync("Deleted", $"Item Type '{itemType.Name}' has been deleted successfully.", ToastType.Success);
+            NavigationManager.NavigateTo(PageRouteNames.AdminItemType, true);
         }
         catch (Exception ex)
         {
-            await _toastNotification.ShowAsync("Error", $"Failed to delete Item Category: {ex.Message}", ToastType.Error);
+            await _toastNotification.ShowAsync("Error", $"Failed to delete Item Type: {ex.Message}", ToastType.Error);
         }
         finally
         {
             _isProcessing = false;
-            _deleteItemCategoryId = 0;
-            _deleteItemCategoryName = string.Empty;
+            _deleteItemTypeId = 0;
+            _deleteItemTypeName = string.Empty;
         }
     }
 
     private async Task ShowRecoverConfirmation(int id, string name)
     {
-        _recoverItemCategoryId = id;
-        _recoverItemCategoryName = name;
+        _recoverItemTypeId = id;
+        _recoverItemTypeName = name;
         await _recoverConfirmationDialog.ShowAsync();
     }
 
     private async Task CancelRecover()
     {
-        _recoverItemCategoryId = 0;
-        _recoverItemCategoryName = string.Empty;
+        _recoverItemTypeId = 0;
+        _recoverItemTypeName = string.Empty;
         await _recoverConfirmationDialog.HideAsync();
     }
 
@@ -158,28 +158,28 @@ public partial class ItemCategoryPage : IAsyncDisposable
             _isProcessing = true;
             await _recoverConfirmationDialog.HideAsync();
 
-            var itemCategory = _itemCategories.FirstOrDefault(l => l.Id == _recoverItemCategoryId);
-            if (itemCategory == null)
+            var itemType = _itemTypes.FirstOrDefault(l => l.Id == _recoverItemTypeId);
+            if (itemType == null)
             {
-                await _toastNotification.ShowAsync("Error", "Item Category not found.", ToastType.Error);
+                await _toastNotification.ShowAsync("Error", "Item Type not found.", ToastType.Error);
                 return;
             }
 
-            itemCategory.Status = true;
-            await ItemData.InsertItemCategory(itemCategory);
+            itemType.Status = true;
+            await ItemData.InsertItemType(itemType);
 
-            await _toastNotification.ShowAsync("Recovered", $"Item Category '{itemCategory.Name}' has been recovered successfully.", ToastType.Success);
-            NavigationManager.NavigateTo(PageRouteNames.AdminItemCategory, true);
+            await _toastNotification.ShowAsync("Recovered", $"Item Type '{itemType.Name}' has been recovered successfully.", ToastType.Success);
+            NavigationManager.NavigateTo(PageRouteNames.AdminItemType, true);
         }
         catch (Exception ex)
         {
-            await _toastNotification.ShowAsync("Error", $"Failed to recover Item Category: {ex.Message}", ToastType.Error);
+            await _toastNotification.ShowAsync("Error", $"Failed to recover Item Type: {ex.Message}", ToastType.Error);
         }
         finally
         {
             _isProcessing = false;
-            _recoverItemCategoryId = 0;
-            _recoverItemCategoryName = string.Empty;
+            _recoverItemTypeId = 0;
+            _recoverItemTypeName = string.Empty;
         }
     }
     #endregion
@@ -187,40 +187,40 @@ public partial class ItemCategoryPage : IAsyncDisposable
     #region Saving
     private async Task<bool> ValidateForm()
     {
-        _itemCategory.Name = _itemCategory.Name?.Trim() ?? "";
-        _itemCategory.Name = _itemCategory.Name?.ToUpper() ?? "";
+        _itemType.Name = _itemType.Name?.Trim() ?? "";
+        _itemType.Name = _itemType.Name?.ToUpper() ?? "";
 
-        _itemCategory.Remarks = _itemCategory.Remarks?.Trim() ?? "";
-        _itemCategory.Status = true;
+        _itemType.Remarks = _itemType.Remarks?.Trim() ?? "";
+        _itemType.Status = true;
 
 
-        if (_itemCategory.Id == 0)
-            _itemCategory.Code = await GenerateCodes.GenerateItemCategoryCode();
+        if (_itemType.Id == 0)
+            _itemType.Code = await GenerateCodes.GenerateItemTypeCode();
 
-        if (string.IsNullOrWhiteSpace(_itemCategory.Name))
+        if (string.IsNullOrWhiteSpace(_itemType.Name))
         {
-            await _toastNotification.ShowAsync("Validation", "Item Category name is required. Please enter a valid name.", ToastType.Warning);
+            await _toastNotification.ShowAsync("Validation", "Item Type name is required. Please enter a valid name.", ToastType.Warning);
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(_itemCategory.Remarks))
-            _itemCategory.Remarks = null;
+        if (string.IsNullOrWhiteSpace(_itemType.Remarks))
+            _itemType.Remarks = null;
 
-        if (_itemCategory.Id > 0)
+        if (_itemType.Id > 0)
         {
-            var existingRawMaterialCategory = _itemCategories.FirstOrDefault(_ => _.Id != _itemCategory.Id && _.Name.Equals(_itemCategory.Name, StringComparison.OrdinalIgnoreCase));
-            if (existingRawMaterialCategory is not null)
+            var existingItemType = _itemTypes.FirstOrDefault(_ => _.Id != _itemType.Id && _.Name.Equals(_itemType.Name, StringComparison.OrdinalIgnoreCase));
+            if (existingItemType is not null)
             {
-                await _toastNotification.ShowAsync("Duplicate", $"Item Category name '{_itemCategory.Name}' already exists. Please choose a different name.", ToastType.Warning);
+                await _toastNotification.ShowAsync("Duplicate", $"Item Type name '{_itemType.Name}' already exists. Please choose a different name.", ToastType.Warning);
                 return false;
             }
         }
         else
         {
-            var existingRawMaterialCategory = _itemCategories.FirstOrDefault(_ => _.Name.Equals(_itemCategory.Name, StringComparison.OrdinalIgnoreCase));
-            if (existingRawMaterialCategory is not null)
+            var existingItemType = _itemTypes.FirstOrDefault(_ => _.Name.Equals(_itemType.Name, StringComparison.OrdinalIgnoreCase));
+            if (existingItemType is not null)
             {
-                await _toastNotification.ShowAsync("Duplicate", $"Item Category name '{_itemCategory.Name}' already exists. Please choose a different name.", ToastType.Warning);
+                await _toastNotification.ShowAsync("Duplicate", $"Item Type name '{_itemType.Name}' already exists. Please choose a different name.", ToastType.Warning);
                 return false;
             }
         }
@@ -228,7 +228,7 @@ public partial class ItemCategoryPage : IAsyncDisposable
         return true;
     }
 
-    private async Task SaveItemCategory()
+    private async Task SaveItemType()
     {
         if (_isProcessing)
             return;
@@ -244,16 +244,16 @@ public partial class ItemCategoryPage : IAsyncDisposable
                 return;
             }
 
-            await _toastNotification.ShowAsync("Processing", "Please wait while the category is being saved...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing", "Please wait while the type is being saved...", ToastType.Info);
 
-            await ItemData.InsertItemCategory(_itemCategory);
+            await ItemData.InsertItemType(_itemType);
 
-            await _toastNotification.ShowAsync("Saved", $"Item Category '{_itemCategory.Name}' has been saved successfully.", ToastType.Success);
-            NavigationManager.NavigateTo(PageRouteNames.AdminItemCategory, true);
+            await _toastNotification.ShowAsync("Saved", $"Item Type '{_itemType.Name}' has been saved successfully.", ToastType.Success);
+            NavigationManager.NavigateTo(PageRouteNames.AdminItemType, true);
         }
         catch (Exception ex)
         {
-            await _toastNotification.ShowAsync("Error", $"Failed to save Item Category: {ex.Message}", ToastType.Error);
+            await _toastNotification.ShowAsync("Error", $"Failed to save Item Type: {ex.Message}", ToastType.Error);
         }
         finally
         {
@@ -274,9 +274,9 @@ public partial class ItemCategoryPage : IAsyncDisposable
             StateHasChanged();
             await _toastNotification.ShowAsync("Exporting", "Exporting to Excel...", ToastType.Info);
 
-            var (stream, fileName) = await ItemCategoryExcelExport.ExportMaster(_itemCategories);
+            var (stream, fileName) = await ItemTypeExcelExport.ExportMaster(_itemTypes);
             await SaveAndViewService.SaveAndView(fileName, stream);
-            await _toastNotification.ShowAsync("Exported", "Item Category data exported to Excel successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Exported", "Item Type data exported to Excel successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -300,9 +300,9 @@ public partial class ItemCategoryPage : IAsyncDisposable
             StateHasChanged();
             await _toastNotification.ShowAsync("Exporting", "Exporting to PDF...", ToastType.Info);
 
-            var (stream, fileName) = await ItemCategoryPDFExport.ExportMaster(_itemCategories);
+            var (stream, fileName) = await ItemTypePDFExport.ExportMaster(_itemTypes);
             await SaveAndViewService.SaveAndView(fileName, stream);
-            await _toastNotification.ShowAsync("Exported", "Item Category data exported to PDF successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Exported", "Item Type data exported to PDF successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -321,7 +321,7 @@ public partial class ItemCategoryPage : IAsyncDisposable
     {
         var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
         if (selectedRecords.Count > 0)
-            OnEditItemCategory(selectedRecords[0]);
+            OnEditItemType(selectedRecords[0]);
     }
 
     private async Task DeleteSelectedItem()
@@ -337,7 +337,7 @@ public partial class ItemCategoryPage : IAsyncDisposable
     }
 
     private async Task ResetPage() =>
-        NavigationManager.NavigateTo(PageRouteNames.AdminVoucher, true);
+        NavigationManager.NavigateTo(PageRouteNames.AdminItemType, true);
 
     private async Task NavigateBack() =>
         NavigationManager.NavigateTo(PageRouteNames.InventoryDashboard);

@@ -1,0 +1,404 @@
+﻿@page "/admin/item"
+
+@using VizarLibrary.Models.Inventory.Item
+
+<PageTitle>Item Management - Vizar</PageTitle>
+
+@if (_isLoading)
+{
+    <SfSpinner @bind-Visible="_isLoading" Label="Page is Loading, Please Wait" />
+}
+else
+{
+    <PageHeader Title="Item Management" Subtitle="Manage items and details" ShowHome="true" ShowBack="true" ShowLogout="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
+        <RightContent>
+            <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Title="Export to Excel (Ctrl + E)" Disabled="_isProcessing" OnClick="ExportExcel" />
+            <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Title="Export to PDF (Ctrl + P)" Disabled="_isProcessing" OnClick="ExportPdf" />
+            <IconButton Icon="IconType.Save" Variant="ButtonVariant.Save" Title="Save Item (Ctrl + S)" Disabled="_isProcessing" OnClick="SaveItem" />
+            <IconButton Icon="IconType.New" Title="New Item (Ctrl + N)" Disabled="_isProcessing" OnClick="ResetPage" />
+        </RightContent>
+    </PageHeader>
+
+    <!-- Main Content Container -->
+    <div class="purchase-container">
+
+        <!-- Item Entry Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title-wrapper">
+                    <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" />
+                    </svg>
+                    <h2 class="section-title">Item Details</h2>
+                </div>
+            </div>
+            <div class="section-body">
+                <div class="form-grid-triple">
+                    <!-- Item Name -->
+                    <div class="form-field">
+                        <label class="field-label">
+                            Item Name <span class="required">*</span>
+                        </label>
+                        <SfTextBox @bind-Value="_item.Name" Placeholder="Enter item name"
+                                   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+                    </div>
+
+                    <!-- Item Code -->
+                    <div class="form-field">
+                        <label class="field-label">
+                            Item Code <span class="required">*</span>
+                        </label>
+                        <SfTextBox Value="@_item.Code" Placeholder="Auto-generated code" Readonly="true"
+                                   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+                    </div>
+
+                    <!-- Item Type -->
+                    <div class="form-field">
+                        <label class="field-label">
+                            Item Type <span class="required">*</span>
+                        </label>
+                        <SfAutoComplete Value="@_selectedItemType" TValue="ItemTypeModel" TItem="ItemTypeModel"
+                                        DataSource="@_itemTypes" Placeholder="Select Item Type"
+                                        FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+                                        FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
+                            <AutoCompleteEvents TItem="ItemTypeModel" TValue="ItemTypeModel"
+                                                ValueChange="OnItemTypeChanged" />
+                            <AutoCompleteFieldSettings Value="Name" />
+                        </SfAutoComplete>
+                    </div>
+
+                    <!-- Item Category -->
+                    <div class="form-field">
+                        <label class="field-label">
+                            Item Category <span class="required">*</span>
+                        </label>
+                        <SfAutoComplete Value="@_selectedItemCategory" TValue="ItemCategoryModel" TItem="ItemCategoryModel"
+                                        DataSource="@_itemCategories" Placeholder="Select Item Category"
+                                        FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+                                        FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
+                            <AutoCompleteEvents TItem="ItemCategoryModel" TValue="ItemCategoryModel"
+                                                ValueChange="OnItemCategoryChanged" />
+                            <AutoCompleteFieldSettings Value="Name" />
+                        </SfAutoComplete>
+                    </div>
+
+                    <!-- Manufacturer -->
+                    <div class="form-field">
+                        <label class="field-label">
+                            Manufacturer <span class="required">*</span>
+                        </label>
+                        <SfAutoComplete Value="@_selectedManufacturer" TValue="ManufacturerModel" TItem="ManufacturerModel"
+                                        DataSource="@_manufacturers" Placeholder="Select Manufacturer"
+                                        FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+                                        FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
+                            <AutoCompleteEvents TItem="ManufacturerModel" TValue="ManufacturerModel"
+                                                ValueChange="OnManufacturerChanged" />
+                            <AutoCompleteFieldSettings Value="Name" />
+                        </SfAutoComplete>
+                    </div>
+
+                    <!-- Tax -->
+                    <div class="form-field">
+                        <label class="field-label">
+                            Tax <span class="required">*</span>
+                        </label>
+                        <SfAutoComplete Value="@_selectedTax" TValue="TaxModel" TItem="TaxModel"
+                                        DataSource="@_taxes" Placeholder="Select Tax"
+                                        FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+                                        FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
+                            <AutoCompleteEvents TItem="TaxModel" TValue="TaxModel"
+                                                ValueChange="OnTaxChanged" />
+                            <AutoCompleteFieldSettings Value="Name" />
+                        </SfAutoComplete>
+                    </div>
+
+                    <!-- Rate -->
+                    <div class="form-field">
+                        <label class="field-label">
+                            Rate <span class="required">*</span>
+                        </label>
+                        <SfNumericTextBox @bind-Value="_item.Rate" Placeholder="Enter rate" Format="N2"
+                                          FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox"
+                                          TValue="decimal" Min="0" />
+                    </div>
+
+                    <!-- Unit of Measurement -->
+                    <div class="form-field">
+                        <label class="field-label">
+                            Unit of Measurement <span class="required">*</span>
+                        </label>
+                        <SfTextBox @bind-Value="_item.UnitOfMeasurement" Placeholder="Enter unit (e.g., KG, PCS, LTR)"
+                                   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+                    </div>
+
+                    <!-- Reorder Level -->
+                    <div class="form-field">
+                        <label class="field-label">
+                            Reorder Level <span class="required">*</span>
+                        </label>
+                        <SfNumericTextBox @bind-Value="_item.ReorderLevel" Placeholder="Enter reorder level" Format="N2"
+                                          FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox"
+                                          TValue="decimal?" Min="0" />
+                    </div>
+
+                    <!-- Remarks -->
+                    <div class="form-field form-field-span-3">
+                        <label class="field-label">Remarks</label>
+                        <SfTextBox @bind-Value="_item.Remarks" Placeholder="Enter remarks (optional)" Multiline="true"
+                                   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items List Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title-wrapper">
+                    <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 11l3 3L22 4" />
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                    </svg>
+                    <h2 class="section-title">Items List</h2>
+                </div>
+                <div class="header-actions">
+                    <ToggleDeletedButton Disabled="@_isProcessing" ShowDeleted="@_showDeleted" OnToggle="ToggleDeleted" />
+                </div>
+            </div>
+            <div class="section-body grid-body">
+                <SfGrid @ref="_sfGrid" DataSource="@_items" AllowPaging="true" AllowSorting="true" AllowFiltering="true"
+                        AllowResizing="true" CssClass="professional-grid" Toolbar="@(new List<string>() { "Search" })">
+                    <GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
+                    <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
+                    <GridColumns>
+                        <GridColumn HeaderText="Actions" Width="120" TextAlign="TextAlign.Center" AllowFiltering="false">
+                            <Template>
+                                @{
+                                    var item = (context as ItemModel);
+
+                                    <div class="grid-actions">
+                                        @if (item.Status)
+                                        {
+                                            <IconButton Icon="IconType.Edit" Variant="ButtonVariant.Edit" Size="ButtonSize.Grid" Title="Edit (Insert)" OnClick="@(() => OnEditItem(item))" />
+                                            <IconButton Icon="IconType.Delete" Variant="ButtonVariant.Delete" Size="ButtonSize.Grid" Title="Delete (Delete)" OnClick="@(() => ShowDeleteConfirmation(item.Id, item.Name))" />
+                                        }
+                                        else
+                                        {
+                                            <IconButton Icon="IconType.Recover" Variant="ButtonVariant.Recover" Size="ButtonSize.Grid" Title="Recover (Delete)" OnClick="@(() => ShowRecoverConfirmation(item.Id, item.Name))" />
+                                        }
+                                    </div>
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Field="@nameof(ItemModel.Id)" HeaderText="ID" Width="80" TextAlign="TextAlign.Center" />
+                        <GridColumn Field="@nameof(ItemModel.Name)" HeaderText="Name" Width="250" />
+                        <GridColumn Field="@nameof(ItemModel.Code)" HeaderText="Code" Width="150" />
+                        <GridColumn Field="@nameof(ItemModel.ItemTypeId)" HeaderText="Item Type" Width="150">
+                            <Template>
+                                @{
+                                    var item = (context as ItemModel);
+                                    @GetItemTypeName(item.ItemTypeId)
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Field="@nameof(ItemModel.ItemCategoryId)" HeaderText="Item Category" Width="150">
+                            <Template>
+                                @{
+                                    var item = (context as ItemModel);
+                                    @GetItemCategoryName(item.ItemCategoryId)
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Field="@nameof(ItemModel.ManufacturerId)" HeaderText="Manufacturer" Width="150">
+                            <Template>
+                                @{
+                                    var item = (context as ItemModel);
+                                    @GetManufacturerName(item.ManufacturerId)
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Field="@nameof(ItemModel.Rate)" HeaderText="Rate" Width="120" Format="N2" TextAlign="TextAlign.Right" />
+                        <GridColumn Field="@nameof(ItemModel.TaxId)" HeaderText="Tax" Width="120">
+                            <Template>
+                                @{
+                                    var item = (context as ItemModel);
+                                    @GetTaxName(item.TaxId)
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Field="@nameof(ItemModel.UnitOfMeasurement)" HeaderText="Unit" Width="100" />
+                        <GridColumn Field="@nameof(ItemModel.ReorderLevel)" HeaderText="Reorder Level" Width="120" Format="N2" TextAlign="TextAlign.Right" />
+                        <GridColumn Field="@nameof(ItemModel.Remarks)" HeaderText="Remarks" Width="250" />
+                        <GridColumn Field="@nameof(ItemModel.Status)" HeaderText="Status" Width="100" TextAlign="TextAlign.Center">
+                            <Template>
+                                @{
+                                    var item = (context as ItemModel);
+                                    <div class="grid-checkbox" style="@(item.Status ? "color: #10b981; background: #d1fae5;" : "color: #dc2626; background: #fee2e2;")">
+                                        @(item.Status ? "✓" : "✗")
+                                    </div>
+                                }
+                            </Template>
+                        </GridColumn>
+                    </GridColumns>
+                </SfGrid>
+            </div>
+        </div>
+
+    </div>
+}
+
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog"
+                          EntityName="Item"
+                          IdentifierLabel="Item Name"
+                          IdentifierValue="@_deleteItemName"
+                          IsPermanentDelete="false"
+                          Disabled="@_isProcessing"
+                          OnConfirm="ConfirmDelete"
+                          OnCancel="CancelDelete" />
+
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog"
+                           EntityName="Item"
+                           IdentifierLabel="Item Name"
+                           IdentifierValue="@_recoverItemName"
+                           Disabled="@_isProcessing"
+                           OnConfirm="ConfirmRecover"
+                           OnCancel="CancelRecover" />
+
+<!-- Toast Notification -->
+<ToastNotification @ref="_toastNotification" />
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    /* Main Container */
+    .purchase-container {
+        padding: 24px 32px;
+        max-width: 1920px;
+        margin: 0 auto;
+        background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%);
+        min-height: calc(100vh - 72px);
+    }
+
+    /* Section Card */
+    .section-card {
+        background: #ffffff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        margin-bottom: 24px;
+        overflow: hidden;
+    }
+
+    .section-header {
+        padding: 20px 24px;
+        border-bottom: 2px solid #e2e8f0;
+        background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .section-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .section-icon {
+        color: #3b82f6;
+        flex-shrink: 0;
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #0f172a;
+        margin: 0;
+        letter-spacing: -0.3px;
+    }
+
+    .section-body {
+        padding: 24px;
+    }
+
+    /* Form Grid */
+    .form-grid-triple {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        align-items: start;
+    }
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-field-span-2 {
+        grid-column: span 2;
+    }
+
+    .form-field-span-3 {
+        grid-column: span 3;
+    }
+
+    .field-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-bottom: 2px;
+    }
+
+    .required {
+        color: #dc2626;
+        margin-left: 2px;
+    }
+
+    /* Grid Body */
+    .grid-body {
+        padding: 0;
+    }
+
+    .professional-grid {
+        border: none;
+    }
+
+    .grid-checkbox {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 1024px) {
+        .form-grid-triple {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .form-grid-triple {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+

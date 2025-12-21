@@ -32,7 +32,7 @@ public static class ItemCategoryExcelExport
             [nameof(ItemCategoryModel.Status)] = new() { DisplayName = "Status", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignCenter, IncludeInTotal = false }
         };
 
-        List<string> columnOrder = new()
+        var columnOrder = new List<string>
         {
             nameof(ItemCategoryModel.Id),
             nameof(ItemCategoryModel.Name),

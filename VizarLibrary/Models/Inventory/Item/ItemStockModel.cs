@@ -59,6 +59,7 @@ public class ItemStockSummaryModel
     public decimal SaleStock { get; set; }
     public decimal MonthlyStock { get; set; }
     public decimal ClosingStock { get; set; }
+    public decimal? ReorderLevel { get; set; }
     public decimal Rate { get; set; }
     public decimal ClosingValue { get; set; }
     public decimal AveragePrice { get; set; }

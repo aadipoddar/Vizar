@@ -338,10 +338,9 @@ else
 								}
 							</Template>
 						</GridColumn>
-						<GridColumn Field="@nameof(ItemStockSummaryModel.Rate)" HeaderText="Rate" Width="120"
-									Format="N2" TextAlign="TextAlign.Right" />
-						<GridColumn Field="@nameof(ItemStockSummaryModel.ClosingValue)" HeaderText="Closing Value"
-									Width="150" Format="N2" TextAlign="TextAlign.Right">
+						<GridColumn Field="@nameof(ItemStockSummaryModel.ReorderLevel)" HeaderText="Reorder Level" Width="150" Format="N2" TextAlign="TextAlign.Right" />
+						<GridColumn Field="@nameof(ItemStockSummaryModel.Rate)" HeaderText="Rate" Width="120" Format="N2" TextAlign="TextAlign.Right" />
+						<GridColumn Field="@nameof(ItemStockSummaryModel.ClosingValue)" HeaderText="Closing Value" Width="150" Format="N2" TextAlign="TextAlign.Right">
 							<Template>
 								@{
 									var item = (context as ItemStockSummaryModel);

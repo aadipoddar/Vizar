@@ -48,6 +48,7 @@ public static class ItemStockReportExcelExport
             [nameof(ItemStockSummaryModel.MonthlyStock)] = new() { DisplayName = "Monthly Stock", Format = "#,##0.00", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignRight, IncludeInTotal = true, HighlightNegative = true, Width = 15 },
             [nameof(ItemStockSummaryModel.ClosingStock)] = new() { DisplayName = "Closing Stock", Format = "#,##0.00", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignRight, IncludeInTotal = true, HighlightNegative = true, Width = 15 },
 
+            [nameof(ItemStockSummaryModel.ReorderLevel)] = new() { DisplayName = "Reorder Level", Format = "#,##0.00", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignRight, IncludeInTotal = false, Width = 15 },
             [nameof(ItemStockSummaryModel.Rate)] = new() { DisplayName = "Rate", Format = "#,##0.00", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignRight, IncludeInTotal = false, Width = 12 },
             [nameof(ItemStockSummaryModel.ClosingValue)] = new() { DisplayName = "Closing Value", Format = "#,##0.00", Alignment = Syncfusion.XlsIO.ExcelHAlign.HAlignRight, IncludeInTotal = true, HighlightNegative = true, Width = 15 },
 
@@ -76,6 +77,7 @@ public static class ItemStockReportExcelExport
                 nameof(ItemStockSummaryModel.SaleStock),
                 nameof(ItemStockSummaryModel.MonthlyStock),
                 nameof(ItemStockSummaryModel.ClosingStock),
+                nameof(ItemStockSummaryModel.ReorderLevel),
                 nameof(ItemStockSummaryModel.Rate),
                 nameof(ItemStockSummaryModel.ClosingValue),
                 nameof(ItemStockSummaryModel.AveragePrice),

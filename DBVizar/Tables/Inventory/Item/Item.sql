@@ -9,7 +9,7 @@
 	[Rate] MONEY NOT NULL,
 	[TaxId] INT NOT NULL,
 	[UnitOfMeasurement] VARCHAR(20) NOT NULL,
-	[ReorderLevel] MONEY NULL,
+	[ReorderLevel] MONEY NULL DEFAULT 0,
 	[Remarks] VARCHAR(MAX) NULL,
 	[Status] BIT NOT NULL DEFAULT 1, 
     CONSTRAINT [FK_Item_ToItemType] FOREIGN KEY ([ItemTypeId]) REFERENCES [dbo].[ItemType]([Id]), 

@@ -43,6 +43,7 @@ public static class ItemStockSummaryReportPDFExport
                 nameof(ItemStockSummaryModel.SaleStock),
                 nameof(ItemStockSummaryModel.MonthlyStock),
                 nameof(ItemStockSummaryModel.ClosingStock),
+                nameof(ItemStockSummaryModel.ReorderLevel),
                 nameof(ItemStockSummaryModel.Rate),
                 nameof(ItemStockSummaryModel.ClosingValue),
                 nameof(ItemStockSummaryModel.AveragePrice),
@@ -133,6 +134,18 @@ public static class ItemStockSummaryReportPDFExport
         columnSettings[nameof(ItemStockSummaryModel.ClosingStock)] = new()
         {
             DisplayName = "Closing Stock",
+            Format = "#,##0.00",
+            HighlightNegative = true,
+            StringFormat = new Syncfusion.Pdf.Graphics.PdfStringFormat
+            {
+                Alignment = Syncfusion.Pdf.Graphics.PdfTextAlignment.Right,
+                LineAlignment = Syncfusion.Pdf.Graphics.PdfVerticalAlignment.Middle
+            }
+        };
+
+        columnSettings[nameof(ItemStockSummaryModel.ReorderLevel)] = new()
+        {
+            DisplayName = "Reorder Level",
             Format = "#,##0.00",
             HighlightNegative = true,
             StringFormat = new Syncfusion.Pdf.Graphics.PdfStringFormat

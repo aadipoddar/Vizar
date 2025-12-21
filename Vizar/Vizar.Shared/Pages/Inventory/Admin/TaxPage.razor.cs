@@ -2,7 +2,6 @@ using Syncfusion.Blazor.Grids;
 
 using Vizar.Shared.Components.Dialog;
 
-using VizarLibrary.Data;
 using VizarLibrary.Data.Common;
 using VizarLibrary.Data.Inventory.Item;
 using VizarLibrary.DataAccess;
@@ -12,26 +11,26 @@ using VizarLibrary.Models.Inventory.Item;
 
 namespace Vizar.Shared.Pages.Inventory.Admin;
 
-public partial class ItemCategoryPage : IAsyncDisposable
+public partial class TaxPage : IAsyncDisposable
 {
     private HotKeysContext _hotKeysContext;
     private bool _isLoading = true;
     private bool _isProcessing = false;
     private bool _showDeleted = false;
 
-    private ItemCategoryModel _itemCategory = new();
+    private TaxModel _tax = new();
 
-    private List<ItemCategoryModel> _itemCategories = [];
+    private List<TaxModel> _taxes = [];
 
-    private SfGrid<ItemCategoryModel> _sfGrid;
+    private SfGrid<TaxModel> _sfGrid;
     private DeleteConfirmationDialog _deleteConfirmationDialog;
     private RecoverConfirmationDialog _recoverConfirmationDialog;
 
-    private int _deleteItemCategoryId = 0;
-    private string _deleteItemCategoryName = string.Empty;
+    private int _deleteTaxId = 0;
+    private string _deleteTaxName = string.Empty;
 
-    private int _recoverItemCategoryId = 0;
-    private string _recoverItemCategoryName = string.Empty;
+    private int _recoverTaxId = 0;
+    private string _recoverTaxName = string.Empty;
 
     private ToastNotification _toastNotification;
 
@@ -50,7 +49,7 @@ public partial class ItemCategoryPage : IAsyncDisposable
     private async Task LoadData()
     {
         _hotKeysContext = HotKeys.CreateContext()
-            .Add(ModCode.Ctrl, Code.S, SaveItemCategory, "Save", Exclude.None)
+            .Add(ModCode.Ctrl, Code.S, SaveTax, "Save", Exclude.None)
             .Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
             .Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
             .Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
@@ -60,10 +59,10 @@ public partial class ItemCategoryPage : IAsyncDisposable
             .Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
             .Add(Code.Delete, DeleteSelectedItem, "Delete selected", Exclude.None);
 
-        _itemCategories = await CommonData.LoadTableData<ItemCategoryModel>(TableNames.ItemCategory);
+        _taxes = await CommonData.LoadTableData<TaxModel>(TableNames.Tax);
 
         if (!_showDeleted)
-            _itemCategories = [.. _itemCategories.Where(l => l.Status)];
+            _taxes = [.. _taxes.Where(l => l.Status)];
 
         if (_sfGrid is not null)
             await _sfGrid.Refresh();
@@ -71,15 +70,20 @@ public partial class ItemCategoryPage : IAsyncDisposable
     #endregion
 
     #region Actions
-    private void OnEditItemCategory(ItemCategoryModel itemCategory)
+    private void OnEditTax(TaxModel tax)
     {
-        _itemCategory = new()
+        _tax = new()
         {
-            Id = itemCategory.Id,
-            Name = itemCategory.Name,
-            Code = itemCategory.Code,
-            Remarks = itemCategory.Remarks,
-            Status = itemCategory.Status
+            Id = tax.Id,
+            Name = tax.Name,
+            Code = tax.Code,
+            CGST = tax.CGST,
+            SGST = tax.SGST,
+            IGST = tax.IGST,
+            Inclusive = tax.Inclusive,
+            Extra = tax.Extra,
+            Remarks = tax.Remarks,
+            Status = tax.Status
         };
 
         StateHasChanged();
@@ -87,15 +91,15 @@ public partial class ItemCategoryPage : IAsyncDisposable
 
     private async Task ShowDeleteConfirmation(int id, string name)
     {
-        _deleteItemCategoryId = id;
-        _deleteItemCategoryName = name;
+        _deleteTaxId = id;
+        _deleteTaxName = name;
         await _deleteConfirmationDialog.ShowAsync();
     }
 
     private async Task CancelDelete()
     {
-        _deleteItemCategoryId = 0;
-        _deleteItemCategoryName = string.Empty;
+        _deleteTaxId = 0;
+        _deleteTaxName = string.Empty;
         await _deleteConfirmationDialog.HideAsync();
     }
 
@@ -106,42 +110,42 @@ public partial class ItemCategoryPage : IAsyncDisposable
             _isProcessing = true;
             await _deleteConfirmationDialog.HideAsync();
 
-            var itemCategory = _itemCategories.FirstOrDefault(l => l.Id == _deleteItemCategoryId);
-            if (itemCategory == null)
+            var tax = _taxes.FirstOrDefault(l => l.Id == _deleteTaxId);
+            if (tax == null)
             {
-                await _toastNotification.ShowAsync("Error", "Item Category not found.", ToastType.Error);
+                await _toastNotification.ShowAsync("Error", "Tax not found.", ToastType.Error);
                 return;
             }
 
-            itemCategory.Status = false;
-            await ItemData.InsertItemCategory(itemCategory);
+            tax.Status = false;
+            await ItemData.InsertTax(tax);
 
-            await _toastNotification.ShowAsync("Deleted", $"Item Category '{itemCategory.Name}' has been deleted successfully.", ToastType.Success);
-            NavigationManager.NavigateTo(PageRouteNames.AdminItemCategory, true);
+            await _toastNotification.ShowAsync("Deleted", $"Tax '{tax.Name}' has been deleted successfully.", ToastType.Success);
+            NavigationManager.NavigateTo(PageRouteNames.AdminTax, true);
         }
         catch (Exception ex)
         {
-            await _toastNotification.ShowAsync("Error", $"Failed to delete Item Category: {ex.Message}", ToastType.Error);
+            await _toastNotification.ShowAsync("Error", $"Failed to delete Tax: {ex.Message}", ToastType.Error);
         }
         finally
         {
             _isProcessing = false;
-            _deleteItemCategoryId = 0;
-            _deleteItemCategoryName = string.Empty;
+            _deleteTaxId = 0;
+            _deleteTaxName = string.Empty;
         }
     }
 
     private async Task ShowRecoverConfirmation(int id, string name)
     {
-        _recoverItemCategoryId = id;
-        _recoverItemCategoryName = name;
+        _recoverTaxId = id;
+        _recoverTaxName = name;
         await _recoverConfirmationDialog.ShowAsync();
     }
 
     private async Task CancelRecover()
     {
-        _recoverItemCategoryId = 0;
-        _recoverItemCategoryName = string.Empty;
+        _recoverTaxId = 0;
+        _recoverTaxName = string.Empty;
         await _recoverConfirmationDialog.HideAsync();
     }
 
@@ -158,28 +162,28 @@ public partial class ItemCategoryPage : IAsyncDisposable
             _isProcessing = true;
             await _recoverConfirmationDialog.HideAsync();
 
-            var itemCategory = _itemCategories.FirstOrDefault(l => l.Id == _recoverItemCategoryId);
-            if (itemCategory == null)
+            var tax = _taxes.FirstOrDefault(l => l.Id == _recoverTaxId);
+            if (tax == null)
             {
-                await _toastNotification.ShowAsync("Error", "Item Category not found.", ToastType.Error);
+                await _toastNotification.ShowAsync("Error", "Tax not found.", ToastType.Error);
                 return;
             }
 
-            itemCategory.Status = true;
-            await ItemData.InsertItemCategory(itemCategory);
+            tax.Status = true;
+            await ItemData.InsertTax(tax);
 
-            await _toastNotification.ShowAsync("Recovered", $"Item Category '{itemCategory.Name}' has been recovered successfully.", ToastType.Success);
-            NavigationManager.NavigateTo(PageRouteNames.AdminItemCategory, true);
+            await _toastNotification.ShowAsync("Recovered", $"Tax '{tax.Name}' has been recovered successfully.", ToastType.Success);
+            NavigationManager.NavigateTo(PageRouteNames.AdminTax, true);
         }
         catch (Exception ex)
         {
-            await _toastNotification.ShowAsync("Error", $"Failed to recover Item Category: {ex.Message}", ToastType.Error);
+            await _toastNotification.ShowAsync("Error", $"Failed to recover Tax: {ex.Message}", ToastType.Error);
         }
         finally
         {
             _isProcessing = false;
-            _recoverItemCategoryId = 0;
-            _recoverItemCategoryName = string.Empty;
+            _recoverTaxId = 0;
+            _recoverTaxName = string.Empty;
         }
     }
     #endregion
@@ -187,40 +191,71 @@ public partial class ItemCategoryPage : IAsyncDisposable
     #region Saving
     private async Task<bool> ValidateForm()
     {
-        _itemCategory.Name = _itemCategory.Name?.Trim() ?? "";
-        _itemCategory.Name = _itemCategory.Name?.ToUpper() ?? "";
+        _tax.Name = _tax.Name?.Trim() ?? "";
+        _tax.Name = _tax.Name?.ToUpper() ?? "";
 
-        _itemCategory.Remarks = _itemCategory.Remarks?.Trim() ?? "";
-        _itemCategory.Status = true;
+        _tax.Code = _tax.Code?.Trim() ?? "";
+        _tax.Code = _tax.Code?.ToUpper() ?? "";
 
+        _tax.Remarks = _tax.Remarks?.Trim() ?? "";
+        _tax.Status = true;
 
-        if (_itemCategory.Id == 0)
-            _itemCategory.Code = await GenerateCodes.GenerateItemCategoryCode();
-
-        if (string.IsNullOrWhiteSpace(_itemCategory.Name))
+        if (string.IsNullOrWhiteSpace(_tax.Name))
         {
-            await _toastNotification.ShowAsync("Validation", "Item Category name is required. Please enter a valid name.", ToastType.Warning);
+            await _toastNotification.ShowAsync("Validation", "Tax name is required. Please enter a valid name.", ToastType.Warning);
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(_itemCategory.Remarks))
-            _itemCategory.Remarks = null;
-
-        if (_itemCategory.Id > 0)
+        if (string.IsNullOrWhiteSpace(_tax.Code))
         {
-            var existingRawMaterialCategory = _itemCategories.FirstOrDefault(_ => _.Id != _itemCategory.Id && _.Name.Equals(_itemCategory.Name, StringComparison.OrdinalIgnoreCase));
-            if (existingRawMaterialCategory is not null)
+            await _toastNotification.ShowAsync("Validation", "Tax code is required. Please enter a valid code.", ToastType.Warning);
+            return false;
+        }
+
+        if (_tax.Inclusive && _tax.Extra)
+        {
+            await _toastNotification.ShowAsync("Validation", "Tax cannot be both Inclusive and Extra. Please select only one option.", ToastType.Warning);
+            return false;
+        }
+
+        if (!_tax.Inclusive && !_tax.Extra)
+        {
+            await _toastNotification.ShowAsync("Validation", "Tax must be either Inclusive or Extra. Please select one option.", ToastType.Warning);
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(_tax.Remarks))
+            _tax.Remarks = null;
+
+        if (_tax.Id > 0)
+        {
+            var existingTax = _taxes.FirstOrDefault(_ => _.Id != _tax.Id && _.Name.Equals(_tax.Name, StringComparison.OrdinalIgnoreCase));
+            if (existingTax is not null)
             {
-                await _toastNotification.ShowAsync("Duplicate", $"Item Category name '{_itemCategory.Name}' already exists. Please choose a different name.", ToastType.Warning);
+                await _toastNotification.ShowAsync("Duplicate", $"Tax name '{_tax.Name}' already exists. Please choose a different name.", ToastType.Warning);
+                return false;
+            }
+
+            var existingCode = _taxes.FirstOrDefault(_ => _.Id != _tax.Id && _.Code.Equals(_tax.Code, StringComparison.OrdinalIgnoreCase));
+            if (existingCode is not null)
+            {
+                await _toastNotification.ShowAsync("Duplicate", $"Tax code '{_tax.Code}' already exists. Please choose a different code.", ToastType.Warning);
                 return false;
             }
         }
         else
         {
-            var existingRawMaterialCategory = _itemCategories.FirstOrDefault(_ => _.Name.Equals(_itemCategory.Name, StringComparison.OrdinalIgnoreCase));
-            if (existingRawMaterialCategory is not null)
+            var existingTax = _taxes.FirstOrDefault(_ => _.Name.Equals(_tax.Name, StringComparison.OrdinalIgnoreCase));
+            if (existingTax is not null)
             {
-                await _toastNotification.ShowAsync("Duplicate", $"Item Category name '{_itemCategory.Name}' already exists. Please choose a different name.", ToastType.Warning);
+                await _toastNotification.ShowAsync("Duplicate", $"Tax name '{_tax.Name}' already exists. Please choose a different name.", ToastType.Warning);
+                return false;
+            }
+
+            var existingCode = _taxes.FirstOrDefault(_ => _.Code.Equals(_tax.Code, StringComparison.OrdinalIgnoreCase));
+            if (existingCode is not null)
+            {
+                await _toastNotification.ShowAsync("Duplicate", $"Tax code '{_tax.Code}' already exists. Please choose a different code.", ToastType.Warning);
                 return false;
             }
         }
@@ -228,7 +263,7 @@ public partial class ItemCategoryPage : IAsyncDisposable
         return true;
     }
 
-    private async Task SaveItemCategory()
+    private async Task SaveTax()
     {
         if (_isProcessing)
             return;
@@ -244,16 +279,16 @@ public partial class ItemCategoryPage : IAsyncDisposable
                 return;
             }
 
-            await _toastNotification.ShowAsync("Processing", "Please wait while the category is being saved...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing", "Please wait while the tax is being saved...", ToastType.Info);
 
-            await ItemData.InsertItemCategory(_itemCategory);
+            await ItemData.InsertTax(_tax);
 
-            await _toastNotification.ShowAsync("Saved", $"Item Category '{_itemCategory.Name}' has been saved successfully.", ToastType.Success);
-            NavigationManager.NavigateTo(PageRouteNames.AdminItemCategory, true);
+            await _toastNotification.ShowAsync("Saved", $"Tax '{_tax.Name}' has been saved successfully.", ToastType.Success);
+            NavigationManager.NavigateTo(PageRouteNames.AdminTax, true);
         }
         catch (Exception ex)
         {
-            await _toastNotification.ShowAsync("Error", $"Failed to save Item Category: {ex.Message}", ToastType.Error);
+            await _toastNotification.ShowAsync("Error", $"Failed to save Tax: {ex.Message}", ToastType.Error);
         }
         finally
         {
@@ -274,9 +309,9 @@ public partial class ItemCategoryPage : IAsyncDisposable
             StateHasChanged();
             await _toastNotification.ShowAsync("Exporting", "Exporting to Excel...", ToastType.Info);
 
-            var (stream, fileName) = await ItemCategoryExcelExport.ExportMaster(_itemCategories);
+            var (stream, fileName) = await TaxExcelExport.ExportMaster(_taxes);
             await SaveAndViewService.SaveAndView(fileName, stream);
-            await _toastNotification.ShowAsync("Exported", "Item Category data exported to Excel successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Exported", "Tax data exported to Excel successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -300,9 +335,9 @@ public partial class ItemCategoryPage : IAsyncDisposable
             StateHasChanged();
             await _toastNotification.ShowAsync("Exporting", "Exporting to PDF...", ToastType.Info);
 
-            var (stream, fileName) = await ItemCategoryPDFExport.ExportMaster(_itemCategories);
+            var (stream, fileName) = await TaxPDFExport.ExportMaster(_taxes);
             await SaveAndViewService.SaveAndView(fileName, stream);
-            await _toastNotification.ShowAsync("Exported", "Item Category data exported to PDF successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Exported", "Tax data exported to PDF successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -321,7 +356,7 @@ public partial class ItemCategoryPage : IAsyncDisposable
     {
         var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
         if (selectedRecords.Count > 0)
-            OnEditItemCategory(selectedRecords[0]);
+            OnEditTax(selectedRecords[0]);
     }
 
     private async Task DeleteSelectedItem()
@@ -337,7 +372,7 @@ public partial class ItemCategoryPage : IAsyncDisposable
     }
 
     private async Task ResetPage() =>
-        NavigationManager.NavigateTo(PageRouteNames.AdminVoucher, true);
+        NavigationManager.NavigateTo(PageRouteNames.AdminTax, true);
 
     private async Task NavigateBack() =>
         NavigationManager.NavigateTo(PageRouteNames.InventoryDashboard);

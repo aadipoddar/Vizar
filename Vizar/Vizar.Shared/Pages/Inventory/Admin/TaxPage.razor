@@ -1,8 +1,8 @@
-﻿@page "/admin/item-category"
+﻿@page "/admin/tax"
 
 @using VizarLibrary.Models.Inventory.Item
 
-<PageTitle>Item Category Management - Vizar</PageTitle>
+<PageTitle>Tax Management - Vizar</PageTitle>
 
 @if (_isLoading)
 {
@@ -10,19 +10,19 @@
 }
 else
 {
-    <PageHeader Title="Item Category Management" Subtitle="Manage item categories and details" ShowHome="true" ShowBack="true" ShowLogout="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
+    <PageHeader Title="Tax Management" Subtitle="Manage taxes and details" ShowHome="true" ShowBack="true" ShowLogout="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
         <RightContent>
             <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Title="Export to Excel (Ctrl + E)" Disabled="_isProcessing" OnClick="ExportExcel" />
             <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Title="Export to PDF (Ctrl + P)" Disabled="_isProcessing" OnClick="ExportPdf" />
-            <IconButton Icon="IconType.Save" Variant="ButtonVariant.Save" Title="Save Item Category (Ctrl + S)" Disabled="_isProcessing" OnClick="SaveItemCategory" />
-            <IconButton Icon="IconType.New" Title="New Item Category (Ctrl + N)" Disabled="_isProcessing" OnClick="ResetPage" />
+            <IconButton Icon="IconType.Save" Variant="ButtonVariant.Save" Title="Save Tax (Ctrl + S)" Disabled="_isProcessing" OnClick="SaveTax" />
+            <IconButton Icon="IconType.New" Title="New Tax (Ctrl + N)" Disabled="_isProcessing" OnClick="ResetPage" />
         </RightContent>
     </PageHeader>
 
     <!-- Main Content Container -->
     <div class="purchase-container">
 
-        <!-- Item Category Entry Section -->
+        <!-- Tax Entry Section -->
         <div class="section-card">
             <div class="section-header">
                 <div class="section-title-wrapper">
@@ -30,39 +30,73 @@ else
                          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" />
                     </svg>
-                    <h2 class="section-title">Item Category Details</h2>
+                    <h2 class="section-title">Tax Details</h2>
                 </div>
             </div>
             <div class="section-body">
                 <div class="form-grid-triple">
-                    <!-- Item Category Name -->
+                    <!-- Tax Name -->
                     <div class="form-field">
                         <label class="field-label">
-                            Item Category Name <span class="required">*</span>
+                            Tax Name <span class="required">*</span>
                         </label>
-                        <SfTextBox @bind-Value="_itemCategory.Name" Placeholder="Enter item category name"
+                        <SfTextBox @bind-Value="_tax.Name" Placeholder="Enter tax name"
                                    FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                     </div>
 
+                    <!-- Tax Code -->
                     <div class="form-field">
                         <label class="field-label">
-                            Item Category Code <span class="required">*</span>
+                            Tax Code <span class="required">*</span>
                         </label>
-                        <SfTextBox Value="@_itemCategory.Code" Placeholder="Enter item category code" Readonly="true"
+                        <SfTextBox @bind-Value="_tax.Code" Placeholder="Enter tax code"
                                    FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+                    </div>
+
+                    <!-- Inclusive and Extra Checkboxes -->
+                    <div class="form-field">
+                        <label class="field-label">Tax Type (Select one only)</label>
+                        <div style="display: flex; gap: 24px; margin-top: 8px;">
+                            <SfCheckBox @bind-Checked="_tax.Inclusive" Label="Inclusive" TValue="bool" CssClass="custom-checkbox" />
+                            <SfCheckBox @bind-Checked="_tax.Extra" Label="Extra" TValue="bool" CssClass="custom-checkbox" />
+                        </div>
+                    </div>
+
+                    <!-- CGST -->
+                    <div class="form-field">
+                        <label class="field-label">CGST %</label>
+                        <SfNumericTextBox @bind-Value="_tax.CGST" Placeholder="Enter CGST percentage" Format="N2"
+                                          FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox"
+                                          TValue="decimal" Min="0" Max="100" />
+                    </div>
+
+                    <!-- SGST -->
+                    <div class="form-field">
+                        <label class="field-label">SGST %</label>
+                        <SfNumericTextBox @bind-Value="_tax.SGST" Placeholder="Enter SGST percentage" Format="N2"
+                                          FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox"
+                                          TValue="decimal" Min="0" Max="100" />
+                    </div>
+
+                    <!-- IGST -->
+                    <div class="form-field">
+                        <label class="field-label">IGST %</label>
+                        <SfNumericTextBox @bind-Value="_tax.IGST" Placeholder="Enter IGST percentage" Format="N2"
+                                          FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox"
+                                          TValue="decimal" Min="0" Max="100" />
                     </div>
 
                     <!-- Remarks -->
-                    <div class="form-field">
+                    <div class="form-field form-field-span-3">
                         <label class="field-label">Remarks</label>
-                        <SfTextBox @bind-Value="_itemCategory.Remarks" Placeholder="Enter remarks (optional)" Multiline="true"
+                        <SfTextBox @bind-Value="_tax.Remarks" Placeholder="Enter remarks (optional)" Multiline="true"
                                    FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Kitchens List Section -->
+        <!-- Taxes List Section -->
         <div class="section-card">
             <div class="section-header">
                 <div class="section-title-wrapper">
@@ -71,14 +105,14 @@ else
                         <path d="M9 11l3 3L22 4" />
                         <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                     </svg>
-                    <h2 class="section-title">Item Categories List</h2>
+                    <h2 class="section-title">Taxes List</h2>
                 </div>
                 <div class="header-actions">
                     <ToggleDeletedButton Disabled="@_isProcessing" ShowDeleted="@_showDeleted" OnToggle="ToggleDeleted" />
                 </div>
             </div>
             <div class="section-body grid-body">
-                <SfGrid @ref="_sfGrid" DataSource="@_itemCategories" AllowPaging="true" AllowSorting="true" AllowFiltering="true"
+                <SfGrid @ref="_sfGrid" DataSource="@_taxes" AllowPaging="true" AllowSorting="true" AllowFiltering="true"
                         AllowResizing="true" CssClass="professional-grid" Toolbar="@(new List<string>() { "Search" })">
                     <GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
                     <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
@@ -86,32 +120,55 @@ else
                         <GridColumn HeaderText="Actions" Width="120" TextAlign="TextAlign.Center" AllowFiltering="false">
                             <Template>
                                 @{
-                                    var itemCategory = (context as ItemCategoryModel);
+                                    var tax = (context as TaxModel);
 
                                     <div class="grid-actions">
-                                        @if (itemCategory.Status)
+                                        @if (tax.Status)
                                         {
-                                            <IconButton Icon="IconType.Edit" Variant="ButtonVariant.Edit" Size="ButtonSize.Grid" Title="Edit (Insert)" OnClick="@(() => OnEditItemCategory(itemCategory))" />
-                                            <IconButton Icon="IconType.Delete" Variant="ButtonVariant.Delete" Size="ButtonSize.Grid" Title="Delete (Delete)" OnClick="@(() => ShowDeleteConfirmation(itemCategory.Id, itemCategory.Name))" />
+                                            <IconButton Icon="IconType.Edit" Variant="ButtonVariant.Edit" Size="ButtonSize.Grid" Title="Edit (Insert)" OnClick="@(() => OnEditTax(tax))" />
+                                            <IconButton Icon="IconType.Delete" Variant="ButtonVariant.Delete" Size="ButtonSize.Grid" Title="Delete (Delete)" OnClick="@(() => ShowDeleteConfirmation(tax.Id, tax.Name))" />
                                         }
                                         else
                                         {
-                                            <IconButton Icon="IconType.Recover" Variant="ButtonVariant.Recover" Size="ButtonSize.Grid" Title="Recover (Delete)" OnClick="@(() => ShowRecoverConfirmation(itemCategory.Id, itemCategory.Name))" />
+                                            <IconButton Icon="IconType.Recover" Variant="ButtonVariant.Recover" Size="ButtonSize.Grid" Title="Recover (Delete)" OnClick="@(() => ShowRecoverConfirmation(tax.Id, tax.Name))" />
                                         }
                                     </div>
                                 }
                             </Template>
                         </GridColumn>
-                        <GridColumn Field="@nameof(ItemCategoryModel.Id)" HeaderText="ID" Width="80" TextAlign="TextAlign.Center" />
-                        <GridColumn Field="@nameof(ItemCategoryModel.Name)" HeaderText="Name" Width="300" />
-                        <GridColumn Field="@nameof(ItemCategoryModel.Code)" HeaderText="Code" Width="200" />
-                        <GridColumn Field="@nameof(ItemCategoryModel.Remarks)" HeaderText="Remarks" Width="400" />
-                        <GridColumn Field="@nameof(ItemCategoryModel.Status)" HeaderText="Status" Width="100" TextAlign="TextAlign.Center">
+                        <GridColumn Field="@nameof(TaxModel.Id)" HeaderText="ID" Width="80" TextAlign="TextAlign.Center" />
+                        <GridColumn Field="@nameof(TaxModel.Name)" HeaderText="Name" Width="200" />
+                        <GridColumn Field="@nameof(TaxModel.Code)" HeaderText="Code" Width="150" />
+                        <GridColumn Field="@nameof(TaxModel.CGST)" HeaderText="CGST %" Width="120" Format="N2" TextAlign="TextAlign.Right" />
+                        <GridColumn Field="@nameof(TaxModel.SGST)" HeaderText="SGST %" Width="120" Format="N2" TextAlign="TextAlign.Right" />
+                        <GridColumn Field="@nameof(TaxModel.IGST)" HeaderText="IGST %" Width="120" Format="N2" TextAlign="TextAlign.Right" />
+                        <GridColumn Field="@nameof(TaxModel.Inclusive)" HeaderText="Inclusive" Width="100" TextAlign="TextAlign.Center">
                             <Template>
                                 @{
-                                    var itemCategory = (context as ItemCategoryModel);
-                                    <div class="grid-checkbox" style="@(itemCategory.Status ? "color: #10b981; background: #d1fae5;" : "color: #dc2626; background: #fee2e2;")">
-                                        @(itemCategory.Status ? "✓" : "✗")
+                                    var tax = (context as TaxModel);
+                                    <div class="grid-checkbox" style="@(tax.Inclusive ? "color: #10b981; background: #d1fae5;" : "color: #64748b; background: #f1f5f9;")">
+                                        @(tax.Inclusive ? "✓" : "✗")
+                                    </div>
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Field="@nameof(TaxModel.Extra)" HeaderText="Extra" Width="100" TextAlign="TextAlign.Center">
+                            <Template>
+                                @{
+                                    var tax = (context as TaxModel);
+                                    <div class="grid-checkbox" style="@(tax.Extra ? "color: #10b981; background: #d1fae5;" : "color: #64748b; background: #f1f5f9;")">
+                                        @(tax.Extra ? "✓" : "✗")
+                                    </div>
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Field="@nameof(TaxModel.Remarks)" HeaderText="Remarks" Width="300" />
+                        <GridColumn Field="@nameof(TaxModel.Status)" HeaderText="Status" Width="100" TextAlign="TextAlign.Center">
+                            <Template>
+                                @{
+                                    var tax = (context as TaxModel);
+                                    <div class="grid-checkbox" style="@(tax.Status ? "color: #10b981; background: #d1fae5;" : "color: #dc2626; background: #fee2e2;")">
+                                        @(tax.Status ? "✓" : "✗")
                                     </div>
                                 }
                             </Template>
@@ -125,18 +182,18 @@ else
 }
 
 <DeleteConfirmationDialog @ref="_deleteConfirmationDialog"
-                          EntityName="Item Category"
-                          IdentifierLabel="Item Category Name"
-                          IdentifierValue="@_deleteItemCategoryName"
+                          EntityName="Tax"
+                          IdentifierLabel="Tax Name"
+                          IdentifierValue="@_deleteTaxName"
                           IsPermanentDelete="false"
                           Disabled="@_isProcessing"
                           OnConfirm="ConfirmDelete"
                           OnCancel="CancelDelete" />
 
 <RecoverConfirmationDialog @ref="_recoverConfirmationDialog"
-                           EntityName="Item Category"
-                           IdentifierLabel="Item Category Name"
-                           IdentifierValue="@_recoverItemCategoryName"
+                           EntityName="Tax"
+                           IdentifierLabel="Tax Name"
+                           IdentifierValue="@_recoverTaxName"
                            Disabled="@_isProcessing"
                            OnConfirm="ConfirmRecover"
                            OnCancel="CancelRecover" />
@@ -262,67 +319,6 @@ else
         font-size: 14px;
     }
 
-    /* Dialog Styles */
-    .dialog-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        height: 44px;
-        padding: 0 24px;
-        border: none;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-    }
-
-        .dialog-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
-        }
-
-        .dialog-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-        }
-
-        .dialog-btn svg {
-            flex-shrink: 0;
-        }
-
-    .dialog-btn-cancel {
-        background: #ffffff;
-        color: #64748b;
-        border: 2px solid #e2e8f0;
-    }
-
-        .dialog-btn-cancel:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-            color: #475569;
-        }
-
-    .dialog-btn-delete {
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        color: white;
-    }
-
-        .dialog-btn-delete:hover {
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-        }
-
-    .dialog-btn-recover {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        color: white;
-    }
-
-        .dialog-btn-recover:hover {
-            background: linear-gradient(135deg, #059669 0%, #047857 100%);
-        }
-
     /* Responsive Design */
     @@media (max-width: 1024px) {
         .form-grid-triple {
@@ -336,3 +332,5 @@ else
         }
     }
 </style>
+
+
