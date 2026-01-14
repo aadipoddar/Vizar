@@ -3,6 +3,7 @@ using Syncfusion.Blazor.Inputs;
 using Vizar.Shared.Components.Dialog;
 
 using VizarLibrary.Data.Common;
+using VizarLibrary.Data.Operations;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Models.Common;
 

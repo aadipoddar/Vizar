@@ -15,10 +15,11 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-		Dapper.SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
-		Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(Secrets.SyncfusionLicense);
+        Dapper.SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
+        Dapper.SqlMapper.AddTypeHandler(new TimeOnlyTypeHandler());
+        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(Secrets.SyncfusionLicense);
 
-		var builder = MauiApp.CreateBuilder();
+        var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
             .ConfigureFonts(fonts =>
@@ -28,19 +29,19 @@ public static class MauiProgram
 
         // Add device-specific services used by the Vizar.Shared project
         builder.Services.AddSingleton<IFormFactor, FormFactor>();
-		builder.Services.AddSingleton<ISaveAndViewService, SaveAndViewService>();
-		builder.Services.AddSingleton<IUpdateService, UpdateService>();
-		builder.Services.AddSingleton<IDataStorageService, DataStorageService>();
-		builder.Services.AddSingleton<IVibrationService, VibrationService>();
-		builder.Services.AddSingleton<ISoundService, SoundService>();
-		builder.Services.AddScoped<INotificationService, NotificationService>();
+        builder.Services.AddSingleton<ISaveAndViewService, SaveAndViewService>();
+        builder.Services.AddSingleton<IUpdateService, UpdateService>();
+        builder.Services.AddSingleton<IDataStorageService, DataStorageService>();
+        builder.Services.AddSingleton<IVibrationService, VibrationService>();
+        builder.Services.AddSingleton<ISoundService, SoundService>();
+        builder.Services.AddScoped<INotificationService, NotificationService>();
 
-		builder.Services.AddMauiBlazorWebView();
-		builder.Services.AddSyncfusionBlazor();
-		builder.Services.AddHotKeys2();
+        builder.Services.AddMauiBlazorWebView();
+        builder.Services.AddSyncfusionBlazor();
+        builder.Services.AddHotKeys2();
 
 #if DEBUG
-		builder.Services.AddBlazorWebViewDeveloperTools();
+        builder.Services.AddBlazorWebViewDeveloperTools();
         builder.Logging.AddDebug();
 #endif
 

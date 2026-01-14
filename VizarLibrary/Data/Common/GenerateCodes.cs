@@ -1,5 +1,4 @@
 ﻿using VizarLibrary.Data.Accounts.Masters;
-using VizarLibrary.Data.Common;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Models.Accounts.FinancialAccounting;
 using VizarLibrary.Models.Accounts.Masters;
@@ -10,7 +9,7 @@ using VizarLibrary.Models.Inventory.Item;
 using VizarLibrary.Models.Inventory.ItemIssue;
 using VizarLibrary.Models.Inventory.Purchase;
 
-namespace VizarLibrary.Data;
+namespace VizarLibrary.Data.Common;
 
 public static class GenerateCodes
 {

@@ -8,7 +8,6 @@ using Syncfusion.Pdf;
 using Syncfusion.Pdf.Graphics;
 using Syncfusion.Pdf.Grid;
 
-using VizarLibrary.Data;
 using VizarLibrary.Data.Common;
 
 namespace VizarLibrary.Exporting.Utils;

@@ -5,7 +5,6 @@ using Syncfusion.Blazor.Grids;
 
 using Vizar.Shared.Components.Dialog;
 
-using VizarLibrary.Data;
 using VizarLibrary.Data.Accounts.FinancialAccounting;
 using VizarLibrary.Data.Common;
 using VizarLibrary.DataAccess;

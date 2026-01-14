@@ -8,7 +8,6 @@ using Syncfusion.Pdf;
 using Syncfusion.Pdf.Graphics;
 using Syncfusion.Pdf.Grid;
 
-using VizarLibrary.Data;
 using VizarLibrary.Data.Common;
 using VizarLibrary.Models.Accounts.Masters;
 
@@ -178,8 +177,8 @@ public static class PDFInvoiceExportUtil
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot", "images", "logo_full.png"),
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "wwwroot", "images", "logo_full.png"),
                 Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "logo_full.png"),
-                Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "Viizar", "Viizar", "wwwroot", "images", "logo_full.png"),
-                Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "Viizar", "Viizar.Web", "wwwroot", "images", "logo_full.png")
+                Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "Vizar", "Vizar", "wwwroot", "images", "logo_full.png"),
+                Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "Vizar", "Vizar.Web", "wwwroot", "images", "logo_full.png")
             };
 
             string resolvedLogoPath = possibleLogoPaths.FirstOrDefault(File.Exists);

@@ -2,7 +2,6 @@ using Syncfusion.Blazor.Grids;
 
 using Vizar.Shared.Components.Dialog;
 
-using VizarLibrary.Data;
 using VizarLibrary.Data.Common;
 using VizarLibrary.Data.Fleet.Vehicle;
 using VizarLibrary.DataAccess;
