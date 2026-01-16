@@ -10,12 +10,14 @@ using Vizar.Shared.Components.Dialog;
 using VizarLibrary.Data.Accounts.Masters;
 using VizarLibrary.Data.Common;
 using VizarLibrary.Data.Inventory.Purchase;
+using VizarLibrary.Data.Operations;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Inventory.Purchase;
+using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
-using VizarLibrary.Models.Common;
 using VizarLibrary.Models.Inventory.Item;
 using VizarLibrary.Models.Inventory.Purchase;
+using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages.Inventory.Purchase;
 
@@ -248,8 +250,8 @@ public partial class PurchasePage : IAsyncDisposable
                 {
                     if (_items.FirstOrDefault(s => s.Id == item.ItemId) is null)
                     {
-                        var rawMaterial = await CommonData.LoadTableDataById<ItemModel>(TableNames.Item, item.ItemId);
-                        await _toastNotification.ShowAsync("Item Not Found", $"The item {rawMaterial?.Name} (ID: {item.ItemId}) in the existing transaction cart was not found in the available items list. It may have been deleted or is inaccessible.", ToastType.Error);
+                        var purchaseItem = await CommonData.LoadTableDataById<ItemModel>(TableNames.Item, item.ItemId);
+                        await _toastNotification.ShowAsync("Item Not Found", $"The item {purchaseItem?.Name} (ID: {item.ItemId}) in the existing transaction cart was not found in the available items list. It may have been deleted or is inaccessible.", ToastType.Error);
                         continue;
                     }
 
@@ -760,7 +762,7 @@ public partial class PurchasePage : IAsyncDisposable
             return false;
         }
 
-        if (_selectedFinancialYear.Status == false)
+        if (!_selectedFinancialYear.Status)
         {
             await _toastNotification.ShowAsync("Financial Year Inactive", "The financial year for the selected transaction date is inactive. Please select a different date.", ToastType.Error);
             return false;
@@ -792,12 +794,8 @@ public partial class PurchasePage : IAsyncDisposable
 
         if (_purchase.Id > 0)
         {
-            var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, _purchase.FinancialYearId);
-            if (financialYear is null || financialYear.Locked || financialYear.Status == false)
-            {
-                await _toastNotification.ShowAsync("Financial Year Locked or Inactive", "The financial year for the selected transaction date is either locked or inactive. Please select a different date.", ToastType.Error);
-                return false;
-            }
+            var existingPurchase = await CommonData.LoadTableDataById<PurchaseModel>(TableNames.Purchase, _purchase.Id);
+            await FinancialYearData.ValidateFinancialYear(existingPurchase.TransactionDateTime);
 
             if (!_user.Admin)
             {
@@ -845,12 +843,12 @@ public partial class PurchasePage : IAsyncDisposable
             _purchase.CreatedBy = _user.Id;
             _purchase.LastModifiedBy = _user.Id;
 
-            _purchase.Id = await PurchaseData.SavePurchaseTransaction(_purchase, _cart);
-            var (pdfStream, fileName) = await PurchaseInvoicePDFExport.ExportInvoice(_purchase.Id);
-            await SaveAndViewService.SaveAndView(fileName, pdfStream);
-            await DeleteLocalFiles();
-            NavigationManager.NavigateTo(PageRouteNames.Purchase, true);
+            _purchase.Id = await PurchaseData.SaveTransaction(_purchase, _cart);
 
+            var (pdfStream, fileName) = await PurchaseInvoiceExport.ExportInvoice(_purchase.Id, InvoiceExportType.PDF);
+            await SaveAndViewService.SaveAndView(fileName, pdfStream);
+
+            await ResetPage();
             await _toastNotification.ShowAsync("Save Transaction", "Transaction saved successfully! Invoice has been generated.", ToastType.Success);
         }
         catch (Exception ex)
@@ -966,8 +964,10 @@ public partial class PurchasePage : IAsyncDisposable
             _isProcessing = true;
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Generating PDF invoice...", ToastType.Info);
-            var (pdfStream, fileName) = await PurchaseInvoicePDFExport.ExportInvoice(Id.Value);
+
+            var (pdfStream, fileName) = await PurchaseInvoiceExport.ExportInvoice(Id.Value, InvoiceExportType.PDF);
             await SaveAndViewService.SaveAndView(fileName, pdfStream);
+
             await _toastNotification.ShowAsync("Invoice Downloaded", "The PDF invoice has been downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
@@ -996,8 +996,10 @@ public partial class PurchasePage : IAsyncDisposable
             _isProcessing = true;
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Generating Excel invoice...", ToastType.Info);
-            var (excelStream, fileName) = await PurchaseInvoiceExcelExport.ExportInvoice(Id.Value);
+
+            var (excelStream, fileName) = await PurchaseInvoiceExport.ExportInvoice(Id.Value, InvoiceExportType.Excel);
             await SaveAndViewService.SaveAndView(fileName, excelStream);
+
             await _toastNotification.ShowAsync("Invoice Downloaded", "The Excel invoice has been downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
@@ -1035,7 +1037,7 @@ public partial class PurchasePage : IAsyncDisposable
     private void NavigateToDashboard() =>
         NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 
-    private async Task NavigateBack() =>
+    private void NavigateBack() =>
         NavigationManager.NavigateTo(PageRouteNames.InventoryDashboard);
 
     private async Task Logout() =>

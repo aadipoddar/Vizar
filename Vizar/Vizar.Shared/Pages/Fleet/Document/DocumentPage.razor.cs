@@ -9,9 +9,10 @@ using VizarLibrary.Data.Common;
 using VizarLibrary.Data.Fleet.Document;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Fleet.Document;
-using VizarLibrary.Models.Common;
+using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Fleet.Document;
 using VizarLibrary.Models.Fleet.Vehicle;
+using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages.Fleet.Document;
 
@@ -440,11 +441,12 @@ public partial class DocumentPage : IAsyncDisposable
         {
             _isProcessing = true;
             StateHasChanged();
-            await _toastNotification.ShowAsync("Exporting", "Exporting to Excel...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing", "Please wait while the report is being exported...", ToastType.Info);
 
-            var (stream, fileName) = await DocumentExcelExport.ExportMaster(_documents);
+            var (stream, fileName) = await DocumentExport.ExportMaster(_documents, ReportExportType.Excel);
             await SaveAndViewService.SaveAndView(fileName, stream);
-            await _toastNotification.ShowAsync("Exported", "Document data exported to Excel successfully.", ToastType.Success);
+
+            await _toastNotification.ShowAsync("Success", "Document data exported to Excel successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -466,11 +468,12 @@ public partial class DocumentPage : IAsyncDisposable
         {
             _isProcessing = true;
             StateHasChanged();
-            await _toastNotification.ShowAsync("Exporting", "Exporting to PDF...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing", "Please wait while the report is being exported...", ToastType.Info);
 
-            var (stream, fileName) = await DocumentPDFExport.ExportMaster(_documents);
+            var (stream, fileName) = await DocumentExport.ExportMaster(_documents, ReportExportType.PDF);
             await SaveAndViewService.SaveAndView(fileName, stream);
-            await _toastNotification.ShowAsync("Exported", "Document data exported to PDF successfully.", ToastType.Success);
+
+            await _toastNotification.ShowAsync("Success", "Document data exported to PDF successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -537,7 +540,7 @@ public partial class DocumentPage : IAsyncDisposable
     private async Task ResetPage() =>
         NavigationManager.NavigateTo(PageRouteNames.Document, true);
 
-    private async Task NavigateBack() =>
+    private void NavigateBack() =>
         NavigationManager.NavigateTo(PageRouteNames.FleetDashboard);
 
     private void NavigateToDashboard() =>

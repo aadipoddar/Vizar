@@ -24,6 +24,8 @@ public static class PageRouteNames
     public static string ReportFinancialAccounting => "/report/financial-accounting";
     public static string ReportAccountingLedger => "/report/accounting-ledger";
     public static string ReportTrialBalance => "/report/trial-balance";
+    public static string ReportProfitAndLoss => "/report/profit-and-loss";
+    public static string ReportBalanceSheet => "/report/balance-sheet";
     public static string ReportPurchase => "/report/purchase";
     public static string ReportPurchaseReturn => "/report/purchase-return";
     public static string ReportPurchaseItem => "/report/purchase-item";

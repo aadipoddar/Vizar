@@ -13,48 +13,9 @@ using VizarLibrary.Models.Accounts.Masters;
 
 namespace VizarLibrary.Exporting.Utils;
 
-/// <summary>
-/// Professional Invoice PDF export utility - SAP-style professional invoices
-/// </summary>
 public static class PDFInvoiceExportUtil
 {
     private static PdfLayoutFormat _layoutFormat;
-
-    #region Generic Invoice Models
-
-    /// <summary>
-    /// Generic invoice header data that works with any transaction type
-    /// </summary>
-    public class InvoiceData
-    {
-        public string TransactionNo { get; set; }
-        public DateTime TransactionDateTime { get; set; }
-        public string ReferenceTransactionNo { get; set; }
-        public DateTime? ReferenceDateTime { get; set; }
-        public decimal TotalAmount { get; set; }
-        public string Remarks { get; set; }
-        public bool Status { get; set; } = true; // True = Active, False = Deleted
-        /// <summary>
-        /// Payment modes breakdown (e.g., "Cash" => 1000.00, "Card" => 500.00)
-        /// </summary>
-        public Dictionary<string, decimal> PaymentModes { get; set; }
-    }
-
-    /// <summary>
-    /// Column configuration for invoice line items table
-    /// </summary>
-    public class InvoiceColumnSetting(string propertyName, string displayName, float width,
-        PdfTextAlignment alignment = PdfTextAlignment.Right, string format = null, bool showOnlyIfHasValue = true)
-    {
-        public string PropertyName { get; set; } = propertyName;
-        public string DisplayName { get; set; } = displayName;
-        public float Width { get; set; } = width;
-        public PdfTextAlignment Alignment { get; set; } = alignment;
-        public string Format { get; set; } = format;
-        public bool ShowOnlyIfHasValue { get; set; } = showOnlyIfHasValue;
-    }
-
-    #endregion
 
     #region Public Methods
 
@@ -62,11 +23,8 @@ public static class PDFInvoiceExportUtil
     /// Export invoice to PDF with professional layout (unified method for all transaction types)
     /// </summary>
     /// <typeparam name="T">Type of line item (must be a class)</typeparam>
-    /// <param name="invoiceData">Generic invoice header data</param>
+    /// <param name="invoiceData">Generic invoice header data with all invoice information</param>
     /// <param name="lineItems">Generic invoice line items of any type</param>
-    /// <param name="company">Company information (Bill From)</param>
-    /// <param name="billTo">Customer/Party information (Bill To) - can be null</param>
-    /// <param name="invoiceType">Type of invoice (INVOICE, PURCHASE RETURN, SALES INVOICE, etc.)</param>
     /// <param name="columnSettings">Optional: Custom column settings for line items table</param>
     /// <param name="columnOrder">Optional: Custom column order for line items table</param>
     /// <param name="summaryFields">Optional: Custom summary fields to display (key=label, value=formatted value)</param>
@@ -74,9 +32,6 @@ public static class PDFInvoiceExportUtil
     public static async Task<MemoryStream> ExportInvoiceToPdf<T>(
         InvoiceData invoiceData,
         List<T> lineItems,
-        CompanyModel company,
-        LedgerModel billTo = null,
-        string invoiceType = "INVOICE",
         List<InvoiceColumnSetting> columnSettings = null,
         List<string> columnOrder = null,
         Dictionary<string, string> summaryFields = null) where T : class
@@ -109,14 +64,14 @@ public static class PDFInvoiceExportUtil
             currentY = DrawInvoiceHeader(graphics, leftMargin, pageWidth, currentY);
 
             // 2. Invoice Type and Number
-            currentY = DrawInvoiceTitle(graphics, invoiceType, invoiceData.TransactionNo, invoiceData.TransactionDateTime, leftMargin, pageWidth, currentY);
+            currentY = DrawInvoiceTitle(graphics, invoiceData.InvoiceType, invoiceData.TransactionNo, invoiceData.TransactionDateTime, leftMargin, pageWidth, currentY, invoiceData.Outlet);
 
             // 2.5. Draw DELETED status badge if Status is false
             if (!invoiceData.Status)
                 currentY = DrawDeletedStatusBadge(graphics, pageWidth, currentY);
 
             // 3. Company and Customer Information (Two Columns)
-            currentY = DrawCompanyInfo(graphics, company, billTo, invoiceData, leftMargin, pageWidth, currentY);
+            currentY = DrawCompanyInfo(graphics, invoiceData.Company, invoiceData.BillTo, invoiceData, leftMargin, pageWidth, currentY);
 
             // Get column settings dynamically if not provided
             columnSettings ??= GetDefaultInvoiceColumnSettings<T>();
@@ -135,8 +90,38 @@ public static class PDFInvoiceExportUtil
             PdfGraphics lastPageGraphics = lastPage.Graphics;
             currentY = gridResult.Bounds.Bottom + 8;
 
+            // Calculate estimated heights for sections
+            float pageHeight = lastPage.GetClientSize().Height;
+            float footerHeight = 30; // Footer template height
+            float availableSpace = pageHeight - currentY - footerHeight;
+
+            // Estimate space needed for summary and remarks (minimum)
+            float estimatedSummaryHeight = summaryFields != null ? summaryFields.Count(f => !IsZeroValue(f.Value)) * 12 + 20 : 40;
+            float estimatedRemarksHeight = string.IsNullOrWhiteSpace(invoiceData.Remarks) ? 0 : 50;
+            float estimatedWordsHeight = invoiceData.TotalAmount > 0 ? 30 : 0;
+            float estimatedPaymentHeight = (invoiceData.PaymentModes != null && invoiceData.PaymentModes.Any(p => p.Value > 0)) ? 40 : 0;
+            float totalEstimatedHeight = Math.Max(estimatedSummaryHeight, estimatedRemarksHeight) + Math.Max(estimatedWordsHeight, estimatedPaymentHeight);
+
+            // If not enough space, add a new page
+            if (availableSpace < totalEstimatedHeight)
+            {
+                lastPage = pdfDocument.Pages.Add();
+                lastPageGraphics = lastPage.Graphics;
+                currentY = 15; // Start from top margin
+            }
+
             // 5. Summary Section with Remarks (two-column layout on the last page)
             currentY = DrawSummaryAndRemarks(lastPageGraphics, invoiceData, summaryFields, leftMargin, pageWidth, currentY);
+
+            // Check space before amount in words section (recalculate pageHeight in case we added a new page)
+            pageHeight = lastPage.GetClientSize().Height;
+            availableSpace = pageHeight - currentY - footerHeight;
+            if (availableSpace < Math.Max(estimatedWordsHeight, estimatedPaymentHeight) && (estimatedWordsHeight > 0 || estimatedPaymentHeight > 0))
+            {
+                lastPage = pdfDocument.Pages.Add();
+                lastPageGraphics = lastPage.Graphics;
+                currentY = 15;
+            }
 
             // 6. Amount in Words and Payment Methods side by side (on the last page)
             float amountInWordsStartY = currentY;
@@ -223,7 +208,7 @@ public static class PDFInvoiceExportUtil
     /// <summary>
     /// Draw invoice type and number
     /// </summary>
-    private static float DrawInvoiceTitle(PdfGraphics graphics, string invoiceType, string invoiceNumber, DateTime transactionDateTime, float leftMargin, float pageWidth, float startY)
+    private static float DrawInvoiceTitle(PdfGraphics graphics, string invoiceType, string invoiceNumber, DateTime transactionDateTime, float leftMargin, float pageWidth, float startY, string outlet = null)
     {
         float currentY = startY;
 
@@ -240,6 +225,15 @@ public static class PDFInvoiceExportUtil
             new PointF(pageWidth - 20 - numberSize.Width, currentY));
 
         currentY += 16;
+
+        // Draw Outlet label and Invoice Date on same line
+        if (!string.IsNullOrWhiteSpace(outlet))
+        {
+            PdfStandardFont outletFont = new(PdfFontFamily.Helvetica, 10, PdfFontStyle.Bold);
+            PdfBrush outletBrush = new PdfSolidBrush(new PdfColor(100, 100, 100));
+            string outletText = $"Outlet: {outlet}";
+            graphics.DrawString(outletText, outletFont, outletBrush, new PointF(leftMargin, currentY));
+        }
 
         // Invoice Date (right aligned, on same line as outlet)
         PdfStandardFont dateFont = new(PdfFontFamily.Helvetica, 10);
@@ -306,35 +300,46 @@ public static class PDFInvoiceExportUtil
         graphics.DrawString("FROM:", labelFont, labelBrush, new PointF(leftMargin + padding, leftTextY));
         leftTextY += 10;
 
-        graphics.DrawString(company.Name, valueFont, valueBrush, new PointF(leftMargin + padding, leftTextY));
-        leftTextY += 9;
-
-        if (!string.IsNullOrEmpty(company.Address))
+        if (company != null)
         {
-            // Calculate actual address height dynamically
-            int addressLines = Math.Max(1, company.Address.Length / 50);
-            float addressHeight = addressLines * 9;
-            DrawWrappedText(graphics, company.Address, valueFont, valueBrush,
-                new RectangleF(leftMargin + padding, leftTextY, columnWidth - 2 * padding, addressHeight + 5));
-            leftTextY += addressHeight + 2;
-        }
-
-        if (!string.IsNullOrEmpty(company.Phone))
-        {
-            graphics.DrawString($"Phone: {company.Phone}", valueFont, valueBrush, new PointF(leftMargin + padding, leftTextY));
+            graphics.DrawString(company.Name ?? string.Empty, valueFont, valueBrush, new PointF(leftMargin + padding, leftTextY));
             leftTextY += 9;
-        }
 
-        if (!string.IsNullOrEmpty(company.Email))
-        {
-            graphics.DrawString($"Email: {company.Email}", valueFont, valueBrush, new PointF(leftMargin + padding, leftTextY));
-            leftTextY += 9;
-        }
+            if (!string.IsNullOrEmpty(company.Address))
+            {
+                // Measure actual text height needed for the address
+                PdfStringFormat format = new()
+                {
+                    LineAlignment = PdfVerticalAlignment.Top,
+                    Alignment = PdfTextAlignment.Left,
+                    WordWrap = PdfWordWrapType.Word
+                };
 
-        if (!string.IsNullOrEmpty(company.GSTNo))
-        {
-            graphics.DrawString($"GSTIN: {company.GSTNo}", valueFont, valueBrush, new PointF(leftMargin + padding, leftTextY));
-            leftTextY += 9;
+                SizeF textSize = valueFont.MeasureString(company.Address, new SizeF(columnWidth - 2 * padding, 1000), format);
+                float addressHeight = textSize.Height;
+
+                DrawWrappedText(graphics, company.Address, valueFont, valueBrush,
+                    new RectangleF(leftMargin + padding, leftTextY, columnWidth - 2 * padding, addressHeight + 5));
+                leftTextY += addressHeight + 2;
+            }
+
+            if (!string.IsNullOrEmpty(company.Phone))
+            {
+                graphics.DrawString($"Phone: {company.Phone}", valueFont, valueBrush, new PointF(leftMargin + padding, leftTextY));
+                leftTextY += 9;
+            }
+
+            if (!string.IsNullOrEmpty(company.Email))
+            {
+                graphics.DrawString($"Email: {company.Email}", valueFont, valueBrush, new PointF(leftMargin + padding, leftTextY));
+                leftTextY += 9;
+            }
+
+            if (!string.IsNullOrEmpty(company.GSTNo))
+            {
+                graphics.DrawString($"GSTIN: {company.GSTNo}", valueFont, valueBrush, new PointF(leftMargin + padding, leftTextY));
+                leftTextY += 9;
+            }
         }
 
         // Right Column - To (Customer/Party) - skip entire section if null
@@ -348,9 +353,17 @@ public static class PDFInvoiceExportUtil
 
             if (!string.IsNullOrEmpty(billTo.Address))
             {
-                // Calculate actual address height dynamically
-                int addressLines = Math.Max(1, billTo.Address.Length / 50);
-                float addressHeight = addressLines * 9;
+                // Measure actual text height needed for the address
+                PdfStringFormat format = new()
+                {
+                    LineAlignment = PdfVerticalAlignment.Top,
+                    Alignment = PdfTextAlignment.Left,
+                    WordWrap = PdfWordWrapType.Word
+                };
+
+                SizeF textSize = valueFont.MeasureString(billTo.Address, new SizeF(columnWidth - 2 * padding, 1000), format);
+                float addressHeight = textSize.Height;
+
                 DrawWrappedText(graphics, billTo.Address, valueFont, valueBrush,
                     new RectangleF(rightColumnX + padding, rightTextY, columnWidth - 2 * padding, addressHeight + 5));
                 rightTextY += addressHeight + 2;
@@ -414,26 +427,27 @@ public static class PDFInvoiceExportUtil
 
         // Calculate available width and adjust column widths to fit within page
         float availableWidth = pageWidth - leftMargin - rightMargin;
-        float fixedWidths = orderedColumnSettings.Where(c => c.Width > 0).Sum(c => c.Width);
+        float fixedWidths = orderedColumnSettings.Where(c => c.PDFWidth.HasValue && c.PDFWidth.Value > 0).Sum(c => (float)c.PDFWidth.Value);
 
         // Find first column with width 0 (auto-size column, typically description)
-        var autoSizeColumn = orderedColumnSettings.FirstOrDefault(c => c.Width == 0);
+        var autoSizeColumn = orderedColumnSettings.FirstOrDefault(c => c.PDFWidth.HasValue && c.PDFWidth.Value == 0);
         if (autoSizeColumn != null)
         {
             // Calculate remaining width for auto-size column
             float remainingWidth = availableWidth - fixedWidths;
-            autoSizeColumn.Width = Math.Max(remainingWidth, 80); // Minimum 80 points
+            autoSizeColumn.PDFWidth = Math.Max(remainingWidth, 80); // Minimum 80 points
         }
 
         // Check if total width exceeds available width - if so, scale proportionally
-        float totalWidth = orderedColumnSettings.Sum(c => c.Width);
+        float totalWidth = orderedColumnSettings.Where(c => c.PDFWidth.HasValue).Sum(c => (float)c.PDFWidth.Value);
         if (totalWidth > availableWidth)
         {
             // Scale all columns proportionally to fit within available width
             float scaleFactor = availableWidth / totalWidth;
             foreach (var column in orderedColumnSettings)
             {
-                column.Width *= scaleFactor;
+                if (column.PDFWidth.HasValue)
+                    column.PDFWidth = column.PDFWidth.Value * scaleFactor;
             }
         }
 
@@ -441,7 +455,8 @@ public static class PDFInvoiceExportUtil
         pdfGrid.Columns.Add(orderedColumnSettings.Count);
         for (int i = 0; i < orderedColumnSettings.Count; i++)
         {
-            pdfGrid.Columns[i].Width = orderedColumnSettings[i].Width;
+            if (orderedColumnSettings[i].PDFWidth.HasValue)
+                pdfGrid.Columns[i].Width = (float)orderedColumnSettings[i].PDFWidth.Value;
         }
 
         pdfGrid.Style.AllowHorizontalOverflow = false;
@@ -455,7 +470,7 @@ public static class PDFInvoiceExportUtil
             headerRow.Cells[i].Value = orderedColumnSettings[i].DisplayName;
             headerRow.Cells[i].Style.BackgroundBrush = new PdfSolidBrush(new PdfColor(59, 130, 246));
             headerRow.Cells[i].Style.TextBrush = PdfBrushes.White;
-            headerRow.Cells[i].Style.Font = new PdfStandardFont(PdfFontFamily.Helvetica, 7f, PdfFontStyle.Bold);
+            headerRow.Cells[i].Style.Font = new PdfStandardFont(PdfFontFamily.Helvetica, 9f, PdfFontStyle.Bold);
             headerRow.Cells[i].Style.StringFormat = new PdfStringFormat
             {
                 Alignment = PdfTextAlignment.Center,
@@ -479,12 +494,20 @@ public static class PDFInvoiceExportUtil
                 row.Cells[i].Value = cellValue;
 
                 // Apply styling
-                row.Cells[i].Style.Font = new PdfStandardFont(PdfFontFamily.Helvetica, 7f);
+                row.Cells[i].Style.Font = new PdfStandardFont(PdfFontFamily.Helvetica, 9f);
                 row.Cells[i].Style.Borders.All = new PdfPen(new PdfColor(220, 220, 220), 0.5f);
                 row.Cells[i].Style.CellPadding = new PdfPaddings(1f, 1f, 1f, 1f);
+                // Convert CellAlignment to PdfTextAlignment
+                PdfTextAlignment pdfAlign = column.Alignment switch
+                {
+                    CellAlignment.Left => PdfTextAlignment.Left,
+                    CellAlignment.Center => PdfTextAlignment.Center,
+                    CellAlignment.Right => PdfTextAlignment.Right,
+                    _ => PdfTextAlignment.Right
+                };
                 row.Cells[i].Style.StringFormat = new PdfStringFormat
                 {
-                    Alignment = column.Alignment,
+                    Alignment = pdfAlign,
                     LineAlignment = PdfVerticalAlignment.Middle,
                     WordWrap = PdfWordWrapType.Word
                 };
@@ -572,13 +595,19 @@ public static class PDFInvoiceExportUtil
         {
             bool isLastField;
             int fieldIndex = 0;
+            int visibleFieldsDrawn = 0;
+
             foreach (var field in summaryFields)
             {
                 fieldIndex++;
                 isLastField = fieldIndex == summaryFields.Count;
 
-                // Draw line before last field (typically Grand Total)
-                if (isLastField && summaryFields.Count > 1)
+                // Skip fields with 0.00 value, except for the last field (Grand Total)
+                if (!isLastField && IsZeroValue(field.Value))
+                    continue;
+
+                // Draw line before last field (typically Grand Total) and after at least one field has been drawn
+                if (isLastField && visibleFieldsDrawn > 0)
                 {
                     PdfPen linePen = new(new PdfColor(59, 130, 246), 1f);
                     graphics.DrawLine(linePen, new PointF(summaryColumnX - 10, summaryStartY), new PointF(pageWidth - 20, summaryStartY));
@@ -594,6 +623,7 @@ public static class PDFInvoiceExportUtil
                 SizeF valueSize = currentValueFont.MeasureString(field.Value);
                 graphics.DrawString(field.Value, currentValueFont, currentBrush, new PointF(pageWidth - rightMargin - valueSize.Width, summaryStartY));
                 summaryStartY += isLastField ? 15 : 10;
+                visibleFieldsDrawn++;
             }
         }
         else
@@ -620,6 +650,10 @@ public static class PDFInvoiceExportUtil
     /// </summary>
     private static float DrawAmountInWords(PdfGraphics graphics, decimal amount, float leftMargin, float pageWidth, float startY)
     {
+        // Skip if amount is 0
+        if (amount == 0)
+            return startY;
+
         float currentY = startY;
 
         PdfStandardFont labelFont = new(PdfFontFamily.Helvetica, 8, PdfFontStyle.Bold);
@@ -832,10 +866,37 @@ public static class PDFInvoiceExportUtil
                 alignment = PdfTextAlignment.Center;
             }
 
-            settings.Add(new InvoiceColumnSetting(prop.Name, displayName, width, alignment, format));
+            // Convert PdfTextAlignment to CellAlignment
+            CellAlignment cellAlignment = alignment switch
+            {
+                PdfTextAlignment.Left => CellAlignment.Left,
+                PdfTextAlignment.Center => CellAlignment.Center,
+                PdfTextAlignment.Right => CellAlignment.Right,
+                _ => CellAlignment.Right
+            };
+
+            settings.Add(new InvoiceColumnSetting(prop.Name, displayName, InvoiceExportType.PDF, cellAlignment, width, null, format));
         }
 
         return settings;
+    }
+
+    /// <summary>
+    /// Check if a string value represents zero (0.00, 0, etc.)
+    /// </summary>
+    private static bool IsZeroValue(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return true;
+
+        // Remove currency symbols, commas, and whitespace
+        string cleanValue = value.Replace("₹", "").Replace(",", "").Trim();
+
+        // Try to parse as decimal
+        if (decimal.TryParse(cleanValue, out decimal decValue))
+            return decValue == 0;
+
+        return false;
     }
 
     /// <summary>

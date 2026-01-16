@@ -2,7 +2,7 @@
 
 using VizarLibrary.Data.Common;
 using VizarLibrary.DataAccess;
-using VizarLibrary.Models.Common;
+using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Services;
 

@@ -1,0 +1,142 @@
+<div class="page-header">
+    <div class="header-left">
+        <img src="images/logo.png" alt="Vizar" class="header-logo" />
+        <div class="header-divider"></div>
+        <div class="header-text">
+            <span class="app-name">Vizar</span>
+        </div>
+    </div>
+    <div class="header-center">
+        <h1 class="page-title">@Title</h1>
+        <p class="page-subtitle">@Subtitle</p>
+    </div>
+    <div class="header-right">
+        @if (!string.IsNullOrEmpty(UserName))
+        {
+            <span class="user-name">@UserName</span>
+        }
+        @if (RightContent != null)
+        {
+            @RightContent
+        }
+        @if (ShowLogout)
+        {
+            <IconButton Icon="IconType.Logout" Variant="ButtonVariant.Logout" Title="Logout (Ctrl + L)" OnClick="OnLogoutClick" />
+        }
+        @if (ShowHome)
+        {
+            <IconButton Icon="IconType.Home" Title="Home (Ctrl + D)" OnClick="OnHomeClick" />
+        }
+        @if (ShowBack)
+        {
+            <IconButton Icon="IconType.Back" Title="Back (Ctrl + B)" OnClick="OnBackClick" />
+        }
+    </div>
+</div>
+
+<style>
+    /* Professional Header Section */
+    .page-header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 10px 24px;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+        min-height: 52px;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .header-logo {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+    }
+
+    .header-divider {
+        width: 1px;
+        height: 24px;
+        background: #e2e8f0;
+        flex-shrink: 0;
+    }
+
+    .header-text {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        color: #0f172a;
+        font-weight: 600;
+    }
+
+    .app-name {
+        color: #0f172a;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    .header-center {
+        text-align: center;
+    }
+
+    .page-title {
+        font-size: 17px;
+        font-weight: 600;
+        color: #0f172a;
+        margin: 0;
+        letter-spacing: -0.2px;
+    }
+
+    .page-subtitle {
+        font-size: 12px;
+        color: #64748b;
+        margin: 2px 0 0 0;
+        font-weight: 400;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 6px;
+    }
+
+    .user-name {
+        font-size: 13px;
+        font-weight: 500;
+        color: #0f172a;
+        padding: 6px 10px;
+        background: #f8fafc;
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
+    }
+
+    /* Hide title and subtitle on smaller displays (phones) */
+    @@media (max-width: 768px) {
+        .page-header {
+            grid-template-columns: auto 1fr;
+        }
+        
+        .header-center {
+            display: none;
+        }
+
+        .header-text {
+            display: none;
+        }
+
+        .header-divider {
+            display: none;
+        }
+    }
+
+</style>

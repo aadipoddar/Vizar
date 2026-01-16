@@ -11,47 +11,8 @@ using VizarLibrary.Models.Accounts.Masters;
 
 namespace VizarLibrary.Exporting.Utils;
 
-/// <summary>
-/// Professional Invoice Excel export utility - SAP-style professional invoices
-/// </summary>
 public static class ExcelInvoiceExportUtil
 {
-    #region Generic Invoice Models
-
-    /// <summary>
-    /// Generic invoice header data that works with any transaction type
-    /// </summary>
-    public class InvoiceData
-    {
-        public string TransactionNo { get; set; }
-        public DateTime TransactionDateTime { get; set; }
-        public string ReferenceTransactionNo { get; set; }
-        public DateTime? ReferenceDateTime { get; set; }
-        public decimal TotalAmount { get; set; }
-        public string Remarks { get; set; }
-        public bool Status { get; set; } = true; // True = Active, False = Deleted
-        /// <summary>
-        /// Payment modes breakdown (e.g., "Cash" => 1000.00, "Card" => 500.00)
-        /// </summary>
-        public Dictionary<string, decimal> PaymentModes { get; set; }
-    }
-
-    /// <summary>
-    /// Column configuration for invoice line items table
-    /// </summary>
-    public class InvoiceColumnSetting(string propertyName, string displayName, double width,
-        ExcelHAlign alignment = ExcelHAlign.HAlignRight, string format = null, bool showOnlyIfHasValue = true)
-    {
-        public string PropertyName { get; set; } = propertyName;
-        public string DisplayName { get; set; } = displayName;
-        public double Width { get; set; } = width;
-        public ExcelHAlign Alignment { get; set; } = alignment;
-        public string Format { get; set; } = format;
-        public bool ShowOnlyIfHasValue { get; set; } = showOnlyIfHasValue;
-    }
-
-    #endregion
-
     #region Color Definitions
 
     private static readonly Color PrimaryBlue = Color.FromArgb(59, 130, 246);
@@ -70,11 +31,8 @@ public static class ExcelInvoiceExportUtil
     /// Export invoice to Excel with professional layout (unified method for all transaction types)
     /// </summary>
     /// <typeparam name="T">Type of line item (must be a class)</typeparam>
-    /// <param name="invoiceData">Generic invoice header data</param>
+    /// <param name="invoiceData">Generic invoice header data with all invoice information</param>
     /// <param name="lineItems">Generic invoice line items of any type</param>
-    /// <param name="company">Company information (Bill From)</param>
-    /// <param name="billTo">Customer/Party information (Bill To) - can be null</param>
-    /// <param name="invoiceType">Type of invoice (INVOICE, PURCHASE RETURN, SALES INVOICE, etc.)</param>
     /// <param name="columnSettings">Optional: Custom column settings for line items table</param>
     /// <param name="columnOrder">Optional: Custom column order for line items table</param>
     /// <param name="summaryFields">Optional: Custom summary fields to display (key=label, value=formatted value)</param>
@@ -82,9 +40,6 @@ public static class ExcelInvoiceExportUtil
     public static async Task<MemoryStream> ExportInvoiceToExcel<T>(
         InvoiceData invoiceData,
         List<T> lineItems,
-        CompanyModel company,
-        LedgerModel billTo = null,
-        string invoiceType = "INVOICE",
         List<InvoiceColumnSetting> columnSettings = null,
         List<string> columnOrder = null,
         Dictionary<string, string> summaryFields = null) where T : class
@@ -102,8 +57,8 @@ public static class ExcelInvoiceExportUtil
             worksheet.Name = "Invoice";
 
             // Set document properties
-            workbook.BuiltInDocumentProperties.Title = $"{invoiceType} - {invoiceData.TransactionNo}";
-            workbook.BuiltInDocumentProperties.Subject = invoiceType;
+            workbook.BuiltInDocumentProperties.Title = $"{invoiceData.InvoiceType} - {invoiceData.TransactionNo}";
+            workbook.BuiltInDocumentProperties.Subject = invoiceData.InvoiceType;
             workbook.BuiltInDocumentProperties.Author = "Vizar";
 
             int currentRow = 1;
@@ -112,14 +67,14 @@ public static class ExcelInvoiceExportUtil
             currentRow = await DrawInvoiceHeader(worksheet, currentRow);
 
             // 2. Invoice Type and Number
-            currentRow = DrawInvoiceTitle(worksheet, invoiceType, invoiceData.TransactionNo, invoiceData.TransactionDateTime, currentRow);
+            currentRow = DrawInvoiceTitle(worksheet, invoiceData.InvoiceType, invoiceData.TransactionNo, invoiceData.TransactionDateTime, currentRow, invoiceData.Outlet);
 
             // 2.5. Draw DELETED status badge if Status is false
             if (!invoiceData.Status)
                 currentRow = DrawDeletedStatusBadge(worksheet, currentRow);
 
             // 3. Company and Customer Information (Two Columns)
-            currentRow = DrawCompanyInfo(worksheet, company, billTo, invoiceData, currentRow);
+            currentRow = DrawCompanyInfo(worksheet, invoiceData.Company, invoiceData.BillTo, invoiceData, currentRow);
 
             // Get column settings dynamically if not provided
             columnSettings ??= GetDefaultInvoiceColumnSettings<T>();
@@ -217,7 +172,7 @@ public static class ExcelInvoiceExportUtil
     /// <summary>
     /// Draw invoice type and number
     /// </summary>
-    private static int DrawInvoiceTitle(IWorksheet worksheet, string invoiceType, string invoiceNumber, DateTime transactionDateTime, int startRow)
+    private static int DrawInvoiceTitle(IWorksheet worksheet, string invoiceType, string invoiceNumber, DateTime transactionDateTime, int startRow, string outlet = null)
     {
         int currentRow = startRow;
 
@@ -234,6 +189,16 @@ public static class ExcelInvoiceExportUtil
         worksheet.Range[currentRow, 6].CellStyle.Font.Size = 12;
         worksheet.Range[currentRow, 6].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
         currentRow++;
+
+        // Row 2: Outlet (left) and Invoice Date (right)
+        if (!string.IsNullOrWhiteSpace(outlet))
+        {
+            worksheet.Range[currentRow, 1, currentRow, 5].Merge();
+            worksheet.Range[currentRow, 1].Text = $"Outlet: {outlet}";
+            worksheet.Range[currentRow, 1].CellStyle.Font.Bold = true;
+            worksheet.Range[currentRow, 1].CellStyle.Font.Size = 10;
+            worksheet.Range[currentRow, 1].CellStyle.Font.RGBColor = Color.FromArgb(100, 100, 100);
+        }
 
         worksheet.Range[currentRow, 6, currentRow, 10].Merge();
         worksheet.Range[currentRow, 6].Text = $"Invoice Date: {transactionDateTime:dd-MMM-yyyy hh:mm tt}";
@@ -289,10 +254,13 @@ public static class ExcelInvoiceExportUtil
         }
 
         // Company Name (Left)
-        worksheet.Range[leftRow, 1, leftRow, 4].Merge();
-        worksheet.Range[leftRow, 1].Text = company.Name;
-        worksheet.Range[leftRow, 1].CellStyle.Font.Bold = true;
-        leftRow++;
+        if (company != null)
+        {
+            worksheet.Range[leftRow, 1, leftRow, 4].Merge();
+            worksheet.Range[leftRow, 1].Text = company.Name ?? string.Empty;
+            worksheet.Range[leftRow, 1].CellStyle.Font.Bold = true;
+            leftRow++;
+        }
 
         // Bill To Name (Right)
         if (billTo != null)
@@ -304,11 +272,19 @@ public static class ExcelInvoiceExportUtil
         }
 
         // Company Address (Left)
-        if (!string.IsNullOrEmpty(company.Address))
+        if (!string.IsNullOrEmpty(company?.Address))
         {
             worksheet.Range[leftRow, 1, leftRow, 4].Merge();
             worksheet.Range[leftRow, 1].Text = company.Address;
             worksheet.Range[leftRow, 1].WrapText = true;
+            worksheet.Range[leftRow, 1].CellStyle.VerticalAlignment = ExcelVAlign.VAlignTop;
+
+            // Calculate required row height based on text length
+            // Assuming average character width of ~2.5 and column width for 4 merged columns
+            int estimatedCharsPerLine = 50; // Approximate characters that fit in 4 merged columns
+            int numberOfLines = Math.Max(1, (int)Math.Ceiling((double)company.Address.Length / estimatedCharsPerLine));
+            worksheet.Range[leftRow, 1].RowHeight = Math.Max(15, numberOfLines * 15); // 15 points per line
+
             leftRow++;
         }
 
@@ -318,11 +294,18 @@ public static class ExcelInvoiceExportUtil
             worksheet.Range[rightRow, 6, rightRow, 10].Merge();
             worksheet.Range[rightRow, 6].Text = billTo.Address;
             worksheet.Range[rightRow, 6].WrapText = true;
+            worksheet.Range[rightRow, 6].CellStyle.VerticalAlignment = ExcelVAlign.VAlignTop;
+
+            // Calculate required row height based on text length
+            int estimatedCharsPerLine = 50; // Approximate characters that fit in 5 merged columns
+            int numberOfLines = Math.Max(1, (int)Math.Ceiling((double)billTo.Address.Length / estimatedCharsPerLine));
+            worksheet.Range[rightRow, 6].RowHeight = Math.Max(15, numberOfLines * 15); // 15 points per line
+
             rightRow++;
         }
 
         // Company Phone (Left)
-        if (!string.IsNullOrEmpty(company.Phone))
+        if (!string.IsNullOrEmpty(company?.Phone))
         {
             worksheet.Range[leftRow, 1, leftRow, 4].Merge();
             worksheet.Range[leftRow, 1].Text = $"Phone: {company.Phone}";
@@ -338,7 +321,7 @@ public static class ExcelInvoiceExportUtil
         }
 
         // Company Email (Left)
-        if (!string.IsNullOrEmpty(company.Email))
+        if (!string.IsNullOrEmpty(company?.Email))
         {
             worksheet.Range[leftRow, 1, leftRow, 4].Merge();
             worksheet.Range[leftRow, 1].Text = $"Email: {company.Email}";
@@ -354,7 +337,7 @@ public static class ExcelInvoiceExportUtil
         }
 
         // Company GST (Left)
-        if (!string.IsNullOrEmpty(company.GSTNo))
+        if (!string.IsNullOrEmpty(company?.GSTNo))
         {
             worksheet.Range[leftRow, 1, leftRow, 4].Merge();
             worksheet.Range[leftRow, 1].Text = $"GSTIN: {company.GSTNo}";
@@ -371,6 +354,21 @@ public static class ExcelInvoiceExportUtil
 
         // Use the maximum row from both columns
         int currentRow = Math.Max(leftRow, rightRow);
+
+        // Set column widths to ensure addresses display properly
+        // Columns 1-4 for left section (FROM)
+        worksheet.SetColumnWidth(1, 12);
+        worksheet.SetColumnWidth(2, 12);
+        worksheet.SetColumnWidth(3, 12);
+        worksheet.SetColumnWidth(4, 12);
+        // Column 5 is gap
+        worksheet.SetColumnWidth(5, 2);
+        // Columns 6-10 for right section (BILL TO)
+        worksheet.SetColumnWidth(6, 12);
+        worksheet.SetColumnWidth(7, 12);
+        worksheet.SetColumnWidth(8, 12);
+        worksheet.SetColumnWidth(9, 12);
+        worksheet.SetColumnWidth(10, 12);
 
         // Linked Transaction Details (Left column) - shows connected order/sale reference
         if (!string.IsNullOrWhiteSpace(invoiceData.ReferenceTransactionNo))
@@ -419,10 +417,16 @@ public static class ExcelInvoiceExportUtil
         if (summaryFields != null && summaryFields.Count > 0)
         {
             var summaryList = summaryFields.ToList();
+            int visibleFieldsDrawn = 0;
+
             for (int i = 0; i < summaryList.Count; i++)
             {
                 var field = summaryList[i];
                 bool isLastField = i == summaryList.Count - 1;
+
+                // Skip fields with 0 value, except for the last field (Grand Total)
+                if (!isLastField && IsZeroValue(field.Value))
+                    continue;
 
                 // Label
                 worksheet.Range[summaryRow, summaryCol].Text = field.Key;
@@ -446,7 +450,7 @@ public static class ExcelInvoiceExportUtil
                 }
                 worksheet.Range[summaryRow, summaryCol + 1].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
 
-                if (isLastField)
+                if (isLastField && visibleFieldsDrawn > 0)
                 {
                     // Separator line before grand total
                     worksheet.Range[summaryRow, summaryCol, summaryRow, summaryCol + 2].CellStyle.Borders[ExcelBordersIndex.EdgeTop].LineStyle = ExcelLineStyle.Medium;
@@ -458,6 +462,7 @@ public static class ExcelInvoiceExportUtil
                 }
 
                 summaryRow++;
+                visibleFieldsDrawn++;
             }
         }
 
@@ -472,34 +477,38 @@ public static class ExcelInvoiceExportUtil
     {
         int currentRow = startRow;
 
-        // Amount in Words (Left side)
-        worksheet.Range[currentRow, 1].Text = "Amount in Words:";
-        worksheet.Range[currentRow, 1].CellStyle.Font.Bold = true;
-        currentRow++;
-
-        try
+        // Skip amount in words if total amount is 0
+        if (invoiceData.TotalAmount != 0)
         {
-            var converter = new CurrencyWordsConverter(new CurrencyWordsConversionOptions
+            // Amount in Words (Left side)
+            worksheet.Range[currentRow, 1].Text = "Amount in Words:";
+            worksheet.Range[currentRow, 1].CellStyle.Font.Bold = true;
+            currentRow++;
+
+            try
             {
-                Culture = Culture.International,
-                OutputFormat = OutputFormat.English,
-                CurrencyUnit = "Rupees",
-                SubCurrencyUnit = "Paise",
-                CurrencyUnitSeparator = "and"
-            });
+                var converter = new CurrencyWordsConverter(new CurrencyWordsConversionOptions
+                {
+                    Culture = Culture.International,
+                    OutputFormat = OutputFormat.English,
+                    CurrencyUnit = "Rupees",
+                    SubCurrencyUnit = "Paise",
+                    CurrencyUnitSeparator = "and"
+                });
 
-            string amountInWords = converter.ToWords(invoiceData.TotalAmount);
-            amountInWords = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(amountInWords.ToLower());
+                string amountInWords = converter.ToWords(invoiceData.TotalAmount);
+                amountInWords = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(amountInWords.ToLower());
 
-            worksheet.Range[currentRow, 1, currentRow, 5].Merge();
-            worksheet.Range[currentRow, 1].Text = amountInWords;
-            worksheet.Range[currentRow, 1].CellStyle.Font.Italic = true;
-            worksheet.Range[currentRow, 1].WrapText = true;
-        }
-        catch
-        {
-            worksheet.Range[currentRow, 1, currentRow, 5].Merge();
-            worksheet.Range[currentRow, 1].Text = $"₹ {invoiceData.TotalAmount:N2}";
+                worksheet.Range[currentRow, 1, currentRow, 5].Merge();
+                worksheet.Range[currentRow, 1].Text = amountInWords;
+                worksheet.Range[currentRow, 1].CellStyle.Font.Italic = true;
+                worksheet.Range[currentRow, 1].WrapText = true;
+            }
+            catch
+            {
+                worksheet.Range[currentRow, 1, currentRow, 5].Merge();
+                worksheet.Range[currentRow, 1].Text = $"₹ {invoiceData.TotalAmount:N2}";
+            }
         }
 
         // Payment Methods (Right side)
@@ -638,7 +647,16 @@ public static class ExcelInvoiceExportUtil
                 alignment = ExcelHAlign.HAlignCenter;
             }
 
-            settings.Add(new InvoiceColumnSetting(prop.Name, displayName, width, alignment, format));
+            // Convert ExcelHAlign to CellAlignment
+            CellAlignment cellAlignment = alignment switch
+            {
+                ExcelHAlign.HAlignLeft => CellAlignment.Left,
+                ExcelHAlign.HAlignCenter => CellAlignment.Center,
+                ExcelHAlign.HAlignRight => CellAlignment.Right,
+                _ => CellAlignment.Right
+            };
+
+            settings.Add(new InvoiceColumnSetting(prop.Name, displayName, InvoiceExportType.Excel, cellAlignment, null, width, format));
         }
 
         return settings;
@@ -753,15 +771,33 @@ public static class ExcelInvoiceExportUtil
 
         // Format based on type
         if (value is decimal decValue)
-            return decValue.ToString(column.Format ?? "#,##0.00");
+            return decValue.FormatSmartDecimal();
         else if (value is double dblValue)
-            return dblValue.ToString(column.Format ?? "#,##0.00");
+            return ((decimal)dblValue).FormatSmartDecimal();
         else if (value is DateTime dtValue)
             return dtValue.ToString(column.Format ?? "dd-MMM-yyyy");
         else if (value is DateOnly doValue)
             return doValue.ToString(column.Format ?? "dd-MMM-yyyy");
         else
             return value.ToString();
+    }
+
+    /// <summary>
+    /// Check if a string value represents zero (0.00, 0, etc.)
+    /// </summary>
+    private static bool IsZeroValue(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return true;
+
+        // Remove currency symbols, commas, and whitespace
+        string cleanValue = value.Replace("₹", "").Replace(",", "").Trim();
+
+        // Try to parse as decimal
+        if (decimal.TryParse(cleanValue, out decimal decValue))
+            return decValue == 0;
+
+        return false;
     }
 
     /// <summary>
@@ -786,7 +822,8 @@ public static class ExcelInvoiceExportUtil
             worksheet.Range[currentRow, i + 1].CellStyle.Color = PrimaryBlue;
             worksheet.Range[currentRow, i + 1].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Medium;
             worksheet.Range[currentRow, i + 1].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].Color = ExcelKnownColors.Blue;
-            worksheet.SetColumnWidth(i + 1, orderedColumnSettings[i].Width);
+            if (orderedColumnSettings[i].ExcelWidth.HasValue)
+                worksheet.SetColumnWidth(i + 1, orderedColumnSettings[i].ExcelWidth.Value);
         }
         currentRow++;
 
@@ -800,7 +837,15 @@ public static class ExcelInvoiceExportUtil
                 string cellValue = GetCellValueDynamic(item, column, rowNumber);
 
                 worksheet.Range[currentRow, i + 1].Text = cellValue;
-                worksheet.Range[currentRow, i + 1].CellStyle.HorizontalAlignment = column.Alignment;
+                // Convert CellAlignment to ExcelHAlign
+                ExcelHAlign excelAlign = column.Alignment switch
+                {
+                    CellAlignment.Left => ExcelHAlign.HAlignLeft,
+                    CellAlignment.Center => ExcelHAlign.HAlignCenter,
+                    CellAlignment.Right => ExcelHAlign.HAlignRight,
+                    _ => ExcelHAlign.HAlignRight
+                };
+                worksheet.Range[currentRow, i + 1].CellStyle.HorizontalAlignment = excelAlign;
                 worksheet.Range[currentRow, i + 1].CellStyle.WrapText = true;
                 worksheet.Range[currentRow, i + 1].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].LineStyle = ExcelLineStyle.Thin;
                 worksheet.Range[currentRow, i + 1].CellStyle.Borders[ExcelBordersIndex.EdgeBottom].Color = ExcelKnownColors.Grey_25_percent;

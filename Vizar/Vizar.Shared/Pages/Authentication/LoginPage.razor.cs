@@ -5,7 +5,7 @@ using Vizar.Shared.Components.Dialog;
 using VizarLibrary.Data.Common;
 using VizarLibrary.Data.Operations;
 using VizarLibrary.DataAccess;
-using VizarLibrary.Models.Common;
+using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages.Authentication;
 

@@ -9,12 +9,14 @@ using Vizar.Shared.Components.Dialog;
 using VizarLibrary.Data.Accounts.FinancialAccounting;
 using VizarLibrary.Data.Accounts.Masters;
 using VizarLibrary.Data.Common;
+using VizarLibrary.Data.Operations;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Accounts.FinancialAccounting;
 using VizarLibrary.Exporting.Inventory.Purchase;
+using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.FinancialAccounting;
 using VizarLibrary.Models.Accounts.Masters;
-using VizarLibrary.Models.Common;
+using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages.Accounts;
 
@@ -71,6 +73,8 @@ public partial class FinancialAccounting : IAsyncDisposable
             .Add(ModCode.Ctrl, Code.H, NavigateToTransactionHistoryPage, "Open transaction history", Exclude.None)
             .Add(ModCode.Ctrl, Code.I, NavigateToItemReport, "Open item report", Exclude.None)
             .Add(ModCode.Ctrl, Code.T, NavigateToTrialBalance, "Open trial balance report", Exclude.None)
+            .Add(ModCode.Alt, Code.F, NavigateToProfitAndLoss, "Open profit and loss report", Exclude.None)
+            .Add(ModCode.Alt, Code.B, NavigateToBalanceSheet, "Open balance sheet report", Exclude.None)
             .Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
             .Add(ModCode.Ctrl, Code.D, NavigateToDashboard, "Go to dashboard", Exclude.None)
             .Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
@@ -664,7 +668,7 @@ public partial class FinancialAccounting : IAsyncDisposable
             return false;
         }
 
-        if (_selectedFinancialYear.Status == false)
+        if (!_selectedFinancialYear.Status)
         {
             await _toastNotification.ShowAsync("Financial Year Inactive", "The financial year for the selected transaction date is inactive. Please select a different date.", ToastType.Error);
             return false;
@@ -697,18 +701,12 @@ public partial class FinancialAccounting : IAsyncDisposable
         if (_accounting.Id > 0)
         {
             var existingAccounting = await CommonData.LoadTableDataById<AccountingModel>(TableNames.Accounting, _accounting.Id);
-            var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, existingAccounting.FinancialYearId);
-            if (financialYear is null || financialYear.Locked || financialYear.Status == false)
-            {
-                await _toastNotification.ShowAsync("Financial Year Locked or Inactive", "The financial year for the selected transaction date is either locked or inactive. Please select a different date.", ToastType.Error);
-                return false;
-            }
+            await FinancialYearData.ValidateFinancialYear(existingAccounting.TransactionDateTime);
 
             if (!_user.Admin)
             {
                 await _toastNotification.ShowAsync("Insufficient Permissions", "You do not have the necessary permissions to modify this transaction.", ToastType.Error);
-                await DeleteLocalFiles();
-                NavigationManager.NavigateTo(PageRouteNames.FinancialAccounting, true);
+                await ResetPage();
                 return false;
             }
         }
@@ -748,12 +746,12 @@ public partial class FinancialAccounting : IAsyncDisposable
             _accounting.CreatedBy = _user.Id;
             _accounting.LastModifiedBy = _user.Id;
 
-            _accounting.Id = await AccountingData.SaveAccountingTransaction(_accounting, _cart);
-            var (pdfStream, fileName) = await AccountingInvoicePDFExport.ExportInvoice(Id.Value);
-            await SaveAndViewService.SaveAndView(fileName, pdfStream);
-            await DeleteLocalFiles();
-            NavigationManager.NavigateTo(PageRouteNames.FinancialAccounting, true);
+            _accounting.Id = await AccountingData.SaveTransaction(_accounting, _cart);
 
+            var (pdfStream, fileName) = await AccountingInvoiceExport.ExportInvoice(_accounting.Id, InvoiceExportType.PDF);
+            await SaveAndViewService.SaveAndView(fileName, pdfStream);
+
+            await ResetPage();
             await _toastNotification.ShowAsync("Save Transaction", "Transaction saved successfully! Invoice has been generated.", ToastType.Success);
         }
         catch (Exception ex)
@@ -789,8 +787,10 @@ public partial class FinancialAccounting : IAsyncDisposable
         {
             _isProcessing = true;
             await _toastNotification.ShowAsync("Processing", "Generating PDF invoice...", ToastType.Info);
-            var (pdfStream, fileName) = await AccountingInvoicePDFExport.ExportInvoice(Id.Value);
+
+            var (pdfStream, fileName) = await AccountingInvoiceExport.ExportInvoice(Id.Value, InvoiceExportType.PDF);
             await SaveAndViewService.SaveAndView(fileName, pdfStream);
+
             await _toastNotification.ShowAsync("Invoice Downloaded", "The PDF invoice has been downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
@@ -818,8 +818,10 @@ public partial class FinancialAccounting : IAsyncDisposable
         {
             _isProcessing = true;
             await _toastNotification.ShowAsync("Processing", "Generating Excel invoice...", ToastType.Info);
-            var (excelStream, fileName) = await AccountingInvoiceExcelExport.ExportInvoice(Id.Value);
+
+            var (excelStream, fileName) = await AccountingInvoiceExport.ExportInvoice(Id.Value, InvoiceExportType.Excel);
             await SaveAndViewService.SaveAndView(fileName, excelStream);
+
             await _toastNotification.ShowAsync("Invoice Downloaded", "The Excel invoice has been downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
@@ -862,6 +864,22 @@ public partial class FinancialAccounting : IAsyncDisposable
             NavigationManager.NavigateTo(PageRouteNames.ReportTrialBalance);
     }
 
+    private async Task NavigateToProfitAndLoss()
+    {
+        if (FormFactor.GetFormFactor() == "Web")
+            await JSRuntime.InvokeVoidAsync("open", PageRouteNames.ReportProfitAndLoss, "_blank");
+        else
+            NavigationManager.NavigateTo(PageRouteNames.ReportProfitAndLoss);
+    }
+
+    private async Task NavigateToBalanceSheet()
+    {
+        if (FormFactor.GetFormFactor() == "Web")
+            await JSRuntime.InvokeVoidAsync("open", PageRouteNames.ReportBalanceSheet, "_blank");
+        else
+            NavigationManager.NavigateTo(PageRouteNames.ReportBalanceSheet);
+    }
+
     private async Task ViewReferenceInvoice()
     {
         if (_accounting.ReferenceId is null || _accounting.ReferenceId <= 0)
@@ -902,7 +920,7 @@ public partial class FinancialAccounting : IAsyncDisposable
 
     private async Task DownloadReferenceInvoice()
     {
-        if (_accounting.ReferenceId is null || _accounting.ReferenceId <= 0)
+        if (_accounting.ReferenceId is null or <= 0)
         {
             await _toastNotification.ShowAsync("Invalid Reference", "No reference transaction found.", ToastType.Error);
             return;
@@ -915,13 +933,13 @@ public partial class FinancialAccounting : IAsyncDisposable
 
             if (_accounting.VoucherId == int.Parse(purchaseVoucher.Value))
             {
-                var (pdfStream, fileName) = await PurchaseInvoicePDFExport.ExportInvoice(_accounting.ReferenceId.Value);
+                var (pdfStream, fileName) = await PurchaseInvoiceExport.ExportInvoice(_accounting.ReferenceId.Value, InvoiceExportType.PDF);
                 await SaveAndViewService.SaveAndView(fileName, pdfStream);
             }
 
             else if (_accounting.VoucherId == int.Parse(purchaseReturnVoucher.Value))
             {
-                var (pdfStream, fileName) = await PurchaseReturnInvoicePDFExport.ExportInvoice(_accounting.ReferenceId.Value);
+                var (pdfStream, fileName) = await PurchaseReturnInvoiceExport.ExportInvoice(_accounting.ReferenceId.Value, InvoiceExportType.PDF);
                 await SaveAndViewService.SaveAndView(fileName, pdfStream);
             }
 
@@ -986,13 +1004,13 @@ public partial class FinancialAccounting : IAsyncDisposable
         {
             if (_selectedAccountingLedger.ReferenceType.ToString() == nameof(ReferenceTypes.Purchase))
             {
-                var (pdfStream, fileName) = await PurchaseInvoicePDFExport.ExportInvoice(_selectedAccountingLedger.ReferenceId.Value);
+                var (pdfStream, fileName) = await PurchaseInvoiceExport.ExportInvoice(_selectedAccountingLedger.ReferenceId.Value, InvoiceExportType.PDF);
                 await SaveAndViewService.SaveAndView(fileName, pdfStream);
             }
 
             else if (_selectedAccountingLedger.ReferenceType.ToString() == nameof(ReferenceTypes.PurchaseReturn))
             {
-                var (pdfStream, fileName) = await PurchaseReturnInvoicePDFExport.ExportInvoice(_selectedAccountingLedger.ReferenceId.Value);
+                var (pdfStream, fileName) = await PurchaseReturnInvoiceExport.ExportInvoice(_selectedAccountingLedger.ReferenceId.Value, InvoiceExportType.PDF);
                 await SaveAndViewService.SaveAndView(fileName, pdfStream);
             }
 
@@ -1013,7 +1031,7 @@ public partial class FinancialAccounting : IAsyncDisposable
     private void NavigateToDashboard() =>
         NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 
-    private async Task NavigateBack() =>
+    private void NavigateBack() =>
         NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
 
     private async Task Logout() =>

@@ -1,4 +1,4 @@
-using VizarLibrary.Models.Common;
+using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages.Inventory;
 

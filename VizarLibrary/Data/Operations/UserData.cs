@@ -1,5 +1,5 @@
 ﻿using VizarLibrary.DataAccess;
-using VizarLibrary.Models.Common;
+using VizarLibrary.Models.Operations;
 
 namespace VizarLibrary.Data.Operations;
 

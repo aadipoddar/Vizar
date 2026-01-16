@@ -2,7 +2,6 @@
 @page "/inventory/item-issue/{Id:int}"
 
 @using VizarLibrary.Models.Accounts.Masters
-@using VizarLibrary.Models.Common
 @using VizarLibrary.Models.Fleet.Service
 @using VizarLibrary.Models.Fleet.Vehicle
 @using VizarLibrary.Models.Inventory
@@ -17,369 +16,373 @@
 }
 else
 {
-    <PageHeader Title="Create Item Issue" Subtitle="Create and manage Item issue transactions" ShowHome="true" ShowBack="true" ShowLogout="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
-        <RightContent>
-            <IconButton Icon="IconType.Save" Variant="ButtonVariant.Save" Title="Save Transaction (Ctrl + S)" Disabled="_isProcessing" OnClick="SaveTransaction" />
-            @if (Id.HasValue && Id.Value > 0)
-            {
-                <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Title="Download Excel Invoice (Alt+E)" Disabled="_isProcessing" OnClick="DownloadExcelInvoice" />
-                <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Title="Download PDF Invoice (Alt+P)" Disabled="_isProcessing" OnClick="DownloadPdfInvoice" />
-            }
-            <IconButton Icon="IconType.History" Title="Transaction History (Ctrl + H)" Disabled="_isProcessing" OnClick="NavigateToTransactionHistoryPage" />
-            <IconButton Icon="IconType.GarageIssueItem" Title="Garage Item Report (Alt + G)" Disabled="_isProcessing" OnClick="NavigateToGarageItemReport" />
-            <IconButton Icon="IconType.VehicleIssueItem" Title="Vehicle Report (Alt + V)" Disabled="_isProcessing" OnClick="NavigateToVehicleItemReport" />
-            <IconButton Icon="IconType.New" Title="New Transaction (Ctrl + N)" Disabled="_isProcessing" OnClick="ResetPage" />
-        </RightContent>
-    </PageHeader>
+    <div style="display: flex; flex-direction: column; min-height: 100vh;">
+        <Header Title="Create Item Issue" Subtitle="Create and manage Item issue transactions" ShowHome="true" ShowBack="true" ShowLogout="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
+            <RightContent>
+                <IconButton Icon="IconType.Save" Variant="ButtonVariant.Save" Title="Save Transaction (Ctrl + S)" Disabled="_isProcessing" OnClick="SaveTransaction" />
+                @if (Id.HasValue && Id.Value > 0)
+                {
+                    <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Title="Download Excel Invoice (Alt+E)" Disabled="_isProcessing" OnClick="DownloadExcelInvoice" />
+                    <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Title="Download PDF Invoice (Alt+P)" Disabled="_isProcessing" OnClick="DownloadPdfInvoice" />
+                }
+                <IconButton Icon="IconType.History" Title="Transaction History (Ctrl + H)" Disabled="_isProcessing" OnClick="NavigateToTransactionHistoryPage" />
+                <IconButton Icon="IconType.GarageIssueItem" Title="Garage Item Report (Alt + G)" Disabled="_isProcessing" OnClick="NavigateToGarageItemReport" />
+                <IconButton Icon="IconType.VehicleIssueItem" Title="Vehicle Report (Alt + V)" Disabled="_isProcessing" OnClick="NavigateToVehicleItemReport" />
+                <IconButton Icon="IconType.New" Title="New Transaction (Ctrl + N)" Disabled="_isProcessing" OnClick="ResetPage" />
+            </RightContent>
+        </Header>
 
-    <!-- Main Content Container -->
-    <div class="purchase-container">
+        <!-- Main Content Container -->
+        <div class="page-container">
 
-        <!-- Top Section: Transaction Summary and Financial Summary Side by Side -->
-        <div class="two-column-layout">
-            <!-- Transaction Summary Section -->
+            <!-- Top Section: Transaction Summary and Financial Summary Side by Side -->
+            <div class="two-column-layout">
+                <!-- Transaction Summary Section -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title-wrapper">
+                            <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                 stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                                <line x1="16" y1="17" x2="8" y2="17" />
+                                <polyline points="10 9 9 9 8 9" />
+                            </svg>
+                            <h2 class="section-title">Transaction Summary</h2>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-grid-transaction">
+                            <!-- Company -->
+                            <div class="form-field">
+                                <label class="field-label">
+                                    Company <span class="required">*</span>
+                                </label>
+                                <SfAutoComplete Value="@_selectedCompany" TValue="CompanyModel" TItem="CompanyModel"
+                                                DataSource="@_companies" Placeholder="Select a Company"
+                                                FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+                                                FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
+                                    <AutoCompleteEvents TItem="CompanyModel" TValue="CompanyModel"
+                                                        ValueChange="OnCompanyChanged" />
+                                    <AutoCompleteFieldSettings Value="Name" />
+                                </SfAutoComplete>
+                            </div>
+
+                            <!-- Party -->
+                            <div class="form-field">
+                                <label class="field-label">Garage</label>
+                                <SfAutoComplete Value="@_selectedGarage" TValue="GarageModel ?" TItem="GarageModel ?"
+                                                DataSource="@_garages" Placeholder="Select a Garage" FloatLabelType="FloatLabelType.Never"
+                                                AllowFiltering="true" FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                                CssClass="custom-autocomplete">
+                                    <AutoCompleteEvents TItem="GarageModel ?" TValue="GarageModel ?"
+                                                        ValueChange="OnGarageChanged" />
+                                    <AutoCompleteFieldSettings Value="Name" />
+                                </SfAutoComplete>
+                            </div>
+
+                            <!-- Transaction Date and Financial Year -->
+                            <div class="form-field">
+                                <label class="field-label">
+                                    Transaction Date <span class="required">*</span> / Financial Year
+                                </label>
+                                <div class="date-year-wrapper">
+                                    <SfDatePicker Value="@_itemIssue.TransactionDateTime" TValue="DateTime" Format="dd/MM/yy"
+                                                  Placeholder="Select Date" FloatLabelType="FloatLabelType.Never"
+                                                  CssClass="custom-datepicker">
+                                        <DatePickerEvents TValue="DateTime" ValueChange="OnTransactionDateChanged" />
+                                    </SfDatePicker>
+                                    <SfTextBox Value="@($"{_selectedFinancialYear?.StartDate:yyyy} to {_selectedFinancialYear?.EndDate:yyyy}")"
+                                               Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never"
+                                               CssClass="custom-textbox readonly-field" />
+                                </div>
+                            </div>
+
+                            <!-- Transaction No -->
+                            <div class="form-field">
+                                <label class="field-label">
+                                    Transaction No
+                                </label>
+                                <div class="transaction-no-wrapper">
+                                    <SfTextBox @bind-Value="_itemIssue.TransactionNo" Placeholder="Enter Transaction No"
+                                               FloatLabelType="FloatLabelType.Never" Readonly="true"
+                                               CssClass="custom-textbox readonly-field" />
+                                </div>
+                            </div>
+
+                            <!-- Remarks -->
+                            <div class="form-field">
+                                <label class="field-label">
+                                    Remarks / Narration
+                                </label>
+                                <SfTextBox @bind-Value="_itemIssue.Remarks" Multiline="true" Placeholder="Enter remarks..."
+                                           FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox textarea-field-small" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add to Cart Section -->
             <div class="section-card">
                 <div class="section-header">
                     <div class="section-title-wrapper">
-                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                             stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                            <polyline points="14 2 14 8 20 8" />
-                            <line x1="16" y1="13" x2="8" y2="13" />
-                            <line x1="16" y1="17" x2="8" y2="17" />
-                            <polyline points="10 9 9 9 8 9" />
+                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="21" r="1" />
+                            <circle cx="20" cy="21" r="1" />
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
                         </svg>
-                        <h2 class="section-title">Transaction Summary</h2>
+                        <h2 class="section-title">Add Item to Cart</h2>
                     </div>
                 </div>
                 <div class="section-body">
-                    <div class="form-grid-transaction">
-                        <!-- Company -->
-                        <div class="form-field">
-                            <label class="field-label">
-                                Company <span class="required">*</span>
-                            </label>
-                            <SfAutoComplete Value="@_selectedCompany" TValue="CompanyModel" TItem="CompanyModel"
-                                            DataSource="@_companies" Placeholder="Select a Company"
+                    <!-- Single Row: All Components -->
+                    <div class="cart-row">
+                        <div class="cart-field cart-field-item">
+                            <label class="cart-label">Item <span class="required">*</span></label>
+                            <SfAutoComplete @ref="_sfItemAutoComplete" Value="@_selectedItem" TValue="ItemModel ?"
+                                            TItem="ItemModel" DataSource="@_items" Placeholder="Select Item (Ctrl + E)"
                                             FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
                                             FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
-                                <AutoCompleteEvents TItem="CompanyModel" TValue="CompanyModel"
-                                                    ValueChange="OnCompanyChanged" />
+                                <AutoCompleteEvents TItem="ItemModel" TValue="ItemModel ?"
+                                                    ValueChange="OnItemChanged" />
                                 <AutoCompleteFieldSettings Value="Name" />
                             </SfAutoComplete>
                         </div>
 
-                        <!-- Party -->
-                        <div class="form-field">
-                            <label class="field-label">Garage</label>
-                            <SfAutoComplete Value="@_selectedGarage" TValue="GarageModel?" TItem="GarageModel?"
-                                            DataSource="@_garages" Placeholder="Select a Garage" FloatLabelType="FloatLabelType.Never"
-                                            AllowFiltering="true" FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-                                            CssClass="custom-autocomplete">
-                                <AutoCompleteEvents TItem="GarageModel?" TValue="GarageModel?"
-                                                    ValueChange="OnGarageChanged" />
-                                <AutoCompleteFieldSettings Value="Name" />
-                            </SfAutoComplete>
-                        </div>
-
-                        <!-- Transaction Date and Financial Year -->
-                        <div class="form-field">
-                            <label class="field-label">
-                                Transaction Date <span class="required">*</span> / Financial Year
-                            </label>
-                            <div class="date-year-wrapper">
-                                <SfDatePicker Value="@_itemIssue.TransactionDateTime" TValue="DateTime" Format="dd/MM/yy"
-                                              Placeholder="Select Date" FloatLabelType="FloatLabelType.Never"
-                                              CssClass="custom-datepicker">
-                                    <DatePickerEvents TValue="DateTime" ValueChange="OnTransactionDateChanged" />
-                                </SfDatePicker>
-                                <SfTextBox Value="@($"{_selectedFinancialYear?.StartDate:yyyy} to {_selectedFinancialYear?.EndDate:yyyy}")"
-                                           Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never"
-                                           CssClass="custom-textbox readonly-field" />
-                            </div>
-                        </div>
-
-                        <!-- Transaction No -->
-                        <div class="form-field">
-                            <label class="field-label">
-                                Transaction No
-                            </label>
-                            <div class="transaction-no-wrapper">
-                                <SfTextBox @bind-Value="_itemIssue.TransactionNo" Placeholder="Enter Transaction No"
-                                           FloatLabelType="FloatLabelType.Never" Readonly="true"
-                                           CssClass="custom-textbox readonly-field" />
-                            </div>
-                        </div>
-
-                        <!-- Remarks -->
-                        <div class="form-field">
-                            <label class="field-label">
-                                Remarks / Narration
-                            </label>
-                            <SfTextBox @bind-Value="_itemIssue.Remarks" Multiline="true" Placeholder="Enter remarks..."
-                                       FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox textarea-field-small" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Add to Cart Section -->
-        <div class="section-card">
-            <div class="section-header">
-                <div class="section-title-wrapper">
-                    <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="9" cy="21" r="1" />
-                        <circle cx="20" cy="21" r="1" />
-                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-                    </svg>
-                    <h2 class="section-title">Add Item to Cart</h2>
-                </div>
-            </div>
-            <div class="section-body">
-                <!-- Single Row: All Components -->
-                <div class="cart-row">
-                    <div class="cart-field cart-field-item">
-                        <label class="cart-label">Item <span class="required">*</span></label>
-                        <SfAutoComplete @ref="_sfItemAutoComplete" Value="@_selectedItem" TValue="ItemModel ?"
-                                        TItem="ItemModel" DataSource="@_items" Placeholder="Select Item (Ctrl + E)"
-                                        FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-                                        FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
-                            <AutoCompleteEvents TItem="ItemModel" TValue="ItemModel?"
-                                                ValueChange="OnItemChanged" />
-                            <AutoCompleteFieldSettings Value="Name" />
-                        </SfAutoComplete>
-                    </div>
-
-                    <div class="cart-field cart-field-stock">
-                        <label class="cart-label">Current Stock</label>
-                        <SfNumericTextBox Value="@(_stockSummary.FirstOrDefault(s => s.ItemId == _selectedItem?.Id)?.ClosingStock ?? 0)"
-                                          TValue="decimal" Readonly="true" ShowSpinButton="false" Placeholder="0.00"
-                                          FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric readonly-field stock-field"
-                                          TabIndex="-1" />
-                    </div>
-
-                    <div class="cart-field cart-field-small">
-                        <label class="cart-label">Qty</label>
-                        <SfNumericTextBox Value="@_selectedCart.Quantity" TValue="decimal" Min="0" ShowSpinButton="false"
-                                          Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
-                                          CssClass="custom-numeric editable-field">
-                            <NumericTextBoxEvents TValue="decimal" ValueChange="OnItemQuantityChanged" />
-                        </SfNumericTextBox>
-                    </div>
-
-                    <div class="cart-field cart-field-small">
-                        <label class="cart-label">UOM</label>
-                        <SfTextBox @bind-Value="_selectedCart.UnitOfMeasurement" Placeholder="UOM..."
-                                   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox identification-input" />
-                    </div>
-
-                    <div class="cart-field cart-field-small">
-                        <label class="cart-label">Rate</label>
-                        <SfNumericTextBox Value="@_selectedCart.Rate" TValue="decimal" Min="0" ShowSpinButton="false"
-                                          Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
-                                          CssClass="custom-numeric editable-field">
-                            <NumericTextBoxEvents TValue="decimal" ValueChange="OnItemRateChanged" />
-                        </SfNumericTextBox>
-                    </div>
-
-                    <div class="cart-field cart-field-remarks">
-                        <label class="cart-label">Remarks</label>
-                        <SfTextBox @bind-Value="_selectedCart.Remarks" Placeholder="Item Narration..."
-                                   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox identification-input" />
-                    </div>
-
-                    <div class="cart-field cart-field-total">
-                        <label class="cart-label">Total</label>
-                        <div class="total-display-inline">
-                            <span class="amount-value">@_selectedCart.Total.ToString("N2")</span>
-                        </div>
-                    </div>
-
-                    <div class="cart-field cart-field-button">
-                        <label class="cart-label" style="visibility: hidden;">Action</label>
-                        <IconButton Icon="IconType.Add" Variant="ButtonVariant.Add" Text="Add" Title="Add to Cart" OnClick="AddItemToCart" />
-                    </div>
-                </div>
-
-                <!-- Second Row: Vehicle Details (Hidden when Garage is selected) -->
-                @if (_itemIssue.GarageId is null || _itemIssue.GarageId <= 0)
-                {
-                    <div class="cart-row cart-row-vehicle">
-                        <div class="cart-field cart-field-vehicle">
-                            <label class="cart-label">Vehicle</label>
-                            <SfAutoComplete TValue="VehicleModel?" TItem="VehicleModel" DataSource="@_vehicles"
-                                            Value="@(_vehicles.FirstOrDefault(v => v.Id == _selectedCart.VehicleId))"
-                                            Placeholder="Select Vehicle" FloatLabelType="FloatLabelType.Never"
-                                            AllowFiltering="true" FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-                                            CssClass="custom-autocomplete">
-                                <AutoCompleteEvents TItem="VehicleModel" TValue="VehicleModel?"
-                                                    ValueChange="OnVehicleChanged" />
-                                <AutoCompleteFieldSettings Value="Code" />
-                                <AutoCompleteTemplates TItem="VehicleModel">
-                                    <ItemTemplate>
-                                        @{
-                                            var vehicle = context as VehicleModel;
-                                        }
-                                        <span>@vehicle.Code @(!string.IsNullOrEmpty(vehicle.ShortCode) ? $"({vehicle.ShortCode})" : "")</span>
-                                    </ItemTemplate>
-                                </AutoCompleteTemplates>
-                            </SfAutoComplete>
+                        <div class="cart-field cart-field-stock">
+                            <label class="cart-label">Current Stock</label>
+                            <SfNumericTextBox Value="@(_stockSummary.FirstOrDefault(s => s.ItemId == _selectedItem?.Id)?.ClosingStock ?? 0)"
+                                              TValue="decimal" Readonly="true" ShowSpinButton="false" Placeholder="0.00"
+                                              FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric readonly-field stock-field"
+                                              TabIndex="-1" />
                         </div>
 
                         <div class="cart-field cart-field-small">
-                            <label class="cart-label">Current Hour</label>
-                            <SfNumericTextBox Value="@_selectedCart.CurrentHour" TValue="decimal?" ShowSpinButton="false"
+                            <label class="cart-label">Qty</label>
+                            <SfNumericTextBox Value="@_selectedCart.Quantity" TValue="decimal" Min="0" ShowSpinButton="false"
                                               Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
                                               CssClass="custom-numeric editable-field">
-                                <NumericTextBoxEvents TValue="decimal?" ValueChange="@((args) => _selectedCart.CurrentHour = args.Value)" />
+                                <NumericTextBoxEvents TValue="decimal" ValueChange="OnItemQuantityChanged" />
                             </SfNumericTextBox>
                         </div>
 
                         <div class="cart-field cart-field-small">
-                            <label class="cart-label">Current KM</label>
-                            <SfNumericTextBox Value="@_selectedCart.CurrentKM" TValue="decimal?" ShowSpinButton="false"
+                            <label class="cart-label">UOM</label>
+                            <SfTextBox @bind-Value="_selectedCart.UnitOfMeasurement" Placeholder="UOM..."
+                                       FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox identification-input" />
+                        </div>
+
+                        <div class="cart-field cart-field-small">
+                            <label class="cart-label">Rate</label>
+                            <SfNumericTextBox Value="@_selectedCart.Rate" TValue="decimal" Min="0" ShowSpinButton="false"
                                               Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
                                               CssClass="custom-numeric editable-field">
-                                <NumericTextBoxEvents TValue="decimal?" ValueChange="@((args) => _selectedCart.CurrentKM = args.Value)" />
+                                <NumericTextBoxEvents TValue="decimal" ValueChange="OnItemRateChanged" />
                             </SfNumericTextBox>
                         </div>
 
-                        <div class="cart-field cart-field-small"></div>
-                        <div class="cart-field cart-field-small"></div>
-
-                        <!-- Identification No (aligned below Remarks) -->
                         <div class="cart-field cart-field-remarks">
-                            <label class="cart-label">Identification No</label>
-                            <SfTextBox @bind-Value="_selectedCart.IdentificationNo" Placeholder="Enter ID..."
-                                       FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+                            <label class="cart-label">Remarks</label>
+                            <SfTextBox @bind-Value="_selectedCart.Remarks" Placeholder="Item Narration..."
+                                       FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox identification-input" />
                         </div>
 
-                        <!-- Empty spacers to align with row above -->
-                        <div class="cart-field cart-field-total"></div>
-                        <div class="cart-field cart-field-button"></div>
-                    </div>
-                }
-                else
-                {
-                    <!-- Show only Identification No when Garage is selected -->
-                    <div class="cart-row cart-row-vehicle">
-                        <!-- Empty spacers for alignment -->
-                        <div class="cart-field cart-field-vehicle"></div>
-                        <div class="cart-field cart-field-small"></div>
-                        <div class="cart-field cart-field-small"></div>
-                        <div class="cart-field cart-field-small"></div>
-                        <div class="cart-field cart-field-small"></div>
-
-                        <!-- Identification No (aligned below Remarks) -->
-                        <div class="cart-field cart-field-remarks">
-                            <label class="cart-label">Identification No</label>
-                            <SfTextBox @bind-Value="_selectedCart.IdentificationNo" Placeholder="Enter ID..."
-                                       FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+                        <div class="cart-field cart-field-total">
+                            <label class="cart-label">Total</label>
+                            <div class="total-display-inline">
+                                <span class="amount-value">@_selectedCart.Total.ToString("N2")</span>
+                            </div>
                         </div>
 
-                        <!-- Empty spacers -->
-                        <div class="cart-field cart-field-total"></div>
-                        <div class="cart-field cart-field-button"></div>
+                        <div class="cart-field cart-field-button">
+                            <label class="cart-label" style="visibility: hidden;">Action</label>
+                            <IconButton Icon="IconType.Add" Variant="ButtonVariant.Add" Text="Add" Title="Add to Cart" OnClick="AddItemToCart" />
+                        </div>
                     </div>
-                }
-            </div>
-        </div>
 
-        <!-- Cart Items Grid Section -->
-        <div class="section-card">
-            <div class="section-header">
-                <div class="section-title-wrapper">
-                    <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 3h7a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H3V3z" />
-                        <path d="M14 3h7v17h-7V3z" />
-                    </svg>
-                    <h2 class="section-title">Issue Items</h2>
+                    <!-- Second Row: Vehicle Details (Hidden when Garage is selected) -->
+                    @if (_itemIssue.GarageId is null || _itemIssue.GarageId <= 0)
+                    {
+                        <div class="cart-row cart-row-vehicle">
+                            <div class="cart-field cart-field-vehicle">
+                                <label class="cart-label">Vehicle</label>
+                                <SfAutoComplete TValue="VehicleModel ?" TItem="VehicleModel" DataSource="@_vehicles"
+                                                Value="@(_vehicles.FirstOrDefault(v => v.Id == _selectedCart.VehicleId))"
+                                                Placeholder="Select Vehicle" FloatLabelType="FloatLabelType.Never"
+                                                AllowFiltering="true" FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                                CssClass="custom-autocomplete">
+                                    <AutoCompleteEvents TItem="VehicleModel" TValue="VehicleModel ?"
+                                                        ValueChange="OnVehicleChanged" />
+                                    <AutoCompleteFieldSettings Value="Code" />
+                                    <AutoCompleteTemplates TItem="VehicleModel">
+                                        <ItemTemplate>
+                                            @{
+                                                var vehicle = context as VehicleModel;
+                                            }
+                                            <span>@vehicle.Code @(!string.IsNullOrEmpty(vehicle.ShortCode) ? $"({vehicle.ShortCode})" : "")</span>
+                                        </ItemTemplate>
+                                    </AutoCompleteTemplates>
+                                </SfAutoComplete>
+                            </div>
+
+                            <div class="cart-field cart-field-small">
+                                <label class="cart-label">Current Hour</label>
+                                <SfNumericTextBox Value="@_selectedCart.CurrentHour" TValue="decimal?" ShowSpinButton="false"
+                                                  Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
+                                                  CssClass="custom-numeric editable-field">
+                                    <NumericTextBoxEvents TValue="decimal?" ValueChange="@((args) => _selectedCart.CurrentHour = args.Value)" />
+                                </SfNumericTextBox>
+                            </div>
+
+                            <div class="cart-field cart-field-small">
+                                <label class="cart-label">Current KM</label>
+                                <SfNumericTextBox Value="@_selectedCart.CurrentKM" TValue="decimal?" ShowSpinButton="false"
+                                                  Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
+                                                  CssClass="custom-numeric editable-field">
+                                    <NumericTextBoxEvents TValue="decimal?" ValueChange="@((args) => _selectedCart.CurrentKM = args.Value)" />
+                                </SfNumericTextBox>
+                            </div>
+
+                            <div class="cart-field cart-field-small"></div>
+                            <div class="cart-field cart-field-small"></div>
+
+                            <!-- Identification No (aligned below Remarks) -->
+                            <div class="cart-field cart-field-remarks">
+                                <label class="cart-label">Identification No</label>
+                                <SfTextBox @bind-Value="_selectedCart.IdentificationNo" Placeholder="Enter ID..."
+                                           FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+                            </div>
+
+                            <!-- Empty spacers to align with row above -->
+                            <div class="cart-field cart-field-total"></div>
+                            <div class="cart-field cart-field-button"></div>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Show only Identification No when Garage is selected -->
+                        <div class="cart-row cart-row-vehicle">
+                            <!-- Empty spacers for alignment -->
+                            <div class="cart-field cart-field-vehicle"></div>
+                            <div class="cart-field cart-field-small"></div>
+                            <div class="cart-field cart-field-small"></div>
+                            <div class="cart-field cart-field-small"></div>
+                            <div class="cart-field cart-field-small"></div>
+
+                            <!-- Identification No (aligned below Remarks) -->
+                            <div class="cart-field cart-field-remarks">
+                                <label class="cart-label">Identification No</label>
+                                <SfTextBox @bind-Value="_selectedCart.IdentificationNo" Placeholder="Enter ID..."
+                                           FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+                            </div>
+
+                            <!-- Empty spacers -->
+                            <div class="cart-field cart-field-total"></div>
+                            <div class="cart-field cart-field-button"></div>
+                        </div>
+                    }
                 </div>
             </div>
-            <div class="section-body grid-body">
-                <SfGrid ID="_sfCartGrid" @ref="_sfCartGrid" DataSource="_cart" AllowTextWrap="true" AllowPaging="false"
-                        AllowSorting="true" AllowResizing="true" AllowFiltering="true" GridLines="GridLine.Horizontal"
-                        CssClass="professional-grid" Toolbar="@(new List<string>() { "Search" })">
 
-                    <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
+            <!-- Cart Items Grid Section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3h7a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H3V3z" />
+                            <path d="M14 3h7v17h-7V3z" />
+                        </svg>
+                        <h2 class="section-title">Issue Items</h2>
+                    </div>
+                </div>
+                <div class="section-body grid-body">
+                    <SfGrid ID="_sfCartGrid" @ref="_sfCartGrid" DataSource="_cart" AllowTextWrap="true" AllowPaging="false"
+                            AllowSorting="true" AllowResizing="true" AllowFiltering="true" GridLines="GridLine.Horizontal"
+                            CssClass="professional-grid" Toolbar="@(new List<string>() { "Search" })">
 
-                    <GridAggregates>
-                        <GridAggregate>
-                            <GridAggregateColumns>
-                                <GridAggregateColumn Field="@nameof(ItemIssueItemCartModel.ItemName)" Type="AggregateType.Count">
-                                    <FooterTemplate>
-                                        @{
-                                            var aggregate = (context as AggregateTemplateContext);
-                                        }
-                                        <div class="aggregate-label">
-                                            <strong>Total Items: @aggregate.Count</strong>
-                                        </div>
-                                    </FooterTemplate>
-                                </GridAggregateColumn>
-                                <GridAggregateColumn Field="@nameof(ItemIssueItemCartModel.Quantity)" Type="AggregateType.Sum">
-                                    <FooterTemplate>
-                                        @{
-                                            var aggregate = (context as AggregateTemplateContext);
-                                            var sum = aggregate.Sum != null ? Convert.ToDecimal(aggregate.Sum) : 0m;
-                                        }
-                                        <div class="aggregate-value">
-                                            <strong>@sum.ToString("N2")</strong>
-                                        </div>
-                                    </FooterTemplate>
-                                </GridAggregateColumn>
-                                <GridAggregateColumn Field="@nameof(ItemIssueItemCartModel.Total)" Type="AggregateType.Sum">
-                                    <FooterTemplate>
-                                        @{
-                                            var aggregate = (context as AggregateTemplateContext);
-                                            var sum = aggregate.Sum != null ? Convert.ToDecimal(aggregate.Sum) : 0m;
-                                        }
-                                        <div class="aggregate-value aggregate-total">
-                                            <strong>@sum.ToString("N2")</strong>
-                                        </div>
-                                    </FooterTemplate>
-                                </GridAggregateColumn>
-                            </GridAggregateColumns>
-                        </GridAggregate>
-                    </GridAggregates>
+                        <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
 
-                    <GridColumns>
-                        <GridColumn HeaderText="Actions" Width="100" TextAlign="TextAlign.Center">
-                            <Template>
-                                @{
-                                    var item = (context as dynamic);
-                                    <div class="grid-actions">
-                                        <IconButton Icon="IconType.Edit" Variant="ButtonVariant.Edit" Size="ButtonSize.Grid" Title="Edit Item (Insert)" OnClick="@(() => EditCartItem(item))" />
-                                        <IconButton Icon="IconType.Delete" Variant="ButtonVariant.Delete" Size="ButtonSize.Grid" Title="Remove Item (Del)" OnClick="@(() => RemoveItemFromCart(item))" />
-                                    </div>
-                                }
-                            </Template>
-                        </GridColumn>
-                        <GridColumn Field="@nameof(ItemIssueItemCartModel.ItemName)" HeaderText="Item Name" Width="200" />
-                        <GridColumn Field="@nameof(ItemIssueItemCartModel.IdentificationNo)" HeaderText="Identification No" Width="150" TextAlign="TextAlign.Center" />
-                        <GridColumn Field="@nameof(ItemIssueItemCartModel.UnitOfMeasurement)" HeaderText="UOM" Width="150" TextAlign="TextAlign.Center" />
-                        <GridColumn Field="@nameof(ItemIssueItemCartModel.Quantity)" HeaderText="Qty" Width="100" TextAlign="TextAlign.Right" Format="N2" />
-                        <GridColumn Field="@nameof(ItemIssueItemCartModel.Rate)" HeaderText="Rate" Width="110" TextAlign="TextAlign.Right" Format="N2" />
-                        <GridColumn Field="@nameof(ItemIssueItemCartModel.Total)" HeaderText="Total" Width="130" TextAlign="TextAlign.Right" Format="N2">
-                            <Template>
-                                @{
-                                    var item = (context as dynamic);
-                                    <span class="grid-total">@item.Total.ToString("N2")</span>
-                                }
-                            </Template>
-                        </GridColumn>
-                        <GridColumn Field="@nameof(ItemIssueItemCartModel.VehicleCode)" HeaderText="Vehicle Code" Width="150" TextAlign="TextAlign.Center" />
-                        <GridColumn Field="@nameof(ItemIssueItemCartModel.VehicleShortCode)" HeaderText="Vehicle Short" Width="150" TextAlign="TextAlign.Center" />
-                        <GridColumn Field="@nameof(ItemIssueItemCartModel.CurrentHour)" HeaderText="Current Hour" Width="150" TextAlign="TextAlign.Right" />
-                        <GridColumn Field="@nameof(ItemIssueItemCartModel.CurrentKM)" HeaderText="Current KM" Width="150" TextAlign="TextAlign.Right" />
-                        <GridColumn Field="@nameof(ItemIssueItemCartModel.Remarks)" HeaderText="Remarks" Width="150" />
-                    </GridColumns>
-                </SfGrid>
+                        <GridAggregates>
+                            <GridAggregate>
+                                <GridAggregateColumns>
+                                    <GridAggregateColumn Field="@nameof(ItemIssueItemCartModel.ItemName)" Type="AggregateType.Count">
+                                        <FooterTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                            }
+                                            <div class="aggregate-label">
+                                                <strong>Total Items: @aggregate.Count</strong>
+                                            </div>
+                                        </FooterTemplate>
+                                    </GridAggregateColumn>
+                                    <GridAggregateColumn Field="@nameof(ItemIssueItemCartModel.Quantity)" Type="AggregateType.Sum">
+                                        <FooterTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                                var sum = aggregate.Sum != null ? Convert.ToDecimal(aggregate.Sum) : 0m;
+                                            }
+                                            <div class="aggregate-value">
+                                                <strong>@sum.ToString("N2")</strong>
+                                            </div>
+                                        </FooterTemplate>
+                                    </GridAggregateColumn>
+                                    <GridAggregateColumn Field="@nameof(ItemIssueItemCartModel.Total)" Type="AggregateType.Sum">
+                                        <FooterTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                                var sum = aggregate.Sum != null ? Convert.ToDecimal(aggregate.Sum) : 0m;
+                                            }
+                                            <div class="aggregate-value aggregate-total">
+                                                <strong>@sum.ToString("N2")</strong>
+                                            </div>
+                                        </FooterTemplate>
+                                    </GridAggregateColumn>
+                                </GridAggregateColumns>
+                            </GridAggregate>
+                        </GridAggregates>
+
+                        <GridColumns>
+                            <GridColumn HeaderText="Actions" Width="100" TextAlign="TextAlign.Center">
+                                <Template>
+                                    @{
+                                        var item = (context as dynamic);
+                                        <div class="grid-actions">
+                                            <IconButton Icon="IconType.Edit" Variant="ButtonVariant.Edit" Size="ButtonSize.Grid" Title="Edit Item (Insert)" OnClick="@(() => EditCartItem(item))" />
+                                            <IconButton Icon="IconType.Delete" Variant="ButtonVariant.Delete" Size="ButtonSize.Grid" Title="Remove Item (Del)" OnClick="@(() => RemoveItemFromCart(item))" />
+                                        </div>
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field="@nameof(ItemIssueItemCartModel.ItemName)" HeaderText="Item Name" Width="200" />
+                            <GridColumn Field="@nameof(ItemIssueItemCartModel.IdentificationNo)" HeaderText="Identification No" Width="150" TextAlign="TextAlign.Center" />
+                            <GridColumn Field="@nameof(ItemIssueItemCartModel.UnitOfMeasurement)" HeaderText="UOM" Width="150" TextAlign="TextAlign.Center" />
+                            <GridColumn Field="@nameof(ItemIssueItemCartModel.Quantity)" HeaderText="Qty" Width="100" TextAlign="TextAlign.Right" Format="N2" />
+                            <GridColumn Field="@nameof(ItemIssueItemCartModel.Rate)" HeaderText="Rate" Width="110" TextAlign="TextAlign.Right" Format="N2" />
+                            <GridColumn Field="@nameof(ItemIssueItemCartModel.Total)" HeaderText="Total" Width="130" TextAlign="TextAlign.Right" Format="N2">
+                                <Template>
+                                    @{
+                                        var item = (context as dynamic);
+                                        <span class="grid-total">@item.Total.ToString("N2")</span>
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field="@nameof(ItemIssueItemCartModel.VehicleCode)" HeaderText="Vehicle Code" Width="150" TextAlign="TextAlign.Center" />
+                            <GridColumn Field="@nameof(ItemIssueItemCartModel.VehicleShortCode)" HeaderText="Vehicle Short" Width="150" TextAlign="TextAlign.Center" />
+                            <GridColumn Field="@nameof(ItemIssueItemCartModel.CurrentHour)" HeaderText="Current Hour" Width="150" TextAlign="TextAlign.Right" />
+                            <GridColumn Field="@nameof(ItemIssueItemCartModel.CurrentKM)" HeaderText="Current KM" Width="150" TextAlign="TextAlign.Right" />
+                            <GridColumn Field="@nameof(ItemIssueItemCartModel.Remarks)" HeaderText="Remarks" Width="150" />
+                        </GridColumns>
+                    </SfGrid>
+                </div>
             </div>
         </div>
+
+        <Footer />
     </div>
 }
 
@@ -388,15 +391,6 @@ else
 <style>
     * {
         box-sizing: border-box;
-    }
-
-    /* Main Container */
-    .purchase-container {
-        padding: 16px 32px;
-        max-width: 1920px;
-        margin: 0 auto;
-        background: #f8fafc;
-        min-height: calc(100vh - 72px);
     }
 
     /* Two Column Layout */

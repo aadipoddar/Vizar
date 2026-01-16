@@ -1,4 +1,5 @@
-﻿using VizarLibrary.Data.Common;
+﻿using VizarLibrary.Data.Accounts.Masters;
+using VizarLibrary.Data.Common;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Models.Accounts.Masters;
 using VizarLibrary.Models.Fleet.Document;
@@ -17,14 +18,11 @@ public static class DocumentData
         if (update)
         {
             var existingDocument = await CommonData.LoadTableDataById<DocumentModel>(TableNames.Document, document.Id);
-            var updateFinancialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, existingDocument.FinancialYearId);
-            if (updateFinancialYear is null || updateFinancialYear.Locked || updateFinancialYear.Status == false)
-                throw new InvalidOperationException("Cannot update transaction as the financial year is locked.");
+            await FinancialYearData.ValidateFinancialYear(existingDocument.TransactionDateTime);
         }
 
         var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, document.FinancialYearId);
-        if (financialYear is null || financialYear.Locked || financialYear.Status == false)
-            throw new InvalidOperationException("Cannot update transaction as the financial year is locked.");
+        await FinancialYearData.ValidateFinancialYear(document.TransactionDateTime);
 
         return await InsertDocument(document);
     }

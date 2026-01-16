@@ -2,15 +2,16 @@
 
 public static class TableNames
 {
-    public static string Settings => "Settings";
     public static string User => "User";
+    public static string Settings => "Settings";
 
     public static string Company => "Company";
+    public static string StateUT => "StateUT";
     public static string Ledger => "Ledger";
     public static string Group => "Group";
+    public static string Nature => "Nature";
     public static string AccountType => "AccountType";
     public static string Voucher => "Voucher";
-    public static string StateUT => "StateUT";
     public static string FinancialYear => "FinancialYear";
 
     public static string Accounting => "Accounting";
@@ -47,6 +48,8 @@ public static class TableNames
 
 public static class StoredProcedureNames
 {
+    public static string LoadSettingsByKey => "Load_Settings_By_Key";
+
     public static string LoadTableData => "Load_TableData";
     public static string LoadTableDataById => "Load_TableData_By_Id";
     public static string LoadTableDataByStatus => "Load_TableData_By_Status";
@@ -57,11 +60,10 @@ public static class StoredProcedureNames
     public static string LoadLastTableDataByFinancialYear => "Load_LastTableData_By_FinancialYear";
     public static string LoadLastTableDataByCompanyFinancialYear => "Load_LastTableData_By_Company_FinancialYear";
     public static string LoadCurrentDateTime => "Load_CurrentDateTime";
-    public static string LoadSettingsByKey => "Load_Settings_By_Key";
 
     public static string LoadFinancialYearByDateTime => "Load_FinancialYear_By_DateTime";
     public static string LoadAccountingByVoucherReference => "Load_Accounting_By_Voucher_Reference";
-    public static string LoadTrialBalanceByDate => "Load_TrialBalance_By_Date";
+    public static string LoadTrialBalanceByCompanyDate => "Load_TrialBalance_By_Company_Date";
 
     public static string LoadItemByPartyPurchaseDateTime => "Load_Item_By_Party_PurchaseDateTime";
     public static string LoadItemStockSummaryByDate => "Load_ItemStockSummary_By_Date";

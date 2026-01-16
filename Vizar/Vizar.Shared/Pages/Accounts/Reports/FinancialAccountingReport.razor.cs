@@ -7,11 +7,13 @@ using Vizar.Shared.Components.Dialog;
 
 using VizarLibrary.Data.Accounts.FinancialAccounting;
 using VizarLibrary.Data.Common;
+using VizarLibrary.Data.Operations;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Accounts.FinancialAccounting;
+using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.FinancialAccounting;
 using VizarLibrary.Models.Accounts.Masters;
-using VizarLibrary.Models.Common;
+using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages.Accounts.Reports;
 
@@ -70,8 +72,11 @@ public partial class FinancialAccountingReport : IAsyncDisposable
             .Add(ModCode.Ctrl, Code.P, ExportPdf, "Export to PDF", Exclude.None)
             .Add(ModCode.Ctrl, Code.I, NavigateToItemReport, "Open item report", Exclude.None)
             .Add(ModCode.Ctrl, Code.T, NavigateToTrialBalance, "Open trial balance report", Exclude.None)
+            .Add(ModCode.Alt, Code.F, NavigateToProfitAndLoss, "Open profit and loss report", Exclude.None)
+            .Add(ModCode.Alt, Code.B, NavigateToBalanceSheet, "Open balance sheet report", Exclude.None)
             .Add(ModCode.Ctrl, Code.N, NavigateToTransactionPage, "New Transaction", Exclude.None)
             .Add(ModCode.Ctrl, Code.D, NavigateToDashboard, "Go to dashboard", Exclude.None)
+            .Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
             .Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
             .Add(ModCode.Ctrl, Code.L, Logout, "Logout", Exclude.None)
             .Add(ModCode.Ctrl, Code.O, ViewSelectedCartItem, "Open Selected Transaction", Exclude.None)
@@ -200,15 +205,16 @@ public partial class FinancialAccountingReport : IAsyncDisposable
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var (stream, fileName) = await AccountingReportExcelExport.ExportReport(
-                    _transactionOverviews.Where(_ => _.Status),
-                    dateRangeStart,
-                    dateRangeEnd,
-                    _showAllColumns,
-                    _user.Admin,
-                    _selectedCompany?.Id > 0 ? _selectedCompany?.Name : null,
-                    _selectedVoucher?.Id > 0 ? _selectedVoucher?.Name : null
-                );
+            var (stream, fileName) = await AccountingReportExport.ExportReport(
+                _transactionOverviews,
+                ReportExportType.Excel,
+                dateRangeStart,
+                dateRangeEnd,
+                _showAllColumns,
+                _selectedCompany?.Id > 0 ? _selectedCompany : null,
+                _selectedVoucher?.Id > 0 ? _selectedVoucher : null
+            );
+
             await SaveAndViewService.SaveAndView(fileName, stream);
             await _toastNotification.ShowAsync("Exported", "Excel file downloaded successfully.", ToastType.Success);
         }
@@ -237,14 +243,16 @@ public partial class FinancialAccountingReport : IAsyncDisposable
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var (stream, fileName) = await AccountingReportPdfExport.ExportReport(
-                    _transactionOverviews.Where(_ => _.Status),
-                    dateRangeStart,
-                    dateRangeEnd,
-                    _showAllColumns,
-                    _selectedCompany?.Id > 0 ? _selectedCompany?.Name : null,
-                    _selectedVoucher?.Id > 0 ? _selectedVoucher?.Name : null
-                );
+            var (stream, fileName) = await AccountingReportExport.ExportReport(
+                 _transactionOverviews,
+                 ReportExportType.PDF,
+                 dateRangeStart,
+                 dateRangeEnd,
+                 _showAllColumns,
+                 _selectedCompany?.Id > 0 ? _selectedCompany : null,
+                 _selectedVoucher?.Id > 0 ? _selectedVoucher : null
+             );
+
             await SaveAndViewService.SaveAndView(fileName, stream);
             await _toastNotification.ShowAsync("Exported", "PDF file downloaded successfully.", ToastType.Success);
         }
@@ -314,8 +322,9 @@ public partial class FinancialAccountingReport : IAsyncDisposable
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Generating PDF invoice...", ToastType.Info);
 
-            var (pdfStream, fileName) = await AccountingInvoicePDFExport.ExportInvoice(transactionId);
+            var (pdfStream, fileName) = await AccountingInvoiceExport.ExportInvoice(transactionId, InvoiceExportType.PDF);
             await SaveAndViewService.SaveAndView(fileName, pdfStream);
+
             await _toastNotification.ShowAsync("Success", "PDF invoice downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
@@ -340,8 +349,9 @@ public partial class FinancialAccountingReport : IAsyncDisposable
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Generating Excel invoice...", ToastType.Info);
 
-            var (excelStream, fileName) = await AccountingInvoiceExcelExport.ExportInvoice(transactionId);
+            var (excelStream, fileName) = await AccountingInvoiceExport.ExportInvoice(transactionId, InvoiceExportType.Excel);
             await SaveAndViewService.SaveAndView(fileName, excelStream);
+
             await _toastNotification.ShowAsync("Success", "Excel invoice downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
@@ -384,14 +394,13 @@ public partial class FinancialAccountingReport : IAsyncDisposable
 
             await _toastNotification.ShowAsync("Processing", "Deleting transaction...", ToastType.Info);
 
-            var accounting = await CommonData.LoadTableDataById<AccountingModel>(TableNames.Accounting, _recoverTransactionId);
+            var accounting = await CommonData.LoadTableDataById<AccountingModel>(TableNames.Accounting, _deleteTransactionId);
             if (accounting is null)
             {
                 await _toastNotification.ShowAsync("Error", "Transaction not found.", ToastType.Error);
                 return;
             }
 
-            // Update the Status to true (active)
             accounting.Status = false;
             accounting.LastModifiedBy = _user.Id;
             accounting.LastModifiedAt = await CommonData.LoadCurrentDateTime();
@@ -430,22 +439,15 @@ public partial class FinancialAccountingReport : IAsyncDisposable
             if (!_user.Admin)
                 throw new UnauthorizedAccessException("You do not have permission to recover this transaction.");
 
-            await _toastNotification.ShowAsync("Processing", "Recovering transaction...", ToastType.Info);
-
-            var accounting = await CommonData.LoadTableDataById<AccountingModel>(TableNames.Accounting, _recoverTransactionId);
-            if (accounting is null)
+            if (_recoverTransactionId == 0)
             {
-                await _toastNotification.ShowAsync("Error", "Transaction not found.", ToastType.Error);
+                await _toastNotification.ShowAsync("Error", "No transaction selected to recover.", ToastType.Error);
                 return;
             }
 
-            // Update the Status to true (active)
-            accounting.Status = true;
-            accounting.LastModifiedBy = _user.Id;
-            accounting.LastModifiedAt = await CommonData.LoadCurrentDateTime();
-            accounting.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
+            await _toastNotification.ShowAsync("Processing", "Recovering transaction...", ToastType.Info);
 
-            await AccountingData.RecoverTransaction(accounting);
+            await RecoverTransaction(_recoverTransactionId);
 
             await _toastNotification.ShowAsync("Success", $"Transaction {_recoverTransactionNo} has been recovered successfully.", ToastType.Success);
 
@@ -463,6 +465,23 @@ public partial class FinancialAccountingReport : IAsyncDisposable
             await LoadTransactionOverviews();
         }
     }
+
+    private async Task RecoverTransaction(int recoverTransactionId)
+    {
+        var accounting = await CommonData.LoadTableDataById<AccountingModel>(TableNames.Accounting, recoverTransactionId);
+        if (accounting is null)
+        {
+            await _toastNotification.ShowAsync("Error", "Transaction not found.", ToastType.Error);
+            return;
+        }
+
+        accounting.Status = true;
+        accounting.LastModifiedBy = _user.Id;
+        accounting.LastModifiedAt = await CommonData.LoadCurrentDateTime();
+        accounting.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
+
+        await AccountingData.RecoverTransaction(accounting);
+    }
     #endregion
 
     #region Utilities
@@ -479,6 +498,7 @@ public partial class FinancialAccountingReport : IAsyncDisposable
     {
         _showDeleted = !_showDeleted;
         await LoadTransactionOverviews();
+        StateHasChanged();
     }
 
     private async Task NavigateToTransactionPage()
@@ -505,10 +525,26 @@ public partial class FinancialAccountingReport : IAsyncDisposable
             NavigationManager.NavigateTo(PageRouteNames.ReportTrialBalance);
     }
 
+    private async Task NavigateToProfitAndLoss()
+    {
+        if (FormFactor.GetFormFactor() == "Web")
+            await JSRuntime.InvokeVoidAsync("open", PageRouteNames.ReportProfitAndLoss, "_blank");
+        else
+            NavigationManager.NavigateTo(PageRouteNames.ReportProfitAndLoss);
+    }
+
+    private async Task NavigateToBalanceSheet()
+    {
+        if (FormFactor.GetFormFactor() == "Web")
+            await JSRuntime.InvokeVoidAsync("open", PageRouteNames.ReportBalanceSheet, "_blank");
+        else
+            NavigationManager.NavigateTo(PageRouteNames.ReportBalanceSheet);
+    }
+
     private void NavigateToDashboard() =>
         NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 
-    private async Task NavigateBack() =>
+    private void NavigateBack() =>
         NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
 
     private async Task Logout() =>
@@ -557,7 +593,7 @@ public partial class FinancialAccountingReport : IAsyncDisposable
         try
         {
             while (await _autoRefreshTimer.WaitForNextTickAsync(cancellationToken))
-                await InvokeAsync(LoadTransactionOverviews);
+                await LoadTransactionOverviews();
         }
         catch (OperationCanceledException)
         {

@@ -7,11 +7,13 @@ using Vizar.Shared.Components.Dialog;
 
 using VizarLibrary.Data.Accounts.FinancialAccounting;
 using VizarLibrary.Data.Common;
+using VizarLibrary.Data.Operations;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Accounts.FinancialAccounting;
+using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.FinancialAccounting;
 using VizarLibrary.Models.Accounts.Masters;
-using VizarLibrary.Models.Common;
+using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages.Accounts.Reports;
 
@@ -62,6 +64,8 @@ public partial class AccountingLedgerReport : IAsyncDisposable
             .Add(ModCode.Ctrl, Code.P, ExportPdf, "Export to PDF", Exclude.None)
             .Add(ModCode.Ctrl, Code.H, NavigateToTransactionHistory, "Open transaction history", Exclude.None)
             .Add(ModCode.Ctrl, Code.T, NavigateToTrialBalance, "Open trial balance report", Exclude.None)
+            .Add(ModCode.Alt, Code.F, NavigateToProfitAndLoss, "Open profit and loss report", Exclude.None)
+            .Add(ModCode.Alt, Code.B, NavigateToBalanceSheet, "Open balance sheet report", Exclude.None)
             .Add(ModCode.Ctrl, Code.N, NavigateToTransactionPage, "New Transaction", Exclude.None)
             .Add(ModCode.Ctrl, Code.D, NavigateToDashboard, "Go to dashboard", Exclude.None)
             .Add(ModCode.Ctrl, Code.B, NavigateBack, "Back", Exclude.None)
@@ -141,13 +145,14 @@ public partial class AccountingLedgerReport : IAsyncDisposable
 
                     var referenceLedgerNamesWithAmount = string.Join("\n",
                         referenceLedgers.Select(l =>
-                        $"{l.LedgerName}\t({(l.Debit.HasValue && l.Debit.Value > 0 ? "Dr " + l.Debit.Value.FormatIndianCurrency() : l.Credit.HasValue && l.Credit.Value > 0 ? "Cr " + l.Credit.Value.FormatIndianCurrency() : "0.00")})")); item.LedgerName = referenceLedgerNamesWithAmount;
+                        $"{l.LedgerName}\t({(l.Debit is > 0 ? "Dr " + l.Debit.Value.FormatIndianCurrency() : l.Credit is > 0 ? "Cr " + l.Credit.Value.FormatIndianCurrency() : "0.00")})")); item.LedgerName = referenceLedgerNamesWithAmount;
                     filteredOverviews.Add(item);
                 }
 
                 _transactionOverviews = filteredOverviews;
 
-                var trialBalances = await AccountingData.LoadTrialBalanceByDate(
+                var trialBalances = await AccountingData.LoadTrialBalanceByCompanyDate(
+                    _selectedCompany?.Id ?? 0,
                     DateOnly.FromDateTime(_fromDate).ToDateTime(TimeOnly.MinValue),
                     DateOnly.FromDateTime(_toDate).ToDateTime(TimeOnly.MaxValue));
 
@@ -213,15 +218,17 @@ public partial class AccountingLedgerReport : IAsyncDisposable
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var (stream, fileName) = await AccountingLedgerReportExcelExport.ExportReport(
-                    _transactionOverviews,
-                    dateRangeStart,
-                    dateRangeEnd,
-                    _showAllColumns,
-                    _selectedCompany?.Id > 0 ? _selectedCompany?.Name : null,
-                    _selectedLedger?.Id > 0 ? _selectedLedger?.Name : null,
-                    _selectedLedger?.Id > 0 ? _selectedTrialBalance : null
-                );
+            var (stream, fileName) = await AccountingReportExport.ExportLedgerReport(
+                _transactionOverviews,
+                ReportExportType.Excel,
+                dateRangeStart,
+                dateRangeEnd,
+                _showAllColumns,
+                _selectedCompany?.Id > 0 ? _selectedCompany : null,
+                _selectedLedger?.Id > 0 ? _selectedLedger : null,
+                _selectedLedger?.Id > 0 ? _selectedTrialBalance : null
+            );
+
             await SaveAndViewService.SaveAndView(fileName, stream);
             await _toastNotification.ShowAsync("Exported", "Excel file downloaded successfully.", ToastType.Success);
         }
@@ -250,15 +257,17 @@ public partial class AccountingLedgerReport : IAsyncDisposable
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var (stream, fileName) = await AccountingLedgerReportPdfExport.ExportReport(
-                    _transactionOverviews,
-                    dateRangeStart,
-                    dateRangeEnd,
-                    _showAllColumns,
-                    _selectedCompany?.Id > 0 ? _selectedCompany?.Name : null,
-                    _selectedLedger?.Id > 0 ? _selectedLedger?.Name : null,
-                    _selectedLedger?.Id > 0 ? _selectedTrialBalance : null
-                );
+            var (stream, fileName) = await AccountingReportExport.ExportLedgerReport(
+                _transactionOverviews,
+                ReportExportType.PDF,
+                dateRangeStart,
+                dateRangeEnd,
+                _showAllColumns,
+                _selectedCompany?.Id > 0 ? _selectedCompany : null,
+                _selectedLedger?.Id > 0 ? _selectedLedger : null,
+                _selectedLedger?.Id > 0 ? _selectedTrialBalance : null
+            );
+
             await SaveAndViewService.SaveAndView(fileName, stream);
             await _toastNotification.ShowAsync("Exported", "PDF file downloaded successfully.", ToastType.Success);
         }
@@ -328,8 +337,9 @@ public partial class AccountingLedgerReport : IAsyncDisposable
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Generating PDF invoice...", ToastType.Info);
 
-            var (pdfStream, fileName) = await AccountingInvoicePDFExport.ExportInvoice(transactionId);
+            var (pdfStream, fileName) = await AccountingInvoiceExport.ExportInvoice(transactionId, InvoiceExportType.PDF);
             await SaveAndViewService.SaveAndView(fileName, pdfStream);
+
             await _toastNotification.ShowAsync("Success", "PDF invoice downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
@@ -354,8 +364,9 @@ public partial class AccountingLedgerReport : IAsyncDisposable
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Generating Excel invoice...", ToastType.Info);
 
-            var (excelStream, fileName) = await AccountingInvoiceExcelExport.ExportInvoice(transactionId);
+            var (excelStream, fileName) = await AccountingInvoiceExport.ExportInvoice(transactionId, InvoiceExportType.Excel);
             await SaveAndViewService.SaveAndView(fileName, excelStream);
+
             await _toastNotification.ShowAsync("Success", "Excel invoice downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
@@ -404,10 +415,26 @@ public partial class AccountingLedgerReport : IAsyncDisposable
             NavigationManager.NavigateTo(PageRouteNames.ReportTrialBalance);
     }
 
+    private async Task NavigateToProfitAndLoss()
+    {
+        if (FormFactor.GetFormFactor() == "Web")
+            await JSRuntime.InvokeVoidAsync("open", PageRouteNames.ReportProfitAndLoss, "_blank");
+        else
+            NavigationManager.NavigateTo(PageRouteNames.ReportProfitAndLoss);
+    }
+
+    private async Task NavigateToBalanceSheet()
+    {
+        if (FormFactor.GetFormFactor() == "Web")
+            await JSRuntime.InvokeVoidAsync("open", PageRouteNames.ReportBalanceSheet, "_blank");
+        else
+            NavigationManager.NavigateTo(PageRouteNames.ReportBalanceSheet);
+    }
+
     private void NavigateToDashboard() =>
         NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 
-    private async Task NavigateBack() =>
+    private void NavigateBack() =>
         NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard);
 
     private async Task Logout() =>
@@ -428,7 +455,7 @@ public partial class AccountingLedgerReport : IAsyncDisposable
         try
         {
             while (await _autoRefreshTimer.WaitForNextTickAsync(cancellationToken))
-                await InvokeAsync(LoadTransactionOverviews);
+                await LoadTransactionOverviews();
         }
         catch (OperationCanceledException)
         {

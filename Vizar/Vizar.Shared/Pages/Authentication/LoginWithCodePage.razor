@@ -22,7 +22,7 @@
                 <div class="input-group">
                     <label class="input-label">Phone / Email</label>
                     <SfTextBox @ref="_phoneEmailTextBox" @bind-Value="_phoneEmail" Placeholder="Enter phone number or email"
-                        CssClass="custom-textbox" ShowClearButton="true">
+                               CssClass="custom-textbox" ShowClearButton="true">
                     </SfTextBox>
                 </div>
 
@@ -48,7 +48,7 @@
                     <label class="input-label">Verification Code</label>
                     <div class="otp-container">
                         <SfOtpInput @ref="_otpInput" @bind-Value="_otpCode" Length="6" CssClass="custom-otp"
-                            Placeholder="@_codePlaceholder">
+                                    Placeholder="@_codePlaceholder">
                         </SfOtpInput>
                     </div>
                     <p class="code-hint">@_codePlaceholder</p>
@@ -60,7 +60,8 @@
                     <div class="input-group">
                         <label class="input-label">New Password (Optional)</label>
                         <SfTextBox @ref="_newPasswordTextBox" @bind-Value="_newPassword" Type="InputType.Password"
-                            Placeholder="Enter new password (min 6 characters)" CssClass="custom-textbox" ShowClearButton="true">
+                                   Placeholder="Enter new password (min 6 characters)" CssClass="custom-textbox"
+                                   ShowClearButton="true">
                         </SfTextBox>
                     </div>
                 }
@@ -142,7 +143,7 @@
         justify-content: center;
         min-height: 100vh;
         padding: 20px;
-        background: var(--secondary-color);
+        background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
         position: relative;
     }
 
@@ -432,4 +433,3 @@
         }
     }
 </style>
-

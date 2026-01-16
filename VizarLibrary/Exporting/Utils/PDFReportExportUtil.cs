@@ -12,9 +12,6 @@ using VizarLibrary.Data.Common;
 
 namespace VizarLibrary.Exporting.Utils;
 
-/// <summary>
-/// Generic PDF export utility for generating professional PDF reports
-/// </summary>
 public static class PDFReportExportUtil
 {
     private static PdfLayoutFormat _layoutFormat;
@@ -31,7 +28,6 @@ public static class PDFReportExportUtil
     /// <param name="columnSettings">Optional custom column settings</param>
     /// <param name="columnOrder">Optional custom column order</param>
     /// <param name="useBuiltInStyle">Optional: Use Syncfusion built-in table styles</param>
-    /// <param name="autoAdjustColumnWidth">Optional: Automatically adjust column widths</param>
     /// <param name="logoPath">Optional: Custom path to company logo image (PNG, JPG, etc.)</param>
     /// <param name="useLandscape">Optional: Use landscape orientation for wide tables</param>
     /// <param name="headerMetadata">Optional metadata to display in header (e.g., {"Location": "Main Store", "Party": "ABC Corp"})</param>
@@ -42,10 +38,9 @@ public static class PDFReportExportUtil
         string reportTitle,
         DateOnly? dateRangeStart = null,
         DateOnly? dateRangeEnd = null,
-        Dictionary<string, ColumnSetting> columnSettings = null,
+        Dictionary<string, ReportColumnSetting> columnSettings = null,
         List<string> columnOrder = null,
         bool useBuiltInStyle = false,
-        string logoPath = null,
         bool useLandscape = false,
         Dictionary<string, string> headerMetadata = null,
         Dictionary<string, string> customSummaryFields = null)
@@ -90,7 +85,7 @@ public static class PDFReportExportUtil
                 };
 
                 // Setup header
-                float currentY = SetupHeader(page, reportTitle, dateRangeStart, dateRangeEnd, logoPath, headerMetadata);
+                float currentY = SetupHeader(page, reportTitle, dateRangeStart, dateRangeEnd, headerMetadata);
 
                 // Add data grid
                 PdfLayoutResult gridResult = AddDataGrid(page, data, effectiveColumnOrder, columnSettings, currentY, useBuiltInStyle);
@@ -122,29 +117,6 @@ public static class PDFReportExportUtil
         }
     }
 
-    /// <summary>
-    /// Column setting configuration class
-    /// </summary>
-    public class ColumnSetting
-    {
-        public string DisplayName { get; set; }
-        public PdfStringFormat StringFormat { get; set; }
-        public bool IncludeInTotal { get; set; } = true;
-        public bool HighlightNegative { get; set; } = false;
-        public string Format { get; set; }
-        public bool IsRequired { get; set; }
-        public bool IsGrandTotal { get; set; }
-
-        public ColumnSetting()
-        {
-            StringFormat = new PdfStringFormat
-            {
-                Alignment = PdfTextAlignment.Left,
-                LineAlignment = PdfVerticalAlignment.Middle
-            };
-        }
-    }
-
     #endregion
 
     #region Private Methods
@@ -152,14 +124,14 @@ public static class PDFReportExportUtil
     /// <summary>
     /// Get default column settings based on data type properties
     /// </summary>
-    private static Dictionary<string, ColumnSetting> GetDefaultColumnSettings<T>()
+    private static Dictionary<string, ReportColumnSetting> GetDefaultColumnSettings<T>()
     {
-        var settings = new Dictionary<string, ColumnSetting>();
+        var settings = new Dictionary<string, ReportColumnSetting>();
         var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
         foreach (var prop in properties)
         {
-            var setting = new ColumnSetting
+            var setting = new ReportColumnSetting
             {
                 DisplayName = SplitCamelCase(prop.Name)
             };
@@ -170,34 +142,34 @@ public static class PDFReportExportUtil
             if (propType == typeof(int) || propType == typeof(long) || propType == typeof(short))
             {
                 // Integer types - right align
-                setting.StringFormat.Alignment = PdfTextAlignment.Right;
+                setting.Alignment = CellAlignment.Right;
                 setting.Format = "#,##0";
                 setting.IncludeInTotal = !prop.Name.EndsWith("Id", StringComparison.OrdinalIgnoreCase);
             }
             else if (propType == typeof(decimal) || propType == typeof(double) || propType == typeof(float))
             {
                 // Decimal types - right align with 2 decimals
-                setting.StringFormat.Alignment = PdfTextAlignment.Right;
+                setting.Alignment = CellAlignment.Right;
                 setting.Format = "#,##0.00";
                 setting.IncludeInTotal = true;
             }
             else if (propType == typeof(DateTime) || propType == typeof(DateOnly))
             {
                 // Date types - center align
-                setting.StringFormat.Alignment = PdfTextAlignment.Center;
+                setting.Alignment = CellAlignment.Center;
                 setting.Format = "dd-MMM-yyyy hh:mm";
                 setting.IncludeInTotal = false;
             }
             else if (propType == typeof(bool))
             {
                 // Boolean - center align
-                setting.StringFormat.Alignment = PdfTextAlignment.Center;
+                setting.Alignment = CellAlignment.Center;
                 setting.IncludeInTotal = false;
             }
             else
             {
                 // String and others - left align
-                setting.StringFormat.Alignment = PdfTextAlignment.Left;
+                setting.Alignment = CellAlignment.Left;
                 setting.IncludeInTotal = false;
             }
 
@@ -227,7 +199,7 @@ public static class PDFReportExportUtil
     private static List<string> FilterEmptyColumns<T>(
         IEnumerable<T> data,
         List<string> columnOrder,
-        Dictionary<string, ColumnSetting> columnSettings = null)
+        Dictionary<string, ReportColumnSetting> columnSettings = null)
     {
         if (data == null || !data.Any())
             return columnOrder;
@@ -326,7 +298,6 @@ public static class PDFReportExportUtil
         string reportTitle,
         DateOnly? dateRangeStart,
         DateOnly? dateRangeEnd,
-        string customLogoPath = null,
         Dictionary<string, string> headerMetadata = null)
     {
         float currentY = 10;
@@ -340,22 +311,15 @@ public static class PDFReportExportUtil
             // Use custom logo path if provided, otherwise try default locations
             string[] possibleLogoPaths;
 
-            if (!string.IsNullOrEmpty(customLogoPath) && File.Exists(customLogoPath))
-            {
-                possibleLogoPaths = [customLogoPath];
-            }
-            else
-            {
-                // Try multiple possible logo paths
-                possibleLogoPaths =
-                [
-                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot", "images", "logo_full.png"),
-                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "wwwroot", "images", "logo_full.png"),
-                    Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "logo_full.png"),
-                    Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "Vizar", "Vizar", "wwwroot", "images", "logo_full.png"),
-                    Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "Vizar", "Vizar.Web", "wwwroot", "images", "logo_full.png")
-                ];
-            }
+            // Try multiple possible logo paths
+            possibleLogoPaths =
+            [
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot", "images", "logo_full.png"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "wwwroot", "images", "logo_full.png"),
+                Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "logo_full.png"),
+                Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "Vizar", "Vizar", "wwwroot", "images", "logo_full.png"),
+                Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "Vizar", "Vizar.Web", "wwwroot", "images", "logo_full.png")
+            ];
 
             string logoPath = possibleLogoPaths.FirstOrDefault(File.Exists);
 
@@ -442,7 +406,7 @@ public static class PDFReportExportUtil
         PdfPage page,
         IEnumerable<T> data,
         List<string> columnOrder,
-        Dictionary<string, ColumnSetting> columnSettings,
+        Dictionary<string, ReportColumnSetting> columnSettings,
         float startY,
         bool useBuiltInStyle = false)
     {
@@ -534,25 +498,21 @@ public static class PDFReportExportUtil
                     row.Cells[i].Style.Borders.All = new PdfPen(new PdfColor(229, 231, 235), 0.5f); // Light gray border
                 }
 
-                // Apply string format with word wrap
-                if (setting.StringFormat != null)
+                // Apply string format with word wrap - convert CellAlignment to PdfTextAlignment
+                PdfTextAlignment pdfAlignment = setting.Alignment switch
                 {
-                    // Clone the existing format and ensure word wrap is enabled
-                    row.Cells[i].Style.StringFormat = new PdfStringFormat
-                    {
-                        Alignment = setting.StringFormat.Alignment,
-                        LineAlignment = setting.StringFormat.LineAlignment,
-                        WordWrap = PdfWordWrapType.Word
-                    };
-                }
-                else
+                    CellAlignment.Left => PdfTextAlignment.Left,
+                    CellAlignment.Center => PdfTextAlignment.Center,
+                    CellAlignment.Right => PdfTextAlignment.Right,
+                    _ => PdfTextAlignment.Left
+                };
+
+                row.Cells[i].Style.StringFormat = new PdfStringFormat
                 {
-                    // Default format with word wrap
-                    row.Cells[i].Style.StringFormat = new PdfStringFormat
-                    {
-                        WordWrap = PdfWordWrapType.Word
-                    };
-                }
+                    Alignment = pdfAlignment,
+                    LineAlignment = PdfVerticalAlignment.Middle,
+                    WordWrap = PdfWordWrapType.Word
+                };
 
                 row.Cells[i].Style.CellPadding = new PdfPaddings(2, 1, 2, 1);
 
@@ -609,7 +569,21 @@ public static class PDFReportExportUtil
                     totalRow.Cells[i].Value = displayValue;
                     totalRow.Cells[i].Style.Font = new PdfStandardFont(PdfFontFamily.Helvetica, 7, PdfFontStyle.Bold);
                     totalRow.Cells[i].Style.TextBrush = new PdfSolidBrush(new PdfColor(30, 64, 175)); // Dark blue
-                    totalRow.Cells[i].Style.StringFormat = setting.StringFormat;
+
+                    // Convert CellAlignment to PdfTextAlignment
+                    PdfTextAlignment pdfAlignment = setting.Alignment switch
+                    {
+                        CellAlignment.Left => PdfTextAlignment.Left,
+                        CellAlignment.Center => PdfTextAlignment.Center,
+                        CellAlignment.Right => PdfTextAlignment.Right,
+                        _ => PdfTextAlignment.Left
+                    };
+
+                    totalRow.Cells[i].Style.StringFormat = new PdfStringFormat
+                    {
+                        Alignment = pdfAlignment,
+                        LineAlignment = PdfVerticalAlignment.Middle
+                    };
                 }
             }
         }
@@ -649,7 +623,7 @@ public static class PDFReportExportUtil
     private static float AddSummarySection<T>(
         PdfGraphics graphics,
         IEnumerable<T> data,
-        Dictionary<string, ColumnSetting> columnSettings,
+        Dictionary<string, ReportColumnSetting> columnSettings,
         List<string> columnOrder,
         float leftMargin,
         float pageWidth,

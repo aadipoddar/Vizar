@@ -1,7 +1,4 @@
-﻿using Android.App;
-using Android.Runtime;
-
-namespace Vizar;
+﻿namespace Vizar;
 
 [Application]
 public class MainApplication : MauiApplication

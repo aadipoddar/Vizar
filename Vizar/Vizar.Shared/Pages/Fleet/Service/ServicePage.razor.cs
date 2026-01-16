@@ -10,12 +10,14 @@ using Vizar.Shared.Components.Dialog;
 using VizarLibrary.Data.Accounts.Masters;
 using VizarLibrary.Data.Common;
 using VizarLibrary.Data.Fleet.Service;
+using VizarLibrary.Data.Operations;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Fleet.Service;
+using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
-using VizarLibrary.Models.Common;
 using VizarLibrary.Models.Fleet.Service;
 using VizarLibrary.Models.Fleet.Vehicle;
+using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages.Fleet.Service;
 
@@ -742,10 +744,11 @@ public partial class ServicePage : IAsyncDisposable
             _service.LastModifiedBy = _user.Id;
 
             _service.Id = await ServiceData.SaveTransaction(_service, _cart);
-            var (pdfStream, fileName) = await ServiceInvoicePDFExport.ExportInvoice(_service.Id);
+
+            var (pdfStream, fileName) = await ServiceInvoiceExport.ExportInvoice(_service.Id, InvoiceExportType.PDF);
             await SaveAndViewService.SaveAndView(fileName, pdfStream);
-            await DeleteLocalFiles();
-            NavigationManager.NavigateTo(PageRouteNames.Service, true);
+
+            await ResetPage();
 
             await _toastNotification.ShowAsync("Save Transaction", "Transaction saved successfully! Invoice has been generated.", ToastType.Success);
         }
@@ -812,10 +815,12 @@ public partial class ServicePage : IAsyncDisposable
         {
             _isProcessing = true;
             StateHasChanged();
-            await _toastNotification.ShowAsync("Processing", "Generating PDF invoice...", ToastType.Info);
-            var (pdfStream, fileName) = await ServiceInvoicePDFExport.ExportInvoice(Id.Value);
+            await _toastNotification.ShowAsync("Processing", "Please wait while the invoice is being generated...", ToastType.Info);
+
+            var (pdfStream, fileName) = await ServiceInvoiceExport.ExportInvoice(Id.Value, InvoiceExportType.PDF);
             await SaveAndViewService.SaveAndView(fileName, pdfStream);
-            await _toastNotification.ShowAsync("Invoice Downloaded", "The PDF invoice has been downloaded successfully.", ToastType.Success);
+
+            await _toastNotification.ShowAsync("Success", "The PDF invoice has been downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -842,10 +847,12 @@ public partial class ServicePage : IAsyncDisposable
         {
             _isProcessing = true;
             StateHasChanged();
-            await _toastNotification.ShowAsync("Processing", "Generating Excel invoice...", ToastType.Info);
-            var (excelStream, fileName) = await ServiceInvoiceExcelExport.ExportInvoice(Id.Value);
+            await _toastNotification.ShowAsync("Processing", "Please wait while the invoice is being generated...", ToastType.Info);
+
+            var (excelStream, fileName) = await ServiceInvoiceExport.ExportInvoice(Id.Value, InvoiceExportType.Excel);
             await SaveAndViewService.SaveAndView(fileName, excelStream);
-            await _toastNotification.ShowAsync("Invoice Downloaded", "The Excel invoice has been downloaded successfully.", ToastType.Success);
+
+            await _toastNotification.ShowAsync("Success", "The Excel invoice has been downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -860,7 +867,7 @@ public partial class ServicePage : IAsyncDisposable
     private void NavigateToDashboard() =>
         NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 
-    private async Task NavigateBack() =>
+    private void NavigateBack() =>
         NavigationManager.NavigateTo(PageRouteNames.FleetDashboard);
 
     private async Task Logout() =>

@@ -1,9 +1,4 @@
-﻿using Android.Content;
-using Android.OS;
-
-using Java.IO;
-
-using Application = Android.App.Application;
+﻿using Application = Android.App.Application;
 using Environment = Android.OS.Environment;
 using Uri = Android.Net.Uri;
 

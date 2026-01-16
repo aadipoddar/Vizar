@@ -1,6 +1,4 @@
-﻿using Android.Content;
-
-using Application = Android.App.Application;
+﻿using Application = Android.App.Application;
 
 namespace Vizar.Services.Android;
 

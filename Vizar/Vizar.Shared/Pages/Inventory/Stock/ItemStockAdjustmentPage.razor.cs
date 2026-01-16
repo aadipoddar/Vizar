@@ -9,17 +9,20 @@ using Vizar.Shared.Components.Dialog;
 
 using VizarLibrary.Data.Accounts.Masters;
 using VizarLibrary.Data.Common;
-using VizarLibrary.Data.Inventory.Item;
 using VizarLibrary.Data.Inventory.Purchase;
+using VizarLibrary.Data.Inventory.Stock;
+using VizarLibrary.DataAccess;
 using VizarLibrary.Models.Accounts.Masters;
-using VizarLibrary.Models.Common;
 using VizarLibrary.Models.Inventory.Item;
+using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages.Inventory.Stock;
 
 public partial class ItemStockAdjustmentPage : IAsyncDisposable
 {
     private HotKeysContext _hotKeysContext;
+
+    private UserModel _user;
 
     private bool _isLoading = true;
     private bool _isProcessing = false;
@@ -46,7 +49,7 @@ public partial class ItemStockAdjustmentPage : IAsyncDisposable
         if (!firstRender)
             return;
 
-        await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, UserRoles.Inventory);
+        _user = await AuthenticationService.ValidateUser(DataStorageService, NavigationManager, VibrationService, UserRoles.Inventory);
         await LoadData();
         _isLoading = false;
         StateHasChanged();
@@ -395,9 +398,8 @@ public partial class ItemStockAdjustmentPage : IAsyncDisposable
 
             await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-            await ItemStockData.SaveItemStockAdjustment(_transactionDateTime, _cart);
-            await DeleteLocalFiles();
-            NavigationManager.NavigateTo(PageRouteNames.ItemStockAdjustment, true);
+            await ItemStockData.SaveItemStockAdjustment(_transactionDateTime, _cart, _user.Id);
+            await ResetPage();
 
             await _toastNotification.ShowAsync("Save Transaction", "Transaction saved successfully!", ToastType.Success);
         }
@@ -430,10 +432,10 @@ public partial class ItemStockAdjustmentPage : IAsyncDisposable
             NavigationManager.NavigateTo(PageRouteNames.ReportItemStock);
     }
 
-    private async Task NavigateToDashboard() =>
+    private void NavigateToDashboard() =>
         NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 
-    private async Task NavigateBack() =>
+    private void NavigateBack() =>
         NavigationManager.NavigateTo(PageRouteNames.InventoryDashboard);
 
     private async Task Logout() =>

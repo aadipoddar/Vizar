@@ -6,12 +6,14 @@ using Syncfusion.Blazor.Grids;
 using Vizar.Shared.Components.Dialog;
 
 using VizarLibrary.Data.Common;
+using VizarLibrary.Data.Operations;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Inventory.ItemIssue;
+using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
-using VizarLibrary.Models.Common;
 using VizarLibrary.Models.Fleet.Vehicle;
 using VizarLibrary.Models.Inventory.ItemIssue;
+using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages.Inventory.ItemIssue.Reports;
 
@@ -199,20 +201,24 @@ public partial class VehicleIssueItemReport : IAsyncDisposable
         {
             _isProcessing = true;
             StateHasChanged();
-            await _toastNotification.ShowAsync("Exporting", "Generating Excel file...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing", "Generating Excel file...", ToastType.Info);
 
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var (stream, fileName) = await VehicleIssueItemReportExcelExport.ExportReport(
+            var (stream, fileName) = await VehicleIssueItemReportExport.ExportReport(
                     _transactionOverviews,
+                    ReportExportType.Excel,
                     dateRangeStart,
                     dateRangeEnd,
                     _showAllColumns,
-                    _showSummary
+                    _showSummary,
+                    _selectedVehicle?.Id > 0 ? _selectedVehicle : null,
+                    _selectedCompany?.Id > 0 ? _selectedCompany : null
                 );
+
             await SaveAndViewService.SaveAndView(fileName, stream);
-            await _toastNotification.ShowAsync("Exported", "Excel file downloaded successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Success", "Excel file downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -234,20 +240,24 @@ public partial class VehicleIssueItemReport : IAsyncDisposable
         {
             _isProcessing = true;
             StateHasChanged();
-            await _toastNotification.ShowAsync("Exporting", "Generating PDF file...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing", "Generating PDF file...", ToastType.Info);
 
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var (stream, fileName) = await VehicleIssueItemReportPDFExport.ExportReport(
+            var (stream, fileName) = await VehicleIssueItemReportExport.ExportReport(
                     _transactionOverviews,
+                    ReportExportType.PDF,
                     dateRangeStart,
                     dateRangeEnd,
                     _showAllColumns,
-                    _showSummary
+                    _showSummary,
+                    _selectedVehicle?.Id > 0 ? _selectedVehicle : null,
+                    _selectedCompany?.Id > 0 ? _selectedCompany : null
                 );
+
             await SaveAndViewService.SaveAndView(fileName, stream);
-            await _toastNotification.ShowAsync("Exported", "PDF file downloaded successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Success", "PDF file downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -315,8 +325,9 @@ public partial class VehicleIssueItemReport : IAsyncDisposable
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Generating PDF invoice...", ToastType.Info);
 
-            var (pdfStream, fileName) = await ItemIssueInvoicePDFExport.ExportInvoice(transactionId);
+            var (pdfStream, fileName) = await ItemIssueInvoiceExport.ExportInvoice(transactionId, InvoiceExportType.PDF);
             await SaveAndViewService.SaveAndView(fileName, pdfStream);
+
             await _toastNotification.ShowAsync("Success", "PDF invoice downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
@@ -341,8 +352,9 @@ public partial class VehicleIssueItemReport : IAsyncDisposable
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Generating Excel invoice...", ToastType.Info);
 
-            var (excelStream, fileName) = await ItemIssueInvoiceExcelExport.ExportInvoice(transactionId);
+            var (excelStream, fileName) = await ItemIssueInvoiceExport.ExportInvoice(transactionId, InvoiceExportType.Excel);
             await SaveAndViewService.SaveAndView(fileName, excelStream);
+
             await _toastNotification.ShowAsync("Success", "Excel invoice downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
@@ -397,10 +409,10 @@ public partial class VehicleIssueItemReport : IAsyncDisposable
             NavigationManager.NavigateTo(PageRouteNames.ReportGarageIssueItem);
     }
 
-    private async Task NavigateToDashboard() =>
+    private void NavigateToDashboard() =>
         NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 
-    private async Task NavigateBack() =>
+    private void NavigateBack() =>
         NavigationManager.NavigateTo(PageRouteNames.InventoryDashboard);
 
     private async Task Logout() =>
@@ -421,7 +433,7 @@ public partial class VehicleIssueItemReport : IAsyncDisposable
         try
         {
             while (await _autoRefreshTimer.WaitForNextTickAsync(cancellationToken))
-                await InvokeAsync(LoadTransactionOverviews);
+                await LoadTransactionOverviews();
         }
         catch (OperationCanceledException)
         {

@@ -1,0 +1,16 @@
+﻿using VizarLibrary.DataAccess;
+using VizarLibrary.Models.Operations;
+
+namespace VizarLibrary.Data.Operations;
+
+public static class SettingsData
+{
+    public static async Task<SettingsModel> LoadSettingsByKey(string Key, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
+        (await SqlDataAccess.LoadData<SettingsModel, dynamic>(StoredProcedureNames.LoadSettingsByKey, new { Key }, sqlDataAccessTransaction)).FirstOrDefault();
+
+    public static async Task UpdateSettings(SettingsModel settingsModel) =>
+            await SqlDataAccess.SaveData(StoredProcedureNames.UpdateSettings, settingsModel);
+
+    public static async Task ResetSettings() =>
+            await SqlDataAccess.ExecuteProcedure(StoredProcedureNames.ResetSettings);
+}

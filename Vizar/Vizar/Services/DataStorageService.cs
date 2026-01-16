@@ -1,6 +1,6 @@
 ﻿using Vizar.Shared.Services;
 
-using VizarLibrary.Models.Common;
+using VizarLibrary.DataAccess;
 
 namespace Vizar.Services;
 

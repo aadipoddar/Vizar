@@ -1,7 +1,6 @@
 @page "/report/item-issue"
 
 @using VizarLibrary.Models.Accounts.Masters
-@using VizarLibrary.Models.Common
 @using VizarLibrary.Models.Fleet.Service
 @using VizarLibrary.Models.Inventory.ItemIssue
 
@@ -13,253 +12,258 @@
 }
 else
 {
-    <PageHeader Title="Item Issue Report" Subtitle="View and analyze item issue transactions" ShowHome="true" ShowBack="true" ShowLogout="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
-        <RightContent>
-            <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Title="Export to Excel (Ctrl + E)" Disabled="_isProcessing" OnClick="ExportExcel" />
-            <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Title="Export to PDF (Ctrl + P)" Disabled="_isProcessing" OnClick="ExportPdf" />
-            <IconButton Icon="IconType.Refresh" Title="Refresh Data (Ctrl + R)" Disabled="_isProcessing" OnClick="LoadTransactionOverviews" />
-            <IconButton Icon="IconType.GarageIssueItem" Title="Garage Item Report (Alt + G)" Disabled="_isProcessing" OnClick="NavigateToGarageItemReport" />
-            <IconButton Icon="IconType.VehicleIssueItem" Title="Vehicle Report (Alt + V)" Disabled="_isProcessing" OnClick="NavigateToVehicleItemReport" />
-            <IconButton Icon="IconType.New" Title="New Transaction (Ctrl + N)" Disabled="_isProcessing" OnClick="NavigateToTransactionPage" />
-        </RightContent>
-    </PageHeader>
+    <div style="display: flex; flex-direction: column; min-height: 100vh;">
+        <Header Title="Item Issue Report" Subtitle="View and analyze item issue transactions" ShowHome="true" ShowBack="true" ShowLogout="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
+            <RightContent>
+                <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Title="Export to Excel (Ctrl + E)" Disabled="_isProcessing" OnClick="ExportExcel" />
+                <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Title="Export to PDF (Ctrl + P)" Disabled="_isProcessing" OnClick="ExportPdf" />
+                <IconButton Icon="IconType.Refresh" Title="Refresh Data (Ctrl + R)" Disabled="_isProcessing" OnClick="LoadTransactionOverviews" />
+                <IconButton Icon="IconType.GarageIssueItem" Title="Garage Item Report (Alt + G)" Disabled="_isProcessing" OnClick="NavigateToGarageItemReport" />
+                <IconButton Icon="IconType.VehicleIssueItem" Title="Vehicle Report (Alt + V)" Disabled="_isProcessing" OnClick="NavigateToVehicleItemReport" />
+                <IconButton Icon="IconType.New" Title="New Transaction (Ctrl + N)" Disabled="_isProcessing" OnClick="NavigateToTransactionPage" />
+            </RightContent>
+        </Header>
 
-    <!-- Main Content Container -->
-    <div class="report-container">
+        <!-- Main Content Container -->
+        <div class="page-container">
 
-        <!-- Filters Section -->
-        <div class="section-card">
-            <div class="section-header">
-                <div class="section-title-wrapper">
-                    <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-                    </svg>
-                    <h2 class="section-title">Filters</h2>
-                </div>
-            </div>
-            <div class="section-body">
-                <div class="filters-container">
-                    <div class="filters-grid">
-                        <!-- Date Range -->
-                        <div class="form-field">
-                            <label class="field-label">Date Range</label>
-                            <SfDateRangePicker CssClass="custom-daterange" StartDate="_fromDate" EndDate="_toDate"
-                                               TValue="DateTime" Format="dd/MM/yyyy" AllowEdit="true" Placeholder="Select date range">
-                                <DateRangePickerEvents TValue="DateTime" ValueChange="OnDateRangeChanged" />
-                            </SfDateRangePicker>
-                        </div>
-
-                        <!-- Company -->
-                        <div class="form-field">
-                            <label class="field-label">Company</label>
-                            <SfAutoComplete CssClass="custom-autocomplete" Value="@_selectedCompany" TValue="CompanyModel"
-                                            TItem="CompanyModel" DataSource="@_companies" Placeholder="All Companies"
-                                            AllowFiltering="true" FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
-                                <AutoCompleteEvents TItem="CompanyModel" TValue="CompanyModel"
-                                                    ValueChange="OnCompanyChanged" />
-                                <AutoCompleteFieldSettings Value="Name" />
-                            </SfAutoComplete>
-                        </div>
-
-                        <!-- Garage -->
-                        <div class="form-field">
-                            <label class="field-label">Garage</label>
-                            <SfAutoComplete CssClass="custom-autocomplete" Value="@_selectedGarage" TValue="GarageModel"
-                                            TItem="GarageModel" DataSource="@_garages" Placeholder="All Garages"
-                                            AllowFiltering="true" FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
-                                <AutoCompleteEvents TItem="GarageModel" TValue="GarageModel"
-                                                    ValueChange="OnGarageChanged" />
-                                <AutoCompleteFieldSettings Value="Name" />
-                            </SfAutoComplete>
-                        </div>
+            <!-- Filters Section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                        </svg>
+                        <h2 class="section-title">Filters</h2>
                     </div>
+                </div>
+                <div class="section-body">
+                    <div class="filters-container">
+                        <div class="filters-grid">
+                            <!-- Date Range -->
+                            <div class="form-field">
+                                <label class="field-label">Date Range</label>
+                                <SfDateRangePicker CssClass="custom-daterange" StartDate="_fromDate" EndDate="_toDate"
+                                                   TValue="DateTime" Format="dd/MM/yyyy" AllowEdit="true" Placeholder="Select date range">
+                                    <DateRangePickerEvents TValue="DateTime" ValueChange="OnDateRangeChanged" />
+                                </SfDateRangePicker>
+                            </div>
 
-                    <!-- Date Utility Buttons -->
-                    <DateRangeButtons Disabled="_isProcessing" FromDate="_fromDate" ToDate="_toDate" 
-                        OnDatesChanged="HandleDatesChanged" ToastNotification="_toastNotification" />
+                            <!-- Company -->
+                            <div class="form-field">
+                                <label class="field-label">Company</label>
+                                <SfAutoComplete CssClass="custom-autocomplete" Value="@_selectedCompany" TValue="CompanyModel"
+                                                TItem="CompanyModel" DataSource="@_companies" Placeholder="All Companies"
+                                                AllowFiltering="true" FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
+                                    <AutoCompleteEvents TItem="CompanyModel" TValue="CompanyModel"
+                                                        ValueChange="OnCompanyChanged" />
+                                    <AutoCompleteFieldSettings Value="Name" />
+                                </SfAutoComplete>
+                            </div>
+
+                            <!-- Garage -->
+                            <div class="form-field">
+                                <label class="field-label">Garage</label>
+                                <SfAutoComplete CssClass="custom-autocomplete" Value="@_selectedGarage" TValue="GarageModel"
+                                                TItem="GarageModel" DataSource="@_garages" Placeholder="All Garages"
+                                                AllowFiltering="true" FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
+                                    <AutoCompleteEvents TItem="GarageModel" TValue="GarageModel"
+                                                        ValueChange="OnGarageChanged" />
+                                    <AutoCompleteFieldSettings Value="Name" />
+                                </SfAutoComplete>
+                            </div>
+                        </div>
+
+                        <!-- Date Utility Buttons -->
+                        <DateRangeButtons Disabled="_isProcessing" FromDate="_fromDate" ToDate="_toDate"
+                                          OnDatesChanged="HandleDatesChanged" ToastNotification="_toastNotification" />
+                    </div>
                 </div>
             </div>
+
+            <!-- Report Grid Section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="8" y1="6" x2="21" y2="6" />
+                            <line x1="8" y1="12" x2="21" y2="12" />
+                            <line x1="8" y1="18" x2="21" y2="18" />
+                            <line x1="3" y1="6" x2="3.01" y2="6" />
+                            <line x1="3" y1="12" x2="3.01" y2="12" />
+                            <line x1="3" y1="18" x2="3.01" y2="18" />
+                        </svg>
+                        <h2 class="section-title">Item Issue Transactions</h2>
+                    </div>
+                    <div class="header-actions">
+                        <ToggleSummaryButton Disabled="@_isProcessing" ShowSummary="@_showSummary" OnToggle="ToggleSummary" />
+                        <ToggleDeletedButton Disabled="@_isProcessing" ShowDeleted="@_showDeleted" OnToggle="ToggleDeleted" />
+                        <ToggleDetailsButton Disabled="@_isProcessing" ShowAllColumns="@_showAllColumns" OnToggle="ToggleDetailsView" />
+                    </div>
+                </div>
+                <div class="section-body grid-body">
+                    <SfGrid ID="_sfGrid" @ref="_sfGrid" TValue="ItemIssueOverviewModel"
+                            DataSource="_transactionOverviews" AllowTextWrap="true" AllowPaging="true" AllowSorting="true"
+                            AllowResizing="true" AllowFiltering="true" AllowExcelExport="true" AllowPdfExport="true"
+                            AllowGrouping="true" GridLines="GridLine.Horizontal" CssClass="professional-grid"
+                            Toolbar="@(new List<string>() { "Search" })">
+
+                        <GridGroupSettings ShowDropArea="true" ShowGroupedColumn="true" ShowUngroupButton="true" />
+                        <GridPageSettings PageSize="20" PageSizes="@(new string[] { "10", "20", "50", "100", "All" })" />
+                        <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
+
+                        <GridAggregates>
+                            <GridAggregate>
+                                <GridAggregateColumns>
+                                    <GridAggregateColumn Field="@nameof(ItemIssueOverviewModel.TransactionNo)"
+                                                         Type="AggregateType.Count">
+                                        <FooterTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                            }
+                                            <div class="aggregate-label">
+                                                <strong>Total Items: @aggregate.Count</strong>
+                                            </div>
+                                        </FooterTemplate>
+                                        <GroupFooterTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                            }
+                                            <div class="aggregate-label">
+                                                <strong>Total Items: @aggregate.Count</strong>
+                                            </div>
+                                        </GroupFooterTemplate>
+                                        <GroupCaptionTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                            }
+                                            <div class="aggregate-label">
+                                                <strong>Total Items: @aggregate.Count</strong>
+                                            </div>
+                                        </GroupCaptionTemplate>
+                                    </GridAggregateColumn>
+                                    <GridAggregateColumn Field="@nameof(ItemIssueOverviewModel.TotalItems)"
+                                                         Type="AggregateType.Sum" Format="N0">
+                                        <FooterTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                                <div><strong>@aggregate.Sum</strong></div>
+                                            }
+                                        </FooterTemplate>
+                                        <GroupFooterTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                                <div><strong>@aggregate.Sum</strong></div>
+                                            }
+                                        </GroupFooterTemplate>
+                                        <GroupCaptionTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                                <div><strong>@aggregate.Sum</strong></div>
+                                            }
+                                        </GroupCaptionTemplate>
+                                    </GridAggregateColumn>
+                                    <GridAggregateColumn Field="@nameof(ItemIssueOverviewModel.TotalQuantity)"
+                                                         Type="AggregateType.Sum" Format="N2">
+                                        <FooterTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                                <div><strong>@aggregate.Sum</strong></div>
+                                            }
+                                        </FooterTemplate>
+                                        <GroupFooterTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                                <div><strong>@aggregate.Sum</strong></div>
+                                            }
+                                        </GroupFooterTemplate>
+                                        <GroupCaptionTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                                <div><strong>@aggregate.Sum</strong></div>
+                                            }
+                                        </GroupCaptionTemplate>
+                                    </GridAggregateColumn>
+                                    <GridAggregateColumn Field="@nameof(ItemIssueOverviewModel.TotalAmount)"
+                                                         Type="AggregateType.Sum" Format="N2">
+                                        <FooterTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                                <div class="aggregate-value aggregate-total"><strong>@aggregate.Sum</strong></div>
+                                            }
+                                        </FooterTemplate>
+                                        <GroupFooterTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                                <div class="aggregate-value aggregate-total"><strong>@aggregate.Sum</strong></div>
+                                            }
+                                        </GroupFooterTemplate>
+                                        <GroupCaptionTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                                <div class="aggregate-value aggregate-total"><strong>@aggregate.Sum</strong></div>
+                                            }
+                                        </GroupCaptionTemplate>
+                                    </GridAggregateColumn>
+                                </GridAggregateColumns>
+                            </GridAggregate>
+                        </GridAggregates>
+
+                        <GridColumns>
+                            <GridColumn HeaderText="Actions" Width="160" TextAlign="TextAlign.Center" Visible="@(!_showSummary)">
+                                <Template>
+                                    @{
+                                        var item = (context as ItemIssueOverviewModel);
+                                    }
+                                    <div class="grid-actions">
+                                        @if (item.Status == false)
+                                        {
+                                            <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Size="ButtonSize.Grid" Title="Download Excel Invoice (Alt + E)" Disabled="_isProcessing" OnClick="@(() => DownloadExcelInvoice(item.Id))" />
+                                            <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Size="ButtonSize.Grid" Title="Download PDF Invoice (Alt + P)" Disabled="_isProcessing" OnClick="@(() => DownloadPdfInvoice(item.Id))" />
+                                            <IconButton Icon="IconType.Recover" Variant="ButtonVariant.Recover" Size="ButtonSize.Grid" Title="Recover Transaction (Delete)" Disabled="_isProcessing" OnClick="@(() => ShowRecoverConfirmation(item.Id, item.TransactionNo))" />
+                                        }
+                                        else
+                                        {
+                                            <IconButton Icon="IconType.View" Variant="ButtonVariant.View" Size="ButtonSize.Grid" Title="View Transaction (Ctrl + O)" Disabled="_isProcessing" OnClick="@(() => ViewTransaction(item.Id))" />
+                                            <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Size="ButtonSize.Grid" Title="Download Excel Invoice (Alt + E)" Disabled="_isProcessing" OnClick="@(() => DownloadExcelInvoice(item.Id))" />
+                                            <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Size="ButtonSize.Grid" Title="Download PDF Invoice (Alt + P)" Disabled="_isProcessing" OnClick="@(() => DownloadPdfInvoice(item.Id))" />
+                                            <IconButton Icon="IconType.Delete" Variant="ButtonVariant.Delete" Size="ButtonSize.Grid" Title="Delete Transaction (Delete)" Disabled="_isProcessing" OnClick="@(() => ShowDeleteConfirmation(item.Id, item.TransactionNo))" />
+                                        }
+                                    </div>
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field="@nameof(ItemIssueOverviewModel.TransactionNo)" HeaderText="Trans No" Width="170" Visible="@(!_showSummary)" />
+                            <GridColumn Field="@nameof(ItemIssueOverviewModel.TransactionDateTime)" HeaderText="Date" Width="150" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime" Visible="@(!_showSummary)" />
+                            <GridColumn Field="@nameof(ItemIssueOverviewModel.CompanyName)" HeaderText="Company" Width="180" Visible="@(_showAllColumns && !_showSummary)" />
+                            <GridColumn Field="@nameof(ItemIssueOverviewModel.GarageName)" HeaderText="Garage" Width="200" />
+                            <GridColumn Field="@nameof(ItemIssueOverviewModel.FinancialYear)" HeaderText="Financial Year" Width="150" Visible="@(_showAllColumns && !_showSummary)" />
+                            <GridColumn Field="@nameof(ItemIssueOverviewModel.TotalItems)" HeaderText="Items" Width="100" TextAlign="TextAlign.Right" Visible="_showAllColumns" />
+                            <GridColumn Field="@nameof(ItemIssueOverviewModel.TotalQuantity)" HeaderText="Qty" Width="120" Format="N2" TextAlign="TextAlign.Right" />
+                            <GridColumn Field="@nameof(ItemIssueOverviewModel.TotalAmount)" HeaderText="Total" Width="150" TextAlign="TextAlign.Right">
+                                <Template>
+                                    @{
+                                        var item = (context as ItemIssueOverviewModel);
+                                        <span class="grid-total">@item.TotalAmount.ToString("N2")</span>
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field="@nameof(ItemIssueOverviewModel.Remarks)" HeaderText="Remarks" Width="200" Visible="@(_showAllColumns && !_showSummary)" />
+                            <GridColumn Field="@nameof(ItemIssueOverviewModel.CreatedByName)" HeaderText="Created By" Width="150" Visible="@(_showAllColumns && !_showSummary)" />
+                            <GridColumn Field="@nameof(ItemIssueOverviewModel.CreatedAt)" HeaderText="Created At" Width="160" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime" Visible="@(_showAllColumns && !_showSummary)" />
+                            <GridColumn Field="@nameof(ItemIssueOverviewModel.CreatedFromPlatform)" HeaderText="Created Platform" Width="200" Visible="@(_showAllColumns && !_showSummary)" />
+                            <GridColumn Field="@nameof(ItemIssueOverviewModel.LastModifiedByUserName)" HeaderText="Modified By" Width="150" Visible="@(_showAllColumns && !_showSummary)" />
+                            <GridColumn Field="@nameof(ItemIssueOverviewModel.LastModifiedAt)" HeaderText="Modified At" Width="160" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime" Visible="@(_showAllColumns && !_showSummary)" />
+                            <GridColumn Field="@nameof(ItemIssueOverviewModel.LastModifiedFromPlatform)" HeaderText="Modified Platform" Width="200" Visible="@(_showAllColumns && !_showSummary)" />
+                        </GridColumns>
+                    </SfGrid>
+                </div>
+            </div>
+
         </div>
 
-        <!-- Report Grid Section -->
-        <div class="section-card">
-            <div class="section-header">
-                <div class="section-title-wrapper">
-                    <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="8" y1="6" x2="21" y2="6" />
-                        <line x1="8" y1="12" x2="21" y2="12" />
-                        <line x1="8" y1="18" x2="21" y2="18" />
-                        <line x1="3" y1="6" x2="3.01" y2="6" />
-                        <line x1="3" y1="12" x2="3.01" y2="12" />
-                        <line x1="3" y1="18" x2="3.01" y2="18" />
-                    </svg>
-                    <h2 class="section-title">Item Issue Transactions</h2>
-                </div>
-                <div class="header-actions">
-                    <ToggleSummaryButton Disabled="@_isProcessing" ShowSummary="@_showSummary" OnToggle="ToggleSummary" />
-                    <ToggleDeletedButton Disabled="@_isProcessing" ShowDeleted="@_showDeleted" OnToggle="ToggleDeleted" />
-                    <ToggleDetailsButton Disabled="@_isProcessing" ShowAllColumns="@_showAllColumns" OnToggle="ToggleDetailsView" />
-                </div>
-            </div>
-            <div class="section-body grid-body">
-                <SfGrid ID="_sfGrid" @ref="_sfGrid" TValue="ItemIssueOverviewModel"
-                        DataSource="_transactionOverviews" AllowTextWrap="true" AllowPaging="true" AllowSorting="true"
-                        AllowResizing="true" AllowFiltering="true" AllowExcelExport="true" AllowPdfExport="true"
-                        AllowGrouping="true" GridLines="GridLine.Horizontal" CssClass="professional-grid"
-                        Toolbar="@(new List<string>() { "Search" })">
-
-                    <GridGroupSettings ShowDropArea="true" ShowGroupedColumn="true" ShowUngroupButton="true" />
-                    <GridPageSettings PageSize="20" PageSizes="@(new string[] { "10", "20", "50", "100", "All" })" />
-                    <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
-
-                    <GridAggregates>
-                        <GridAggregate>
-                            <GridAggregateColumns>
-                                <GridAggregateColumn Field="@nameof(ItemIssueOverviewModel.TransactionNo)"
-                                                     Type="AggregateType.Count">
-                                    <FooterTemplate>
-                                        @{
-                                            var aggregate = (context as AggregateTemplateContext);
-                                        }
-                                        <div class="aggregate-label">
-                                            <strong>Total Items: @aggregate.Count</strong>
-                                        </div>
-                                    </FooterTemplate>
-                                    <GroupFooterTemplate>
-                                        @{
-                                            var aggregate = (context as AggregateTemplateContext);
-                                        }
-                                        <div class="aggregate-label">
-                                            <strong>Total Items: @aggregate.Count</strong>
-                                        </div>
-                                    </GroupFooterTemplate>
-                                    <GroupCaptionTemplate>
-                                        @{
-                                            var aggregate = (context as AggregateTemplateContext);
-                                        }
-                                        <div class="aggregate-label">
-                                            <strong>Total Items: @aggregate.Count</strong>
-                                        </div>
-                                    </GroupCaptionTemplate>
-                                </GridAggregateColumn>
-                                <GridAggregateColumn Field="@nameof(ItemIssueOverviewModel.TotalItems)"
-                                                     Type="AggregateType.Sum" Format="N0">
-                                    <FooterTemplate>
-                                        @{
-                                            var aggregate = (context as AggregateTemplateContext);
-                                            <div><strong>@aggregate.Sum</strong></div>
-                                        }
-                                    </FooterTemplate>
-                                    <GroupFooterTemplate>
-                                        @{
-                                            var aggregate = (context as AggregateTemplateContext);
-                                            <div><strong>@aggregate.Sum</strong></div>
-                                        }
-                                    </GroupFooterTemplate>
-                                    <GroupCaptionTemplate>
-                                        @{
-                                            var aggregate = (context as AggregateTemplateContext);
-                                            <div><strong>@aggregate.Sum</strong></div>
-                                        }
-                                    </GroupCaptionTemplate>
-                                </GridAggregateColumn>
-                                <GridAggregateColumn Field="@nameof(ItemIssueOverviewModel.TotalQuantity)"
-                                                     Type="AggregateType.Sum" Format="N2">
-                                    <FooterTemplate>
-                                        @{
-                                            var aggregate = (context as AggregateTemplateContext);
-                                            <div><strong>@aggregate.Sum</strong></div>
-                                        }
-                                    </FooterTemplate>
-                                    <GroupFooterTemplate>
-                                        @{
-                                            var aggregate = (context as AggregateTemplateContext);
-                                            <div><strong>@aggregate.Sum</strong></div>
-                                        }
-                                    </GroupFooterTemplate>
-                                    <GroupCaptionTemplate>
-                                        @{
-                                            var aggregate = (context as AggregateTemplateContext);
-                                            <div><strong>@aggregate.Sum</strong></div>
-                                        }
-                                    </GroupCaptionTemplate>
-                                </GridAggregateColumn>
-                                <GridAggregateColumn Field="@nameof(ItemIssueOverviewModel.TotalAmount)"
-                                                     Type="AggregateType.Sum" Format="N2">
-                                    <FooterTemplate>
-                                        @{
-                                            var aggregate = (context as AggregateTemplateContext);
-                                            <div class="aggregate-value aggregate-total"><strong>@aggregate.Sum</strong></div>
-                                        }
-                                    </FooterTemplate>
-                                    <GroupFooterTemplate>
-                                        @{
-                                            var aggregate = (context as AggregateTemplateContext);
-                                            <div class="aggregate-value aggregate-total"><strong>@aggregate.Sum</strong></div>
-                                        }
-                                    </GroupFooterTemplate>
-                                    <GroupCaptionTemplate>
-                                        @{
-                                            var aggregate = (context as AggregateTemplateContext);
-                                            <div class="aggregate-value aggregate-total"><strong>@aggregate.Sum</strong></div>
-                                        }
-                                    </GroupCaptionTemplate>
-                                </GridAggregateColumn>
-                            </GridAggregateColumns>
-                        </GridAggregate>
-                    </GridAggregates>
-
-                    <GridColumns>
-                        <GridColumn HeaderText="Actions" Width="160" TextAlign="TextAlign.Center" Visible="@(!_showSummary)">
-                            <Template>
-                                @{
-                                    var item = (context as ItemIssueOverviewModel);
-                                }
-                                <div class="grid-actions">
-                                    @if (item.Status == false)
-                                    {
-                                        <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Size="ButtonSize.Grid" Title="Download Excel Invoice (Alt + E)" Disabled="_isProcessing" OnClick="@(() => DownloadExcelInvoice(item.Id))" />
-                                        <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Size="ButtonSize.Grid" Title="Download PDF Invoice (Alt + P)" Disabled="_isProcessing" OnClick="@(() => DownloadPdfInvoice(item.Id))" />
-                                        <IconButton Icon="IconType.Recover" Variant="ButtonVariant.Recover" Size="ButtonSize.Grid" Title="Recover Transaction (Delete)" Disabled="_isProcessing" OnClick="@(() => ShowRecoverConfirmation(item.Id, item.TransactionNo))" />
-                                    }
-                                    else
-                                    {
-                                        <IconButton Icon="IconType.View" Variant="ButtonVariant.View" Size="ButtonSize.Grid" Title="View Transaction (Ctrl + O)" Disabled="_isProcessing" OnClick="@(() => ViewTransaction(item.Id))" />
-                                        <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Size="ButtonSize.Grid" Title="Download Excel Invoice (Alt + E)" Disabled="_isProcessing" OnClick="@(() => DownloadExcelInvoice(item.Id))" />
-                                        <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Size="ButtonSize.Grid" Title="Download PDF Invoice (Alt + P)" Disabled="_isProcessing" OnClick="@(() => DownloadPdfInvoice(item.Id))" />
-                                        <IconButton Icon="IconType.Delete" Variant="ButtonVariant.Delete" Size="ButtonSize.Grid" Title="Delete Transaction (Delete)" Disabled="_isProcessing" OnClick="@(() => ShowDeleteConfirmation(item.Id, item.TransactionNo))" />
-                                    }
-                                </div>
-                            </Template>
-                        </GridColumn>
-                        <GridColumn Field="@nameof(ItemIssueOverviewModel.TransactionNo)" HeaderText="Trans No" Width="170" Visible="@(!_showSummary)" />
-                        <GridColumn Field="@nameof(ItemIssueOverviewModel.TransactionDateTime)" HeaderText="Date" Width="150" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime" Visible="@(!_showSummary)" />
-                        <GridColumn Field="@nameof(ItemIssueOverviewModel.CompanyName)" HeaderText="Company" Width="180" Visible="@(_showAllColumns && !_showSummary)" />
-                        <GridColumn Field="@nameof(ItemIssueOverviewModel.GarageName)" HeaderText="Garage" Width="200" />
-                        <GridColumn Field="@nameof(ItemIssueOverviewModel.FinancialYear)" HeaderText="Financial Year" Width="150" Visible="@(_showAllColumns && !_showSummary)" />
-                        <GridColumn Field="@nameof(ItemIssueOverviewModel.TotalItems)" HeaderText="Items" Width="100" TextAlign="TextAlign.Right" Visible="_showAllColumns" />
-                        <GridColumn Field="@nameof(ItemIssueOverviewModel.TotalQuantity)" HeaderText="Qty" Width="120" Format="N2" TextAlign="TextAlign.Right" />
-                        <GridColumn Field="@nameof(ItemIssueOverviewModel.TotalAmount)" HeaderText="Total" Width="150" TextAlign="TextAlign.Right">
-                            <Template>
-                                @{
-                                    var item = (context as ItemIssueOverviewModel);
-                                    <span class="grid-total">@item.TotalAmount.ToString("N2")</span>
-                                }
-                            </Template>
-                        </GridColumn>
-                        <GridColumn Field="@nameof(ItemIssueOverviewModel.Remarks)" HeaderText="Remarks" Width="200" Visible="@(_showAllColumns && !_showSummary)" />
-                        <GridColumn Field="@nameof(ItemIssueOverviewModel.CreatedByName)" HeaderText="Created By" Width="150" Visible="@(_showAllColumns && !_showSummary)" />
-                        <GridColumn Field="@nameof(ItemIssueOverviewModel.CreatedAt)" HeaderText="Created At" Width="160" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime" Visible="@(_showAllColumns && !_showSummary)" />
-                        <GridColumn Field="@nameof(ItemIssueOverviewModel.CreatedFromPlatform)" HeaderText="Created Platform" Width="200" Visible="@(_showAllColumns && !_showSummary)" />
-                        <GridColumn Field="@nameof(ItemIssueOverviewModel.LastModifiedByUserName)" HeaderText="Modified By" Width="150" Visible="@(_showAllColumns && !_showSummary)" />
-                        <GridColumn Field="@nameof(ItemIssueOverviewModel.LastModifiedAt)" HeaderText="Modified At" Width="160" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime" Visible="@(_showAllColumns && !_showSummary)" />
-                        <GridColumn Field="@nameof(ItemIssueOverviewModel.LastModifiedFromPlatform)" HeaderText="Modified Platform" Width="200" Visible="@(_showAllColumns && !_showSummary)" />
-                    </GridColumns>
-                </SfGrid>
-            </div>
-        </div>
+        <Footer />
     </div>
 }
 
@@ -285,15 +289,6 @@ else
 <style>
     * {
         box-sizing: border-box;
-    }
-
-    /* Main Container */
-    .report-container {
-        padding: 24px 32px;
-        max-width: 1920px;
-        margin: 0 auto;
-        background: #f8fafc;
-        min-height: calc(100vh - 72px);
     }
 
     /* Section Card Styles */
@@ -611,7 +606,7 @@ else
             justify-content: center;
         }
 
-        .report-container {
+        .page-container {
             padding: 16px;
         }
 

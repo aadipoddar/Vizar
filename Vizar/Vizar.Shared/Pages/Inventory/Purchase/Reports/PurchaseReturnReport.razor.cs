@@ -7,11 +7,13 @@ using Vizar.Shared.Components.Dialog;
 
 using VizarLibrary.Data.Common;
 using VizarLibrary.Data.Inventory.Purchase;
+using VizarLibrary.Data.Operations;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Inventory.Purchase;
+using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
-using VizarLibrary.Models.Common;
 using VizarLibrary.Models.Inventory.Purchase;
+using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages.Inventory.Purchase.Reports;
 
@@ -216,21 +218,24 @@ public partial class PurchaseReturnReport : IAsyncDisposable
         {
             _isProcessing = true;
             StateHasChanged();
-            await _toastNotification.ShowAsync("Exporting", "Generating Excel file...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing", "Generating Excel file...", ToastType.Info);
 
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var (stream, fileName) = await PurchaseReturnReportExcelExport.ExportReport(
+            var (stream, fileName) = await PurchaseReturnReportExport.ExportReport(
                     _transactionOverviews,
+                    ReportExportType.Excel,
                     dateRangeStart,
                     dateRangeEnd,
                     _showAllColumns,
-                    _selectedParty?.Id > 0 ? _selectedParty?.Name : null,
-                    _showSummary
+                    _showSummary,
+                    _selectedParty?.Id > 0 ? _selectedParty : null,
+                    _selectedCompany?.Id > 0 ? _selectedCompany : null
                 );
+
             await SaveAndViewService.SaveAndView(fileName, stream);
-            await _toastNotification.ShowAsync("Exported", "Excel file downloaded successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Success", "Excel file downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -252,21 +257,24 @@ public partial class PurchaseReturnReport : IAsyncDisposable
         {
             _isProcessing = true;
             StateHasChanged();
-            await _toastNotification.ShowAsync("Exporting", "Generating PDF file...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing", "Generating PDF file...", ToastType.Info);
 
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var (stream, fileName) = await PurchaseReturnReportPdfExport.ExportReport(
+            var (stream, fileName) = await PurchaseReturnReportExport.ExportReport(
                     _transactionOverviews,
+                    ReportExportType.PDF,
                     dateRangeStart,
                     dateRangeEnd,
                     _showAllColumns,
-                    _selectedParty?.Id > 0 ? _selectedParty?.Name : null,
-                    _showSummary
+                    _showSummary,
+                    _selectedParty?.Id > 0 ? _selectedParty : null,
+                    _selectedCompany?.Id > 0 ? _selectedCompany : null
                 );
+
             await SaveAndViewService.SaveAndView(fileName, stream);
-            await _toastNotification.ShowAsync("Exported", "PDF file downloaded successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Success", "PDF file downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -334,7 +342,7 @@ public partial class PurchaseReturnReport : IAsyncDisposable
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Generating PDF invoice...", ToastType.Info);
 
-            var (pdfStream, fileName) = await PurchaseReturnInvoicePDFExport.ExportInvoice(transactionId);
+            var (pdfStream, fileName) = await PurchaseReturnInvoiceExport.ExportInvoice(transactionId, InvoiceExportType.PDF);
             await SaveAndViewService.SaveAndView(fileName, pdfStream);
 
             await _toastNotification.ShowAsync("Success", "PDF invoice downloaded successfully.", ToastType.Success);
@@ -361,7 +369,7 @@ public partial class PurchaseReturnReport : IAsyncDisposable
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Generating Excel invoice...", ToastType.Info);
 
-            var (excelStream, fileName) = await PurchaseReturnInvoiceExcelExport.ExportInvoice(transactionId);
+            var (excelStream, fileName) = await PurchaseReturnInvoiceExport.ExportInvoice(transactionId, InvoiceExportType.Excel);
             await SaveAndViewService.SaveAndView(fileName, excelStream);
 
             await _toastNotification.ShowAsync("Success", "Excel invoice downloaded successfully.", ToastType.Success);
@@ -438,15 +446,14 @@ public partial class PurchaseReturnReport : IAsyncDisposable
 
             await _toastNotification.ShowAsync("Processing", "Deleting transaction...", ToastType.Info);
 
-            var purchaseReturn = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, _deleteTransactionId);
+            if (_deleteTransactionId == 0)
+            {
+                await _toastNotification.ShowAsync("Error", "Invalid transaction selected for deletion.", ToastType.Error);
+                return;
+            }
 
-            // Delete the purchase return transaction
-            purchaseReturn.Status = false;
-            purchaseReturn.LastModifiedBy = _user.Id;
-            purchaseReturn.LastModifiedAt = await CommonData.LoadCurrentDateTime();
-            purchaseReturn.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
+            await DeleteTransaction(_deleteTransactionId);
 
-            await PurchaseReturnData.DeleteTransaction(purchaseReturn);
             await _toastNotification.ShowAsync("Success", $"Transaction '{_deleteTransactionNo}' has been successfully deleted.", ToastType.Success);
 
             _deleteTransactionId = 0;
@@ -464,6 +471,24 @@ public partial class PurchaseReturnReport : IAsyncDisposable
         }
     }
 
+    private async Task DeleteTransaction(int deleteTransactionId)
+    {
+        var purchaseReturn = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, deleteTransactionId);
+        if (purchaseReturn is null)
+        {
+            await _toastNotification.ShowAsync("Error", "Transaction not found.", ToastType.Error);
+            return;
+        }
+
+        // Update the Status to false (deleted)
+        purchaseReturn.Status = false;
+        purchaseReturn.LastModifiedBy = _user.Id;
+        purchaseReturn.LastModifiedAt = await CommonData.LoadCurrentDateTime();
+        purchaseReturn.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
+
+        await PurchaseReturnData.DeleteTransaction(purchaseReturn);
+    }
+
     private async Task ConfirmRecover()
     {
         if (_isProcessing)
@@ -478,17 +503,16 @@ public partial class PurchaseReturnReport : IAsyncDisposable
             if (!_user.Admin)
                 throw new UnauthorizedAccessException("You do not have permission to recover this transaction.");
 
+            if (_recoverTransactionId == 0)
+            {
+                await _toastNotification.ShowAsync("Error", "No transaction selected to recover.", ToastType.Error);
+                return;
+            }
+
             await _toastNotification.ShowAsync("Processing", "Recovering transaction...", ToastType.Info);
 
-            var purchaseReturn = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, _recoverTransactionId);
+            await RecoverTransaction();
 
-            // Recover the purchase return transaction
-            purchaseReturn.Status = true;
-            purchaseReturn.LastModifiedBy = _user.Id;
-            purchaseReturn.LastModifiedAt = await CommonData.LoadCurrentDateTime();
-            purchaseReturn.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
-
-            await PurchaseReturnData.RecoverPurchaseReturnTransaction(purchaseReturn);
             await _toastNotification.ShowAsync("Success", $"Transaction '{_recoverTransactionNo}' has been successfully recovered.", ToastType.Success);
 
             _recoverTransactionId = 0;
@@ -504,6 +528,23 @@ public partial class PurchaseReturnReport : IAsyncDisposable
             StateHasChanged();
             await LoadTransactionOverviews();
         }
+    }
+
+    private async Task RecoverTransaction()
+    {
+        var purchaseReturn = await CommonData.LoadTableDataById<PurchaseReturnModel>(TableNames.PurchaseReturn, _recoverTransactionId);
+        if (purchaseReturn is null)
+        {
+            await _toastNotification.ShowAsync("Error", "Transaction not found.", ToastType.Error);
+            return;
+        }
+
+        purchaseReturn.Status = true;
+        purchaseReturn.LastModifiedBy = _user.Id;
+        purchaseReturn.LastModifiedAt = await CommonData.LoadCurrentDateTime();
+        purchaseReturn.LastModifiedFromPlatform = FormFactor.GetFormFactor() + FormFactor.GetPlatform();
+
+        await PurchaseReturnData.RecoverTransaction(purchaseReturn);
     }
     #endregion
 
@@ -548,7 +589,7 @@ public partial class PurchaseReturnReport : IAsyncDisposable
     private void NavigateToDashboard() =>
         NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 
-    private async Task NavigateBack() =>
+    private void NavigateBack() =>
         NavigationManager.NavigateTo(PageRouteNames.InventoryDashboard);
 
     private async Task Logout() =>
@@ -599,7 +640,7 @@ public partial class PurchaseReturnReport : IAsyncDisposable
         try
         {
             while (await _autoRefreshTimer.WaitForNextTickAsync(cancellationToken))
-                await InvokeAsync(LoadTransactionOverviews);
+                await LoadTransactionOverviews();
         }
         catch (OperationCanceledException)
         {

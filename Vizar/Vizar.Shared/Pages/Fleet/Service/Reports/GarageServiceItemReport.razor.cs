@@ -6,11 +6,13 @@ using Syncfusion.Blazor.Grids;
 using Vizar.Shared.Components.Dialog;
 
 using VizarLibrary.Data.Common;
+using VizarLibrary.Data.Operations;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Fleet.Service;
+using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
-using VizarLibrary.Models.Common;
 using VizarLibrary.Models.Fleet.Service;
+using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages.Fleet.Service.Reports;
 
@@ -193,20 +195,24 @@ public partial class GarageServiceItemReport : IAsyncDisposable
         {
             _isProcessing = true;
             StateHasChanged();
-            await _toastNotification.ShowAsync("Exporting", "Generating Excel file...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing", "Please wait while the report is being exported...", ToastType.Info);
 
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var (stream, fileName) = await GarageServiceItemReportExcelExport.ExportReport(
+            var (stream, fileName) = await GarageServiceItemReportExport.ExportReport(
                     _transactionOverviews,
+                    ReportExportType.Excel,
                     dateRangeStart,
                     dateRangeEnd,
                     _showAllColumns,
-                    _showSummary
+                    _showSummary,
+                    _selectedGarage?.Id > 0 ? _selectedGarage : null,
+                    _selectedCompany?.Id > 0 ? _selectedCompany : null
                 );
+
             await SaveAndViewService.SaveAndView(fileName, stream);
-            await _toastNotification.ShowAsync("Exported", "Excel file downloaded successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Success", "Excel file downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -228,20 +234,24 @@ public partial class GarageServiceItemReport : IAsyncDisposable
         {
             _isProcessing = true;
             StateHasChanged();
-            await _toastNotification.ShowAsync("Exporting", "Generating PDF file...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing", "Please wait while the report is being exported...", ToastType.Info);
 
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var (stream, fileName) = await GarageServiceItemReportPDFExport.ExportReport(
+            var (stream, fileName) = await GarageServiceItemReportExport.ExportReport(
                     _transactionOverviews,
+                    ReportExportType.PDF,
                     dateRangeStart,
                     dateRangeEnd,
                     _showAllColumns,
-                    _showSummary
+                    _showSummary,
+                    _selectedGarage?.Id > 0 ? _selectedGarage : null,
+                    _selectedCompany?.Id > 0 ? _selectedCompany : null
                 );
+
             await SaveAndViewService.SaveAndView(fileName, stream);
-            await _toastNotification.ShowAsync("Exported", "PDF file downloaded successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Success", "PDF file downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -309,8 +319,9 @@ public partial class GarageServiceItemReport : IAsyncDisposable
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Generating PDF invoice...", ToastType.Info);
 
-            var (pdfStream, fileName) = await ServiceInvoicePDFExport.ExportInvoice(transactionId);
+            var (pdfStream, fileName) = await ServiceInvoiceExport.ExportInvoice(transactionId, InvoiceExportType.PDF);
             await SaveAndViewService.SaveAndView(fileName, pdfStream);
+
             await _toastNotification.ShowAsync("Success", "PDF invoice downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
@@ -335,8 +346,9 @@ public partial class GarageServiceItemReport : IAsyncDisposable
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Generating Excel invoice...", ToastType.Info);
 
-            var (excelStream, fileName) = await ServiceInvoiceExcelExport.ExportInvoice(transactionId);
-            await SaveAndViewService.SaveAndView(fileName, excelStream);
+            var (pdfStream, fileName) = await ServiceInvoiceExport.ExportInvoice(transactionId, InvoiceExportType.Excel);
+            await SaveAndViewService.SaveAndView(fileName, pdfStream);
+
             await _toastNotification.ShowAsync("Success", "Excel invoice downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
@@ -391,10 +403,10 @@ public partial class GarageServiceItemReport : IAsyncDisposable
             NavigationManager.NavigateTo(PageRouteNames.ReportVehicleServiceItem);
     }
 
-    private async Task NavigateToDashboard() =>
+    private void NavigateToDashboard() =>
         NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 
-    private async Task NavigateBack() =>
+    private void NavigateBack() =>
         NavigationManager.NavigateTo(PageRouteNames.FleetDashboard);
 
     private async Task Logout() =>
@@ -415,7 +427,7 @@ public partial class GarageServiceItemReport : IAsyncDisposable
         try
         {
             while (await _autoRefreshTimer.WaitForNextTickAsync(cancellationToken))
-                await InvokeAsync(LoadTransactionOverviews);
+                await LoadTransactionOverviews();
         }
         catch (OperationCanceledException)
         {

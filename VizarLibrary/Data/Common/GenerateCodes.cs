@@ -1,13 +1,14 @@
 ﻿using VizarLibrary.Data.Accounts.Masters;
+using VizarLibrary.Data.Operations;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Models.Accounts.FinancialAccounting;
 using VizarLibrary.Models.Accounts.Masters;
-using VizarLibrary.Models.Common;
 using VizarLibrary.Models.Fleet.Service;
 using VizarLibrary.Models.Fleet.Vehicle;
 using VizarLibrary.Models.Inventory.Item;
 using VizarLibrary.Models.Inventory.ItemIssue;
 using VizarLibrary.Models.Inventory.Purchase;
+using VizarLibrary.Models.Operations;
 
 namespace VizarLibrary.Data.Common;
 
@@ -28,7 +29,7 @@ public static class GenerateCodes
         VehicleType
     }
 
-    private static async Task<string> CheckDuplicateCode(string code, int numberLength, CodeType type)
+    private static async Task<string> CheckDuplicateCode(string code, int numberLength, CodeType type, SqlDataAccessTransaction sqlDataAccessTransaction = null)
     {
         var isDuplicate = true;
         while (isDuplicate)
@@ -36,48 +37,48 @@ public static class GenerateCodes
             switch (type)
             {
                 case CodeType.Accounting:
-                    var accounting = await CommonData.LoadTableDataByTransactionNo<AccountingModel>(TableNames.Accounting, code);
+                    var accounting = await CommonData.LoadTableDataByTransactionNo<AccountingModel>(TableNames.Accounting, code, sqlDataAccessTransaction);
                     isDuplicate = accounting is not null;
                     break;
                 case CodeType.Purchase:
-                    var purchase = await CommonData.LoadTableDataByTransactionNo<PurchaseModel>(TableNames.Purchase, code);
+                    var purchase = await CommonData.LoadTableDataByTransactionNo<PurchaseModel>(TableNames.Purchase, code, sqlDataAccessTransaction);
                     isDuplicate = purchase is not null;
                     break;
                 case CodeType.PurchaseReturn:
-                    var purchaseReturn = await CommonData.LoadTableDataByTransactionNo<PurchaseReturnModel>(TableNames.PurchaseReturn, code);
+                    var purchaseReturn = await CommonData.LoadTableDataByTransactionNo<PurchaseReturnModel>(TableNames.PurchaseReturn, code, sqlDataAccessTransaction);
                     isDuplicate = purchaseReturn is not null;
                     break;
                 case CodeType.ItemIssue:
-                    var itemIssue = await CommonData.LoadTableDataByTransactionNo<ItemIssueModel>(TableNames.ItemIssue, code);
+                    var itemIssue = await CommonData.LoadTableDataByTransactionNo<ItemIssueModel>(TableNames.ItemIssue, code, sqlDataAccessTransaction);
                     isDuplicate = itemIssue is not null;
                     break;
                 case CodeType.Service:
-                    var service = await CommonData.LoadTableDataByTransactionNo<ServiceModel>(TableNames.Service, code);
+                    var service = await CommonData.LoadTableDataByTransactionNo<ServiceModel>(TableNames.Service, code, sqlDataAccessTransaction);
                     isDuplicate = service is not null;
                     break;
 
                 case CodeType.Ledger:
-                    var ledger = await CommonData.LoadTableDataByCode<LedgerModel>(TableNames.Ledger, code);
+                    var ledger = await CommonData.LoadTableDataByCode<LedgerModel>(TableNames.Ledger, code, sqlDataAccessTransaction);
                     isDuplicate = ledger is not null;
                     break;
                 case CodeType.Manufacturer:
-                    var manufacturer = await CommonData.LoadTableDataByCode<ManufacturerModel>(TableNames.Manufacturer, code);
+                    var manufacturer = await CommonData.LoadTableDataByCode<ManufacturerModel>(TableNames.Manufacturer, code, sqlDataAccessTransaction);
                     isDuplicate = manufacturer is not null;
                     break;
                 case CodeType.ItemCategory:
-                    var itemCategory = await CommonData.LoadTableDataByCode<ItemCategoryModel>(TableNames.ItemCategory, code);
+                    var itemCategory = await CommonData.LoadTableDataByCode<ItemCategoryModel>(TableNames.ItemCategory, code, sqlDataAccessTransaction);
                     isDuplicate = itemCategory is not null;
                     break;
                 case CodeType.ItemType:
-                    var itemType = await CommonData.LoadTableDataByCode<ItemTypeModel>(TableNames.ItemType, code);
+                    var itemType = await CommonData.LoadTableDataByCode<ItemTypeModel>(TableNames.ItemType, code, sqlDataAccessTransaction);
                     isDuplicate = itemType is not null;
                     break;
                 case CodeType.Item:
-                    var item = await CommonData.LoadTableDataByCode<ItemModel>(TableNames.Item, code);
+                    var item = await CommonData.LoadTableDataByCode<ItemModel>(TableNames.Item, code, sqlDataAccessTransaction);
                     isDuplicate = item is not null;
                     break;
                 case CodeType.VehicleType:
-                    var vehicleType = await CommonData.LoadTableDataByCode<VehicleTypeModel>(TableNames.VehicleType, code);
+                    var vehicleType = await CommonData.LoadTableDataByCode<VehicleTypeModel>(TableNames.VehicleType, code, sqlDataAccessTransaction);
                     isDuplicate = vehicleType is not null;
                     break;
             }
@@ -98,13 +99,13 @@ public static class GenerateCodes
         return code;
     }
 
-    public static async Task<string> GenerateAccountingTransactionNo(AccountingModel transaction)
+    public static async Task<string> GenerateAccountingTransactionNo(AccountingModel transaction, SqlDataAccessTransaction sqlDataAccessTransaction = null)
     {
-        var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, transaction.FinancialYearId);
-        var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId)).Code;
-        var accountingPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.FinancialAccountingTransactionPrefix)).Value;
+        var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, transaction.FinancialYearId, sqlDataAccessTransaction);
+        var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId, sqlDataAccessTransaction)).Code;
+        var accountingPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.FinancialAccountingTransactionPrefix, sqlDataAccessTransaction)).Value;
 
-        var lastAccounting = await CommonData.LoadLastTableDataByCompanyFinancialYear<AccountingModel>(TableNames.Accounting, transaction.CompanyId, transaction.FinancialYearId);
+        var lastAccounting = await CommonData.LoadLastTableDataByCompanyFinancialYear<AccountingModel>(TableNames.Accounting, transaction.CompanyId, transaction.FinancialYearId, sqlDataAccessTransaction);
         if (lastAccounting is not null)
         {
             var lastTransactionNo = lastAccounting.TransactionNo;
@@ -114,21 +115,21 @@ public static class GenerateCodes
                 if (int.TryParse(lastNumberPart, out int lastNumber))
                 {
                     int nextNumber = lastNumber + 1;
-                    return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{accountingPrefix}{nextNumber:D6}", 6, CodeType.Accounting);
+                    return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{accountingPrefix}{nextNumber:D6}", 6, CodeType.Accounting, sqlDataAccessTransaction);
                 }
             }
         }
 
-        return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{accountingPrefix}000001", 6, CodeType.Accounting);
+        return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{accountingPrefix}000001", 6, CodeType.Accounting, sqlDataAccessTransaction);
     }
 
-    public static async Task<string> GeneratePurchaseTransactionNo(PurchaseModel transaction)
+    public static async Task<string> GeneratePurchaseTransactionNo(PurchaseModel transaction, SqlDataAccessTransaction sqlDataAccessTransaction = null)
     {
-        var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, transaction.FinancialYearId);
-        var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId)).Code;
-        var purchasePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.PurchaseTransactionPrefix)).Value;
+        var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, transaction.FinancialYearId, sqlDataAccessTransaction);
+        var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId, sqlDataAccessTransaction)).Code;
+        var purchasePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.PurchaseTransactionPrefix, sqlDataAccessTransaction)).Value;
 
-        var lastPurchase = await CommonData.LoadLastTableDataByCompanyFinancialYear<PurchaseModel>(TableNames.Purchase, transaction.CompanyId, transaction.FinancialYearId);
+        var lastPurchase = await CommonData.LoadLastTableDataByCompanyFinancialYear<PurchaseModel>(TableNames.Purchase, transaction.CompanyId, transaction.FinancialYearId, sqlDataAccessTransaction);
         if (lastPurchase is not null)
         {
             var lastTransactionNo = lastPurchase.TransactionNo;
@@ -138,21 +139,21 @@ public static class GenerateCodes
                 if (int.TryParse(lastNumberPart, out int lastNumber))
                 {
                     int nextNumber = lastNumber + 1;
-                    return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{purchasePrefix}{nextNumber:D6}", 6, CodeType.Purchase);
+                    return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{purchasePrefix}{nextNumber:D6}", 6, CodeType.Purchase, sqlDataAccessTransaction);
                 }
             }
         }
 
-        return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{purchasePrefix}000001", 6, CodeType.Purchase);
+        return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{purchasePrefix}000001", 6, CodeType.Purchase, sqlDataAccessTransaction);
     }
 
-    public static async Task<string> GeneratePurchaseReturnTransactionNo(PurchaseReturnModel transaction)
+    public static async Task<string> GeneratePurchaseReturnTransactionNo(PurchaseReturnModel transaction, SqlDataAccessTransaction sqlDataAccessTransaction = null)
     {
-        var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, transaction.FinancialYearId);
-        var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId)).Code;
-        var purchaseReturnPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.PurchaseReturnTransactionPrefix)).Value;
+        var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, transaction.FinancialYearId, sqlDataAccessTransaction);
+        var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId, sqlDataAccessTransaction)).Code;
+        var purchaseReturnPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.PurchaseReturnTransactionPrefix, sqlDataAccessTransaction)).Value;
 
-        var lastPurchase = await CommonData.LoadLastTableDataByCompanyFinancialYear<PurchaseReturnModel>(TableNames.PurchaseReturn, transaction.CompanyId, transaction.FinancialYearId);
+        var lastPurchase = await CommonData.LoadLastTableDataByCompanyFinancialYear<PurchaseReturnModel>(TableNames.PurchaseReturn, transaction.CompanyId, transaction.FinancialYearId, sqlDataAccessTransaction);
         if (lastPurchase is not null)
         {
             var lastTransactionNo = lastPurchase.TransactionNo;
@@ -162,21 +163,21 @@ public static class GenerateCodes
                 if (int.TryParse(lastNumberPart, out int lastNumber))
                 {
                     int nextNumber = lastNumber + 1;
-                    return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{purchaseReturnPrefix}{nextNumber:D6}", 6, CodeType.PurchaseReturn);
+                    return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{purchaseReturnPrefix}{nextNumber:D6}", 6, CodeType.PurchaseReturn, sqlDataAccessTransaction);
                 }
             }
         }
 
-        return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{purchaseReturnPrefix}000001", 6, CodeType.PurchaseReturn);
+        return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{purchaseReturnPrefix}000001", 6, CodeType.PurchaseReturn, sqlDataAccessTransaction);
     }
 
-    public static async Task<string> GenerateItemIssueTransactionNo(ItemIssueModel transaction)
+    public static async Task<string> GenerateItemIssueTransactionNo(ItemIssueModel transaction, SqlDataAccessTransaction sqlDataAccessTransaction = null)
     {
-        var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, transaction.FinancialYearId);
-        var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId)).Code;
-        var itemIssuePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.ItemIssueTransactionPrefix)).Value;
+        var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, transaction.FinancialYearId, sqlDataAccessTransaction);
+        var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId, sqlDataAccessTransaction)).Code;
+        var itemIssuePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.ItemIssueTransactionPrefix, sqlDataAccessTransaction)).Value;
 
-        var lastItemIssue = await CommonData.LoadLastTableDataByFinancialYear<ItemIssueModel>(TableNames.ItemIssue, transaction.FinancialYearId);
+        var lastItemIssue = await CommonData.LoadLastTableDataByFinancialYear<ItemIssueModel>(TableNames.ItemIssue, transaction.FinancialYearId, sqlDataAccessTransaction);
         if (lastItemIssue is not null)
         {
             var lastTransactionNo = lastItemIssue.TransactionNo;
@@ -186,21 +187,21 @@ public static class GenerateCodes
                 if (int.TryParse(lastNumberPart, out int lastNumber))
                 {
                     int nextNumber = lastNumber + 1;
-                    return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{itemIssuePrefix}{nextNumber:D6}", 6, CodeType.ItemIssue);
+                    return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{itemIssuePrefix}{nextNumber:D6}", 6, CodeType.ItemIssue, sqlDataAccessTransaction);
                 }
             }
         }
 
-        return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{itemIssuePrefix}000001", 6, CodeType.ItemIssue);
+        return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{itemIssuePrefix}000001", 6, CodeType.ItemIssue, sqlDataAccessTransaction);
     }
 
-    public static async Task<string> GenerateServiceTransactionNo(ServiceModel transaction)
+    public static async Task<string> GenerateServiceTransactionNo(ServiceModel transaction, SqlDataAccessTransaction sqlDataAccessTransaction = null)
     {
-        var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, transaction.FinancialYearId);
-        var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId)).Code;
-        var servicePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.ServiceTransactionPrefix)).Value;
+        var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, transaction.FinancialYearId, sqlDataAccessTransaction);
+        var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId, sqlDataAccessTransaction)).Code;
+        var servicePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.ServiceTransactionPrefix, sqlDataAccessTransaction)).Value;
 
-        var lastService = await CommonData.LoadLastTableDataByFinancialYear<ServiceModel>(TableNames.Service, transaction.FinancialYearId);
+        var lastService = await CommonData.LoadLastTableDataByFinancialYear<ServiceModel>(TableNames.Service, transaction.FinancialYearId, sqlDataAccessTransaction);
         if (lastService is not null)
         {
             var lastTransactionNo = lastService.TransactionNo;
@@ -210,12 +211,12 @@ public static class GenerateCodes
                 if (int.TryParse(lastNumberPart, out int lastNumber))
                 {
                     int nextNumber = lastNumber + 1;
-                    return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{servicePrefix}{nextNumber:D6}", 6, CodeType.Service);
+                    return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{servicePrefix}{nextNumber:D6}", 6, CodeType.Service, sqlDataAccessTransaction);
                 }
             }
         }
 
-        return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{servicePrefix}000001", 6, CodeType.Service);
+        return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{servicePrefix}000001", 6, CodeType.Service, sqlDataAccessTransaction);
     }
 
     public static async Task<string> GenerateItemStockAdjustmentTransactionNo(DateTime transactionDateTime)

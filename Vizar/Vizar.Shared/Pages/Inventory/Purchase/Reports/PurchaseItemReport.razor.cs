@@ -6,11 +6,13 @@ using Syncfusion.Blazor.Grids;
 using Vizar.Shared.Components.Dialog;
 
 using VizarLibrary.Data.Common;
+using VizarLibrary.Data.Operations;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Inventory.Purchase;
+using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
-using VizarLibrary.Models.Common;
 using VizarLibrary.Models.Inventory.Purchase;
+using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages.Inventory.Purchase.Reports;
 
@@ -272,20 +274,24 @@ public partial class PurchaseItemReport : IAsyncDisposable
         {
             _isProcessing = true;
             StateHasChanged();
-            await _toastNotification.ShowAsync("Exporting", "Generating Excel file...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing", "Generating Excel file...", ToastType.Info);
 
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var (stream, fileName) = await PurchaseItemReportExcelExport.ExportReport(
+            var (stream, fileName) = await PurchaseReportExport.ExportItemReport(
                     _transactionOverviews,
+                    ReportExportType.Excel,
                     dateRangeStart,
                     dateRangeEnd,
                     _showAllColumns,
-                    _showSummary
+                    _showSummary,
+                    _selectedParty?.Id > 0 ? _selectedParty : null,
+                    _selectedCompany?.Id > 0 ? _selectedCompany : null
                 );
+
             await SaveAndViewService.SaveAndView(fileName, stream);
-            await _toastNotification.ShowAsync("Exported", "Excel file downloaded successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Success", "Excel file downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -307,20 +313,24 @@ public partial class PurchaseItemReport : IAsyncDisposable
         {
             _isProcessing = true;
             StateHasChanged();
-            await _toastNotification.ShowAsync("Exporting", "Generating PDF file...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing", "Generating PDF file...", ToastType.Info);
 
             DateOnly? dateRangeStart = _fromDate != default ? DateOnly.FromDateTime(_fromDate) : null;
             DateOnly? dateRangeEnd = _toDate != default ? DateOnly.FromDateTime(_toDate) : null;
 
-            var (stream, fileName) = await PurchaseItemReportPDFExport.ExportReport(
+            var (stream, fileName) = await PurchaseReportExport.ExportItemReport(
                     _transactionOverviews,
+                    ReportExportType.PDF,
                     dateRangeStart,
                     dateRangeEnd,
                     _showAllColumns,
-                    _showSummary
+                    _showSummary,
+                    _selectedParty?.Id > 0 ? _selectedParty : null,
+                    _selectedCompany?.Id > 0 ? _selectedCompany : null
                 );
+
             await SaveAndViewService.SaveAndView(fileName, stream);
-            await _toastNotification.ShowAsync("Exported", "PDF file downloaded successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Success", "PDF file downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -404,12 +414,12 @@ public partial class PurchaseItemReport : IAsyncDisposable
 
             if (isPurchaseReturn)
             {
-                var (pdfStream, fileName) = await PurchaseReturnInvoicePDFExport.ExportInvoice(actualId);
+                var (pdfStream, fileName) = await PurchaseReturnInvoiceExport.ExportInvoice(actualId, InvoiceExportType.PDF);
                 await SaveAndViewService.SaveAndView(fileName, pdfStream);
             }
             else
             {
-                var (pdfStream, fileName) = await PurchaseInvoicePDFExport.ExportInvoice(actualId);
+                var (pdfStream, fileName) = await PurchaseInvoiceExport.ExportInvoice(actualId, InvoiceExportType.PDF);
                 await SaveAndViewService.SaveAndView(fileName, pdfStream);
             }
 
@@ -442,12 +452,12 @@ public partial class PurchaseItemReport : IAsyncDisposable
 
             if (isPurchaseReturn)
             {
-                var (excelStream, fileName) = await PurchaseReturnInvoiceExcelExport.ExportInvoice(actualId);
+                var (excelStream, fileName) = await PurchaseReturnInvoiceExport.ExportInvoice(actualId, InvoiceExportType.Excel);
                 await SaveAndViewService.SaveAndView(fileName, excelStream);
             }
             else
             {
-                var (excelStream, fileName) = await PurchaseInvoiceExcelExport.ExportInvoice(actualId);
+                var (excelStream, fileName) = await PurchaseInvoiceExport.ExportInvoice(actualId, InvoiceExportType.Excel);
                 await SaveAndViewService.SaveAndView(fileName, excelStream);
             }
 
@@ -506,7 +516,7 @@ public partial class PurchaseItemReport : IAsyncDisposable
     private void NavigateToDashboard() =>
         NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 
-    private async Task NavigateBack() =>
+    private void NavigateBack() =>
         NavigationManager.NavigateTo(PageRouteNames.InventoryDashboard);
 
     private async Task Logout() =>
@@ -527,7 +537,7 @@ public partial class PurchaseItemReport : IAsyncDisposable
         try
         {
             while (await _autoRefreshTimer.WaitForNextTickAsync(cancellationToken))
-                await InvokeAsync(LoadTransactionOverviews);
+                await LoadTransactionOverviews();
         }
         catch (OperationCanceledException)
         {

@@ -9,17 +9,19 @@ using Vizar.Shared.Components.Dialog;
 
 using VizarLibrary.Data.Accounts.Masters;
 using VizarLibrary.Data.Common;
-using VizarLibrary.Data.Inventory.Item;
 using VizarLibrary.Data.Inventory.ItemIssue;
 using VizarLibrary.Data.Inventory.Purchase;
+using VizarLibrary.Data.Inventory.Stock;
+using VizarLibrary.Data.Operations;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Inventory.ItemIssue;
+using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
-using VizarLibrary.Models.Common;
 using VizarLibrary.Models.Fleet.Service;
 using VizarLibrary.Models.Fleet.Vehicle;
 using VizarLibrary.Models.Inventory.Item;
 using VizarLibrary.Models.Inventory.ItemIssue;
+using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages.Inventory.ItemIssue;
 
@@ -713,7 +715,7 @@ public partial class ItemIssuePage : IAsyncDisposable
             return false;
         }
 
-        if (_selectedFinancialYear.Status == false)
+        if (!_selectedFinancialYear.Status)
         {
             await _toastNotification.ShowAsync("Financial Year Inactive", "The financial year for the selected transaction date is inactive. Please select a different date.", ToastType.Error);
             return false;
@@ -811,10 +813,11 @@ public partial class ItemIssuePage : IAsyncDisposable
             _itemIssue.LastModifiedBy = _user.Id;
 
             _itemIssue.Id = await ItemIssueData.SaveTransaction(_itemIssue, _cart);
-            var (pdfStream, fileName) = await ItemIssueInvoicePDFExport.ExportInvoice(_itemIssue.Id);
+
+            var (pdfStream, fileName) = await ItemIssueInvoiceExport.ExportInvoice(_itemIssue.Id, InvoiceExportType.PDF);
             await SaveAndViewService.SaveAndView(fileName, pdfStream);
-            await DeleteLocalFiles();
-            NavigationManager.NavigateTo(PageRouteNames.ItemIssue, true);
+
+            await ResetPage();
 
             await _toastNotification.ShowAsync("Save Transaction", "Transaction saved successfully! Invoice has been generated.", ToastType.Success);
         }
@@ -882,8 +885,10 @@ public partial class ItemIssuePage : IAsyncDisposable
             _isProcessing = true;
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Generating PDF invoice...", ToastType.Info);
-            var (pdfStream, fileName) = await ItemIssueInvoicePDFExport.ExportInvoice(Id.Value);
+
+            var (pdfStream, fileName) = await ItemIssueInvoiceExport.ExportInvoice(_itemIssue.Id, InvoiceExportType.PDF);
             await SaveAndViewService.SaveAndView(fileName, pdfStream);
+
             await _toastNotification.ShowAsync("Invoice Downloaded", "The PDF invoice has been downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
@@ -912,8 +917,10 @@ public partial class ItemIssuePage : IAsyncDisposable
             _isProcessing = true;
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Generating Excel invoice...", ToastType.Info);
-            var (excelStream, fileName) = await ItemIssueInvoiceExcelExport.ExportInvoice(Id.Value);
+
+            var (excelStream, fileName) = await ItemIssueInvoiceExport.ExportInvoice(_itemIssue.Id, InvoiceExportType.Excel);
             await SaveAndViewService.SaveAndView(fileName, excelStream);
+
             await _toastNotification.ShowAsync("Invoice Downloaded", "The Excel invoice has been downloaded successfully.", ToastType.Success);
         }
         catch (Exception ex)
@@ -929,7 +936,7 @@ public partial class ItemIssuePage : IAsyncDisposable
     private void NavigateToDashboard() =>
         NavigationManager.NavigateTo(PageRouteNames.Dashboard);
 
-    private async Task NavigateBack() =>
+    private void NavigateBack() =>
         NavigationManager.NavigateTo(PageRouteNames.InventoryDashboard);
 
     private async Task Logout() =>
