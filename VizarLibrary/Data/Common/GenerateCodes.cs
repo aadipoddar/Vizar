@@ -3,6 +3,7 @@ using VizarLibrary.Data.Operations;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Models.Accounts.FinancialAccounting;
 using VizarLibrary.Models.Accounts.Masters;
+using VizarLibrary.Models.Fleet.Document;
 using VizarLibrary.Models.Fleet.Service;
 using VizarLibrary.Models.Fleet.Vehicle;
 using VizarLibrary.Models.Inventory.Item;
@@ -25,6 +26,7 @@ public static class GenerateCodes
         Item,
         ItemType,
         ItemCategory,
+        DocumentType,
         Manufacturer,
         VehicleType
     }
@@ -68,6 +70,10 @@ public static class GenerateCodes
                 case CodeType.ItemCategory:
                     var itemCategory = await CommonData.LoadTableDataByCode<ItemCategoryModel>(TableNames.ItemCategory, code, sqlDataAccessTransaction);
                     isDuplicate = itemCategory is not null;
+                    break;
+                case CodeType.DocumentType:
+                    var documentType = await CommonData.LoadTableDataByCode<DocumentTypeModel>(TableNames.DocumentType, code, sqlDataAccessTransaction);
+                    isDuplicate = documentType is not null;
                     break;
                 case CodeType.ItemType:
                     var itemType = await CommonData.LoadTableDataByCode<ItemTypeModel>(TableNames.ItemType, code, sqlDataAccessTransaction);
@@ -321,6 +327,29 @@ public static class GenerateCodes
         }
 
         return await CheckDuplicateCode($"{itemCategoryPrefix}000001", 6, CodeType.ItemCategory);
+    }
+
+    public static async Task<string> GenerateDocumentTypeCode()
+    {
+        var documentTypes = await CommonData.LoadTableData<DocumentTypeModel>(TableNames.DocumentType);
+        var documentTypePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.DocumentTypeCodePrefix)).Value;
+
+        var lastDocumentType = documentTypes.OrderByDescending(r => r.Id).FirstOrDefault();
+        if (lastDocumentType is not null)
+        {
+            var lastDocumentTypeCode = lastDocumentType.Code;
+            if (lastDocumentTypeCode.StartsWith(documentTypePrefix))
+            {
+                var lastNumberPart = lastDocumentTypeCode[documentTypePrefix.Length..];
+                if (int.TryParse(lastNumberPart, out int lastNumber))
+                {
+                    int nextNumber = lastNumber + 1;
+                    return await CheckDuplicateCode($"{documentTypePrefix}{nextNumber:D6}", 6, CodeType.DocumentType);
+                }
+            }
+        }
+
+        return await CheckDuplicateCode($"{documentTypePrefix}000001", 6, CodeType.DocumentType);
     }
 
     public static async Task<string> GenerateManufacturerCode()

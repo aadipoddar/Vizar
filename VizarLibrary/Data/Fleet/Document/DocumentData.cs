@@ -8,6 +8,9 @@ namespace VizarLibrary.Data.Fleet.Document;
 
 public static class DocumentData
 {
+    public static async Task<int> InsertDocumentType(DocumentTypeModel documentType) =>
+        (await SqlDataAccess.LoadData<int, dynamic>(StoredProcedureNames.InsertDocumentType, documentType)).FirstOrDefault();
+
     private static async Task<int> InsertDocument(DocumentModel document) =>
         (await SqlDataAccess.LoadData<int, dynamic>(StoredProcedureNames.InsertDocument, document)).FirstOrDefault();
 
