@@ -1,7 +1,7 @@
 ﻿using VizarLibrary.DataAccess;
 using VizarLibrary.Models.Fleet.Vehicle;
 
-namespace VizarLibrary.Data.Fleet.Vehicle;
+namespace VizarLibrary.Data.Fleet.Masters;
 
 public static class VehicleData
 {

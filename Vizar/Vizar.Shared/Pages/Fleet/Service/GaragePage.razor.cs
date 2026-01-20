@@ -3,35 +3,35 @@ using Syncfusion.Blazor.Grids;
 using Vizar.Shared.Components.Dialog;
 
 using VizarLibrary.Data.Common;
-using VizarLibrary.Data.Inventory.Masters;
+using VizarLibrary.Data.Fleet.Masters;
 using VizarLibrary.DataAccess;
-using VizarLibrary.Exporting.Inventory.Masters;
+using VizarLibrary.Exporting.Fleet.Service;
 using VizarLibrary.Exporting.Utils;
-using VizarLibrary.Models.Inventory.Item;
+using VizarLibrary.Models.Fleet.Service;
 using VizarLibrary.Models.Operations;
 
-namespace Vizar.Shared.Pages.Inventory.Masters;
+namespace Vizar.Shared.Pages.Fleet.Service;
 
-public partial class ItemCategoryPage : IAsyncDisposable
+public partial class GaragePage : IAsyncDisposable
 {
     private HotKeysContext _hotKeysContext;
     private bool _isLoading = true;
     private bool _isProcessing = false;
     private bool _showDeleted = false;
 
-    private ItemCategoryModel _itemCategory = new();
+    private GarageModel _garage = new();
 
-    private List<ItemCategoryModel> _itemCategories = [];
+    private List<GarageModel> _garages = [];
 
-    private SfGrid<ItemCategoryModel> _sfGrid;
+    private SfGrid<GarageModel> _sfGrid;
     private DeleteConfirmationDialog _deleteConfirmationDialog;
     private RecoverConfirmationDialog _recoverConfirmationDialog;
 
-    private int _deleteItemCategoryId = 0;
-    private string _deleteItemCategoryName = string.Empty;
+    private int _deleteGarageId = 0;
+    private string _deleteGarageName = string.Empty;
 
-    private int _recoverItemCategoryId = 0;
-    private string _recoverItemCategoryName = string.Empty;
+    private int _recoverGarageId = 0;
+    private string _recoverGarageName = string.Empty;
 
     private ToastNotification _toastNotification;
 
@@ -50,7 +50,7 @@ public partial class ItemCategoryPage : IAsyncDisposable
     private async Task LoadData()
     {
         _hotKeysContext = HotKeys.CreateContext()
-            .Add(ModCode.Ctrl, Code.S, SaveItemCategory, "Save", Exclude.None)
+            .Add(ModCode.Ctrl, Code.S, SaveGarage, "Save", Exclude.None)
             .Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
             .Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
             .Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
@@ -60,10 +60,10 @@ public partial class ItemCategoryPage : IAsyncDisposable
             .Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
             .Add(Code.Delete, DeleteSelectedItem, "Delete selected", Exclude.None);
 
-        _itemCategories = await CommonData.LoadTableData<ItemCategoryModel>(TableNames.ItemCategory);
+        _garages = await CommonData.LoadTableData<GarageModel>(TableNames.Garage);
 
         if (!_showDeleted)
-            _itemCategories = [.. _itemCategories.Where(l => l.Status)];
+            _garages = [.. _garages.Where(l => l.Status)];
 
         if (_sfGrid is not null)
             await _sfGrid.Refresh();
@@ -71,15 +71,14 @@ public partial class ItemCategoryPage : IAsyncDisposable
     #endregion
 
     #region Actions
-    private void OnEditItemCategory(ItemCategoryModel itemCategory)
+    private void OnEditGarage(GarageModel garage)
     {
-        _itemCategory = new()
+        _garage = new()
         {
-            Id = itemCategory.Id,
-            Name = itemCategory.Name,
-            Code = itemCategory.Code,
-            Remarks = itemCategory.Remarks,
-            Status = itemCategory.Status
+            Id = garage.Id,
+            Name = garage.Name,
+            Remarks = garage.Remarks,
+            Status = garage.Status
         };
 
         StateHasChanged();
@@ -87,15 +86,15 @@ public partial class ItemCategoryPage : IAsyncDisposable
 
     private async Task ShowDeleteConfirmation(int id, string name)
     {
-        _deleteItemCategoryId = id;
-        _deleteItemCategoryName = name;
+        _deleteGarageId = id;
+        _deleteGarageName = name;
         await _deleteConfirmationDialog.ShowAsync();
     }
 
     private async Task CancelDelete()
     {
-        _deleteItemCategoryId = 0;
-        _deleteItemCategoryName = string.Empty;
+        _deleteGarageId = 0;
+        _deleteGarageName = string.Empty;
         await _deleteConfirmationDialog.HideAsync();
     }
 
@@ -106,42 +105,42 @@ public partial class ItemCategoryPage : IAsyncDisposable
             _isProcessing = true;
             await _deleteConfirmationDialog.HideAsync();
 
-            var itemCategory = _itemCategories.FirstOrDefault(l => l.Id == _deleteItemCategoryId);
-            if (itemCategory == null)
+            var garage = _garages.FirstOrDefault(l => l.Id == _deleteGarageId);
+            if (garage == null)
             {
-                await _toastNotification.ShowAsync("Error", "Item Category not found.", ToastType.Error);
+                await _toastNotification.ShowAsync("Error", "Garage not found.", ToastType.Error);
                 return;
             }
 
-            itemCategory.Status = false;
-            await ItemData.InsertItemCategory(itemCategory);
+            garage.Status = false;
+            await GarageData.InsertGarage(garage);
 
-            await _toastNotification.ShowAsync("Deleted", $"Item Category '{itemCategory.Name}' has been deleted successfully.", ToastType.Success);
-            NavigationManager.NavigateTo(PageRouteNames.AdminItemCategory, true);
+            await _toastNotification.ShowAsync("Deleted", $"Garage '{garage.Name}' has been deleted successfully.", ToastType.Success);
+            NavigationManager.NavigateTo(PageRouteNames.AdminGarage, true);
         }
         catch (Exception ex)
         {
-            await _toastNotification.ShowAsync("Error", $"Failed to delete Item Category: {ex.Message}", ToastType.Error);
+            await _toastNotification.ShowAsync("Error", $"Failed to delete Garage: {ex.Message}", ToastType.Error);
         }
         finally
         {
             _isProcessing = false;
-            _deleteItemCategoryId = 0;
-            _deleteItemCategoryName = string.Empty;
+            _deleteGarageId = 0;
+            _deleteGarageName = string.Empty;
         }
     }
 
     private async Task ShowRecoverConfirmation(int id, string name)
     {
-        _recoverItemCategoryId = id;
-        _recoverItemCategoryName = name;
+        _recoverGarageId = id;
+        _recoverGarageName = name;
         await _recoverConfirmationDialog.ShowAsync();
     }
 
     private async Task CancelRecover()
     {
-        _recoverItemCategoryId = 0;
-        _recoverItemCategoryName = string.Empty;
+        _recoverGarageId = 0;
+        _recoverGarageName = string.Empty;
         await _recoverConfirmationDialog.HideAsync();
     }
 
@@ -158,28 +157,28 @@ public partial class ItemCategoryPage : IAsyncDisposable
             _isProcessing = true;
             await _recoverConfirmationDialog.HideAsync();
 
-            var itemCategory = _itemCategories.FirstOrDefault(l => l.Id == _recoverItemCategoryId);
-            if (itemCategory == null)
+            var garage = _garages.FirstOrDefault(l => l.Id == _recoverGarageId);
+            if (garage == null)
             {
-                await _toastNotification.ShowAsync("Error", "Item Category not found.", ToastType.Error);
+                await _toastNotification.ShowAsync("Error", "Garage not found.", ToastType.Error);
                 return;
             }
 
-            itemCategory.Status = true;
-            await ItemData.InsertItemCategory(itemCategory);
+            garage.Status = true;
+            await GarageData.InsertGarage(garage);
 
-            await _toastNotification.ShowAsync("Recovered", $"Item Category '{itemCategory.Name}' has been recovered successfully.", ToastType.Success);
-            NavigationManager.NavigateTo(PageRouteNames.AdminItemCategory, true);
+            await _toastNotification.ShowAsync("Recovered", $"Garage '{garage.Name}' has been recovered successfully.", ToastType.Success);
+            NavigationManager.NavigateTo(PageRouteNames.AdminGarage, true);
         }
         catch (Exception ex)
         {
-            await _toastNotification.ShowAsync("Error", $"Failed to recover Item Category: {ex.Message}", ToastType.Error);
+            await _toastNotification.ShowAsync("Error", $"Failed to recover Garage: {ex.Message}", ToastType.Error);
         }
         finally
         {
             _isProcessing = false;
-            _recoverItemCategoryId = 0;
-            _recoverItemCategoryName = string.Empty;
+            _recoverGarageId = 0;
+            _recoverGarageName = string.Empty;
         }
     }
     #endregion
@@ -187,40 +186,36 @@ public partial class ItemCategoryPage : IAsyncDisposable
     #region Saving
     private async Task<bool> ValidateForm()
     {
-        _itemCategory.Name = _itemCategory.Name?.Trim() ?? "";
-        _itemCategory.Name = _itemCategory.Name?.ToUpper() ?? "";
+        _garage.Name = _garage.Name?.Trim() ?? "";
+        _garage.Name = _garage.Name?.ToUpper() ?? "";
 
-        _itemCategory.Remarks = _itemCategory.Remarks?.Trim() ?? "";
-        _itemCategory.Status = true;
+        _garage.Remarks = _garage.Remarks?.Trim() ?? "";
+        _garage.Status = true;
 
-
-        if (_itemCategory.Id == 0)
-            _itemCategory.Code = await GenerateCodes.GenerateItemCategoryCode();
-
-        if (string.IsNullOrWhiteSpace(_itemCategory.Name))
+        if (string.IsNullOrWhiteSpace(_garage.Name))
         {
-            await _toastNotification.ShowAsync("Validation", "Item Category name is required. Please enter a valid name.", ToastType.Warning);
+            await _toastNotification.ShowAsync("Validation", "Garage name is required. Please enter a valid name.", ToastType.Warning);
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(_itemCategory.Remarks))
-            _itemCategory.Remarks = null;
+        if (string.IsNullOrWhiteSpace(_garage.Remarks))
+            _garage.Remarks = null;
 
-        if (_itemCategory.Id > 0)
+        if (_garage.Id > 0)
         {
-            var existingRawMaterialCategory = _itemCategories.FirstOrDefault(_ => _.Id != _itemCategory.Id && _.Name.Equals(_itemCategory.Name, StringComparison.OrdinalIgnoreCase));
-            if (existingRawMaterialCategory is not null)
+            var existingGarage = _garages.FirstOrDefault(_ => _.Id != _garage.Id && _.Name.Equals(_garage.Name, StringComparison.OrdinalIgnoreCase));
+            if (existingGarage is not null)
             {
-                await _toastNotification.ShowAsync("Duplicate", $"Item Category name '{_itemCategory.Name}' already exists. Please choose a different name.", ToastType.Warning);
+                await _toastNotification.ShowAsync("Duplicate", $"Garage name '{_garage.Name}' already exists. Please choose a different name.", ToastType.Warning);
                 return false;
             }
         }
         else
         {
-            var existingRawMaterialCategory = _itemCategories.FirstOrDefault(_ => _.Name.Equals(_itemCategory.Name, StringComparison.OrdinalIgnoreCase));
-            if (existingRawMaterialCategory is not null)
+            var existingGarage = _garages.FirstOrDefault(_ => _.Name.Equals(_garage.Name, StringComparison.OrdinalIgnoreCase));
+            if (existingGarage is not null)
             {
-                await _toastNotification.ShowAsync("Duplicate", $"Item Category name '{_itemCategory.Name}' already exists. Please choose a different name.", ToastType.Warning);
+                await _toastNotification.ShowAsync("Duplicate", $"Garage name '{_garage.Name}' already exists. Please choose a different name.", ToastType.Warning);
                 return false;
             }
         }
@@ -228,7 +223,7 @@ public partial class ItemCategoryPage : IAsyncDisposable
         return true;
     }
 
-    private async Task SaveItemCategory()
+    private async Task SaveGarage()
     {
         if (_isProcessing)
             return;
@@ -244,16 +239,16 @@ public partial class ItemCategoryPage : IAsyncDisposable
                 return;
             }
 
-            await _toastNotification.ShowAsync("Processing", "Please wait while the category is being saved...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing", "Please wait while the garage is being saved...", ToastType.Info);
 
-            await ItemData.InsertItemCategory(_itemCategory);
+            await GarageData.InsertGarage(_garage);
 
-            await _toastNotification.ShowAsync("Saved", $"Item Category '{_itemCategory.Name}' has been saved successfully.", ToastType.Success);
-            NavigationManager.NavigateTo(PageRouteNames.AdminItemCategory, true);
+            await _toastNotification.ShowAsync("Saved", $"Garage '{_garage.Name}' has been saved successfully.", ToastType.Success);
+            NavigationManager.NavigateTo(PageRouteNames.AdminGarage, true);
         }
         catch (Exception ex)
         {
-            await _toastNotification.ShowAsync("Error", $"Failed to save Item Category: {ex.Message}", ToastType.Error);
+            await _toastNotification.ShowAsync("Error", $"Failed to save Garage: {ex.Message}", ToastType.Error);
         }
         finally
         {
@@ -274,10 +269,10 @@ public partial class ItemCategoryPage : IAsyncDisposable
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Please wait while the report is being exported...", ToastType.Info);
 
-            var (stream, fileName) = await ItemCategoryExport.ExportMaster(_itemCategories, ReportExportType.Excel);
+            var (stream, fileName) = await GarageExport.ExportMaster(_garages, ReportExportType.Excel);
             await SaveAndViewService.SaveAndView(fileName, stream);
 
-            await _toastNotification.ShowAsync("Success", "Item Category data exported to Excel successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Success", "Garage data exported to Excel successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -301,10 +296,10 @@ public partial class ItemCategoryPage : IAsyncDisposable
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Please wait while the report is being exported...", ToastType.Info);
 
-            var (stream, fileName) = await ItemCategoryExport.ExportMaster(_itemCategories, ReportExportType.PDF);
+            var (stream, fileName) = await GarageExport.ExportMaster(_garages, ReportExportType.PDF);
             await SaveAndViewService.SaveAndView(fileName, stream);
 
-            await _toastNotification.ShowAsync("Success", "Item Category data exported to PDF successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Success", "Garage data exported to PDF successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -323,7 +318,7 @@ public partial class ItemCategoryPage : IAsyncDisposable
     {
         var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
         if (selectedRecords.Count > 0)
-            OnEditItemCategory(selectedRecords[0]);
+            OnEditGarage(selectedRecords[0]);
     }
 
     private async Task DeleteSelectedItem()
@@ -338,11 +333,11 @@ public partial class ItemCategoryPage : IAsyncDisposable
         }
     }
 
-    private async Task ResetPage() =>
-        NavigationManager.NavigateTo(PageRouteNames.AdminVoucher, true);
+    private void ResetPage() =>
+        NavigationManager.NavigateTo(PageRouteNames.AdminGarage, true);
 
     private void NavigateBack() =>
-        NavigationManager.NavigateTo(PageRouteNames.InventoryDashboard);
+        NavigationManager.NavigateTo(PageRouteNames.FleetDashboard);
 
     private void NavigateToDashboard() =>
         NavigationManager.NavigateTo(PageRouteNames.Dashboard);

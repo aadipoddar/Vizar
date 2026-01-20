@@ -3,15 +3,15 @@ using Syncfusion.Blazor.Grids;
 using Vizar.Shared.Components.Dialog;
 
 using VizarLibrary.Data.Common;
-using VizarLibrary.Data.Fleet.Vehicle;
+using VizarLibrary.Data.Fleet.Masters;
 using VizarLibrary.DataAccess;
-using VizarLibrary.Exporting.Fleet.Masters;
+using VizarLibrary.Exporting.Fleet.Vehicle;
 using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Fleet.Vehicle;
 using VizarLibrary.Models.Inventory.Item;
 using VizarLibrary.Models.Operations;
 
-namespace Vizar.Shared.Pages.Fleet.Masters;
+namespace Vizar.Shared.Pages.Fleet.Vehicle;
 
 public partial class VehicleModelPage : IAsyncDisposable
 {

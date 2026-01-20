@@ -1,9 +1,8 @@
-
 using VizarLibrary.Data.Common;
 using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Fleet.Service;
 
-namespace VizarLibrary.Exporting.Fleet.Masters;
+namespace VizarLibrary.Exporting.Fleet.Service;
 
 public static class GarageExport
 {

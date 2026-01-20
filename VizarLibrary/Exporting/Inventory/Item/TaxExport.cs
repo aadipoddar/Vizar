@@ -2,7 +2,7 @@ using VizarLibrary.Data.Common;
 using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Inventory.Item;
 
-namespace VizarLibrary.Exporting.Inventory.Masters;
+namespace VizarLibrary.Exporting.Inventory.Item;
 
 public static class TaxExport
 {

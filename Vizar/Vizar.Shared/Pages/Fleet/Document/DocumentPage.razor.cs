@@ -537,7 +537,7 @@ public partial class DocumentPage : IAsyncDisposable
         }
     }
 
-    private async Task ResetPage() =>
+    private void ResetPage() =>
         NavigationManager.NavigateTo(PageRouteNames.Document, true);
 
     private void NavigateBack() =>

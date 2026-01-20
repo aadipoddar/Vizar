@@ -3,35 +3,35 @@ using Syncfusion.Blazor.Grids;
 using Vizar.Shared.Components.Dialog;
 
 using VizarLibrary.Data.Common;
-using VizarLibrary.Data.Fleet.Vehicle;
+using VizarLibrary.Data.Inventory.Item;
 using VizarLibrary.DataAccess;
-using VizarLibrary.Exporting.Fleet.Masters;
+using VizarLibrary.Exporting.Inventory.Item;
 using VizarLibrary.Exporting.Utils;
-using VizarLibrary.Models.Fleet.Vehicle;
+using VizarLibrary.Models.Inventory.Item;
 using VizarLibrary.Models.Operations;
 
-namespace Vizar.Shared.Pages.Fleet.Masters;
+namespace Vizar.Shared.Pages.Inventory.Item;
 
-public partial class VehicleTypePage : IAsyncDisposable
+public partial class ManufacturerPage : IAsyncDisposable
 {
     private HotKeysContext _hotKeysContext;
     private bool _isLoading = true;
     private bool _isProcessing = false;
     private bool _showDeleted = false;
 
-    private VehicleTypeModel _vehicleType = new();
+    private ManufacturerModel _manufacturer = new();
 
-    private List<VehicleTypeModel> _vehicleTypes = [];
+    private List<ManufacturerModel> _manufacturers = [];
 
-    private SfGrid<VehicleTypeModel> _sfGrid;
+    private SfGrid<ManufacturerModel> _sfGrid;
     private DeleteConfirmationDialog _deleteConfirmationDialog;
     private RecoverConfirmationDialog _recoverConfirmationDialog;
 
-    private int _deleteVehicleTypeId = 0;
-    private string _deleteVehicleTypeName = string.Empty;
+    private int _deleteManufacturerId = 0;
+    private string _deleteManufacturerName = string.Empty;
 
-    private int _recoverVehicleTypeId = 0;
-    private string _recoverVehicleTypeName = string.Empty;
+    private int _recoverManufacturerId = 0;
+    private string _recoverManufacturerName = string.Empty;
 
     private ToastNotification _toastNotification;
 
@@ -50,7 +50,7 @@ public partial class VehicleTypePage : IAsyncDisposable
     private async Task LoadData()
     {
         _hotKeysContext = HotKeys.CreateContext()
-            .Add(ModCode.Ctrl, Code.S, SaveVehicleType, "Save", Exclude.None)
+            .Add(ModCode.Ctrl, Code.S, SaveManufacturer, "Save", Exclude.None)
             .Add(ModCode.Ctrl, Code.E, ExportExcel, "Export Excel", Exclude.None)
             .Add(ModCode.Ctrl, Code.P, ExportPdf, "Export PDF", Exclude.None)
             .Add(ModCode.Ctrl, Code.N, ResetPage, "Reset the page", Exclude.None)
@@ -60,10 +60,10 @@ public partial class VehicleTypePage : IAsyncDisposable
             .Add(Code.Insert, EditSelectedItem, "Edit selected", Exclude.None)
             .Add(Code.Delete, DeleteSelectedItem, "Delete selected", Exclude.None);
 
-        _vehicleTypes = await CommonData.LoadTableData<VehicleTypeModel>(TableNames.VehicleType);
+        _manufacturers = await CommonData.LoadTableData<ManufacturerModel>(TableNames.Manufacturer);
 
         if (!_showDeleted)
-            _vehicleTypes = [.. _vehicleTypes.Where(l => l.Status)];
+            _manufacturers = [.. _manufacturers.Where(l => l.Status)];
 
         if (_sfGrid is not null)
             await _sfGrid.Refresh();
@@ -71,15 +71,15 @@ public partial class VehicleTypePage : IAsyncDisposable
     #endregion
 
     #region Actions
-    private void OnEditVehicleType(VehicleTypeModel vehicleType)
+    private void OnEditManufacturer(ManufacturerModel manufacturer)
     {
-        _vehicleType = new()
+        _manufacturer = new()
         {
-            Id = vehicleType.Id,
-            Name = vehicleType.Name,
-            Code = vehicleType.Code,
-            Remarks = vehicleType.Remarks,
-            Status = vehicleType.Status
+            Id = manufacturer.Id,
+            Name = manufacturer.Name,
+            Code = manufacturer.Code,
+            Remarks = manufacturer.Remarks,
+            Status = manufacturer.Status
         };
 
         StateHasChanged();
@@ -87,15 +87,15 @@ public partial class VehicleTypePage : IAsyncDisposable
 
     private async Task ShowDeleteConfirmation(int id, string name)
     {
-        _deleteVehicleTypeId = id;
-        _deleteVehicleTypeName = name;
+        _deleteManufacturerId = id;
+        _deleteManufacturerName = name;
         await _deleteConfirmationDialog.ShowAsync();
     }
 
     private async Task CancelDelete()
     {
-        _deleteVehicleTypeId = 0;
-        _deleteVehicleTypeName = string.Empty;
+        _deleteManufacturerId = 0;
+        _deleteManufacturerName = string.Empty;
         await _deleteConfirmationDialog.HideAsync();
     }
 
@@ -106,42 +106,42 @@ public partial class VehicleTypePage : IAsyncDisposable
             _isProcessing = true;
             await _deleteConfirmationDialog.HideAsync();
 
-            var vehicleType = _vehicleTypes.FirstOrDefault(l => l.Id == _deleteVehicleTypeId);
-            if (vehicleType == null)
+            var manufacturer = _manufacturers.FirstOrDefault(l => l.Id == _deleteManufacturerId);
+            if (manufacturer == null)
             {
-                await _toastNotification.ShowAsync("Error", "Vehicle Type not found.", ToastType.Error);
+                await _toastNotification.ShowAsync("Error", "Manufacturer not found.", ToastType.Error);
                 return;
             }
 
-            vehicleType.Status = false;
-            await VehicleData.InsertVehicleType(vehicleType);
+            manufacturer.Status = false;
+            await ItemData.InsertManufacturer(manufacturer);
 
-            await _toastNotification.ShowAsync("Deleted", $"Vehicle Type '{vehicleType.Name}' has been deleted successfully.", ToastType.Success);
-            NavigationManager.NavigateTo(PageRouteNames.AdminVehicleType, true);
+            await _toastNotification.ShowAsync("Deleted", $"Manufacturer '{manufacturer.Name}' has been deleted successfully.", ToastType.Success);
+            NavigationManager.NavigateTo(PageRouteNames.AdminManufacturer, true);
         }
         catch (Exception ex)
         {
-            await _toastNotification.ShowAsync("Error", $"Failed to delete Vehicle Type: {ex.Message}", ToastType.Error);
+            await _toastNotification.ShowAsync("Error", $"Failed to delete Manufacturer: {ex.Message}", ToastType.Error);
         }
         finally
         {
             _isProcessing = false;
-            _deleteVehicleTypeId = 0;
-            _deleteVehicleTypeName = string.Empty;
+            _deleteManufacturerId = 0;
+            _deleteManufacturerName = string.Empty;
         }
     }
 
     private async Task ShowRecoverConfirmation(int id, string name)
     {
-        _recoverVehicleTypeId = id;
-        _recoverVehicleTypeName = name;
+        _recoverManufacturerId = id;
+        _recoverManufacturerName = name;
         await _recoverConfirmationDialog.ShowAsync();
     }
 
     private async Task CancelRecover()
     {
-        _recoverVehicleTypeId = 0;
-        _recoverVehicleTypeName = string.Empty;
+        _recoverManufacturerId = 0;
+        _recoverManufacturerName = string.Empty;
         await _recoverConfirmationDialog.HideAsync();
     }
 
@@ -158,28 +158,28 @@ public partial class VehicleTypePage : IAsyncDisposable
             _isProcessing = true;
             await _recoverConfirmationDialog.HideAsync();
 
-            var vehicleType = _vehicleTypes.FirstOrDefault(l => l.Id == _recoverVehicleTypeId);
-            if (vehicleType == null)
+            var manufacturer = _manufacturers.FirstOrDefault(l => l.Id == _recoverManufacturerId);
+            if (manufacturer == null)
             {
-                await _toastNotification.ShowAsync("Error", "Vehicle Type not found.", ToastType.Error);
+                await _toastNotification.ShowAsync("Error", "Manufacturer not found.", ToastType.Error);
                 return;
             }
 
-            vehicleType.Status = true;
-            await VehicleData.InsertVehicleType(vehicleType);
+            manufacturer.Status = true;
+            await ItemData.InsertManufacturer(manufacturer);
 
-            await _toastNotification.ShowAsync("Recovered", $"Vehicle Type '{vehicleType.Name}' has been recovered successfully.", ToastType.Success);
-            NavigationManager.NavigateTo(PageRouteNames.AdminVehicleType, true);
+            await _toastNotification.ShowAsync("Recovered", $"Manufacturer '{manufacturer.Name}' has been recovered successfully.", ToastType.Success);
+            NavigationManager.NavigateTo(PageRouteNames.AdminManufacturer, true);
         }
         catch (Exception ex)
         {
-            await _toastNotification.ShowAsync("Error", $"Failed to recover Vehicle Type: {ex.Message}", ToastType.Error);
+            await _toastNotification.ShowAsync("Error", $"Failed to recover Manufacturer: {ex.Message}", ToastType.Error);
         }
         finally
         {
             _isProcessing = false;
-            _recoverVehicleTypeId = 0;
-            _recoverVehicleTypeName = string.Empty;
+            _recoverManufacturerId = 0;
+            _recoverManufacturerName = string.Empty;
         }
     }
     #endregion
@@ -187,40 +187,40 @@ public partial class VehicleTypePage : IAsyncDisposable
     #region Saving
     private async Task<bool> ValidateForm()
     {
-        _vehicleType.Name = _vehicleType.Name?.Trim() ?? "";
-        _vehicleType.Name = _vehicleType.Name?.ToUpper() ?? "";
+        _manufacturer.Name = _manufacturer.Name?.Trim() ?? "";
+        _manufacturer.Name = _manufacturer.Name?.ToUpper() ?? "";
 
-        _vehicleType.Remarks = _vehicleType.Remarks?.Trim() ?? "";
-        _vehicleType.Status = true;
+        _manufacturer.Remarks = _manufacturer.Remarks?.Trim() ?? "";
+        _manufacturer.Status = true;
 
 
-        if (_vehicleType.Id == 0)
-            _vehicleType.Code = await GenerateCodes.GenerateVehicleTypeCode();
+        if (_manufacturer.Id == 0)
+            _manufacturer.Code = await GenerateCodes.GenerateManufacturerCode();
 
-        if (string.IsNullOrWhiteSpace(_vehicleType.Name))
+        if (string.IsNullOrWhiteSpace(_manufacturer.Name))
         {
-            await _toastNotification.ShowAsync("Validation", "Vehicle Type name is required. Please enter a valid name.", ToastType.Warning);
+            await _toastNotification.ShowAsync("Validation", "Manufacturer name is required. Please enter a valid name.", ToastType.Warning);
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(_vehicleType.Remarks))
-            _vehicleType.Remarks = null;
+        if (string.IsNullOrWhiteSpace(_manufacturer.Remarks))
+            _manufacturer.Remarks = null;
 
-        if (_vehicleType.Id > 0)
+        if (_manufacturer.Id > 0)
         {
-            var existingVehicleType = _vehicleTypes.FirstOrDefault(_ => _.Id != _vehicleType.Id && _.Name.Equals(_vehicleType.Name, StringComparison.OrdinalIgnoreCase));
-            if (existingVehicleType is not null)
+            var existingManufacturer = _manufacturers.FirstOrDefault(_ => _.Id != _manufacturer.Id && _.Name.Equals(_manufacturer.Name, StringComparison.OrdinalIgnoreCase));
+            if (existingManufacturer is not null)
             {
-                await _toastNotification.ShowAsync("Duplicate", $"Vehicle Type name '{_vehicleType.Name}' already exists. Please choose a different name.", ToastType.Warning);
+                await _toastNotification.ShowAsync("Duplicate", $"Manufacturer name '{_manufacturer.Name}' already exists. Please choose a different name.", ToastType.Warning);
                 return false;
             }
         }
         else
         {
-            var existingVehicleType = _vehicleTypes.FirstOrDefault(_ => _.Name.Equals(_vehicleType.Name, StringComparison.OrdinalIgnoreCase));
-            if (existingVehicleType is not null)
+            var existingManufacturer = _manufacturers.FirstOrDefault(_ => _.Name.Equals(_manufacturer.Name, StringComparison.OrdinalIgnoreCase));
+            if (existingManufacturer is not null)
             {
-                await _toastNotification.ShowAsync("Duplicate", $"Vehicle Type name '{_vehicleType.Name}' already exists. Please choose a different name.", ToastType.Warning);
+                await _toastNotification.ShowAsync("Duplicate", $"Manufacturer name '{_manufacturer.Name}' already exists. Please choose a different name.", ToastType.Warning);
                 return false;
             }
         }
@@ -228,7 +228,7 @@ public partial class VehicleTypePage : IAsyncDisposable
         return true;
     }
 
-    private async Task SaveVehicleType()
+    private async Task SaveManufacturer()
     {
         if (_isProcessing)
             return;
@@ -244,16 +244,16 @@ public partial class VehicleTypePage : IAsyncDisposable
                 return;
             }
 
-            await _toastNotification.ShowAsync("Processing", "Please wait while the vehicle type is being saved...", ToastType.Info);
+            await _toastNotification.ShowAsync("Processing", "Please wait while the manufacturer is being saved...", ToastType.Info);
 
-            await VehicleData.InsertVehicleType(_vehicleType);
+            await ItemData.InsertManufacturer(_manufacturer);
 
-            await _toastNotification.ShowAsync("Saved", $"Vehicle Type '{_vehicleType.Name}' has been saved successfully.", ToastType.Success);
-            NavigationManager.NavigateTo(PageRouteNames.AdminVehicleType, true);
+            await _toastNotification.ShowAsync("Saved", $"Manufacturer '{_manufacturer.Name}' has been saved successfully.", ToastType.Success);
+            NavigationManager.NavigateTo(PageRouteNames.AdminManufacturer, true);
         }
         catch (Exception ex)
         {
-            await _toastNotification.ShowAsync("Error", $"Failed to save Vehicle Type: {ex.Message}", ToastType.Error);
+            await _toastNotification.ShowAsync("Error", $"Failed to save Manufacturer: {ex.Message}", ToastType.Error);
         }
         finally
         {
@@ -274,10 +274,10 @@ public partial class VehicleTypePage : IAsyncDisposable
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Please wait while the report is being exported...", ToastType.Info);
 
-            var (stream, fileName) = await VehicleTypeExport.ExportMaster(_vehicleTypes, ReportExportType.Excel);
+            var (stream, fileName) = await ManufacturerExport.ExportMaster(_manufacturers, ReportExportType.Excel);
             await SaveAndViewService.SaveAndView(fileName, stream);
 
-            await _toastNotification.ShowAsync("Success", "Vehicle Type data exported to Excel successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Success", "Manufacturer data exported to Excel successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -301,10 +301,10 @@ public partial class VehicleTypePage : IAsyncDisposable
             StateHasChanged();
             await _toastNotification.ShowAsync("Processing", "Please wait while the report is being exported...", ToastType.Info);
 
-            var (stream, fileName) = await VehicleTypeExport.ExportMaster(_vehicleTypes, ReportExportType.PDF);
+            var (stream, fileName) = await ManufacturerExport.ExportMaster(_manufacturers, ReportExportType.PDF);
             await SaveAndViewService.SaveAndView(fileName, stream);
 
-            await _toastNotification.ShowAsync("Success", "Vehicle Type data exported to PDF successfully.", ToastType.Success);
+            await _toastNotification.ShowAsync("Success", "Manufacturer data exported to PDF successfully.", ToastType.Success);
         }
         catch (Exception ex)
         {
@@ -323,7 +323,7 @@ public partial class VehicleTypePage : IAsyncDisposable
     {
         var selectedRecords = await _sfGrid.GetSelectedRecordsAsync();
         if (selectedRecords.Count > 0)
-            OnEditVehicleType(selectedRecords[0]);
+            OnEditManufacturer(selectedRecords[0]);
     }
 
     private async Task DeleteSelectedItem()
@@ -339,10 +339,10 @@ public partial class VehicleTypePage : IAsyncDisposable
     }
 
     private async Task ResetPage() =>
-        NavigationManager.NavigateTo(PageRouteNames.AdminVehicleType, true);
+        NavigationManager.NavigateTo(PageRouteNames.AdminManufacturer, true);
 
     private void NavigateBack() =>
-        NavigationManager.NavigateTo(PageRouteNames.FleetDashboard);
+        NavigationManager.NavigateTo(PageRouteNames.InventoryDashboard);
 
     private void NavigateToDashboard() =>
         NavigationManager.NavigateTo(PageRouteNames.Dashboard);

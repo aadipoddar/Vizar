@@ -1,7 +1,7 @@
 ﻿using VizarLibrary.Data.Accounts.FinancialAccounting;
 using VizarLibrary.Data.Accounts.Masters;
 using VizarLibrary.Data.Common;
-using VizarLibrary.Data.Inventory.Masters;
+using VizarLibrary.Data.Inventory.Item;
 using VizarLibrary.Data.Inventory.Stock;
 using VizarLibrary.Data.Operations;
 using VizarLibrary.DataAccess;

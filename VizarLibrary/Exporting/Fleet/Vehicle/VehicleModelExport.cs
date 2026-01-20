@@ -4,7 +4,7 @@ using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Fleet.Vehicle;
 using VizarLibrary.Models.Inventory.Item;
 
-namespace VizarLibrary.Exporting.Fleet.Masters;
+namespace VizarLibrary.Exporting.Fleet.Vehicle;
 
 public static class VehicleModelExport
 {
