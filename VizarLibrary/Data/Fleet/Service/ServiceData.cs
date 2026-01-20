@@ -9,6 +9,9 @@ namespace VizarLibrary.Data.Fleet.Service;
 
 public static class ServiceData
 {
+    public static async Task<int> InsertServiceType(ServiceTypeModel serviceType) =>
+        (await SqlDataAccess.LoadData<int, dynamic>(StoredProcedureNames.InsertServiceType, serviceType)).FirstOrDefault();
+
     private static async Task<int> InsertService(ServiceModel service, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
         (await SqlDataAccess.LoadData<int, dynamic>(StoredProcedureNames.InsertService, service, sqlDataAccessTransaction)).FirstOrDefault();
 

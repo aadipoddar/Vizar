@@ -17,6 +17,7 @@ BEGIN
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ManufacturerCodePrefix'			, N'MFR'	, N'Prefix for Manufacturer Codes')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'VehicleTypeCodePrefix'			, N'VHTY'	, N'Prefix for Vehicle Type Codes')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'DocumentTypeCodePrefix'			, N'DCTY'	, N'Prefix for Document Type Codes')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ServiceTypeCodePrefix'			, N'SRTY'	, N'Prefix for Service Type Codes')
 
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'FinancialAccountingTransactionPrefix'	, N'FAT'	, N'Prefix for Financial Accounting Transaction Numbers')
 	

@@ -1,8 +1,8 @@
-﻿@page "/admin/document-type"
+﻿@page "/admin/service-type"
 
-@using VizarLibrary.Models.Fleet.Document
+@using VizarLibrary.Models.Fleet.Service
 
-<PageTitle>Document Type Management - Vizar</PageTitle>
+<PageTitle>Service Type Management - Vizar</PageTitle>
 
 @if (_isLoading)
 {
@@ -11,19 +11,19 @@
 else
 {
     <div style="display: flex; flex-direction: column; min-height: 100vh;">
-        <Header Title="Document Type Management" Subtitle="Manage document types and details" ShowHome="true" ShowBack="true" ShowLogout="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
+        <Header Title="Service Type Management" Subtitle="Manage service types and details" ShowHome="true" ShowBack="true" ShowLogout="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
             <RightContent>
                 <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Title="Export to Excel (Ctrl + E)" Disabled="_isProcessing" OnClick="ExportExcel" />
                 <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Title="Export to PDF (Ctrl + P)" Disabled="_isProcessing" OnClick="ExportPdf" />
-                <IconButton Icon="IconType.Save" Variant="ButtonVariant.Save" Title="Save Document Type (Ctrl + S)" Disabled="_isProcessing" OnClick="SaveDocumentType" />
-                <IconButton Icon="IconType.New" Title="New Document Type (Ctrl + N)" Disabled="_isProcessing" OnClick="ResetPage" />
+                <IconButton Icon="IconType.Save" Variant="ButtonVariant.Save" Title="Save Service Type (Ctrl + S)" Disabled="_isProcessing" OnClick="SaveServiceType" />
+                <IconButton Icon="IconType.New" Title="New Service Type (Ctrl + N)" Disabled="_isProcessing" OnClick="ResetPage" />
             </RightContent>
         </Header>
 
         <!-- Main Content Container -->
         <div class="page-container">
 
-        <!-- Document Type Entry Section -->
+        <!-- Service Type Entry Section -->
         <div class="section-card">
             <div class="section-header">
                 <div class="section-title-wrapper">
@@ -31,46 +31,46 @@ else
                          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" />
                     </svg>
-                    <h2 class="section-title">Document Type Details</h2>
+                    <h2 class="section-title">Service Type Details</h2>
                 </div>
             </div>
             <div class="section-body">
                 <div class="form-grid-triple">
-                    <!-- Document Type Name -->
+                    <!-- Service Type Name -->
                     <div class="form-field">
                         <label class="field-label">
-                            Document Type Name <span class="required">*</span>
+                            Service Type Name <span class="required">*</span>
                         </label>
-                        <SfTextBox @bind-Value="_documentType.Name" Placeholder="Enter document type name"
+                        <SfTextBox @bind-Value="_serviceType.Name" Placeholder="Enter service type name"
                                    FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                     </div>
 
                     <div class="form-field">
                         <label class="field-label">
-                            Document Type Code <span class="required">*</span>
+                            Service Type Code <span class="required">*</span>
                         </label>
-                        <SfTextBox Value="@_documentType.Code" Placeholder="Auto-generated" Readonly="true"
+                        <SfTextBox Value="@_serviceType.Code" Placeholder="Auto-generated" Readonly="true"
                                    FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                     </div>
 
                     <!-- Rate -->
                     <div class="form-field">
                         <label class="field-label">Rate</label>
-                        <SfNumericTextBox @bind-Value="_documentType.Rate" TValue="decimal" Format="0.00" 
+                        <SfNumericTextBox @bind-Value="_serviceType.Rate" TValue="decimal" Format="0.00" 
                                           Placeholder="Enter rate" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                     </div>
 
                     <!-- Remarks -->
                     <div class="form-field">
                         <label class="field-label">Remarks</label>
-                        <SfTextBox @bind-Value="_documentType.Remarks" Placeholder="Enter remarks (optional)" Multiline="true"
+                        <SfTextBox @bind-Value="_serviceType.Remarks" Placeholder="Enter remarks (optional)" Multiline="true"
                                    FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Document Types List Section -->
+        <!-- Service Types List Section -->
         <div class="section-card">
             <div class="section-header">
                 <div class="section-title-wrapper">
@@ -79,14 +79,14 @@ else
                         <path d="M9 11l3 3L22 4" />
                         <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                     </svg>
-                    <h2 class="section-title">Document Types List</h2>
+                    <h2 class="section-title">Service Types List</h2>
                 </div>
                 <div class="header-actions">
                     <ToggleDeletedButton Disabled="@_isProcessing" ShowDeleted="@_showDeleted" OnToggle="ToggleDeleted" />
                 </div>
             </div>
             <div class="section-body grid-body">
-                <SfGrid @ref="_sfGrid" DataSource="@_documentTypes" AllowPaging="true" AllowSorting="true" AllowFiltering="true"
+                <SfGrid @ref="_sfGrid" DataSource="@_serviceTypes" AllowPaging="true" AllowSorting="true" AllowFiltering="true"
                         AllowResizing="true" CssClass="professional-grid" Toolbar="@(new List<string>() { "Search" })">
                     <GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
                     <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
@@ -94,33 +94,33 @@ else
                         <GridColumn HeaderText="Actions" Width="120" TextAlign="TextAlign.Center" AllowFiltering="false">
                             <Template>
                                 @{
-                                    var documentType = (context as DocumentTypeModel);
+                                    var serviceType = (context as ServiceTypeModel);
 
                                     <div class="grid-actions">
-                                        @if (documentType.Status)
+                                        @if (serviceType.Status)
                                         {
-                                            <IconButton Icon="IconType.Edit" Variant="ButtonVariant.Edit" Size="ButtonSize.Grid" Title="Edit (Insert)" OnClick="@(() => OnEditDocumentType(documentType))" />
-                                            <IconButton Icon="IconType.Delete" Variant="ButtonVariant.Delete" Size="ButtonSize.Grid" Title="Delete (Delete)" OnClick="@(() => ShowDeleteConfirmation(documentType.Id, documentType.Name))" />
+                                            <IconButton Icon="IconType.Edit" Variant="ButtonVariant.Edit" Size="ButtonSize.Grid" Title="Edit (Insert)" OnClick="@(() => OnEditServiceType(serviceType))" />
+                                            <IconButton Icon="IconType.Delete" Variant="ButtonVariant.Delete" Size="ButtonSize.Grid" Title="Delete (Delete)" OnClick="@(() => ShowDeleteConfirmation(serviceType.Id, serviceType.Name))" />
                                         }
                                         else
                                         {
-                                            <IconButton Icon="IconType.Recover" Variant="ButtonVariant.Recover" Size="ButtonSize.Grid" Title="Recover (Delete)" OnClick="@(() => ShowRecoverConfirmation(documentType.Id, documentType.Name))" />
+                                            <IconButton Icon="IconType.Recover" Variant="ButtonVariant.Recover" Size="ButtonSize.Grid" Title="Recover (Delete)" OnClick="@(() => ShowRecoverConfirmation(serviceType.Id, serviceType.Name))" />
                                         }
                                     </div>
                                 }
                             </Template>
                         </GridColumn>
-                        <GridColumn Field="@nameof(DocumentTypeModel.Id)" HeaderText="ID" Width="80" TextAlign="TextAlign.Center" />
-                        <GridColumn Field="@nameof(DocumentTypeModel.Name)" HeaderText="Name" Width="300" />
-                        <GridColumn Field="@nameof(DocumentTypeModel.Code)" HeaderText="Code" Width="200" />
-                        <GridColumn Field="@nameof(DocumentTypeModel.Rate)" HeaderText="Rate" Format="#,##0.00" Width="150" TextAlign="TextAlign.Right" />
-                        <GridColumn Field="@nameof(DocumentTypeModel.Remarks)" HeaderText="Remarks" Width="300" />
-                        <GridColumn Field="@nameof(DocumentTypeModel.Status)" HeaderText="Status" Width="100" TextAlign="TextAlign.Center">
+                        <GridColumn Field="@nameof(ServiceTypeModel.Id)" HeaderText="ID" Width="80" TextAlign="TextAlign.Center" />
+                        <GridColumn Field="@nameof(ServiceTypeModel.Name)" HeaderText="Name" Width="300" />
+                        <GridColumn Field="@nameof(ServiceTypeModel.Code)" HeaderText="Code" Width="200" />
+                        <GridColumn Field="@nameof(ServiceTypeModel.Rate)" HeaderText="Rate" Format="#,##0.00" Width="150" TextAlign="TextAlign.Right" />
+                        <GridColumn Field="@nameof(ServiceTypeModel.Remarks)" HeaderText="Remarks" Width="300" />
+                        <GridColumn Field="@nameof(ServiceTypeModel.Status)" HeaderText="Status" Width="100" TextAlign="TextAlign.Center">
                             <Template>
                                 @{
-                                    var documentType = (context as DocumentTypeModel);
-                                    <div class="grid-checkbox" style="@(documentType.Status ? "color: #10b981; background: #d1fae5;" : "color: #dc2626; background: #fee2e2;")">
-                                        @(documentType.Status ? "✓" : "✗")
+                                    var serviceType = (context as ServiceTypeModel);
+                                    <div class="grid-checkbox" style="@(serviceType.Status ? "color: #10b981; background: #d1fae5;" : "color: #dc2626; background: #fee2e2;")">
+                                        @(serviceType.Status ? "✓" : "✗")
                                     </div>
                                 }
                             </Template>
@@ -137,18 +137,18 @@ else
 }
 
 <DeleteConfirmationDialog @ref="_deleteConfirmationDialog"
-                          EntityName="Document Type"
-                          IdentifierLabel="Document Type Name"
-                          IdentifierValue="@_deleteDocumentTypeName"
+                          EntityName="Service Type"
+                          IdentifierLabel="Service Type Name"
+                          IdentifierValue="@_deleteServiceTypeName"
                           IsPermanentDelete="false"
                           Disabled="@_isProcessing"
                           OnConfirm="ConfirmDelete"
                           OnCancel="CancelDelete" />
 
 <RecoverConfirmationDialog @ref="_recoverConfirmationDialog"
-                           EntityName="Document Type"
-                           IdentifierLabel="Document Type Name"
-                           IdentifierValue="@_recoverDocumentTypeName"
+                           EntityName="Service Type"
+                           IdentifierLabel="Service Type Name"
+                           IdentifierValue="@_recoverServiceTypeName"
                            Disabled="@_isProcessing"
                            OnConfirm="ConfirmRecover"
                            OnCancel="CancelRecover" />
@@ -298,5 +298,4 @@ else
         }
     }
 </style>
-
 

@@ -27,6 +27,7 @@ public static class GenerateCodes
         ItemType,
         ItemCategory,
         DocumentType,
+        ServiceType,
         Manufacturer,
         VehicleType
     }
@@ -74,6 +75,10 @@ public static class GenerateCodes
                 case CodeType.DocumentType:
                     var documentType = await CommonData.LoadTableDataByCode<DocumentTypeModel>(TableNames.DocumentType, code, sqlDataAccessTransaction);
                     isDuplicate = documentType is not null;
+                    break;
+                case CodeType.ServiceType:
+                    var serviceType = await CommonData.LoadTableDataByCode<ServiceTypeModel>(TableNames.ServiceType, code, sqlDataAccessTransaction);
+                    isDuplicate = serviceType is not null;
                     break;
                 case CodeType.ItemType:
                     var itemType = await CommonData.LoadTableDataByCode<ItemTypeModel>(TableNames.ItemType, code, sqlDataAccessTransaction);
@@ -350,6 +355,29 @@ public static class GenerateCodes
         }
 
         return await CheckDuplicateCode($"{documentTypePrefix}000001", 6, CodeType.DocumentType);
+    }
+
+    public static async Task<string> GenerateServiceTypeCode()
+    {
+        var serviceTypes = await CommonData.LoadTableData<ServiceTypeModel>(TableNames.ServiceType);
+        var serviceTypePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.ServiceTypeCodePrefix)).Value;
+
+        var lastServiceType = serviceTypes.OrderByDescending(r => r.Id).FirstOrDefault();
+        if (lastServiceType is not null)
+        {
+            var lastServiceTypeCode = lastServiceType.Code;
+            if (lastServiceTypeCode.StartsWith(serviceTypePrefix))
+            {
+                var lastNumberPart = lastServiceTypeCode[serviceTypePrefix.Length..];
+                if (int.TryParse(lastNumberPart, out int lastNumber))
+                {
+                    int nextNumber = lastNumber + 1;
+                    return await CheckDuplicateCode($"{serviceTypePrefix}{nextNumber:D6}", 6, CodeType.ServiceType);
+                }
+            }
+        }
+
+        return await CheckDuplicateCode($"{serviceTypePrefix}000001", 6, CodeType.ServiceType);
     }
 
     public static async Task<string> GenerateManufacturerCode()
