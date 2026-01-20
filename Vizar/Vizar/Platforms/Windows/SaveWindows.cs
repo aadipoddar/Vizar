@@ -1,4 +1,9 @@
-﻿namespace Vizar.Services;
+﻿using Windows.Storage;
+using Windows.Storage.Pickers;
+using Windows.Storage.Streams;
+using Windows.UI.Popups;
+
+namespace Vizar.Services;
 
 public partial class SaveService
 {
