@@ -149,9 +149,15 @@
 
     /* Login Card */
     .login-card {
-        background: var(--white);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
         border-radius: var(--border-radius);
-        box-shadow: var(--shadow);
+        box-shadow:
+            0 10px 40px rgba(59, 130, 246, 0.15),
+            0 20px 80px rgba(0, 0, 0, 0.08),
+            inset 0 1px 1px rgba(255, 255, 255, 0.9);
         padding: 48px 40px;
         width: 100%;
         max-width: 450px;
@@ -221,13 +227,23 @@
 
     :deep(.custom-textbox .e-input-group) {
         border-radius: 12px;
-        border: 2px solid var(--border-color);
-        transition: all 0.3s ease;
+        border: 1px solid rgba(226, 232, 240, 0.6);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(248, 250, 252, 0.6) 100%);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow:
+            0 1px 3px rgba(0, 0, 0, 0.05),
+            inset 0 1px 1px rgba(255, 255, 255, 0.5);
     }
 
     :deep(.custom-textbox .e-input-group:focus-within) {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        border-color: rgba(59, 130, 246, 0.5);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(239, 246, 255, 0.7) 100%);
+        box-shadow:
+            0 0 0 4px rgba(59, 130, 246, 0.1),
+            0 2px 8px rgba(59, 130, 246, 0.15),
+            inset 0 1px 1px rgba(255, 255, 255, 0.6);
     }
 
     :deep(.custom-textbox .e-input-group input) {
@@ -255,13 +271,23 @@
     :deep(.custom-otp .e-input-group) {
         flex: 1;
         border-radius: 12px;
-        border: 2px solid var(--border-color);
-        transition: all 0.3s ease;
+        border: 1px solid rgba(226, 232, 240, 0.6);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(248, 250, 252, 0.6) 100%);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow:
+            0 1px 3px rgba(0, 0, 0, 0.05),
+            inset 0 1px 1px rgba(255, 255, 255, 0.5);
     }
 
     :deep(.custom-otp .e-input-group:focus-within) {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        border-color: rgba(59, 130, 246, 0.5);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(239, 246, 255, 0.7) 100%);
+        box-shadow:
+            0 0 0 4px rgba(59, 130, 246, 0.1),
+            0 2px 8px rgba(59, 130, 246, 0.15),
+            inset 0 1px 1px rgba(255, 255, 255, 0.6);
     }
 
     :deep(.custom-otp .e-input-group input) {
@@ -287,33 +313,61 @@
     .btn-login {
         width: 100%;
         padding: 14px 24px;
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.9) 0%, rgba(37, 99, 235, 0.85) 100%);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         color: var(--white);
-        border: none;
+        border: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 12px;
         font-size: 16px;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow:
+            0 4px 16px rgba(59, 130, 246, 0.3),
+            0 8px 32px rgba(59, 130, 246, 0.2),
+            inset 0 1px 1px rgba(255, 255, 255, 0.3);
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-login::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 50%;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 100%);
+        border-radius: 12px 12px 0 0;
+        pointer-events: none;
     }
 
     .btn-login:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.95) 0%, rgba(29, 78, 216, 0.9) 100%);
+        transform: translateY(-2px) scale(1.01);
+        box-shadow:
+            0 6px 20px rgba(59, 130, 246, 0.4),
+            0 12px 40px rgba(59, 130, 246, 0.25),
+            inset 0 1px 1px rgba(255, 255, 255, 0.4);
     }
 
     .btn-login:active:not(:disabled) {
-        transform: translateY(0);
+        transform: translateY(0) scale(0.99);
+        box-shadow:
+            0 2px 8px rgba(59, 130, 246, 0.3),
+            inset 0 1px 1px rgba(255, 255, 255, 0.2);
+        transition: all 0.1s ease;
     }
 
     .btn-login:disabled {
         opacity: 0.7;
         cursor: not-allowed;
+        backdrop-filter: blur(10px);
     }
 
     /* Spinner */
