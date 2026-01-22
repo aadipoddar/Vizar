@@ -1,10 +1,8 @@
-html,
-body {
+html, body {
 	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-a,
-.btn-link {
+a, .btn-link {
 	color: #006bb7;
 }
 
@@ -14,11 +12,7 @@ a,
 	border-color: #1861ac;
 }
 
-.btn:focus,
-.btn:active:focus,
-.btn-link.nav-link:focus,
-.form-control:focus,
-.form-check-input:focus {
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
 	box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
@@ -48,22 +42,20 @@ h1:focus {
 	color: white;
 }
 
-.blazor-error-boundary::after {
-	content: "An error has occurred."
-}
+	.blazor-error-boundary::after {
+		content: "An error has occurred."
+	}
 
 .darker-border-checkbox.form-check-input {
 	border-color: #929292;
 }
 
-.form-floating>.form-control-plaintext::placeholder,
-.form-floating>.form-control::placeholder {
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
 	color: var(--bs-secondary-color);
 	text-align: end;
 }
 
-.form-floating>.form-control-plaintext:focus::placeholder,
-.form-floating>.form-control:focus::placeholder {
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
 	text-align: start;
 }
 
@@ -97,7 +89,7 @@ h1:focus {
 	padding: 16px 32px;
 	width: 100%;
 	margin: 0 auto;
-	background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
+	background: linear-gradient(135deg, #ffeef5 0%, #fff5f9 100%);
 	flex: 1;
 }
 
@@ -133,65 +125,65 @@ h1:focus {
 	width: 100%;
 }
 
-.custom-autocomplete .e-input-group,
-.custom-datepicker .e-input-group,
-.custom-textbox .e-input-group,
-.custom-numeric .e-input-group,
-.custom-daterange .e-input-group {
-	border: 1px solid #cbd5e1;
-	border-radius: 6px;
-	background: #ffffff;
-	transition: all 0.2s ease;
-	height: 40px;
-}
+	.custom-autocomplete .e-input-group,
+	.custom-datepicker .e-input-group,
+	.custom-textbox .e-input-group,
+	.custom-numeric .e-input-group,
+	.custom-daterange .e-input-group {
+		border: 1px solid #cbd5e1;
+		border-radius: 6px;
+		background: #ffffff;
+		transition: all 0.2s ease;
+		height: 40px;
+	}
 
-.custom-autocomplete .e-input-group:hover,
-.custom-datepicker .e-input-group:hover,
-.custom-textbox .e-input-group:hover,
-.custom-numeric .e-input-group:not(.e-disabled):hover,
-.custom-daterange .e-input-group:hover {
-	border-color: #94a3b8;
-}
+		.custom-autocomplete .e-input-group:hover,
+		.custom-datepicker .e-input-group:hover,
+		.custom-textbox .e-input-group:hover,
+		.custom-numeric .e-input-group:not(.e-disabled):hover,
+		.custom-daterange .e-input-group:hover {
+			border-color: #94a3b8;
+		}
 
-.custom-autocomplete .e-input-group.e-input-focus,
-.custom-datepicker .e-input-group.e-input-focus,
-.custom-textbox .e-input-group.e-input-focus,
-.custom-numeric .e-input-group.e-input-focus,
-.custom-daterange .e-input-group.e-input-focus {
-	border-color: #3b82f6;
-	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
+		.custom-autocomplete .e-input-group.e-input-focus,
+		.custom-datepicker .e-input-group.e-input-focus,
+		.custom-textbox .e-input-group.e-input-focus,
+		.custom-numeric .e-input-group.e-input-focus,
+		.custom-daterange .e-input-group.e-input-focus {
+			border-color: #3b82f6;
+			box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+		}
 
-.custom-autocomplete .e-input-group input,
-.custom-datepicker .e-input-group input,
-.custom-textbox .e-input-group input,
-.custom-textbox .e-input-group textarea,
-.custom-numeric .e-input-group input,
-.custom-daterange .e-input-group input {
-	font-size: 14px;
-	color: #1e293b;
-	padding: 8px 12px;
-}
+		.custom-autocomplete .e-input-group input,
+		.custom-datepicker .e-input-group input,
+		.custom-textbox .e-input-group input,
+		.custom-textbox .e-input-group textarea,
+		.custom-numeric .e-input-group input,
+		.custom-daterange .e-input-group input {
+			font-size: 14px;
+			color: #1e293b;
+			padding: 8px 12px;
+		}
 
-.custom-numeric .e-input-group input {
-	text-align: right;
-}
+		.custom-numeric .e-input-group input {
+			text-align: right;
+		}
 
-.custom-autocomplete .e-input-group input::placeholder,
-.custom-datepicker .e-input-group input::placeholder,
-.custom-textbox .e-input-group input::placeholder,
-.custom-textbox .e-input-group textarea::placeholder,
-.custom-numeric .e-input-group input::placeholder,
-.custom-daterange .e-input-group input::placeholder {
-	color: #94a3b8;
-}
+			.custom-autocomplete .e-input-group input::placeholder,
+			.custom-datepicker .e-input-group input::placeholder,
+			.custom-textbox .e-input-group input::placeholder,
+			.custom-textbox .e-input-group textarea::placeholder,
+			.custom-numeric .e-input-group input::placeholder,
+			.custom-daterange .e-input-group input::placeholder {
+				color: #94a3b8;
+			}
 
 .readonly-field .e-input-group {
 	background: #f8fafc;
 	cursor: not-allowed;
 }
 
-.readonly-field .e-input-group input {
-	color: #64748b;
-	font-weight: 500;
-}
+	.readonly-field .e-input-group input {
+		color: #64748b;
+		font-weight: 500;
+	}
