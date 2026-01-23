@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - vizar
+name: Build and deploy to Azure Web App - Vizar
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
   version-check:
     runs-on: ubuntu-latest
     outputs:
-      should-deploy: ${{ steps.version-compare.outputs.should-deploy }}
+      should-deploy: ${{ steps.final-decision.outputs.should-deploy }}
       current-version: ${{ steps.extract-version.outputs.version }}
     
     steps:
@@ -45,11 +45,43 @@ jobs:
           PREVIOUS="${{ steps.get-previous.outputs.previous }}"
           
           if [ "$CURRENT" != "$PREVIOUS" ]; then
+            echo "version-changed=true" >> $GITHUB_OUTPUT
+            echo "✅ Version changed: $PREVIOUS → $CURRENT"
+          else
+            echo "version-changed=false" >> $GITHUB_OUTPUT
+            echo "⏭️ Version unchanged ($CURRENT)"
+          fi
+      
+      - name: Verify Azure Connection String
+        id: connection-check
+        run: |
+          CONNECTION_LINE=$(grep "_databaseConnection = Secrets" VizarLibrary/DataAccess/SqlDataAccess.cs)
+          
+          if echo "$CONNECTION_LINE" | grep -q "Secrets.AzureConnectionString"; then
+            echo "connection-valid=true" >> $GITHUB_OUTPUT
+            echo "✅ Using Azure connection string - Safe for deployment"
+          elif echo "$CONNECTION_LINE" | grep -q "Secrets.LocalConnectionString"; then
+            echo "connection-valid=false" >> $GITHUB_OUTPUT
+            echo "❌ ERROR: Local connection string detected - Blocking deployment"
+            exit 1
+          else
+            echo "connection-valid=false" >> $GITHUB_OUTPUT
+            echo "❌ ERROR: Unknown connection string configuration - Blocking deployment"
+            exit 1
+          fi
+      
+      - name: Final deployment decision
+        id: final-decision
+        run: |
+          VERSION_CHANGED="${{ steps.version-compare.outputs.version-changed }}"
+          CONNECTION_VALID="${{ steps.connection-check.outputs.connection-valid }}"
+          
+          if [ "$VERSION_CHANGED" = "true" ] && [ "$CONNECTION_VALID" = "true" ]; then
             echo "should-deploy=true" >> $GITHUB_OUTPUT
-            echo "✅ Version changed: $PREVIOUS → $CURRENT - Deployment will proceed"
+            echo "🚀 All checks passed - Deployment will proceed"
           else
             echo "should-deploy=false" >> $GITHUB_OUTPUT
-            echo "⏭️ Version unchanged ($CURRENT) - Skipping deployment"
+            echo "⛔ Deployment blocked - Requirements not met"
           fi
 
   build:
