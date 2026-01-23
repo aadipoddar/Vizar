@@ -40,6 +40,9 @@ jobs:
     - name: Build Vizar MAUI (Android)
       run: dotnet build Vizar/Vizar/Vizar.csproj --configuration Release --framework net10.0-android
     
+    - name: Build Vizar MAUI (Windows)
+      run: dotnet build Vizar/Vizar/Vizar.csproj --configuration Release --framework net10.0-windows10.0.19041.0
+    
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
     

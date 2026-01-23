@@ -9,7 +9,7 @@ jobs:
   version-check:
     uses: ./.github/workflows/version-checks.yml
 
-  build-windows:
+  build:
     runs-on: windows-latest
     needs: version-check
     if: needs.version-check.outputs.should-deploy == 'true'
@@ -58,13 +58,32 @@ jobs:
     - name: Create Zip Archive
       run: Compress-Archive -Path "Vizar/Vizar/publish/windows/*" -DestinationPath "Vizar.zip" -Force
     
+    - name: Upload Windows Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-release
+        path: Vizar.zip
+
+  deploy:
+    runs-on: windows-latest
+    needs: [version-check, build]
+    if: needs.version-check.outputs.should-deploy == 'true'
+    permissions:
+      contents: write
+
+    steps:
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v4
+      with:
+        name: windows-release
+    
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: v${{ needs.version-check.outputs.current-version }}
-        name: Vizar v${{ needs.version-check.outputs.current-version }}
+        tag_name: ${{ needs.version-check.outputs.current-version }}
+        name: ${{ github.event.head_commit.message }}
         body: |
-          ## Vizar v${{ needs.version-check.outputs.current-version }}
+          ## Vizar ${{ needs.version-check.outputs.current-version }}
           
           **Release Date:** ${{ github.event.head_commit.timestamp }}
           
