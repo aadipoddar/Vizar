@@ -6,8 +6,13 @@ on:
   workflow_dispatch:
 
 jobs:
+  version-check:
+    uses: ./.github/workflows/version-checks.yml
+
   build-windows:
     runs-on: windows-latest
+    needs: version-check
+    if: needs.version-check.outputs.should-deploy == 'true'
 
     steps:
     - uses: actions/checkout@v4
@@ -53,8 +58,31 @@ jobs:
     - name: Create Zip Archive
       run: Compress-Archive -Path "Vizar/Vizar/publish/windows/*" -DestinationPath "Vizar.zip" -Force
     
-    - name: Upload Windows Build Artifact
-      uses: actions/upload-artifact@v4
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
       with:
-        name: Vizar-Windows
-        path: Vizar.zip
+        tag_name: v${{ needs.version-check.outputs.current-version }}
+        name: Vizar v${{ needs.version-check.outputs.current-version }}
+        body: |
+          ## Vizar v${{ needs.version-check.outputs.current-version }}
+          
+          **Release Date:** ${{ github.event.head_commit.timestamp }}
+          
+          ### What's New
+          - Version ${{ needs.version-check.outputs.current-version }} release
+          
+          ### Download
+          - Windows: Download `Vizar.zip` below
+          
+          ### Installation
+          1. Download `Vizar.zip`
+          2. Extract the archive
+          3. Run `Vizar.exe`
+          
+          ---
+          *Auto-generated release from GitHub Actions*
+        files: Vizar.zip
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
