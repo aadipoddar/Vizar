@@ -23,8 +23,14 @@ jobs:
         with:
           dotnet-version: '10.x'
 
-      - name: Restore dependencies
-        run: dotnet restore Vizar.slnx
+      - name: Restore VizarLibrary
+        run: dotnet restore VizarLibrary/VizarLibrary.csproj
+
+      - name: Restore Vizar.Shared
+        run: dotnet restore Vizar/Vizar.Shared/Vizar.Shared.csproj
+
+      - name: Restore Vizar.Web
+        run: dotnet restore Vizar/Vizar.Web/Vizar.Web.csproj
 
       - name: Build VizarLibrary
         run: dotnet build VizarLibrary/VizarLibrary.csproj --configuration Release --no-restore
