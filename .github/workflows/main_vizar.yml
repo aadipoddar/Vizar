@@ -23,11 +23,20 @@ jobs:
         with:
           dotnet-version: '10.x'
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+      - name: Restore dependencies
+        run: dotnet restore Vizar.slnx
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+      - name: Build VizarLibrary
+        run: dotnet build VizarLibrary/VizarLibrary.csproj --configuration Release --no-restore
+
+      - name: Build Vizar.Shared
+        run: dotnet build Vizar/Vizar.Shared/Vizar.Shared.csproj --configuration Release --no-restore
+
+      - name: Build Vizar.Web
+        run: dotnet build Vizar/Vizar.Web/Vizar.Web.csproj --configuration Release --no-restore
+
+      - name: Publish Vizar.Web
+        run: dotnet publish Vizar/Vizar.Web/Vizar.Web.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp --no-build
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
