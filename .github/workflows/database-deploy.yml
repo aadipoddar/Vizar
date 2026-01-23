@@ -6,8 +6,13 @@ on:
   workflow_dispatch:
 
 jobs:
+  version-check:
+    uses: ./.github/workflows/version-checks.yml
+
   deploy-database:
     runs-on: windows-latest
+    needs: version-check
+    if: needs.version-check.outputs.should-deploy == 'true'
 
     steps:
     - uses: actions/checkout@v4
@@ -38,4 +43,4 @@ jobs:
     
     - name: Deployment Summary
       run: |
-        echo "🚀 Successfully deployed database to Azure SQL"
+        echo "🚀 Successfully deployed database version ${{ needs.version-check.outputs.current-version }} to Azure SQL"

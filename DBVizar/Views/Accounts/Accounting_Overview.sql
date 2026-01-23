@@ -9,7 +9,7 @@ SELECT
     [v].[Name] AS VoucherName,
 
     [a].[ReferenceId],
-    [a].[ReferenceNo] as ReferenceNo,
+    [a].[ReferenceNo],
 
     [a].[TransactionDateTime],
     [a].[FinancialYearId],
