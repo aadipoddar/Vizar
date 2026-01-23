@@ -27,8 +27,7 @@ jobs:
       run: |
         ./SqlPackage/SqlPackage.exe /Action:Publish `
           /SourceFile:"DBVizar/bin/Release/DBVizar.dacpac" `
-          /TargetConnectionString:"${{ secrets.AZURECONNECTIONSTRING }}" `
-          /TargetDatabaseName:"Vizar" `
+          /TargetConnectionString:"${{ secrets.AzureConnectionString }}" `
           /p:IncludeCompositeObjects=True
     
     - name: Deployment Summary
