@@ -416,5 +416,5 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
-/VizarLibrary/DataAccess/Secrets.cs
 /.idea
+/VizarLibrary/DataAccess/Secrets.local_secrets.cs

@@ -30,23 +30,6 @@ public static class BlobStorageAccess
         await blobClient.DeleteIfExistsAsync();
     }
 
-    public static async Task<List<string>> ListFilesInBlobStorage(BlobStorageContainers container)
-    {
-        BlobContainerClient containerClient = new(
-            Secrets.AzureBlobStorageConnectionString,
-            container.ToString());
-
-        var fileUrls = new List<string>();
-
-        await foreach (var blobItem in containerClient.GetBlobsAsync())
-        {
-            BlobClient blobClient = containerClient.GetBlobClient(blobItem.Name);
-            fileUrls.Add(blobClient.Uri.ToString());
-        }
-
-        return fileUrls;
-    }
-
     public static async Task<(MemoryStream fileStream, string contentType)> DownloadFileFromBlobStorage(string url)
     {
         Uri blobUri = new(url);
