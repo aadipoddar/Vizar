@@ -46,6 +46,7 @@ jobs:
     
     - name: Decode Keystore
       run: |
+        New-Item -ItemType Directory -Path "Vizar/Vizar/key" -Force
         $keystoreBase64 = "${{ secrets.ANDROID_KEYSTORE_BASE64 }}"
         $keystoreBytes = [System.Convert]::FromBase64String($keystoreBase64)
         [System.IO.File]::WriteAllBytes("Vizar/Vizar/key/vizar.keystore", $keystoreBytes)
