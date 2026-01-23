@@ -1,0 +1,38 @@
+name: Deploy Database to Azure
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  deploy-database:
+    runs-on: windows-latest
+    needs: version-check
+    if: needs.version-check.outputs.should-deploy == 'true'
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+    
+    - name: Build SQL Server Database Project
+      run: msbuild DBVizar/DBVizar.sqlproj /p:Configuration=Release /p:Platform="Any CPU"
+    
+    - name: Install SqlPackage
+      run: |
+        Invoke-WebRequest -Uri "https://aka.ms/sqlpackage-windows" -OutFile "SqlPackage.zip"
+        Expand-Archive -Path "SqlPackage.zip" -DestinationPath "SqlPackage"
+    
+    - name: Deploy Database to Azure SQL
+      run: |
+        ./SqlPackage/SqlPackage.exe /Action:Publish `
+          /SourceFile:"DBVizar/bin/Release/DBVizar.dacpac" `
+          /TargetConnectionString:"${{ secrets.AZURECONNECTIONSTRING }}" `
+          /TargetDatabaseName:"Vizar" `
+          /p:IncludeCompositeObjects=True
+    
+    - name: Deployment Summary
+      run: |
+        echo "🚀 Successfully deployed database version ${{ needs.version-check.outputs.current-version }} to Azure SQL"
