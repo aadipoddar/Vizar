@@ -59,7 +59,7 @@ jobs:
         dotnet publish Vizar/Vizar/Vizar.csproj -f net10.0-android -c Release `
           /p:AndroidKeyStore=true `
           /p:AndroidSigningKeyStore="key/vizar.keystore" `
-          /p:AndroidSigningKeyAlias=Vizar `
+          /p:AndroidSigningKeyAlias="vizar" `
           /p:AndroidSigningKeyPass="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" `
           /p:AndroidSigningStorePass="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
     
