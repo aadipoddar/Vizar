@@ -43,15 +43,6 @@ jobs:
       run: |
         dotnet workload install maui-android
         dotnet workload install maui-windows
-        dotnet workload install ios
-    
-    - name: Cache NuGet packages
-      uses: actions/cache@v4
-      with:
-        path: ~/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json', '**/*.csproj') }}
-        restore-keys: |
-          ${{ runner.os }}-nuget-
     
     - name: Restore VizarLibrary
       run: dotnet restore VizarLibrary/VizarLibrary.csproj
