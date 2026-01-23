@@ -29,17 +29,16 @@ jobs:
         {
             static Secrets()
             {
-                AzureConnectionString = "${{ secrets.AZURE_CONNECTION_STRING }}";
-                LocalConnectionString = "${{ secrets.LOCAL_CONNECTION_STRING }}";
+                AzureConnectionString = "${{ secrets.AzureConnectionString }}";
 
-                AzureBlobStorageConnectionString = "${{ secrets.AZURE_BLOB_STORAGE_CONNECTION_STRING }}";
-                AzureBlobStorageAccountKey = "${{ secrets.AZURE_BLOB_STORAGE_ACCOUNT_KEY }}";
+                AzureBlobStorageConnectionString = "${{ secrets.AzureBlobStorageConnectionString }}";
+                AzureBlobStorageAccountKey = "${{ secrets.AzureBlobStorageAccountKey }}";
 
-                SyncfusionLicense = "${{ secrets.SYNCFUSION_LICENSE }}";
+                SyncfusionLicense = "${{ secrets.SyncfusionLicense }}";
 
-                EmailPassword = "${{ secrets.EMAIL_PASSWORD }}";
+                EmailPassword = "${{ secrets.EmailPassword }}";
 
-                ToEmail = "${{ secrets.TO_EMAIL }}";
+                ToEmail = "${{ secrets.ToEmail }}";
             }
         }
         "@
