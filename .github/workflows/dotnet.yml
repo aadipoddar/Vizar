@@ -39,8 +39,11 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
     
-    - name: Install .NET MAUI Workload
-      run: dotnet workload install maui-android
+    - name: Install .NET MAUI Workloads
+      run: |
+        dotnet workload install maui-android
+        dotnet workload install maui-windows
+        dotnet workload install ios
     
     - name: Cache NuGet packages
       uses: actions/cache@v4
@@ -69,9 +72,9 @@ jobs:
       run: dotnet build Vizar/Vizar.Web/Vizar.Web.csproj --configuration Release --no-restore
     
     - name: Restore Vizar (MAUI)
-      run: dotnet restore Vizar/Vizar/Vizar.csproj
+      run: dotnet restore Vizar/Vizar/Vizar.csproj /p:TargetFrameworks="net10.0-android;net10.0-windows10.0.19041.0"
     
-    - name: Build Vizar (MAUI)
+    - name: Build Vizar Windows (MAUI)
       run: dotnet build Vizar/Vizar/Vizar.csproj --configuration Release --no-restore --framework net10.0-windows10.0.19041.0
     
     - name: Build Vizar Android (MAUI)
