@@ -68,13 +68,58 @@ jobs:
             echo "⏭️ Unknown connection string configuration - Skipping deployment"
           fi
       
+      - name: Verify Assembly Version matches README
+        id: assembly-check
+        run: |
+          README_VERSION="${{ steps.extract-version.outputs.version }}"
+          ASSEMBLY_VERSION=$(grep -oP '<AssemblyVersion>\K[^<]+' Vizar/Vizar.Shared/Vizar.Shared.csproj)
+          
+          if [ "$README_VERSION" = "$ASSEMBLY_VERSION" ]; then
+            echo "assembly-valid=true" >> $GITHUB_OUTPUT
+            echo "✅ Assembly version matches README: $ASSEMBLY_VERSION"
+          else
+            echo "assembly-valid=false" >> $GITHUB_OUTPUT
+            echo "⏭️ Version mismatch - README: $README_VERSION, Assembly: $ASSEMBLY_VERSION - Skipping deployment"
+          fi
+      
+      - name: Verify Android Manifest Version
+        id: android-check
+        run: |
+          README_VERSION="${{ steps.extract-version.outputs.version }}"
+          ANDROID_VERSION=$(grep -oP 'android:versionName="\K[^"]+' Vizar/Vizar/Platforms/Android/AndroidManifest.xml)
+          ANDROID_CODE=$(grep -oP 'android:versionCode="\K[^"]+' Vizar/Vizar/Platforms/Android/AndroidManifest.xml)
+          
+          # Get previous versionCode
+          git checkout HEAD~1 2>/dev/null || echo "No previous commit"
+          PREV_ANDROID_CODE=$(grep -oP 'android:versionCode="\K[^"]+' Vizar/Vizar/Platforms/Android/AndroidManifest.xml 2>/dev/null || echo "0")
+          git checkout -
+          
+          # Check version name matches
+          if [ "$README_VERSION" != "$ANDROID_VERSION" ]; then
+            echo "android-valid=false" >> $GITHUB_OUTPUT
+            echo "⏭️ Version mismatch - README: $README_VERSION, Android: $ANDROID_VERSION - Skipping deployment"
+            exit 0
+          fi
+          
+          # Check version code is greater
+          if [ "$ANDROID_CODE" -le "$PREV_ANDROID_CODE" ]; then
+            echo "android-valid=false" >> $GITHUB_OUTPUT
+            echo "⏭️ Android versionCode not incremented - Current: $ANDROID_CODE, Previous: $PREV_ANDROID_CODE - Skipping deployment"
+            exit 0
+          fi
+          
+          echo "android-valid=true" >> $GITHUB_OUTPUT
+          echo "✅ Android version valid - Name: $ANDROID_VERSION, Code: $PREV_ANDROID_CODE → $ANDROID_CODE"
+      
       - name: Final deployment decision
         id: final-decision
         run: |
           VERSION_CHANGED="${{ steps.version-compare.outputs.version-changed }}"
           CONNECTION_VALID="${{ steps.connection-check.outputs.connection-valid }}"
+          ASSEMBLY_VALID="${{ steps.assembly-check.outputs.assembly-valid }}"
+          ANDROID_VALID="${{ steps.android-check.outputs.android-valid }}"
           
-          if [ "$VERSION_CHANGED" = "true" ] && [ "$CONNECTION_VALID" = "true" ]; then
+          if [ "$VERSION_CHANGED" = "true" ] && [ "$CONNECTION_VALID" = "true" ] && [ "$ASSEMBLY_VALID" = "true" ] && [ "$ANDROID_VALID" = "true" ]; then
             echo "should-deploy=true" >> $GITHUB_OUTPUT
             echo "🚀 All checks passed - Deployment will proceed"
           else
