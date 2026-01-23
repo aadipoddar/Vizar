@@ -18,6 +18,10 @@ jobs:
     - name: Build SQL Server Database Project
       run: msbuild DBVizar/DBVizar.sqlproj /p:Configuration=Release /p:Platform="Any CPU"
     
+    - name: Find DACPAC file
+      run: |
+        Get-ChildItem -Path "DBVizar" -Filter "*.dacpac" -Recurse | Select-Object FullName
+    
     - name: Install SqlPackage
       run: |
         Invoke-WebRequest -Uri "https://aka.ms/sqlpackage-windows" -OutFile "SqlPackage.zip"
@@ -25,8 +29,10 @@ jobs:
     
     - name: Deploy Database to Azure SQL
       run: |
+        $dacpacPath = (Get-ChildItem -Path "DBVizar" -Filter "DBVizar.dacpac" -Recurse).FullName
+        echo "Using DACPAC: $dacpacPath"
         ./SqlPackage/SqlPackage.exe /Action:Publish `
-          /SourceFile:"DBVizar/bin/Release/DBVizar.dacpac" `
+          /SourceFile:"$dacpacPath" `
           /TargetConnectionString:"${{ secrets.AzureConnectionString }}" `
           /p:IncludeCompositeObjects=True
     
