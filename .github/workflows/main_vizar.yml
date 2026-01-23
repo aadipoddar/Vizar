@@ -10,8 +10,52 @@ on:
   workflow_dispatch:
 
 jobs:
+  version-check:
+    runs-on: ubuntu-latest
+    outputs:
+      should-deploy: ${{ steps.version-compare.outputs.should-deploy }}
+      current-version: ${{ steps.extract-version.outputs.version }}
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      
+      - name: Extract current version from README
+        id: extract-version
+        run: |
+          VERSION=$(grep -oP 'Latest Version = \K[0-9.]+' README.md)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $VERSION"
+      
+      - name: Get previous version
+        id: get-previous
+        run: |
+          # Get the version from the previous commit
+          git checkout HEAD~1 2>/dev/null || echo "No previous commit"
+          PREV_VERSION=$(grep -oP 'Latest Version = \K[0-9.]+' README.md 2>/dev/null || echo "none")
+          echo "previous=$PREV_VERSION" >> $GITHUB_OUTPUT
+          echo "Previous version: $PREV_VERSION"
+          git checkout -
+      
+      - name: Compare versions
+        id: version-compare
+        run: |
+          CURRENT="${{ steps.extract-version.outputs.version }}"
+          PREVIOUS="${{ steps.get-previous.outputs.previous }}"
+          
+          if [ "$CURRENT" != "$PREVIOUS" ]; then
+            echo "should-deploy=true" >> $GITHUB_OUTPUT
+            echo "✅ Version changed: $PREVIOUS → $CURRENT - Deployment will proceed"
+          else
+            echo "should-deploy=false" >> $GITHUB_OUTPUT
+            echo "⏭️ Version unchanged ($CURRENT) - Skipping deployment"
+          fi
+
   build:
     runs-on: ubuntu-latest
+    needs: version-check
+    if: needs.version-check.outputs.should-deploy == 'true'
     permissions:
       contents: read #This is required for actions/checkout
 
@@ -52,7 +96,8 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+    needs: [version-check, build]
+    if: needs.version-check.outputs.should-deploy == 'true'
     
     steps:
       - name: Download artifact from build job
@@ -68,3 +113,7 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_610D1F10ABE245F095EE0B468DB3D371 }}
+      
+      - name: Deployment Summary
+        run: |
+          echo "🚀 Successfully deployed Vizar version ${{ needs.version-check.outputs.current-version }} to Azure"
