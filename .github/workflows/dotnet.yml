@@ -1,86 +1,47 @@
-# Vizar CI/CD Pipeline - Build and Test .NET 10.0 Projects
+# This workflow will build the Vizar .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
-name: .NET Build
+name: .NET
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  workflow_dispatch:  # Allow manual trigger
 
 jobs:
   build:
-    name: Build Vizar Projects
+
     runs-on: ubuntu-latest
-    
-    env:
-      DOTNET_NOLOGO: true
-      DOTNET_CLI_TELEMETRY_OPTOUT: true
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0  # Full history for better caching
+    - uses: actions/checkout@v4
     
     - name: Setup .NET 10.0
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '10.0.x'
+        dotnet-version: 10.0.x
     
-    - name: Setup Java 17 (for Android)
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'microsoft'
-        java-version: '17'
+    - name: Install .NET MAUI Workload
+      run: dotnet workload install maui --skip-sign-check
     
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-    
-    - name: Install .NET MAUI Workloads
-      run: |
-        dotnet workload install maui-android
-        dotnet workload install maui-windows
-    
-    - name: Restore VizarLibrary
-      run: dotnet restore VizarLibrary/VizarLibrary.csproj
+    - name: Restore dependencies
+      run: dotnet restore Vizar.slnx
     
     - name: Build VizarLibrary
-      run: dotnet build VizarLibrary/VizarLibrary.csproj --configuration Release --no-restore
-    
-    - name: Restore Vizar.Shared
-      run: dotnet restore Vizar/Vizar.Shared/Vizar.Shared.csproj
+      run: dotnet build VizarLibrary/VizarLibrary.csproj --no-restore --configuration Release
     
     - name: Build Vizar.Shared
-      run: dotnet build Vizar/Vizar.Shared/Vizar.Shared.csproj --configuration Release --no-restore
-    
-    - name: Restore Vizar.Web
-      run: dotnet restore Vizar/Vizar.Web/Vizar.Web.csproj
+      run: dotnet build Vizar/Vizar.Shared/Vizar.Shared.csproj --no-restore --configuration Release
     
     - name: Build Vizar.Web
-      run: dotnet build Vizar/Vizar.Web/Vizar.Web.csproj --configuration Release --no-restore
+      run: dotnet build Vizar/Vizar.Web/Vizar.Web.csproj --no-restore --configuration Release
     
-    - name: Restore Vizar (MAUI) - Android
-      run: dotnet restore Vizar/Vizar/Vizar.csproj --framework net10.0-android
-    
-    - name: Restore Vizar (MAUI) - Windows
-      run: dotnet restore Vizar/Vizar/Vizar.csproj --framework net10.0-windows10.0.19041.0
-    
-    - name: Build Vizar Windows (MAUI)
-      run: dotnet build Vizar/Vizar/Vizar.csproj --configuration Release --framework net10.0-windows10.0.19041.0
-    
-    - name: Build Vizar Android (MAUI)
+    - name: Build Vizar MAUI (Android)
       run: dotnet build Vizar/Vizar/Vizar.csproj --configuration Release --framework net10.0-android
     
-    - name: Build Summary
-      if: success()
-      run: |
-        echo "✅ Build completed successfully!"
-        echo "📦 Projects built:"
-        echo "  - VizarLibrary"
-        echo "  - Vizar.Shared"
-        echo "  - Vizar.Web"
-        echo "  - Vizar (MAUI Windows)"
-        echo "  - Vizar (MAUI Android)"
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+    
+    - name: Build SQL Server Database Project
+      run: msbuild DBVizar/DBVizar.sqlproj /p:Configuration=Release /p:Platform="Any CPU"
