@@ -62,14 +62,17 @@ jobs:
     - name: Build Vizar.Web
       run: dotnet build Vizar/Vizar.Web/Vizar.Web.csproj --configuration Release --no-restore
     
-    - name: Restore Vizar (MAUI)
-      run: dotnet restore Vizar/Vizar/Vizar.csproj /p:TargetFrameworks="net10.0-android;net10.0-windows10.0.19041.0"
+    - name: Restore Vizar (MAUI) - Android
+      run: dotnet restore Vizar/Vizar/Vizar.csproj --framework net10.0-android
+    
+    - name: Restore Vizar (MAUI) - Windows
+      run: dotnet restore Vizar/Vizar/Vizar.csproj --framework net10.0-windows10.0.19041.0
     
     - name: Build Vizar Windows (MAUI)
-      run: dotnet build Vizar/Vizar/Vizar.csproj --configuration Release --no-restore --framework net10.0-windows10.0.19041.0
+      run: dotnet build Vizar/Vizar/Vizar.csproj --configuration Release --framework net10.0-windows10.0.19041.0
     
     - name: Build Vizar Android (MAUI)
-      run: dotnet build Vizar/Vizar/Vizar.csproj --configuration Release --no-restore --framework net10.0-android
+      run: dotnet build Vizar/Vizar/Vizar.csproj --configuration Release --framework net10.0-android
     
     - name: Build Summary
       if: success()
