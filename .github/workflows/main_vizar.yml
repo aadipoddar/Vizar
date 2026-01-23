@@ -62,12 +62,10 @@ jobs:
             echo "✅ Using Azure connection string - Safe for deployment"
           elif echo "$CONNECTION_LINE" | grep -q "Secrets.LocalConnectionString"; then
             echo "connection-valid=false" >> $GITHUB_OUTPUT
-            echo "❌ ERROR: Local connection string detected - Blocking deployment"
-            exit 1
+            echo "⏭️ Local connection string detected - Skipping deployment"
           else
             echo "connection-valid=false" >> $GITHUB_OUTPUT
-            echo "❌ ERROR: Unknown connection string configuration - Blocking deployment"
-            exit 1
+            echo "⏭️ Unknown connection string configuration - Skipping deployment"
           fi
       
       - name: Final deployment decision
