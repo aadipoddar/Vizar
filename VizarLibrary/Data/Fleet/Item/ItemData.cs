@@ -1,7 +1,7 @@
 ﻿using VizarLibrary.DataAccess;
-using VizarLibrary.Models.Inventory.Item;
+using VizarLibrary.Models.Fleet.Item;
 
-namespace VizarLibrary.Data.Inventory.Item;
+namespace VizarLibrary.Data.Fleet.Item;
 
 public static class ItemData
 {

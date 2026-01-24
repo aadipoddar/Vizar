@@ -1,6 +1,6 @@
 ﻿@page "/admin/item"
 
-@using VizarLibrary.Models.Inventory.Item
+@using VizarLibrary.Models.Fleet.Item
 
 <PageTitle>Item Management - Vizar</PageTitle>
 
@@ -84,32 +84,31 @@ else
                             </SfAutoComplete>
                         </div>
 
-                        <!-- Manufacturer -->
+                        <!-- Unit of Measurement -->
                         <div class="form-field">
                             <label class="field-label">
-                                Manufacturer <span class="required">*</span>
+                                Unit of Measurement <span class="required">*</span>
                             </label>
+                            <SfTextBox @bind-Value="_item.UnitOfMeasurement" Placeholder="Enter unit (e.g., KG, PCS, LTR)"
+                                       FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+                        </div>
+
+                        <!-- Part Number -->
+                        <div class="form-field">
+                            <label class="field-label">Part Number</label>
+                            <SfTextBox @bind-Value="_item.PartNo" Placeholder="Enter part number (optional)"
+                                       FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+                        </div>
+
+                        <!-- Manufacturer -->
+                        <div class="form-field">
+                            <label class="field-label">Manufacturer</label>
                             <SfAutoComplete Value="@_selectedManufacturer" TValue="ManufacturerModel" TItem="ManufacturerModel"
                                             DataSource="@_manufacturers" Placeholder="Select Manufacturer"
                                             FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
                                             FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
                                 <AutoCompleteEvents TItem="ManufacturerModel" TValue="ManufacturerModel"
                                                     ValueChange="OnManufacturerChanged" />
-                                <AutoCompleteFieldSettings Value="Name" />
-                            </SfAutoComplete>
-                        </div>
-
-                        <!-- Tax -->
-                        <div class="form-field">
-                            <label class="field-label">
-                                Tax <span class="required">*</span>
-                            </label>
-                            <SfAutoComplete Value="@_selectedTax" TValue="TaxModel" TItem="TaxModel"
-                                            DataSource="@_taxes" Placeholder="Select Tax"
-                                            FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
-                                            FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
-                                <AutoCompleteEvents TItem="TaxModel" TValue="TaxModel"
-                                                    ValueChange="OnTaxChanged" />
                                 <AutoCompleteFieldSettings Value="Name" />
                             </SfAutoComplete>
                         </div>
@@ -124,21 +123,23 @@ else
                                               TValue="decimal" Min="0" />
                         </div>
 
-                        <!-- Unit of Measurement -->
+                        <!-- Tax -->
                         <div class="form-field">
-                            <label class="field-label">
-                                Unit of Measurement <span class="required">*</span>
-                            </label>
-                            <SfTextBox @bind-Value="_item.UnitOfMeasurement" Placeholder="Enter unit (e.g., KG, PCS, LTR)"
-                                       FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+                            <label class="field-label">Tax</label>
+                            <SfAutoComplete Value="@_selectedTax" TValue="TaxModel" TItem="TaxModel"
+                                            DataSource="@_taxes" Placeholder="Select Tax"
+                                            FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+                                            FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
+                                <AutoCompleteEvents TItem="TaxModel" TValue="TaxModel"
+                                                    ValueChange="OnTaxChanged" />
+                                <AutoCompleteFieldSettings Value="Name" />
+                            </SfAutoComplete>
                         </div>
 
                         <!-- Reorder Level -->
                         <div class="form-field">
-                            <label class="field-label">
-                                Reorder Level <span class="required">*</span>
-                            </label>
-                            <SfNumericTextBox @bind-Value="_item.ReorderLevel" Placeholder="Enter reorder level" Format="N2"
+                            <label class="field-label">Reorder Level</label>
+                            <SfNumericTextBox @bind-Value="_item.ReorderLevel" Placeholder="Enter reorder level (default: 0)" Format="N2"
                                               FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox"
                                               TValue="decimal?" Min="0" />
                         </div>
@@ -212,6 +213,7 @@ else
                                     }
                                 </Template>
                             </GridColumn>
+                            <GridColumn Field="@nameof(ItemModel.PartNo)" HeaderText="Part No" Width="150" />
                             <GridColumn Field="@nameof(ItemModel.ManufacturerId)" HeaderText="Manufacturer" Width="150">
                                 <Template>
                                     @{

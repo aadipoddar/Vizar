@@ -15,7 +15,7 @@ using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Inventory.Purchase;
 using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
-using VizarLibrary.Models.Inventory.Item;
+using VizarLibrary.Models.Fleet.Item;
 using VizarLibrary.Models.Inventory.Purchase;
 using VizarLibrary.Models.Operations;
 

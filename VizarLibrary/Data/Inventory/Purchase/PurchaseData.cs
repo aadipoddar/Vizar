@@ -1,14 +1,14 @@
 ﻿using VizarLibrary.Data.Accounts.FinancialAccounting;
 using VizarLibrary.Data.Accounts.Masters;
 using VizarLibrary.Data.Common;
-using VizarLibrary.Data.Inventory.Item;
+using VizarLibrary.Data.Fleet.Item;
 using VizarLibrary.Data.Inventory.Stock;
 using VizarLibrary.Data.Operations;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Inventory.Purchase;
 using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.FinancialAccounting;
-using VizarLibrary.Models.Inventory.Item;
+using VizarLibrary.Models.Fleet.Item;
 using VizarLibrary.Models.Inventory.Purchase;
 using VizarLibrary.Models.Operations;
 

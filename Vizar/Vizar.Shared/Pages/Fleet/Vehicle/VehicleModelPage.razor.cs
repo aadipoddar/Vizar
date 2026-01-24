@@ -7,8 +7,8 @@ using VizarLibrary.Data.Fleet.Masters;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Fleet.Vehicle;
 using VizarLibrary.Exporting.Utils;
+using VizarLibrary.Models.Fleet.Item;
 using VizarLibrary.Models.Fleet.Vehicle;
-using VizarLibrary.Models.Inventory.Item;
 using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages.Fleet.Vehicle;

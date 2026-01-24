@@ -53,6 +53,7 @@ static async Task InsertVehicles(ExcelWorksheet worksheet)
                 PurchaseDate = DateTime.Now,
                 VehicleTypeId = 1,
                 VehicleModelId = int.Parse(model),
+                Status = true
             });
 
         }

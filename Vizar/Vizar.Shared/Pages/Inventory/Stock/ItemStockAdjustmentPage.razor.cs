@@ -13,7 +13,7 @@ using VizarLibrary.Data.Inventory.Purchase;
 using VizarLibrary.Data.Inventory.Stock;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Models.Accounts.Masters;
-using VizarLibrary.Models.Inventory.Item;
+using VizarLibrary.Models.Fleet.Item;
 using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages.Inventory.Stock;

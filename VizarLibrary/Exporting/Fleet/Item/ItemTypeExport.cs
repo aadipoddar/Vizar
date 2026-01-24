@@ -1,8 +1,8 @@
 using VizarLibrary.Data.Common;
 using VizarLibrary.Exporting.Utils;
-using VizarLibrary.Models.Inventory.Item;
+using VizarLibrary.Models.Fleet.Item;
 
-namespace VizarLibrary.Exporting.Inventory.Item;
+namespace VizarLibrary.Exporting.Fleet.Item;
 
 public static class ItemTypeExport
 {

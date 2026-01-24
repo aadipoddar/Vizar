@@ -13,7 +13,7 @@ using VizarLibrary.Exporting.Inventory.ItemIssue;
 using VizarLibrary.Exporting.Inventory.Purchase;
 using VizarLibrary.Exporting.Inventory.Stock;
 using VizarLibrary.Exporting.Utils;
-using VizarLibrary.Models.Inventory.Item;
+using VizarLibrary.Models.Fleet.Item;
 using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages.Inventory.Stock.Reports;

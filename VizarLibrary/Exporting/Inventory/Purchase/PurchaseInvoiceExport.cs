@@ -2,7 +2,7 @@ using VizarLibrary.Data.Common;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
-using VizarLibrary.Models.Inventory.Item;
+using VizarLibrary.Models.Fleet.Item;
 using VizarLibrary.Models.Inventory.Purchase;
 
 namespace VizarLibrary.Exporting.Inventory.Purchase;

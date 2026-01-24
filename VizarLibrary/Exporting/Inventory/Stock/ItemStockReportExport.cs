@@ -1,5 +1,5 @@
 using VizarLibrary.Exporting.Utils;
-using VizarLibrary.Models.Inventory.Item;
+using VizarLibrary.Models.Fleet.Item;
 
 namespace VizarLibrary.Exporting.Inventory.Stock;
 

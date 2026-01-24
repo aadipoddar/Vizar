@@ -3,14 +3,14 @@ using Syncfusion.Blazor.Grids;
 using Vizar.Shared.Components.Dialog;
 
 using VizarLibrary.Data.Common;
-using VizarLibrary.Data.Inventory.Item;
+using VizarLibrary.Data.Fleet.Item;
 using VizarLibrary.DataAccess;
-using VizarLibrary.Exporting.Inventory.Item;
+using VizarLibrary.Exporting.Fleet.Item;
 using VizarLibrary.Exporting.Utils;
-using VizarLibrary.Models.Inventory.Item;
+using VizarLibrary.Models.Fleet.Item;
 using VizarLibrary.Models.Operations;
 
-namespace Vizar.Shared.Pages.Inventory.Item;
+namespace Vizar.Shared.Pages.Fleet.Item;
 
 public partial class ItemPage : IAsyncDisposable
 {
@@ -93,6 +93,7 @@ public partial class ItemPage : IAsyncDisposable
             Code = item.Code,
             ItemTypeId = item.ItemTypeId,
             ItemCategoryId = item.ItemCategoryId,
+            PartNo = item.PartNo,
             ManufacturerId = item.ManufacturerId,
             Rate = item.Rate,
             TaxId = item.TaxId,
@@ -242,6 +243,10 @@ public partial class ItemPage : IAsyncDisposable
         _item.UnitOfMeasurement = _item.UnitOfMeasurement?.Trim() ?? "";
         _item.UnitOfMeasurement = _item.UnitOfMeasurement?.ToUpper() ?? "";
 
+        _item.PartNo = _item.PartNo?.Trim() ?? "";
+        if (string.IsNullOrWhiteSpace(_item.PartNo))
+            _item.PartNo = null;
+
         _item.Remarks = _item.Remarks?.Trim() ?? "";
         _item.Status = true;
 
@@ -266,29 +271,24 @@ public partial class ItemPage : IAsyncDisposable
             return false;
         }
 
-        if (_item.ManufacturerId == 0)
-        {
-            await _toastNotification.ShowAsync("Validation", "Manufacturer is required. Please select a manufacturer.", ToastType.Warning);
-            return false;
-        }
-
-        if (_item.TaxId == 0)
-        {
-            await _toastNotification.ShowAsync("Validation", "Tax is required. Please select a tax.", ToastType.Warning);
-            return false;
-        }
-
         if (string.IsNullOrWhiteSpace(_item.UnitOfMeasurement))
         {
             await _toastNotification.ShowAsync("Validation", "Unit of Measurement is required. Please enter a valid unit.", ToastType.Warning);
             return false;
         }
 
-        if (_item.Rate < 0)
+        if (_item.Rate <= 0)
         {
             await _toastNotification.ShowAsync("Validation", "Rate must be greater than 0. Please enter a valid rate.", ToastType.Warning);
             return false;
         }
+
+        // Handle nullable fields - set to null if 0
+        if (_item.ManufacturerId == 0)
+            _item.ManufacturerId = null;
+
+        if (_item.TaxId == 0)
+            _item.TaxId = null;
 
         if (string.IsNullOrWhiteSpace(_item.Remarks))
             _item.Remarks = null;
@@ -412,11 +412,11 @@ public partial class ItemPage : IAsyncDisposable
     private string GetItemCategoryName(int itemCategoryId) =>
         _itemCategories.FirstOrDefault(c => c.Id == itemCategoryId)?.Name ?? "N/A";
 
-    private string GetManufacturerName(int manufacturerId) =>
-        _manufacturers.FirstOrDefault(m => m.Id == manufacturerId)?.Name ?? "N/A";
+    private string GetManufacturerName(int? manufacturerId) =>
+        manufacturerId.HasValue ? _manufacturers.FirstOrDefault(m => m.Id == manufacturerId.Value)?.Name ?? "N/A" : "N/A";
 
-    private string GetTaxName(int taxId) =>
-        _taxes.FirstOrDefault(t => t.Id == taxId)?.Name ?? "N/A";
+    private string GetTaxName(int? taxId) =>
+        taxId.HasValue ? _taxes.FirstOrDefault(t => t.Id == taxId.Value)?.Name ?? "N/A" : "N/A";
 
     private async Task EditSelectedItem()
     {
