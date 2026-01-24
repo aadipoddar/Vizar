@@ -3,6 +3,7 @@
     <Build />
     <Deploy />
   </Project>
+  <Project Path="ExcelImport/ExcelImport.csproj" Id="0a54d1ad-5de7-43ea-bac0-fecc669e903a" />
   <Project Path="Vizar/Vizar.Shared/Vizar.Shared.csproj" />
   <Project Path="Vizar/Vizar.Web/Vizar.Web.csproj" />
   <Project Path="Vizar/Vizar/Vizar.csproj">

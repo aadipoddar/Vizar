@@ -82,24 +82,6 @@ jobs:
       with:
         tag_name: ${{ needs.version-check.outputs.current-version }}
         name: ${{ github.event.head_commit.message }}
-        body: |
-          ## Vizar ${{ needs.version-check.outputs.current-version }}
-          
-          **Release Date:** ${{ github.event.head_commit.timestamp }}
-          
-          ### What's New
-          - Version ${{ needs.version-check.outputs.current-version }} release
-          
-          ### Download
-          - Windows: Download `Vizar.zip` below
-          
-          ### Installation
-          1. Download `Vizar.zip`
-          2. Extract the archive
-          3. Run `Vizar.exe`
-          
-          ---
-          *Auto-generated release from GitHub Actions*
         files: Vizar.zip
         draft: false
         prerelease: false

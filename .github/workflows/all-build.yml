@@ -24,7 +24,10 @@ jobs:
     
     - name: Restore dependencies
       run: dotnet restore Vizar.slnx
-    
+
+    - name: Build ExcelImport
+      run: dotnet build ExcelImport/ExcelImport.csproj --no-restore --configuration Release    
+
     - name: Build VizarLibrary
       run: dotnet build VizarLibrary/VizarLibrary.csproj --no-restore --configuration Release
     

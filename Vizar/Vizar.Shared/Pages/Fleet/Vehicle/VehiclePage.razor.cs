@@ -86,6 +86,7 @@ public partial class VehiclePage : IAsyncDisposable
             Code = vehicle.Code,
             ShortCode = vehicle.ShortCode,
             ChasisCode = vehicle.ChasisCode,
+            EngineCode = vehicle.EngineCode,
             VehicleTypeId = vehicle.VehicleTypeId,
             VehicleModelId = vehicle.VehicleModelId,
             PurchaseDate = vehicle.PurchaseDate,
@@ -224,6 +225,9 @@ public partial class VehiclePage : IAsyncDisposable
         _vehicle.ChasisCode = _vehicle.ChasisCode?.Trim() ?? "";
         _vehicle.ChasisCode = _vehicle.ChasisCode?.ToUpper() ?? "";
 
+        _vehicle.EngineCode = _vehicle.EngineCode?.Trim() ?? "";
+        _vehicle.EngineCode = _vehicle.EngineCode?.ToUpper() ?? "";
+
         _vehicle.Remarks = _vehicle.Remarks?.Trim() ?? "";
         _vehicle.Status = true;
 
@@ -242,6 +246,12 @@ public partial class VehiclePage : IAsyncDisposable
         if (string.IsNullOrWhiteSpace(_vehicle.ChasisCode))
         {
             await _toastNotification.ShowAsync("Validation", "Chasis code is required. Please enter a valid chasis code.", ToastType.Warning);
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(_vehicle.EngineCode))
+        {
+            await _toastNotification.ShowAsync("Validation", "Engine code is required. Please enter a valid engine code.", ToastType.Warning);
             return false;
         }
 
@@ -269,17 +279,17 @@ public partial class VehiclePage : IAsyncDisposable
                 return false;
             }
 
-            var existingVehicleByShortCode = _vehicles.FirstOrDefault(_ => _.Id != _vehicle.Id && _.ShortCode.Equals(_vehicle.ShortCode, StringComparison.OrdinalIgnoreCase));
-            if (existingVehicleByShortCode is not null)
-            {
-                await _toastNotification.ShowAsync("Duplicate", $"Short code '{_vehicle.ShortCode}' already exists. Please choose a different short code.", ToastType.Warning);
-                return false;
-            }
-
             var existingVehicleByChasisCode = _vehicles.FirstOrDefault(_ => _.Id != _vehicle.Id && _.ChasisCode.Equals(_vehicle.ChasisCode, StringComparison.OrdinalIgnoreCase));
             if (existingVehicleByChasisCode is not null)
             {
                 await _toastNotification.ShowAsync("Duplicate", $"Chasis code '{_vehicle.ChasisCode}' already exists. Please choose a different chasis code.", ToastType.Warning);
+                return false;
+            }
+
+            var existingVehicleByEngineCode = _vehicles.FirstOrDefault(_ => _.Id != _vehicle.Id && _.EngineCode.Equals(_vehicle.EngineCode, StringComparison.OrdinalIgnoreCase));
+            if (existingVehicleByEngineCode is not null)
+            {
+                await _toastNotification.ShowAsync("Duplicate", $"Engine code '{_vehicle.EngineCode}' already exists. Please choose a different engine code.", ToastType.Warning);
                 return false;
             }
         }
@@ -292,17 +302,17 @@ public partial class VehiclePage : IAsyncDisposable
                 return false;
             }
 
-            var existingVehicleByShortCode = _vehicles.FirstOrDefault(_ => _.ShortCode.Equals(_vehicle.ShortCode, StringComparison.OrdinalIgnoreCase));
-            if (existingVehicleByShortCode is not null)
-            {
-                await _toastNotification.ShowAsync("Duplicate", $"Short code '{_vehicle.ShortCode}' already exists. Please choose a different short code.", ToastType.Warning);
-                return false;
-            }
-
             var existingVehicleByChasisCode = _vehicles.FirstOrDefault(_ => _.ChasisCode.Equals(_vehicle.ChasisCode, StringComparison.OrdinalIgnoreCase));
             if (existingVehicleByChasisCode is not null)
             {
                 await _toastNotification.ShowAsync("Duplicate", $"Chasis code '{_vehicle.ChasisCode}' already exists. Please choose a different chasis code.", ToastType.Warning);
+                return false;
+            }
+
+            var existingVehicleByEngineCode = _vehicles.FirstOrDefault(_ => _.EngineCode.Equals(_vehicle.EngineCode, StringComparison.OrdinalIgnoreCase));
+            if (existingVehicleByEngineCode is not null)
+            {
+                await _toastNotification.ShowAsync("Duplicate", $"Engine code '{_vehicle.EngineCode}' already exists. Please choose a different engine code.", ToastType.Warning);
                 return false;
             }
         }

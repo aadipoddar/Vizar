@@ -11,12 +11,17 @@
 else
 {
     <div style="display: flex; flex-direction: column; min-height: 100vh;">
-        <Header Title="Vehicle Management" Subtitle="Manage vehicles and details" ShowHome="true" ShowBack="true" ShowLogout="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
+        <Header Title="Vehicle Management" Subtitle="Manage vehicles and details" ShowHome="true" ShowBack="true"
+                ShowLogout="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
             <RightContent>
-                <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Title="Export to Excel (Ctrl + E)" Disabled="_isProcessing" OnClick="ExportExcel" />
-                <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Title="Export to PDF (Ctrl + P)" Disabled="_isProcessing" OnClick="ExportPdf" />
-                <IconButton Icon="IconType.Save" Variant="ButtonVariant.Save" Title="Save Vehicle (Ctrl + S)" Disabled="_isProcessing" OnClick="SaveVehicle" />
-                <IconButton Icon="IconType.New" Title="New Vehicle (Ctrl + N)" Disabled="_isProcessing" OnClick="ResetPage" />
+                <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Title="Export to Excel (Ctrl + E)"
+                            Disabled="_isProcessing" OnClick="ExportExcel" />
+                <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Title="Export to PDF (Ctrl + P)"
+                            Disabled="_isProcessing" OnClick="ExportPdf" />
+                <IconButton Icon="IconType.Save" Variant="ButtonVariant.Save" Title="Save Vehicle (Ctrl + S)"
+                            Disabled="_isProcessing" OnClick="SaveVehicle" />
+                <IconButton Icon="IconType.New" Title="New Vehicle (Ctrl + N)" Disabled="_isProcessing"
+                            OnClick="ResetPage" />
             </RightContent>
         </Header>
 
@@ -61,6 +66,15 @@ else
                                 Chasis Code <span class="required">*</span>
                             </label>
                             <SfTextBox @bind-Value="_vehicle.ChasisCode" Placeholder="Enter chasis code"
+                                       FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+                        </div>
+
+                        <!-- Engine Code -->
+                        <div class="form-field">
+                            <label class="field-label">
+                                Engine Code <span class="required">*</span>
+                            </label>
+                            <SfTextBox @bind-Value="_vehicle.EngineCode" Placeholder="Enter engine code"
                                        FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                         </div>
 
@@ -183,6 +197,7 @@ else
                             <GridColumn Field="@nameof(VehicleModel.Code)" HeaderText="Code" Width="150" />
                             <GridColumn Field="@nameof(VehicleModel.ShortCode)" HeaderText="Short Code" Width="120" />
                             <GridColumn Field="@nameof(VehicleModel.ChasisCode)" HeaderText="Chasis Code" Width="150" />
+                            <GridColumn Field="@nameof(VehicleModel.EngineCode)" HeaderText="Engine Code" Width="150" />
                             <GridColumn HeaderText="Vehicle Type" Width="150">
                                 <Template>
                                     @{
