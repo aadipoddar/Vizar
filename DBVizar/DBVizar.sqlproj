@@ -148,7 +148,7 @@
     <Build Include="Views\Inventory\Purchase\Purchase_Overview.sql" />
     <Build Include="Views\Inventory\Purchase\PurchaseReturn_Item_Overview.sql" />
     <Build Include="Views\Inventory\Purchase\PurchaseReturn_Overview.sql" />
-    <Build Include="StoredProcedures\LoadData\Inventory\Purchase\Load_Item_By_Party_PurchaseDateTime.sql" />
+    <Build Include="StoredProcedures\LoadData\Inventory\Purchase\Load_Item_By_Vendor_PurchaseDateTime.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\Purchase\Insert_Purchase.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\Purchase\Insert_PurchaseDetail.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\Purchase\Insert_PurchaseReturn.sql" />
@@ -212,5 +212,8 @@
     <Build Include="StoredProcedures\Insert\Inventory\Item\Insert_ItemType.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\Item\Insert_Manufacturer.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\Item\Insert_Tax.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="DBVizar.refactorlog" />
   </ItemGroup>
 </Project>

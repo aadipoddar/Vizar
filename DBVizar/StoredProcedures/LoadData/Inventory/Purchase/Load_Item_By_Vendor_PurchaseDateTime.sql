@@ -1,5 +1,5 @@
-﻿CREATE PROCEDURE [dbo].[Load_Item_By_Party_PurchaseDateTime]
-	@PartyId INT,
+﻿CREATE PROCEDURE [dbo].[Load_Item_By_Vendor_PurchaseDateTime]
+	@VendorId INT,
 	@PurchaseDateTime DATETIME,
 	@OnlyActive BIT
 AS
@@ -14,11 +14,11 @@ BEGIN
 
 		ISNULL(
 			CASE 
-				WHEN @PartyId > 0 THEN
+				WHEN @VendorId > 0 THEN
 					(SELECT TOP 1 Rate FROM PurchaseDetail pd
 					 INNER JOIN Purchase p ON pd.MasterId = p.Id
 					 WHERE pd.ItemId = i.[Id]
-					   AND p.PartyId = @PartyId
+					   AND p.[VendorId] = @VendorId
 					   AND p.Status = 1
 					   AND pd.Status = 1
 					   AND p.TransactionDateTime <= @PurchaseDateTime
@@ -38,11 +38,11 @@ BEGIN
 
 		ISNULL(
 			CASE 
-				WHEN @PartyId > 0 THEN
+				WHEN @VendorId > 0 THEN
 					(SELECT TOP 1 UnitOfMeasurement FROM PurchaseDetail pd
 					 INNER JOIN Purchase p ON pd.MasterId = p.Id
 					 WHERE pd.ItemId = i.[Id]
-					   AND p.PartyId = @PartyId
+					   AND p.[VendorId] = @VendorId
 					   AND p.Status = 1
 					   AND pd.Status = 1
 					   AND p.TransactionDateTime <= @PurchaseDateTime

@@ -67,7 +67,7 @@ public static class ExcelInvoiceExportUtil
             currentRow = await DrawInvoiceHeader(worksheet, currentRow);
 
             // 2. Invoice Type and Number
-            currentRow = DrawInvoiceTitle(worksheet, invoiceData.InvoiceType, invoiceData.TransactionNo, invoiceData.TransactionDateTime, currentRow, invoiceData.Outlet);
+            currentRow = DrawInvoiceTitle(worksheet, invoiceData.InvoiceType, invoiceData.TransactionNo, invoiceData.TransactionDateTime, currentRow, invoiceData.Garage);
 
             // 2.5. Draw DELETED status badge if Status is false
             if (!invoiceData.Status)
@@ -194,7 +194,7 @@ public static class ExcelInvoiceExportUtil
         if (!string.IsNullOrWhiteSpace(outlet))
         {
             worksheet.Range[currentRow, 1, currentRow, 5].Merge();
-            worksheet.Range[currentRow, 1].Text = $"Outlet: {outlet}";
+            worksheet.Range[currentRow, 1].Text = $"Garage: {outlet}";
             worksheet.Range[currentRow, 1].CellStyle.Font.Bold = true;
             worksheet.Range[currentRow, 1].CellStyle.Font.Size = 10;
             worksheet.Range[currentRow, 1].CellStyle.Font.RGBColor = Color.FromArgb(100, 100, 100);

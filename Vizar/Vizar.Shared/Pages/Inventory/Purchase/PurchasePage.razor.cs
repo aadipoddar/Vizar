@@ -15,6 +15,7 @@ using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Inventory.Purchase;
 using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
+using VizarLibrary.Models.Fleet.Service;
 using VizarLibrary.Models.Inventory.Item;
 using VizarLibrary.Models.Inventory.Purchase;
 using VizarLibrary.Models.Operations;
@@ -35,14 +36,16 @@ public partial class PurchasePage : IAsyncDisposable
     private bool _isUploadDialogVisible = false;
 
     private CompanyModel _selectedCompany = new();
-    private LedgerModel _selectedParty = new();
+    private LedgerModel _selectedVendor = new();
+    private GarageModel _selectedGarage = new();
     private FinancialYearModel _selectedFinancialYear = new();
     private ItemModel? _selectedItem = new();
     private PurchaseItemCartModel _selectedCart = new();
     private PurchaseModel _purchase = new();
 
     private List<CompanyModel> _companies = [];
-    private List<LedgerModel> _parties = [];
+    private List<LedgerModel> _vendors = [];
+    private List<GarageModel> _garages = [];
     private List<ItemModel> _items = [];
     private List<TaxModel> _taxes = [];
     private List<PurchaseItemCartModel> _cart = [];
@@ -86,6 +89,7 @@ public partial class PurchasePage : IAsyncDisposable
 
         await LoadCompanies();
         await LoadLedgers();
+        await LoadGarages();
         await LoadExistingTransaction();
         await LoadItems();
         await LoadExistingCart();
@@ -117,19 +121,39 @@ public partial class PurchasePage : IAsyncDisposable
     {
         try
         {
-            _parties = await CommonData.LoadTableDataByStatus<LedgerModel>(TableNames.Ledger);
-            _parties = [.. _parties.OrderBy(s => s.Name)];
-            _parties.Add(new()
+            _vendors = await CommonData.LoadTableDataByStatus<LedgerModel>(TableNames.Ledger);
+            _vendors = [.. _vendors.OrderBy(s => s.Name)];
+            _vendors.Add(new()
             {
                 Id = 0,
-                Name = "Create New Party Ledger..."
+                Name = "Create New Vendor Ledger..."
             });
 
-            _selectedParty = _parties.FirstOrDefault();
+            _selectedVendor = _vendors.FirstOrDefault();
         }
         catch (Exception ex)
         {
-            await _toastNotification.ShowAsync("An Error Occurred While Loading Ledgers", ex.Message, ToastType.Error);
+            await _toastNotification.ShowAsync("An Error Occurred While Loading Vendors", ex.Message, ToastType.Error);
+        }
+    }
+
+    private async Task LoadGarages()
+    {
+        try
+        {
+            _garages = await CommonData.LoadTableDataByStatus<GarageModel>(TableNames.Garage);
+            _garages = [.. _garages.OrderBy(s => s.Name)];
+            _garages.Add(new()
+            {
+                Id = 0,
+                Name = "Create New Garage..."
+            });
+
+            _selectedGarage = _garages.FirstOrDefault();
+        }
+        catch (Exception ex)
+        {
+            await _toastNotification.ShowAsync("An Error Occurred While Loading Garages", ex.Message, ToastType.Error);
         }
     }
 
@@ -157,8 +181,10 @@ public partial class PurchasePage : IAsyncDisposable
                     Id = 0,
                     TransactionNo = string.Empty,
                     CompanyId = _selectedCompany.Id,
-                    PartyId = _selectedParty.Id,
+                    VendorId = _selectedVendor.Id,
+                    GarageId = _selectedGarage.Id,
                     TransactionDateTime = await CommonData.LoadCurrentDateTime(),
+                    ReceiveDateTime = null,
                     FinancialYearId = (await FinancialYearData.LoadFinancialYearByDateTime(await CommonData.LoadCurrentDateTime())).Id,
                     CreatedBy = _user.Id,
                     BaseTotal = 0,
@@ -195,12 +221,20 @@ public partial class PurchasePage : IAsyncDisposable
                 _purchase.CompanyId = _selectedCompany.Id;
             }
 
-            if (_purchase.PartyId > 0)
-                _selectedParty = _parties.FirstOrDefault(s => s.Id == _purchase.PartyId);
+            if (_purchase.VendorId > 0)
+                _selectedVendor = _vendors.FirstOrDefault(s => s.Id == _purchase.VendorId);
             else
             {
-                _selectedParty = _parties.FirstOrDefault();
-                _purchase.PartyId = _selectedParty.Id;
+                _selectedVendor = _vendors.FirstOrDefault();
+                _purchase.VendorId = _selectedVendor.Id;
+            }
+
+            if (_purchase.GarageId > 0)
+                _selectedGarage = _garages.FirstOrDefault(s => s.Id == _purchase.GarageId);
+            else
+            {
+                _selectedGarage = _garages.FirstOrDefault();
+                _purchase.GarageId = _selectedGarage.Id;
             }
 
             _selectedFinancialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, _purchase.FinancialYearId);
@@ -220,7 +254,7 @@ public partial class PurchasePage : IAsyncDisposable
     {
         try
         {
-            _items = await PurchaseData.LoadItemByPartyPurchaseDateTime(_purchase.PartyId, _purchase.TransactionDateTime);
+            _items = await PurchaseData.LoadItemByVendorPurchaseDateTime(_purchase.VendorId, _purchase.TransactionDateTime);
             _taxes = await CommonData.LoadTableDataByStatus<TaxModel>(TableNames.Tax);
 
             _items = [.. _items.OrderBy(s => s.Name)];
@@ -319,7 +353,7 @@ public partial class PurchasePage : IAsyncDisposable
         await SaveTransactionFile();
     }
 
-    private async Task OnPartyChanged(ChangeEventArgs<LedgerModel, LedgerModel> args)
+    private async Task OnVendorChanged(ChangeEventArgs<LedgerModel, LedgerModel> args)
     {
         if (args.Value is null)
             return;
@@ -334,10 +368,31 @@ public partial class PurchasePage : IAsyncDisposable
             return;
         }
 
-        _selectedParty = args.Value;
-        _purchase.PartyId = _selectedParty.Id;
+        _selectedVendor = args.Value;
+        _purchase.VendorId = _selectedVendor.Id;
 
         await LoadItems();
+        await SaveTransactionFile();
+    }
+
+    private async Task OnGarageChanged(ChangeEventArgs<GarageModel, GarageModel> args)
+    {
+        if (args.Value is null)
+            return;
+
+        if (args.Value.Id == 0)
+        {
+            if (FormFactor.GetFormFactor() == "Web")
+                await JSRuntime.InvokeVoidAsync("open", PageRouteNames.AdminGarage, "_blank");
+            else
+                NavigationManager.NavigateTo(PageRouteNames.AdminGarage);
+
+            return;
+        }
+
+        _selectedGarage = args.Value;
+        _purchase.GarageId = _selectedGarage.Id;
+
         await SaveTransactionFile();
     }
 
@@ -408,7 +463,7 @@ public partial class PurchasePage : IAsyncDisposable
 
         else
         {
-            var isSameState = _selectedParty.StateUTId == _selectedCompany.StateUTId;
+            var isSameState = _selectedVendor.StateUTId == _selectedCompany.StateUTId;
 
             _selectedCart.ItemId = _selectedItem.Id;
             _selectedCart.ItemName = _selectedItem.Name;
@@ -676,7 +731,8 @@ public partial class PurchasePage : IAsyncDisposable
         _purchase.TotalAmount = totalAfterCashDiscount + _purchase.RoundOffAmount;
 
         _purchase.CompanyId = _selectedCompany.Id;
-        _purchase.PartyId = _selectedParty.Id;
+        _purchase.VendorId = _selectedVendor.Id;
+        _purchase.GarageId = _selectedGarage.Id;
         _purchase.CreatedBy = _user.Id;
 
         #region Financial Year
@@ -732,9 +788,15 @@ public partial class PurchasePage : IAsyncDisposable
             return false;
         }
 
-        if (_selectedParty is null || _purchase.PartyId <= 0)
+        if (_selectedVendor is null || _purchase.VendorId <= 0)
         {
-            await _toastNotification.ShowAsync("Party Not Selected", "Please select a party ledger for the transaction.", ToastType.Error);
+            await _toastNotification.ShowAsync("Vendor Not Selected", "Please select a vendor ledger for the transaction.", ToastType.Error);
+            return false;
+        }
+
+        if (_selectedGarage is null || _purchase.GarageId <= 0)
+        {
+            await _toastNotification.ShowAsync("Garage Not Selected", "Please select a garage for the transaction.", ToastType.Error);
             return false;
         }
 

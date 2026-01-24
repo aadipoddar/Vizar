@@ -64,7 +64,7 @@ public static class PDFInvoiceExportUtil
             currentY = DrawInvoiceHeader(graphics, leftMargin, pageWidth, currentY);
 
             // 2. Invoice Type and Number
-            currentY = DrawInvoiceTitle(graphics, invoiceData.InvoiceType, invoiceData.TransactionNo, invoiceData.TransactionDateTime, leftMargin, pageWidth, currentY, invoiceData.Outlet);
+            currentY = DrawInvoiceTitle(graphics, invoiceData.InvoiceType, invoiceData.TransactionNo, invoiceData.TransactionDateTime, leftMargin, pageWidth, currentY, invoiceData.Garage);
 
             // 2.5. Draw DELETED status badge if Status is false
             if (!invoiceData.Status)
@@ -231,7 +231,7 @@ public static class PDFInvoiceExportUtil
         {
             PdfStandardFont outletFont = new(PdfFontFamily.Helvetica, 10, PdfFontStyle.Bold);
             PdfBrush outletBrush = new PdfSolidBrush(new PdfColor(100, 100, 100));
-            string outletText = $"Outlet: {outlet}";
+            string outletText = $"Garage: {outlet}";
             graphics.DrawString(outletText, outletFont, outletBrush, new PointF(leftMargin, currentY));
         }
 

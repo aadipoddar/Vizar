@@ -5,9 +5,12 @@ SELECT
 	[p].[TransactionNo],
 	[p].[CompanyId],
 	[c].[Name] AS CompanyName,
-	[p].[PartyId],
-	[l].[Name] AS PartyName,
+	[p].[VendorId],
+	[l].[Name] AS VendorName,
+	[p].[GarageId],
+	[g].[Name] AS GarageName,
 	[p].[TransactionDateTime],
+	[p].[ReceiveDateTime],
 	[p].[FinancialYearId],
 	CONVERT(VARCHAR(10), fy.StartDate, 103) + ' to ' + CONVERT(VARCHAR(10), fy.EndDate, 103) AS FinancialYear,
 
@@ -46,7 +49,9 @@ FROM
 INNER JOIN
 	[dbo].[Company] AS c ON p.CompanyId = c.Id
 INNER JOIN
-	[dbo].[Ledger] AS l ON p.PartyId = l.Id
+	[dbo].[Ledger] AS l ON p.[VendorId] = l.Id
+INNER JOIN
+	[dbo].[Garage] AS g ON p.GarageId = g.Id
 INNER JOIN
 	[dbo].[FinancialYear] AS fy ON p.FinancialYearId = fy.Id
 INNER JOIN

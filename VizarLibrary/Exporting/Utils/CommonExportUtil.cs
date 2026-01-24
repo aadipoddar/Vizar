@@ -35,7 +35,7 @@ public class InvoiceData
     public CompanyModel? Company { get; set; }
     public LedgerModel? BillTo { get; set; }
     public string InvoiceType { get; set; } = "INVOICE";
-    public string Outlet { get; set; } = string.Empty;
+    public string Garage { get; set; } = string.Empty;
 }
 
 public enum CellAlignment

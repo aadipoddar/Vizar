@@ -220,7 +220,7 @@ public partial class PurchaseReturnPage : IAsyncDisposable
     {
         try
         {
-            _items = await PurchaseData.LoadItemByPartyPurchaseDateTime(_purchaseReturn.PartyId, _purchaseReturn.TransactionDateTime);
+            _items = await PurchaseData.LoadItemByVendorPurchaseDateTime(_purchaseReturn.PartyId, _purchaseReturn.TransactionDateTime);
             _taxes = await CommonData.LoadTableDataByStatus<TaxModel>(TableNames.Tax);
 
             _items = [.. _items.OrderBy(s => s.Name)];

@@ -22,11 +22,11 @@ internal static class PurchaseNotify
             TransactionType = "Purchase",
             TransactionNo = purchase.TransactionNo,
             Action = type,
-            LocationName = purchase.PartyName,
+            LocationName = purchase.VendorName,
             Details = new Dictionary<string, string>
             {
                 ["Transaction Number"] = purchase.TransactionNo,
-                ["Vendor"] = purchase.PartyName,
+                ["Vendor"] = purchase.VendorName,
                 ["Transaction Date"] = purchase.TransactionDateTime.ToString("dd MMM yyyy, hh:mm tt"),
                 ["Total Items"] = purchase.TotalItems.ToString(),
                 ["Total Quantity"] = purchase.TotalQuantity.FormatSmartDecimal(),

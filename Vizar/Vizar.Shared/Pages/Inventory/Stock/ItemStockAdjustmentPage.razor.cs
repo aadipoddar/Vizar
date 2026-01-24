@@ -93,7 +93,7 @@ public partial class ItemStockAdjustmentPage : IAsyncDisposable
     {
         try
         {
-            _items = await PurchaseData.LoadItemByPartyPurchaseDateTime(0, _transactionDateTime);
+            _items = await PurchaseData.LoadItemByVendorPurchaseDateTime(0, _transactionDateTime);
 
             _items = [.. _items.OrderBy(s => s.Name)];
             _items.Add(new()

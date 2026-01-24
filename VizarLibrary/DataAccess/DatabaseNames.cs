@@ -65,7 +65,7 @@ public static class StoredProcedureNames
     public static string LoadAccountingByVoucherReference => "Load_Accounting_By_Voucher_Reference";
     public static string LoadTrialBalanceByCompanyDate => "Load_TrialBalance_By_Company_Date";
 
-    public static string LoadItemByPartyPurchaseDateTime => "Load_Item_By_Party_PurchaseDateTime";
+    public static string LoadItemByVendorPurchaseDateTime => "Load_Item_By_Vendor_PurchaseDateTime";
     public static string LoadItemStockSummaryByDate => "Load_ItemStockSummary_By_Date";
 
     public static string LoadLastVehicleServiceItemByVehicleServiceTypeDate => "Load_Last_VehicleService_Item_By_Vehicle_ServiceType_Date";

@@ -22,8 +22,8 @@ public static class PurchaseData
     private static async Task<int> InsertPurchaseDetail(PurchaseDetailModel purchaseDetail, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
         (await SqlDataAccess.LoadData<int, dynamic>(StoredProcedureNames.InsertPurchaseDetail, purchaseDetail, sqlDataAccessTransaction)).FirstOrDefault();
 
-    public static async Task<List<ItemModel>> LoadItemByPartyPurchaseDateTime(int PartyId, DateTime PurchaseDateTime, bool OnlyActive = true) =>
-        await SqlDataAccess.LoadData<ItemModel, dynamic>(StoredProcedureNames.LoadItemByPartyPurchaseDateTime, new { PartyId, PurchaseDateTime, OnlyActive });
+    public static async Task<List<ItemModel>> LoadItemByVendorPurchaseDateTime(int VendorId, DateTime PurchaseDateTime, bool OnlyActive = true) =>
+        await SqlDataAccess.LoadData<ItemModel, dynamic>(StoredProcedureNames.LoadItemByVendorPurchaseDateTime, new { VendorId, PurchaseDateTime, OnlyActive });
 
     public static List<PurchaseDetailModel> ConvertCartToDetails(List<PurchaseItemCartModel> cart, int purchaseId) =>
         [.. cart.Select(item => new PurchaseDetailModel
@@ -183,6 +183,9 @@ public static class PurchaseData
         if (update)
             await ItemStockData.DeleteItemStockByTypeTransactionId(nameof(StockType.Purchase), purchase.Id, sqlDataAccessTransaction);
 
+        if (purchase.ReceiveDateTime is null)
+            return;
+
         foreach (var item in purchaseDetails)
         {
             var id = await ItemStockData.InsertItemStock(new()
@@ -195,7 +198,7 @@ public static class PurchaseData
                 Type = nameof(StockType.Purchase),
                 TransactionId = purchase.Id,
                 TransactionNo = purchase.TransactionNo,
-                TransactionDateTime = purchase.TransactionDateTime
+                TransactionDateTime = purchase.ReceiveDateTime.Value
             }, sqlDataAccessTransaction);
 
             if (id <= 0)
@@ -235,7 +238,7 @@ public static class PurchaseData
                 ReferenceId = purchaseOverview.Id,
                 ReferenceType = nameof(ReferenceTypes.Purchase),
                 ReferenceNo = purchaseOverview.TransactionNo,
-                LedgerId = purchaseOverview.PartyId,
+                LedgerId = purchaseOverview.VendorId,
                 Debit = null,
                 Credit = purchaseOverview.TotalAmount,
                 Remarks = $"Party Account Posting For Purchase Bill {purchaseOverview.TransactionNo}",

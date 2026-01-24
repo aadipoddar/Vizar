@@ -14,10 +14,13 @@ SELECT
 	[p].[Id] AS MasterId,
 	[p].[TransactionNo],
 	[p].[TransactionDateTime],
+	[p].[ReceiveDateTime],
 	[c].[Id] AS CompanyId,
 	[c].[Name] AS CompanyName,
-	[l].[Id] AS PartyId,
-	[l].[Name] AS PartyName,
+	[l].[Id] AS VendorId,
+	[l].[Name] AS VendorName,
+	[g].[Id] AS GarageId,
+	[g].[Name] AS GarageName,
 	[p].[Remarks] AS PurchaseRemarks,
 
 	[pd].[IdentificationNo],
@@ -61,7 +64,9 @@ INNER JOIN
 INNER JOIN
 	[dbo].[Company] c ON p.CompanyId = c.Id
 INNER JOIN
-	[dbo].[Ledger] l ON p.PartyId = l.Id
+	[dbo].[Ledger] l ON p.[VendorId] = l.Id
+INNER JOIN
+	[dbo].[Garage] g ON p.[GarageId] = g.Id
 
 WHERE
 	[p].[Status] = 1 AND

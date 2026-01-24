@@ -210,7 +210,7 @@ public partial class ItemIssuePage : IAsyncDisposable
     {
         try
         {
-            _items = await PurchaseData.LoadItemByPartyPurchaseDateTime(0, _itemIssue.TransactionDateTime);
+            _items = await PurchaseData.LoadItemByVendorPurchaseDateTime(0, _itemIssue.TransactionDateTime);
             _items = [.. _items.OrderBy(s => s.Name)];
             _items.Add(new()
             {
