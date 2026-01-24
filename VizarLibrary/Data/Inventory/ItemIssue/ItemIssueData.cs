@@ -4,7 +4,7 @@ using VizarLibrary.Data.Inventory.Stock;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Inventory.ItemIssue;
 using VizarLibrary.Exporting.Utils;
-using VizarLibrary.Models.Fleet.Item;
+using VizarLibrary.Models.Inventory.Item;
 using VizarLibrary.Models.Inventory.ItemIssue;
 
 namespace VizarLibrary.Data.Inventory.ItemIssue;

@@ -3,14 +3,14 @@ using Syncfusion.Blazor.Grids;
 using Vizar.Shared.Components.Dialog;
 
 using VizarLibrary.Data.Common;
-using VizarLibrary.Data.Fleet.Item;
+using VizarLibrary.Data.Inventory.Item;
 using VizarLibrary.DataAccess;
-using VizarLibrary.Exporting.Fleet.Item;
+using VizarLibrary.Exporting.Inventory.Item;
 using VizarLibrary.Exporting.Utils;
-using VizarLibrary.Models.Fleet.Item;
+using VizarLibrary.Models.Inventory.Item;
 using VizarLibrary.Models.Operations;
 
-namespace Vizar.Shared.Pages.Fleet.Item;
+namespace Vizar.Shared.Pages.Inventory.Item;
 
 public partial class ItemPage : IAsyncDisposable
 {

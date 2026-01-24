@@ -3,7 +3,7 @@ using VizarLibrary.Data.Common;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Inventory.Stock;
 using VizarLibrary.Exporting.Utils;
-using VizarLibrary.Models.Fleet.Item;
+using VizarLibrary.Models.Inventory.Item;
 
 namespace VizarLibrary.Data.Inventory.Stock;
 

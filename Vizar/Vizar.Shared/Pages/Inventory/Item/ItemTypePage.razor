@@ -1,8 +1,8 @@
-﻿@page "/admin/manufacturer"
+﻿@page "/admin/item-type"
 
-@using VizarLibrary.Models.Fleet.Item
+@using VizarLibrary.Models.Inventory.Item
 
-<PageTitle>Manufacturer Management - Vizar</PageTitle>
+<PageTitle>Item Type Management - Vizar</PageTitle>
 
 @if (_isLoading)
 {
@@ -11,19 +11,19 @@
 else
 {
     <div style="display: flex; flex-direction: column; min-height: 100vh;">
-        <Header Title="Manufacturer Management" Subtitle="Manage manufacturers and details" ShowHome="true" ShowBack="true" ShowLogout="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
+        <Header Title="Item Type Management" Subtitle="Manage item types and details" ShowHome="true" ShowBack="true" ShowLogout="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
             <RightContent>
                 <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Title="Export to Excel (Ctrl + E)" Disabled="_isProcessing" OnClick="ExportExcel" />
                 <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Title="Export to PDF (Ctrl + P)" Disabled="_isProcessing" OnClick="ExportPdf" />
-                <IconButton Icon="IconType.Save" Variant="ButtonVariant.Save" Title="Save Manufacturer (Ctrl + S)" Disabled="_isProcessing" OnClick="SaveManufacturer" />
-                <IconButton Icon="IconType.New" Title="New Manufacturer (Ctrl + N)" Disabled="_isProcessing" OnClick="ResetPage" />
+                <IconButton Icon="IconType.Save" Variant="ButtonVariant.Save" Title="Save Item Type (Ctrl + S)" Disabled="_isProcessing" OnClick="SaveItemType" />
+                <IconButton Icon="IconType.New" Title="New Item Type (Ctrl + N)" Disabled="_isProcessing" OnClick="ResetPage" />
             </RightContent>
         </Header>
 
         <!-- Main Content Container -->
         <div class="page-container">
 
-        <!-- Manufacturer Entry Section -->
+        <!-- Item Type Entry Section -->
         <div class="section-card">
             <div class="section-header">
                 <div class="section-title-wrapper">
@@ -31,39 +31,39 @@ else
                          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" />
                     </svg>
-                    <h2 class="section-title">Manufacturer Details</h2>
+                    <h2 class="section-title">Item Type Details</h2>
                 </div>
             </div>
             <div class="section-body">
                 <div class="form-grid-triple">
-                    <!-- Manufacturer Name -->
+                    <!-- Item Type Name -->
                     <div class="form-field">
                         <label class="field-label">
-                            Manufacturer Name <span class="required">*</span>
+                            Item Type Name <span class="required">*</span>
                         </label>
-                        <SfTextBox @bind-Value="_manufacturer.Name" Placeholder="Enter manufacturer name"
+                        <SfTextBox @bind-Value="_itemType.Name" Placeholder="Enter item type name"
                                    FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                     </div>
 
                     <div class="form-field">
                         <label class="field-label">
-                            Manufacturer Code <span class="required">*</span>
+                            Item Type Code <span class="required">*</span>
                         </label>
-                        <SfTextBox Value="@_manufacturer.Code" Placeholder="Enter manufacturer code" Readonly="true"
+                        <SfTextBox Value="@_itemType.Code" Placeholder="Enter item type code" Readonly="true"
                                    FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                     </div>
 
                     <!-- Remarks -->
                     <div class="form-field">
                         <label class="field-label">Remarks</label>
-                        <SfTextBox @bind-Value="_manufacturer.Remarks" Placeholder="Enter remarks (optional)" Multiline="true"
+                        <SfTextBox @bind-Value="_itemType.Remarks" Placeholder="Enter remarks (optional)" Multiline="true"
                                    FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Manufacturers List Section -->
+        <!-- Item Types List Section -->
         <div class="section-card">
             <div class="section-header">
                 <div class="section-title-wrapper">
@@ -72,14 +72,14 @@ else
                         <path d="M9 11l3 3L22 4" />
                         <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                     </svg>
-                    <h2 class="section-title">Manufacturers List</h2>
+                    <h2 class="section-title">Item Types List</h2>
                 </div>
                 <div class="header-actions">
                     <ToggleDeletedButton Disabled="@_isProcessing" ShowDeleted="@_showDeleted" OnToggle="ToggleDeleted" />
                 </div>
             </div>
             <div class="section-body grid-body">
-                <SfGrid @ref="_sfGrid" DataSource="@_manufacturers" AllowPaging="true" AllowSorting="true" AllowFiltering="true"
+                <SfGrid @ref="_sfGrid" DataSource="@_itemTypes" AllowPaging="true" AllowSorting="true" AllowFiltering="true"
                         AllowResizing="true" CssClass="professional-grid" Toolbar="@(new List<string>() { "Search" })">
                     <GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
                     <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
@@ -87,32 +87,32 @@ else
                         <GridColumn HeaderText="Actions" Width="120" TextAlign="TextAlign.Center" AllowFiltering="false">
                             <Template>
                                 @{
-                                    var manufacturer = (context as ManufacturerModel);
+                                    var itemType = (context as ItemTypeModel);
 
                                     <div class="grid-actions">
-                                        @if (manufacturer.Status)
+                                        @if (itemType.Status)
                                         {
-                                            <IconButton Icon="IconType.Edit" Variant="ButtonVariant.Edit" Size="ButtonSize.Grid" Title="Edit (Insert)" OnClick="@(() => OnEditManufacturer(manufacturer))" />
-                                            <IconButton Icon="IconType.Delete" Variant="ButtonVariant.Delete" Size="ButtonSize.Grid" Title="Delete (Delete)" OnClick="@(() => ShowDeleteConfirmation(manufacturer.Id, manufacturer.Name))" />
+                                            <IconButton Icon="IconType.Edit" Variant="ButtonVariant.Edit" Size="ButtonSize.Grid" Title="Edit (Insert)" OnClick="@(() => OnEditItemType(itemType))" />
+                                            <IconButton Icon="IconType.Delete" Variant="ButtonVariant.Delete" Size="ButtonSize.Grid" Title="Delete (Delete)" OnClick="@(() => ShowDeleteConfirmation(itemType.Id, itemType.Name))" />
                                         }
                                         else
                                         {
-                                            <IconButton Icon="IconType.Recover" Variant="ButtonVariant.Recover" Size="ButtonSize.Grid" Title="Recover (Delete)" OnClick="@(() => ShowRecoverConfirmation(manufacturer.Id, manufacturer.Name))" />
+                                            <IconButton Icon="IconType.Recover" Variant="ButtonVariant.Recover" Size="ButtonSize.Grid" Title="Recover (Delete)" OnClick="@(() => ShowRecoverConfirmation(itemType.Id, itemType.Name))" />
                                         }
                                     </div>
                                 }
                             </Template>
                         </GridColumn>
-                        <GridColumn Field="@nameof(ManufacturerModel.Id)" HeaderText="ID" Width="80" TextAlign="TextAlign.Center" />
-                        <GridColumn Field="@nameof(ManufacturerModel.Name)" HeaderText="Name" Width="300" />
-                        <GridColumn Field="@nameof(ManufacturerModel.Code)" HeaderText="Code" Width="200" />
-                        <GridColumn Field="@nameof(ManufacturerModel.Remarks)" HeaderText="Remarks" Width="400" />
-                        <GridColumn Field="@nameof(ManufacturerModel.Status)" HeaderText="Status" Width="100" TextAlign="TextAlign.Center">
+                        <GridColumn Field="@nameof(ItemTypeModel.Id)" HeaderText="ID" Width="80" TextAlign="TextAlign.Center" />
+                        <GridColumn Field="@nameof(ItemTypeModel.Name)" HeaderText="Name" Width="300" />
+                        <GridColumn Field="@nameof(ItemTypeModel.Code)" HeaderText="Code" Width="200" />
+                        <GridColumn Field="@nameof(ItemTypeModel.Remarks)" HeaderText="Remarks" Width="400" />
+                        <GridColumn Field="@nameof(ItemTypeModel.Status)" HeaderText="Status" Width="100" TextAlign="TextAlign.Center">
                             <Template>
                                 @{
-                                    var manufacturer = (context as ManufacturerModel);
-                                    <div class="grid-checkbox" style="@(manufacturer.Status ? "color: #10b981; background: #d1fae5;" : "color: #dc2626; background: #fee2e2;")">
-                                        @(manufacturer.Status ? "✓" : "✗")
+                                    var itemType = (context as ItemTypeModel);
+                                    <div class="grid-checkbox" style="@(itemType.Status ? "color: #10b981; background: #d1fae5;" : "color: #dc2626; background: #fee2e2;")">
+                                        @(itemType.Status ? "✓" : "✗")
                                     </div>
                                 }
                             </Template>
@@ -129,18 +129,18 @@ else
 }
 
 <DeleteConfirmationDialog @ref="_deleteConfirmationDialog"
-                          EntityName="Manufacturer"
-                          IdentifierLabel="Manufacturer Name"
-                          IdentifierValue="@_deleteManufacturerName"
+                          EntityName="Item Type"
+                          IdentifierLabel="Item Type Name"
+                          IdentifierValue="@_deleteItemTypeName"
                           IsPermanentDelete="false"
                           Disabled="@_isProcessing"
                           OnConfirm="ConfirmDelete"
                           OnCancel="CancelDelete" />
 
 <RecoverConfirmationDialog @ref="_recoverConfirmationDialog"
-                           EntityName="Manufacturer"
-                           IdentifierLabel="Manufacturer Name"
-                           IdentifierValue="@_recoverManufacturerName"
+                           EntityName="Item Type"
+                           IdentifierLabel="Item Type Name"
+                           IdentifierValue="@_recoverItemTypeName"
                            Disabled="@_isProcessing"
                            OnConfirm="ConfirmRecover"
                            OnCancel="CancelRecover" />

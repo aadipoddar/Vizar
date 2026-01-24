@@ -2,9 +2,9 @@ using VizarLibrary.Data.Common;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
-using VizarLibrary.Models.Fleet.Item;
 using VizarLibrary.Models.Fleet.Service;
 using VizarLibrary.Models.Fleet.Vehicle;
+using VizarLibrary.Models.Inventory.Item;
 using VizarLibrary.Models.Inventory.ItemIssue;
 
 namespace VizarLibrary.Exporting.Inventory.ItemIssue;

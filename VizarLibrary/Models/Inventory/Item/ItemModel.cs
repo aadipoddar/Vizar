@@ -1,4 +1,4 @@
-﻿namespace VizarLibrary.Models.Fleet.Item;
+﻿namespace VizarLibrary.Models.Inventory.Item;
 
 public class ItemModel
 {
