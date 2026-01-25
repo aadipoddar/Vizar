@@ -5,6 +5,7 @@ public class ItemStockModel
     public int Id { get; set; }
     public int ItemId { get; set; }
     public string? IdentificationNo { get; set; }
+    public int GarageId { get; set; }
     public decimal Quantity { get; set; }
     public decimal? NetRate { get; set; }
     public string Type { get; set; }
@@ -34,6 +35,8 @@ public class ItemStockDetailsModel
     public int ManufacturerId { get; set; }
     public string ManufacturerName { get; set; }
     public string? IdentificationNo { get; set; }
+    public int GarageId { get; set; }
+    public string GarageName { get; set; }
     public decimal Quantity { get; set; }
     public decimal? NetRate { get; set; }
     public string Type { get; set; }

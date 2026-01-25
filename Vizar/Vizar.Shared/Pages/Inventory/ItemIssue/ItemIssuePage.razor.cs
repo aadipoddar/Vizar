@@ -218,7 +218,8 @@ public partial class ItemIssuePage : IAsyncDisposable
                 Name = "Create New Item ..."
             });
 
-            _stockSummary = await ItemStockData.LoadItemStockSummaryByDate(_itemIssue.TransactionDateTime, _itemIssue.TransactionDateTime);
+            // TODO - Change
+            _stockSummary = await ItemStockData.LoadItemStockSummaryByGarageDate(1, _itemIssue.TransactionDateTime, _itemIssue.TransactionDateTime);
         }
         catch (Exception ex)
         {

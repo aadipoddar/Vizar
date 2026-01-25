@@ -12,8 +12,8 @@ public static class ItemStockData
     public static async Task<int> InsertItemStock(ItemStockModel stock, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
         (await SqlDataAccess.LoadData<int, dynamic>(StoredProcedureNames.InsertItemStock, stock, sqlDataAccessTransaction)).FirstOrDefault();
 
-    public static async Task<List<ItemStockSummaryModel>> LoadItemStockSummaryByDate(DateTime FromDate, DateTime ToDate) =>
-        await SqlDataAccess.LoadData<ItemStockSummaryModel, dynamic>(StoredProcedureNames.LoadItemStockSummaryByDate, new { FromDate = DateOnly.FromDateTime(FromDate), ToDate = DateOnly.FromDateTime(ToDate) });
+    public static async Task<List<ItemStockSummaryModel>> LoadItemStockSummaryByGarageDate(int GarageId, DateTime FromDate, DateTime ToDate) =>
+        await SqlDataAccess.LoadData<ItemStockSummaryModel, dynamic>(StoredProcedureNames.LoadItemStockSummaryByGarageDate, new { GarageId, FromDate = DateOnly.FromDateTime(FromDate), ToDate = DateOnly.FromDateTime(ToDate) });
 
     public static async Task DeleteItemStockByTypeTransactionId(string Type, int TransactionId, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
         await SqlDataAccess.SaveData(StoredProcedureNames.DeleteItemStockByTypeTransactionId, new { Type, TransactionId }, sqlDataAccessTransaction);
@@ -35,7 +35,8 @@ public static class ItemStockData
     public static async Task SaveItemStockAdjustment(DateTime transactionDateTime, List<ItemStockAdjustmentCartModel> cart, int userId)
     {
         var transactionNo = await GenerateCodes.GenerateItemStockAdjustmentTransactionNo(transactionDateTime);
-        var stockSummary = await LoadItemStockSummaryByDate(transactionDateTime, transactionDateTime);
+        // TODO - Change
+        var stockSummary = await LoadItemStockSummaryByGarageDate(1, transactionDateTime, transactionDateTime);
 
         if (cart is null || cart.Count == 0)
             throw new InvalidOperationException("Cannot save stock adjustment with no items.");

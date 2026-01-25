@@ -81,7 +81,8 @@ public partial class ItemStockAdjustmentPage : IAsyncDisposable
         try
         {
             _selectedFinancialYear = await FinancialYearData.LoadFinancialYearByDateTime(_transactionDateTime);
-            _stockSummary = await ItemStockData.LoadItemStockSummaryByDate(_transactionDateTime, _transactionDateTime);
+            // TODO - Change
+            _stockSummary = await ItemStockData.LoadItemStockSummaryByGarageDate(1, _transactionDateTime, _transactionDateTime);
         }
         catch (Exception ex)
         {
@@ -303,7 +304,8 @@ public partial class ItemStockAdjustmentPage : IAsyncDisposable
             await _toastNotification.ShowAsync("Invalid Transaction Date", "The selected transaction date does not fall within an active financial year.", ToastType.Error);
             _transactionDateTime = await CommonData.LoadCurrentDateTime();
             _selectedFinancialYear = await FinancialYearData.LoadFinancialYearByDateTime(_transactionDateTime);
-            _stockSummary = await ItemStockData.LoadItemStockSummaryByDate(_transactionDateTime, _transactionDateTime);
+            // TODO - Change
+            _stockSummary = await ItemStockData.LoadItemStockSummaryByGarageDate(1, _transactionDateTime, _transactionDateTime);
         }
         #endregion
 

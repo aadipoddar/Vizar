@@ -187,6 +187,7 @@ public static class PurchaseReturnData
                 Id = 0,
                 ItemId = item.ItemId,
                 IdentificationNo = item.IdentificationNo,
+                GarageId = purchaseReturn.GarageId,
                 Quantity = -item.Quantity,
                 NetRate = item.NetRate,
                 TransactionId = purchaseReturn.Id,

@@ -12,6 +12,8 @@ SELECT
 	MFR.Id AS ManufacturerId,
 	MFR.Name AS ManufacturerName,
 	ITST.IdentificationNo,
+	ITST.GarageId,
+	GRG.Name AS GarageName,
 	ITST.Quantity,
 	ITST.NetRate,
 	ITST.Type,
@@ -30,3 +32,5 @@ INNER JOIN
 	ItemType AS ITT ON IT.ItemTypeId = ITT.Id
 INNER JOIN
 	Manufacturer AS MFR ON IT.ManufacturerId = MFR.Id
+INNER JOIN
+	Garage AS GRG ON ITST.GarageId = GRG.Id;

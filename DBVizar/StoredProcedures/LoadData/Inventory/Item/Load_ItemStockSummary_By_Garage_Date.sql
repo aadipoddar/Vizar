@@ -1,4 +1,5 @@
-﻿CREATE PROCEDURE [dbo].[Load_ItemStockSummary_By_Date]
+﻿CREATE PROCEDURE [dbo].[Load_ItemStockSummary_By_Garage_Date]
+	@GarageId INT,
 	@FromDate DATETIME,
 	@ToDate DATETIME
 AS
@@ -27,6 +28,7 @@ BEGIN
 			-- Closing Stock: sum of all quantities up to ToDate
 			SUM(CASE WHEN TransactionDateTime <= @ToDate THEN Quantity ELSE 0 END) AS ClosingStock
 		FROM [ItemStock] WITH (NOLOCK)
+		WHERE GarageId = @GarageId
 		GROUP BY ItemId
 	),
 	-- Calculate average prices for purchases in date range
@@ -35,7 +37,8 @@ BEGIN
 			ItemId,
 			AVG(CASE WHEN Quantity > 0 AND NetRate IS NOT NULL THEN NetRate ELSE NULL END) AS AveragePrice
 		FROM [ItemStock] WITH (NOLOCK)
-		WHERE TransactionDateTime >= @FromDate 
+		WHERE GarageId = @GarageId
+			AND TransactionDateTime >= @FromDate 
 			AND TransactionDateTime <= @ToDate
 		GROUP BY ItemId
 	),
@@ -46,7 +49,8 @@ BEGIN
 			NetRate AS LastPurchasePrice,
 			ROW_NUMBER() OVER (PARTITION BY ItemId ORDER BY TransactionDateTime DESC, Id DESC) AS RowNum
 		FROM [ItemStock] WITH (NOLOCK)
-		WHERE TransactionDateTime >= @FromDate 
+		WHERE GarageId = @GarageId
+			AND TransactionDateTime >= @FromDate 
 			AND TransactionDateTime <= @ToDate
 			AND Quantity > 0
 			AND NetRate IS NOT NULL

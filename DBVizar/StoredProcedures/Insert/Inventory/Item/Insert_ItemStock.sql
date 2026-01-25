@@ -2,6 +2,7 @@
 	@Id INT OUTPUT,
 	@ItemId INT, 
 	@IdentificationNo VARCHAR(MAX),
+	@GarageId INT,
 	@Quantity MONEY, 
 	@NetRate MONEY,
 	@Type VARCHAR(20), 
@@ -16,6 +17,7 @@ BEGIN
 		(
 			[ItemId], 
 			[IdentificationNo],
+			[GarageId],
 			[Quantity], 
 			[NetRate],
 			[Type], 
@@ -27,6 +29,7 @@ BEGIN
 		(
 			@ItemId, 
 			@IdentificationNo,
+			@GarageId,
 			@Quantity, 
 			@NetRate,
 			@Type, 
@@ -44,6 +47,7 @@ BEGIN
 		SET 
 			[ItemId] = @ItemId, 
 			[IdentificationNo] = @IdentificationNo,
+			[GarageId] = @GarageId,
 			[Quantity] = @Quantity, 
 			[NetRate] = @NetRate,
 			[Type] = @Type, 

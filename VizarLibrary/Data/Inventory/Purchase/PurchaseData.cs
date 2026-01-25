@@ -193,6 +193,7 @@ public static class PurchaseData
                 Id = 0,
                 ItemId = item.ItemId,
                 IdentificationNo = item.IdentificationNo,
+                GarageId = purchase.GarageId,
                 Quantity = item.Quantity,
                 NetRate = item.NetRate,
                 Type = nameof(StockType.Purchase),

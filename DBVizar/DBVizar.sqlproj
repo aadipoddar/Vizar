@@ -205,15 +205,12 @@
     <Build Include="Tables\Inventory\Item\ItemType.sql" />
     <Build Include="Tables\Inventory\Item\Manufacturer.sql" />
     <Build Include="Tables\Inventory\Item\Tax.sql" />
-    <Build Include="StoredProcedures\LoadData\Inventory\Item\Load_ItemStockSummary_By_Date.sql" />
+    <Build Include="StoredProcedures\LoadData\Inventory\Item\Load_ItemStockSummary_By_Garage_Date.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\Item\Insert_Item.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\Item\Insert_ItemCategory.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\Item\Insert_ItemStock.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\Item\Insert_ItemType.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\Item\Insert_Manufacturer.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\Item\Insert_Tax.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <RefactorLog Include="DBVizar.refactorlog" />
   </ItemGroup>
 </Project>

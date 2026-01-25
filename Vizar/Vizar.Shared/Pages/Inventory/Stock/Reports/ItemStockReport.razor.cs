@@ -13,6 +13,7 @@ using VizarLibrary.Exporting.Inventory.ItemIssue;
 using VizarLibrary.Exporting.Inventory.Purchase;
 using VizarLibrary.Exporting.Inventory.Stock;
 using VizarLibrary.Exporting.Utils;
+using VizarLibrary.Models.Fleet.Service;
 using VizarLibrary.Models.Inventory.Item;
 using VizarLibrary.Models.Operations;
 
@@ -33,6 +34,9 @@ public partial class ItemStockReport : IAsyncDisposable
 
     private DateTime _fromDate = DateTime.Now;
     private DateTime _toDate = DateTime.Now;
+
+    private GarageModel _selectedGarage = new();
+    private List<GarageModel> _garages = [];
 
     private List<ItemStockSummaryModel> _stockSummary = [];
     private List<ItemStockDetailsModel> _stockDetails = [];
@@ -76,6 +80,7 @@ public partial class ItemStockReport : IAsyncDisposable
 
 
         await LoadDates();
+        await LoadGarages();
         await LoadStockData();
         await StartAutoRefresh();
     }
@@ -84,6 +89,13 @@ public partial class ItemStockReport : IAsyncDisposable
     {
         _fromDate = await CommonData.LoadCurrentDateTime();
         _toDate = _fromDate;
+    }
+
+    private async Task LoadGarages()
+    {
+        _garages = await CommonData.LoadTableDataByStatus<GarageModel>(TableNames.Garage);
+        _garages = [.. _garages.OrderBy(s => s.Name)];
+        _selectedGarage = _garages.FirstOrDefault();
     }
 
     private async Task LoadStockData()
@@ -97,7 +109,7 @@ public partial class ItemStockReport : IAsyncDisposable
             StateHasChanged();
             await _toastNotification.ShowAsync("Loading", "Fetching stock data...", ToastType.Info);
 
-            _stockSummary = await ItemStockData.LoadItemStockSummaryByDate(_fromDate, _toDate);
+            _stockSummary = await ItemStockData.LoadItemStockSummaryByGarageDate(_selectedGarage.Id, _fromDate, _toDate);
 
             _stockSummary = [.. _stockSummary.Where(_ => _.OpeningStock != 0 ||
                                                   _.PurchaseStock != 0 ||
@@ -132,7 +144,10 @@ public partial class ItemStockReport : IAsyncDisposable
                 DateOnly.FromDateTime(_fromDate).ToDateTime(TimeOnly.MinValue),
                 DateOnly.FromDateTime(_toDate).ToDateTime(TimeOnly.MaxValue));
 
-        _stockDetails = [.. _stockDetails.OrderBy(_ => _.TransactionDateTime).ThenBy(_ => _.ItemName)];
+        _stockDetails = [.. _stockDetails
+            .Where(_ => _.GarageId == _selectedGarage.Id)
+            .OrderBy(_ => _.TransactionDateTime)
+            .ThenBy(_ => _.ItemName)];
     }
     #endregion
 
@@ -148,6 +163,15 @@ public partial class ItemStockReport : IAsyncDisposable
     {
         _fromDate = dates.FromDate;
         _toDate = dates.ToDate;
+        await LoadStockData();
+    }
+
+    private async Task OnGarageChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<GarageModel, GarageModel> args)
+    {
+        if (args?.Value is null || args.Value.Id == 0)
+            _selectedGarage = _garages.FirstOrDefault(_ => _.Id == 0);
+
+        _selectedGarage = args.Value;
         await LoadStockData();
     }
     #endregion

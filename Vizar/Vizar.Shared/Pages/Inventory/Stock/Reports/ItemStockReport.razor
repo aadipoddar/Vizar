@@ -1,6 +1,7 @@
 @page "/report/item-stock"
 
 @using VizarLibrary.Models.Accounts.Masters
+@using VizarLibrary.Models.Fleet.Service
 @using VizarLibrary.Models.Inventory
 @using VizarLibrary.Models.Inventory.Item
 
@@ -8,7 +9,7 @@
 
 @if (_isLoading)
 {
-	<AnimatedLoader Visible="true" Label="Page is Loading, Please Wait" />
+	<SfSpinner @bind-Visible="_isLoading" Label="Page is Loading, Please Wait" />
 }
 else
 {
@@ -46,6 +47,17 @@ else
 												   TValue="DateTime" Format="dd/MM/yyyy" AllowEdit="true" Placeholder="Select date range">
 									<DateRangePickerEvents TValue="DateTime" ValueChange="OnDateRangeChanged" />
 								</SfDateRangePicker>
+							</div>
+
+							<!-- Garage -->
+							<div class="form-field">
+								<label class="field-label">Garage</label>
+								<SfAutoComplete CssClass="custom-autocomplete" Value="@_selectedGarage" TValue="GarageModel"
+												TItem="GarageModel" DataSource="@_garages" Placeholder="All Garages" AllowFiltering="true"
+												FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains">
+									<AutoCompleteEvents TItem="GarageModel" TValue="GarageModel" ValueChange="OnGarageChanged" />
+									<AutoCompleteFieldSettings Value="Name" />
+								</SfAutoComplete>
 							</div>
 						</div>
 

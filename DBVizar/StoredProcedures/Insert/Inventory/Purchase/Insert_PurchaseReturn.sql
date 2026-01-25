@@ -42,6 +42,7 @@ BEGIN
 			[GarageId],
 			[TransactionDateTime],
 			[ReceiveDateTime],
+			[FinancialYearId],
 			[TotalItems],
 			[TotalQuantity],
 			[BaseTotal],
