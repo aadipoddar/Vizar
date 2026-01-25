@@ -82,9 +82,6 @@
     <Folder Include="Views\Inventory\Stock" />
     <Folder Include="StoredProcedures\Delete" />
     <Folder Include="Tables\Fleet" />
-    <Folder Include="Tables\Inventory\ItemIssue" />
-    <Folder Include="Views\Inventory\ItemIssue" />
-    <Folder Include="StoredProcedures\Insert\Inventory\ItemIssue" />
     <Folder Include="Tables\Fleet\Vehicle" />
     <Folder Include="Tables\Fleet\Service" />
     <Folder Include="StoredProcedures\Insert\Fleet" />
@@ -107,6 +104,9 @@
     <Folder Include="StoredProcedures\Insert\Inventory\Item" />
     <Folder Include="Tables\Inventory\Stock" />
     <Folder Include="StoredProcedures\Insert\Inventory\Stock" />
+    <Folder Include="StoredProcedures\Insert\Fleet\Repair" />
+    <Folder Include="Tables\Fleet\Repair" />
+    <Folder Include="Views\Fleet\Repair" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\AzureVizar.publish.xml" />
@@ -159,24 +159,15 @@
     <Build Include="StoredProcedures\LoadData\Common\Load_LastTableData_By_Company_FinancialYear.sql" />
     <Build Include="StoredProcedures\Delete\Delete_ItemStock_By_Type_TransactionId.sql" />
     <Build Include="StoredProcedures\Delete\Delete_ItemStock_By_Id.sql" />
-    <Build Include="Tables\Inventory\ItemIssue\ItemIssue.sql" />
-    <Build Include="Tables\Inventory\ItemIssue\ItemIssueDetail.sql" />
-    <Build Include="Views\Inventory\ItemIssue\GarageIssue_Item_Overview.sql" />
-    <Build Include="Views\Inventory\ItemIssue\ItemIssue_Overview.sql" />
     <Build Include="Tables\Fleet\Vehicle\Vehicle.sql" />
     <Build Include="Tables\Fleet\Vehicle\VehicleModel.sql" />
     <Build Include="Tables\Fleet\Vehicle\VehicleType.sql" />
-    <Build Include="Tables\Fleet\Service\Garage.sql" />
-    <Build Include="Views\Inventory\ItemIssue\VehicleIssue_Item_Overview.sql" />
     <Build Include="Tables\Fleet\Service\Service.sql" />
     <Build Include="Tables\Fleet\Service\ServiceDetail.sql" />
     <Build Include="Tables\Fleet\Service\ServiceType.sql" />
     <Build Include="Tables\Fleet\Service\ServiceSchedule.sql" />
-    <Build Include="StoredProcedures\Insert\Inventory\ItemIssue\Insert_ItemIssueDetail.sql" />
-    <Build Include="StoredProcedures\Insert\Inventory\ItemIssue\Insert_ItemIssue.sql" />
     <Build Include="StoredProcedures\Insert\Fleet\Service\Insert_Service.sql" />
     <Build Include="StoredProcedures\Insert\Fleet\Service\Insert_ServiceDetail.sql" />
-    <Build Include="StoredProcedures\Insert\Fleet\Service\Insert_Garage.sql" />
     <Build Include="StoredProcedures\Insert\Fleet\Service\Insert_ServiceType.sql" />
     <Build Include="StoredProcedures\Insert\Fleet\Service\Insert_ServiceSchedule.sql" />
     <Build Include="Views\Fleet\Service\VehicleService_Item_Overview.sql" />
@@ -214,5 +205,13 @@
     <Build Include="StoredProcedures\Insert\Inventory\Item\Insert_Tax.sql" />
     <Build Include="Tables\Inventory\Stock\ItemStock.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\Stock\Insert_ItemStock.sql" />
+    <Build Include="Tables\Fleet\Repair\InsideRepair.sql" />
+    <Build Include="Tables\Fleet\Repair\InsideRepairDetail.sql" />
+    <Build Include="StoredProcedures\Insert\Fleet\Repair\Insert_InsideRepair.sql" />
+    <Build Include="StoredProcedures\Insert\Fleet\Repair\Insert_InsideRepairDetail.sql" />
+    <Build Include="Views\Fleet\Repair\InsideRepair_Overview.sql" />
+    <Build Include="Views\Fleet\Repair\InsideRepair_Item_Overview.sql" />
+    <Build Include="Tables\Fleet\Repair\Garage.sql" />
+    <Build Include="StoredProcedures\Insert\Fleet\Repair\Insert_Garage.sql" />
   </ItemGroup>
 </Project>

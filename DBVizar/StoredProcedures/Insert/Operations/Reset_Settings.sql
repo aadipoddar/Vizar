@@ -23,8 +23,9 @@ BEGIN
 	
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'PurchaseTransactionPrefix'		, N'PUR'	, N'Prefix for Purchase Transaction Numbers')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'PurchaseReturnTransactionPrefix'	, N'PURRET'	, N'Prefix for Purchase Return Transaction Numbers')
-	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ItemIssueTransactionPrefix'		, N'ITISS'	, N'Prefix for Item Issue Transaction Numbers')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ItemStockAdjustmentTransactionPrefix' , N'ISA'	, N'Prefix for Item Stock Adjustment Transaction Numbers')
+
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'InsideRepairTransactionPrefix'	, N'INRP'	, N'Prefix for Inside Repair Transaction Numbers')
 
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ServiceTransactionPrefix'		, N'SRV'	, N'Prefix for Service Transaction Numbers')
 

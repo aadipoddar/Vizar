@@ -1,4 +1,4 @@
-﻿namespace VizarLibrary.Models.Inventory.Item;
+﻿namespace VizarLibrary.Models.Inventory.Stock;
 
 public class ItemStockModel
 {
@@ -18,7 +18,7 @@ public enum StockType
 {
     Purchase,
     PurchaseReturn,
-    ItemIssue,
+    InsideRepair,
     Adjustment
 }
 

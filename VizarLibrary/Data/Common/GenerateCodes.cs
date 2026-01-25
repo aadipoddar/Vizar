@@ -4,10 +4,10 @@ using VizarLibrary.DataAccess;
 using VizarLibrary.Models.Accounts.FinancialAccounting;
 using VizarLibrary.Models.Accounts.Masters;
 using VizarLibrary.Models.Fleet.Document;
+using VizarLibrary.Models.Fleet.Repair;
 using VizarLibrary.Models.Fleet.Service;
 using VizarLibrary.Models.Fleet.Vehicle;
 using VizarLibrary.Models.Inventory.Item;
-using VizarLibrary.Models.Inventory.ItemIssue;
 using VizarLibrary.Models.Inventory.Purchase;
 using VizarLibrary.Models.Operations;
 
@@ -21,7 +21,7 @@ public static class GenerateCodes
         Ledger,
         Purchase,
         PurchaseReturn,
-        ItemIssue,
+        InsideRepair,
         Service,
         Item,
         ItemType,
@@ -51,8 +51,8 @@ public static class GenerateCodes
                     var purchaseReturn = await CommonData.LoadTableDataByTransactionNo<PurchaseReturnModel>(TableNames.PurchaseReturn, code, sqlDataAccessTransaction);
                     isDuplicate = purchaseReturn is not null;
                     break;
-                case CodeType.ItemIssue:
-                    var itemIssue = await CommonData.LoadTableDataByTransactionNo<ItemIssueModel>(TableNames.ItemIssue, code, sqlDataAccessTransaction);
+                case CodeType.InsideRepair:
+                    var itemIssue = await CommonData.LoadTableDataByTransactionNo<InsideRepairModel>(TableNames.InsideRepair, code, sqlDataAccessTransaction);
                     isDuplicate = itemIssue is not null;
                     break;
                 case CodeType.Service:
@@ -182,28 +182,28 @@ public static class GenerateCodes
         return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{purchaseReturnPrefix}000001", 6, CodeType.PurchaseReturn, sqlDataAccessTransaction);
     }
 
-    public static async Task<string> GenerateItemIssueTransactionNo(ItemIssueModel transaction, SqlDataAccessTransaction sqlDataAccessTransaction = null)
+    public static async Task<string> GenerateInsideRepairTransactionNo(InsideRepairModel transaction, SqlDataAccessTransaction sqlDataAccessTransaction = null)
     {
         var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, transaction.FinancialYearId, sqlDataAccessTransaction);
         var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId, sqlDataAccessTransaction)).Code;
-        var itemIssuePrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.ItemIssueTransactionPrefix, sqlDataAccessTransaction)).Value;
+        var insideRepairPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.InsideRepairTransactionPrefix, sqlDataAccessTransaction)).Value;
 
-        var lastItemIssue = await CommonData.LoadLastTableDataByFinancialYear<ItemIssueModel>(TableNames.ItemIssue, transaction.FinancialYearId, sqlDataAccessTransaction);
-        if (lastItemIssue is not null)
+        var lastInsideRepair = await CommonData.LoadLastTableDataByFinancialYear<InsideRepairModel>(TableNames.InsideRepair, transaction.FinancialYearId, sqlDataAccessTransaction);
+        if (lastInsideRepair is not null)
         {
-            var lastTransactionNo = lastItemIssue.TransactionNo;
-            if (lastTransactionNo.StartsWith($"{companyPrefix}{financialYear.YearNo}{itemIssuePrefix}"))
+            var lastTransactionNo = lastInsideRepair.TransactionNo;
+            if (lastTransactionNo.StartsWith($"{companyPrefix}{financialYear.YearNo}{insideRepairPrefix}"))
             {
-                var lastNumberPart = lastTransactionNo[(companyPrefix.Length + financialYear.YearNo.ToString().Length + itemIssuePrefix.Length)..];
+                var lastNumberPart = lastTransactionNo[(companyPrefix.Length + financialYear.YearNo.ToString().Length + insideRepairPrefix.Length)..];
                 if (int.TryParse(lastNumberPart, out int lastNumber))
                 {
                     int nextNumber = lastNumber + 1;
-                    return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{itemIssuePrefix}{nextNumber:D6}", 6, CodeType.ItemIssue, sqlDataAccessTransaction);
+                    return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{insideRepairPrefix}{nextNumber:D6}", 6, CodeType.InsideRepair, sqlDataAccessTransaction);
                 }
             }
         }
 
-        return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{itemIssuePrefix}000001", 6, CodeType.ItemIssue, sqlDataAccessTransaction);
+        return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{insideRepairPrefix}000001", 6, CodeType.InsideRepair, sqlDataAccessTransaction);
     }
 
     public static async Task<string> GenerateServiceTransactionNo(ServiceModel transaction, SqlDataAccessTransaction sqlDataAccessTransaction = null)

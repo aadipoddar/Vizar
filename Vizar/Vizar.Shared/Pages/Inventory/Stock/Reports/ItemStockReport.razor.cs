@@ -9,12 +9,12 @@ using VizarLibrary.Data.Common;
 using VizarLibrary.Data.Inventory.Stock;
 using VizarLibrary.Data.Operations;
 using VizarLibrary.DataAccess;
-using VizarLibrary.Exporting.Inventory.ItemIssue;
+using VizarLibrary.Exporting.Fleet.Repair;
 using VizarLibrary.Exporting.Inventory.Purchase;
 using VizarLibrary.Exporting.Inventory.Stock;
 using VizarLibrary.Exporting.Utils;
-using VizarLibrary.Models.Fleet.Service;
-using VizarLibrary.Models.Inventory.Item;
+using VizarLibrary.Models.Fleet.Repair;
+using VizarLibrary.Models.Inventory.Stock;
 using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages.Inventory.Stock.Reports;
@@ -310,7 +310,7 @@ public partial class ItemStockReport : IAsyncDisposable
             {
                 "purchase" => $"{PageRouteNames.Purchase}/{transactionId}",
                 "purchasereturn" => $"{PageRouteNames.PurchaseReturn}/{transactionId}",
-                "itemissue" => $"{PageRouteNames.ItemIssue}/{transactionId}",
+                "insiderepair" => $"{PageRouteNames.InsideRepair}/{transactionId}",
                 _ => null
             };
 
@@ -370,9 +370,9 @@ public partial class ItemStockReport : IAsyncDisposable
                 var (pdfStream, fileName) = await PurchaseReturnInvoiceExport.ExportInvoice(transactionId, InvoiceExportType.PDF);
                 await SaveAndViewService.SaveAndView(fileName, pdfStream);
             }
-            else if (type.Equals("itemissue", StringComparison.CurrentCultureIgnoreCase))
+            else if (type.Equals("insiderepair", StringComparison.CurrentCultureIgnoreCase))
             {
-                var (pdfStream, fileName) = await ItemIssueInvoiceExport.ExportInvoice(transactionId, InvoiceExportType.PDF);
+                var (pdfStream, fileName) = await InsideRepairInvoiceExport.ExportInvoice(transactionId, InvoiceExportType.PDF);
                 await SaveAndViewService.SaveAndView(fileName, pdfStream);
             }
 
@@ -410,9 +410,9 @@ public partial class ItemStockReport : IAsyncDisposable
                 var (excelStream, fileName) = await PurchaseReturnInvoiceExport.ExportInvoice(transactionId, InvoiceExportType.Excel);
                 await SaveAndViewService.SaveAndView(fileName, excelStream);
             }
-            else if (type.Equals("itemissue", StringComparison.CurrentCultureIgnoreCase))
+            else if (type.Equals("insiderepair", StringComparison.CurrentCultureIgnoreCase))
             {
-                var (excelStream, fileName) = await ItemIssueInvoiceExport.ExportInvoice(transactionId, InvoiceExportType.Excel);
+                var (excelStream, fileName) = await InsideRepairInvoiceExport.ExportInvoice(transactionId, InvoiceExportType.Excel);
                 await SaveAndViewService.SaveAndView(fileName, excelStream);
             }
 

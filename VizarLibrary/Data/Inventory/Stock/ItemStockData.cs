@@ -3,8 +3,8 @@ using VizarLibrary.Data.Common;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Inventory.Stock;
 using VizarLibrary.Exporting.Utils;
-using VizarLibrary.Models.Fleet.Service;
-using VizarLibrary.Models.Inventory.Item;
+using VizarLibrary.Models.Fleet.Repair;
+using VizarLibrary.Models.Inventory.Stock;
 
 namespace VizarLibrary.Data.Inventory.Stock;
 
@@ -14,7 +14,7 @@ public static class ItemStockData
         (await SqlDataAccess.LoadData<int, dynamic>(StoredProcedureNames.InsertItemStock, stock, sqlDataAccessTransaction)).FirstOrDefault();
 
     public static async Task<List<ItemStockSummaryModel>> LoadItemStockSummaryByGarageDate(int GarageId, DateTime FromDate, DateTime ToDate) =>
-        await SqlDataAccess.LoadData<ItemStockSummaryModel, dynamic>(StoredProcedureNames.LoadItemStockSummaryByGarageDate, new { GarageId, FromDate = DateOnly.FromDateTime(FromDate), ToDate = DateOnly.FromDateTime(ToDate) });
+        await SqlDataAccess.LoadData<ItemStockSummaryModel, dynamic>(StoredProcedureNames.LoadItemStockSummaryByGarageDate, new { GarageId, FromDate, ToDate });
 
     public static async Task DeleteItemStockByTypeTransactionId(string Type, int TransactionId, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
         await SqlDataAccess.SaveData(StoredProcedureNames.DeleteItemStockByTypeTransactionId, new { Type, TransactionId }, sqlDataAccessTransaction);

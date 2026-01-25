@@ -77,7 +77,7 @@ public partial class DateRangeButtons
                     var currentFY2 = await FinancialYearData.LoadFinancialYearByDateTime(newFromDate);
                     var financialYears = await CommonData.LoadTableDataByStatus<FinancialYearModel>(TableNames.FinancialYear);
                     var previousFY = financialYears
-                        .Where(fy => fy.Id != currentFY2.Id)
+                        .Where(fy => fy.Id != currentFY2?.Id)
                         .OrderByDescending(fy => fy.StartDate)
                         .FirstOrDefault();
 

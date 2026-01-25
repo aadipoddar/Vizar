@@ -13,10 +13,10 @@ public static class PageRouteNames
     public static string InventoryDashboard => "/inventory";
     public static string Purchase => "/inventory/purchase";
     public static string PurchaseReturn => "/inventory/purchase-return";
-    public static string ItemIssue => "/inventory/item-issue";
     public static string ItemStockAdjustment => "/inventory/item-stock-adjustment";
 
     public static string FleetDashboard => "/fleet";
+    public static string InsideRepair => "/fleet/inside-repair";
     public static string Service => "/fleet/service";
     public static string Document => "/fleet/document";
 
@@ -30,10 +30,9 @@ public static class PageRouteNames
     public static string ReportPurchaseReturn => "/report/purchase-return";
     public static string ReportPurchaseItem => "/report/purchase-item";
     public static string ReportPurchaseReturnItem => "/report/purchase-return-item";
-    public static string ReportItemIssue => "/report/item-issue";
-    public static string ReportGarageIssueItem => "/report/garage-issue-item";
-    public static string ReportVehicleIssueItem => "/report/vehicle-issue-item";
     public static string ReportItemStock => "/report/item-stock";
+    public static string ReportInsideRepair => "/report/inside-repair";
+    public static string ReportInsideRepairItem => "/report/inside-repair-item";
     public static string ReportService => "/report/service";
     public static string ReportGarageServiceItem => "/report/garage-service-item";
     public static string ReportVehicleServiceItem => "/report/vehicle-service-item";

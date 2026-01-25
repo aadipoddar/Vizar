@@ -29,14 +29,15 @@ public static class TableNames
     public static string PurchaseReturn => "PurchaseReturn";
     public static string PurchaseReturnDetail => "PurchaseReturnDetail";
 
-    public static string ItemIssue => "ItemIssue";
-    public static string ItemIssueDetail => "ItemIssueDetail";
-
     public static string Vehicle => "Vehicle";
     public static string VehicleModel => "VehicleModel";
     public static string VehicleType => "VehicleType";
 
     public static string Garage => "Garage";
+
+    public static string InsideRepair => "InsideRepair";
+    public static string InsideRepairDetail => "InsideRepairDetail";
+
     public static string ServiceSchedule => "ServiceSchedule";
     public static string ServiceType => "ServiceType";
 
@@ -97,14 +98,14 @@ public static class StoredProcedureNames
     public static string InsertPurchaseReturn => "Insert_PurchaseReturn";
     public static string InsertPurchaseReturnDetail => "Insert_PurchaseReturnDetail";
 
-    public static string InsertItemIssue => "Insert_ItemIssue";
-    public static string InsertItemIssueDetail => "Insert_ItemIssueDetail";
-
     public static string InsertVehicle => "Insert_Vehicle";
     public static string InsertVehicleModel => "Insert_VehicleModel";
     public static string InsertVehicleType => "Insert_VehicleType";
-
     public static string InsertGarage => "Insert_Garage";
+
+    public static string InsertInsideRepair => "Insert_InsideRepair";
+    public static string InsertInsideRepairDetail => "Insert_InsideRepairDetail";
+
     public static string InsertServiceType => "Insert_ServiceType";
     public static string InsertServiceSchedule => "Insert_ServiceSchedule";
 
@@ -129,9 +130,8 @@ public static class ViewNames
     public static string PurchaseReturnOverview => "PurchaseReturn_Overview";
     public static string PurchaseReturnItemOverview => "PurchaseReturn_Item_Overview";
 
-    public static string ItemIssueOverview => "ItemIssue_Overview";
-    public static string GarageIssueItemOverview => "GarageIssue_Item_Overview";
-    public static string VehicleIssueItemOverview => "VehicleIssue_Item_Overview";
+    public static string InsideRepairOverview => "InsideRepair_Overview";
+    public static string InsideRepairItemOverview => "InsideRepair_Item_Overview";
 
     public static string ServiceOverview => "Service_Overview";
     public static string GarageServiceItemOverview => "GarageService_Item_Overview";

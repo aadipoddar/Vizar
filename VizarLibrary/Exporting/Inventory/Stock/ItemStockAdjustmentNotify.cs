@@ -2,6 +2,7 @@ using VizarLibrary.Data.Common;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Inventory.Item;
+using VizarLibrary.Models.Inventory.Stock;
 using VizarLibrary.Models.Operations;
 
 namespace VizarLibrary.Exporting.Inventory.Stock;
