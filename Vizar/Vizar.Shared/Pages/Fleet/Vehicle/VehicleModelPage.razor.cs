@@ -3,7 +3,7 @@ using Syncfusion.Blazor.Grids;
 using Vizar.Shared.Components.Dialog;
 
 using VizarLibrary.Data.Common;
-using VizarLibrary.Data.Fleet.Masters;
+using VizarLibrary.Data.Fleet.Vehicle;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Fleet.Vehicle;
 using VizarLibrary.Exporting.Utils;

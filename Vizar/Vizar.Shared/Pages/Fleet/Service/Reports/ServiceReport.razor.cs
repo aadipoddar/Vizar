@@ -12,6 +12,7 @@ using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Fleet.Service;
 using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
+using VizarLibrary.Models.Fleet.Repair;
 using VizarLibrary.Models.Fleet.Service;
 using VizarLibrary.Models.Operations;
 

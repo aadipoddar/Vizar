@@ -1,7 +1,7 @@
 ﻿using OfficeOpenXml;
 
 using VizarLibrary.Data.Common;
-using VizarLibrary.Data.Fleet.Masters;
+using VizarLibrary.Data.Fleet.Vehicle;
 
 FileInfo fileInfo = new(@"C:\Others\vehicle.xlsx");
 

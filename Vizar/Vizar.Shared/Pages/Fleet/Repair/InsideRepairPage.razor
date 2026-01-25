@@ -1,0 +1,760 @@
+﻿@page "/fleet/inside-repair"
+@page "/fleet/inside-repair/{Id:int}"
+
+@using VizarLibrary.Models.Accounts.Masters
+@using VizarLibrary.Models.Fleet.Repair
+@using VizarLibrary.Models.Fleet.Service
+@using VizarLibrary.Models.Fleet.Vehicle
+@using VizarLibrary.Models.Inventory.Item
+@using VizarLibrary.Models.Operations
+
+<PageTitle>Inside Repair - Vizar</PageTitle>
+
+@if (_isLoading)
+{
+    <AnimatedLoader Visible="true" Label="Page is Loading, Please Wait" />
+}
+else
+{
+    <div style="display: flex; flex-direction: column; min-height: 100vh;">
+        <Header Title="Inside Repair" Subtitle="Create and manage inside repair transactions" ShowLogout="true" ShowHome="true" ShowBack="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
+            <RightContent>
+                <IconButton Icon="IconType.Save" Variant="ButtonVariant.Save" Title="Save Transaction (Ctrl + S)" Disabled="_isProcessing" OnClick="SaveTransaction" />
+                @if (Id is > 0)
+                {
+                    <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Title="Download Excel Invoice (Alt+E)" Disabled="_isProcessing" OnClick="DownloadExcelInvoice" />
+                    <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Title="Download PDF Invoice (Alt+P)" Disabled="_isProcessing" OnClick="DownloadPdfInvoice" />
+                }
+                <IconButton Icon="IconType.History" Title="Transaction History (Ctrl + H)" Disabled="_isProcessing" OnClick="NavigateToTransactionHistoryPage" />
+                <IconButton Icon="IconType.Report" Title="Item Report (Ctrl + I)" Disabled="_isProcessing" OnClick="NavigateToItemReport" />
+                <IconButton Icon="IconType.New" Title="New Transaction (Ctrl + N)" Disabled="_isProcessing" OnClick="ResetPage" />
+            </RightContent>
+        </Header>
+
+        <!-- Main Content Container -->
+        <div class="page-container">
+
+            <!-- Top Section: Transaction Summary and Vehicle Info Side by Side -->
+            <div class="two-column-layout">
+                <!-- Transaction Summary Section -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title-wrapper">
+                            <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                                <line x1="16" y1="17" x2="8" y2="17" />
+                                <polyline points="10 9 9 9 8 9" />
+                            </svg>
+                            <h2 class="section-title">Transaction Summary</h2>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-grid-single">
+                            <!-- Company -->
+                            <div class="form-field">
+                                <label class="field-label">
+                                    Company <span class="required">*</span>
+                                </label>
+                                <SfAutoComplete Value="@_selectedCompany" TValue="CompanyModel" TItem="CompanyModel"
+                                                DataSource="@_companies" Placeholder="Select a Company"
+                                                FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+                                                FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                                CssClass="custom-autocomplete">
+                                    <AutoCompleteEvents TItem="CompanyModel" TValue="CompanyModel"
+                                                        ValueChange="OnCompanyChanged" />
+                                    <AutoCompleteFieldSettings Value="Name" />
+                                </SfAutoComplete>
+                            </div>
+
+                            <!-- Garage -->
+                            <div class="form-field">
+                                <label class="field-label">
+                                    Garage <span class="required">*</span>
+                                </label>
+                                <SfAutoComplete Value="@_selectedGarage" TValue="GarageModel" TItem="GarageModel"
+                                                DataSource="@_garages" Placeholder="Select a Garage"
+                                                FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+                                                FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                                CssClass="custom-autocomplete">
+                                    <AutoCompleteEvents TItem="GarageModel" TValue="GarageModel"
+                                                        ValueChange="OnGarageChanged" />
+                                    <AutoCompleteFieldSettings Value="Name" />
+                                </SfAutoComplete>
+                            </div>
+
+                            <!-- Vehicle -->
+                            <div class="form-field">
+                                <label class="field-label">
+                                    Vehicle <span class="required">*</span>
+                                </label>
+                                <SfAutoComplete Value="@_selectedVehicle" TValue="VehicleModel" TItem="VehicleModel"
+                                                DataSource="@_vehicles" Placeholder="Select a Vehicle"
+                                                FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+                                                FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                                CssClass="custom-autocomplete">
+                                    <AutoCompleteEvents TItem="VehicleModel" TValue="VehicleModel"
+                                                        ValueChange="OnVehicleChanged" />
+                                    <AutoCompleteFieldSettings Value="Code" />
+                                </SfAutoComplete>
+                            </div>
+
+                            <!-- Transaction Date and Financial Year -->
+                            <div class="form-field">
+                                <label class="field-label">
+                                    Transaction Date <span class="required">*</span> / Financial Year
+                                </label>
+                                <div class="date-year-wrapper">
+                                    <SfDatePicker Value="@_insideRepair.TransactionDateTime" TValue="DateTime" Format="dd/MM/yy"
+                                                  Placeholder="Select Date" FloatLabelType="FloatLabelType.Never"
+                                                  CssClass="custom-datepicker">
+                                        <DatePickerEvents TValue="DateTime" ValueChange="OnTransactionDateChanged" />
+                                    </SfDatePicker>
+                                    <SfTextBox Value="@($"{_selectedFinancialYear?.StartDate:yyyy} to {_selectedFinancialYear?.EndDate:yyyy}")"
+                                               Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never"
+                                               CssClass="custom-textbox readonly-field" />
+                                </div>
+                            </div>
+
+                            <!-- Current KM -->
+                            <div class="form-field">
+                                <label class="field-label">
+                                    Current KM <span class="required">*</span>
+                                </label>
+                                <SfNumericTextBox @bind-Value="_insideRepair.CurrentKM" TValue="decimal?" Min="0"
+                                                  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
+                                                  CssClass="custom-numeric editable-field" />
+                            </div>
+
+                            <!-- Current Hour -->
+                            <div class="form-field">
+                                <label class="field-label">
+                                    Current Hour <span class="required">*</span>
+                                </label>
+                                <SfNumericTextBox @bind-Value="_insideRepair.CurrentHour" TValue="decimal?" Min="0"
+                                                  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
+                                                  CssClass="custom-numeric editable-field" />
+                            </div>
+
+                            <!-- Transaction No -->
+                            <div class="form-field">
+                                <label class="field-label">
+                                    Transaction No
+                                </label>
+                                <SfTextBox @bind-Value="_insideRepair.TransactionNo" Placeholder="Enter Transaction No"
+                                           FloatLabelType="FloatLabelType.Never" Readonly="true"
+                                           CssClass="custom-textbox readonly-field" />
+                            </div>
+
+                            <!-- Remarks -->
+                            <div class="form-field form-field-double">
+                                <label class="field-label">
+                                    Remarks / Narration
+                                </label>
+                                <SfTextBox @bind-Value="_insideRepair.Remarks" Multiline="true" Placeholder="Enter remarks..."
+                                           FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox textarea-field-small" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Section -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <div class="section-title-wrapper">
+                            <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="1" x2="12" y2="23" />
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                            </svg>
+                            <h2 class="section-title">Transaction Summary</h2>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="financial-grid">
+                            <!-- Total Items -->
+                            <div class="financial-row">
+                                <label class="financial-label">Total Items</label>
+                                <SfNumericTextBox Value="@_insideRepair.TotalItems" Readonly="true" TValue="int"
+                                                  ShowSpinButton="false" Placeholder="0" FloatLabelType="FloatLabelType.Never"
+                                                  CssClass="custom-numeric readonly-field" />
+                            </div>
+
+                            <!-- Total Quantity -->
+                            <div class="financial-row">
+                                <label class="financial-label">Total Quantity</label>
+                                <SfNumericTextBox Value="@_insideRepair.TotalQuantity" Readonly="true" TValue="decimal"
+                                                  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
+                                                  CssClass="custom-numeric readonly-field" />
+                            </div>
+
+                            <!-- Total Amount -->
+                            <div class="financial-row total-row">
+                                <label class="financial-label-total">Total Amount</label>
+                                <SfNumericTextBox Value="@_insideRepair.TotalAmount" Readonly="true" TValue="decimal"
+                                                  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
+                                                  CssClass="custom-numeric total-field" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add to Cart Section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <circle cx="9" cy="21" r="1" />
+                            <circle cx="20" cy="21" r="1" />
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                        </svg>
+                        <h2 class="section-title">Add Item to Cart</h2>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <!-- Single Row: All Cart Fields -->
+                    <div class="cart-row-single">
+                        <div class="cart-field cart-field-item">
+                            <label class="cart-label">Item <span class="required">*</span></label>
+                            <SfAutoComplete @ref="_sfItemAutoComplete" Value="@_selectedItem"
+                                            TValue="ItemModel ?" TItem="ItemModel" DataSource="@_items"
+                                            Placeholder="Select Item (Ctrl + E)" FloatLabelType="FloatLabelType.Never"
+                                            AllowFiltering="true" FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                            CssClass="custom-autocomplete">
+                                <AutoCompleteEvents TItem="ItemModel" TValue="ItemModel ?"
+                                                    ValueChange="OnItemChanged" />
+                                <AutoCompleteFieldSettings Value="Name" />
+                            </SfAutoComplete>
+                        </div>
+
+                        <div class="cart-field cart-field-small">
+                            <label class="cart-label">UOM</label>
+                            <SfTextBox @bind-Value="_selectedCart.UnitOfMeasurement" Placeholder="UOM..."
+                                       FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+                        </div>
+
+                        <div class="cart-field cart-field-small">
+                            <label class="cart-label">Qty</label>
+                            <SfNumericTextBox Value="@_selectedCart.Quantity" TValue="decimal" Min="0"
+                                              ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
+                                              CssClass="custom-numeric editable-field">
+                                <NumericTextBoxEvents TValue="decimal" ValueChange="OnItemQuantityChanged" />
+                            </SfNumericTextBox>
+                        </div>
+
+                        <div class="cart-field cart-field-small">
+                            <label class="cart-label">Rate</label>
+                            <SfNumericTextBox Value="@_selectedCart.Rate" TValue="decimal" Min="0" ShowSpinButton="false"
+                                              Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
+                                              CssClass="custom-numeric editable-field">
+                                <NumericTextBoxEvents TValue="decimal" ValueChange="OnItemRateChanged" />
+                            </SfNumericTextBox>
+                        </div>
+
+                        <div class="cart-field cart-field-small">
+                            <label class="cart-label">Total</label>
+                            <SfNumericTextBox Value="@_selectedCart.Total" Readonly="true" TValue="decimal"
+                                              ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
+                                              CssClass="custom-numeric total-field-inline" />
+                        </div>
+
+                        <div class="cart-field cart-field-medium">
+                            <label class="cart-label">Identification No</label>
+                            <SfTextBox @bind-Value="_selectedCart.IdentificationNo" Placeholder="Item Identification No..."
+                                       FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+                        </div>
+
+                        <div class="cart-field cart-field-medium">
+                            <label class="cart-label">Remarks</label>
+                            <SfTextBox @bind-Value="_selectedCart.Remarks" Placeholder="Item Narration..."
+                                       FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+                        </div>
+
+                        <div class="cart-field cart-field-button">
+                            <label class="cart-label">&nbsp;</label>
+                            <IconButton Icon="IconType.Add" Variant="ButtonVariant.Add" Text="Add" Title="Add to Cart" OnClick="AddItemToCart" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cart Items Grid Section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <path d="M3 3h7a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H3V3z" />
+                            <path d="M14 3h7v17h-7V3z" />
+                        </svg>
+                        <h2 class="section-title">Repair Items</h2>
+                    </div>
+                </div>
+                <div class="section-body grid-body">
+                    <SfGrid ID="_sfCartGrid" @ref="_sfCartGrid" DataSource="_cart" AllowTextWrap="true" AllowPaging="false"
+                            AllowSorting="true" AllowResizing="true" AllowFiltering="true" GridLines="GridLine.Horizontal"
+                            CssClass="professional-grid" Toolbar="@(new List<string>() { "Search" })">
+
+                        <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
+
+                        <GridAggregates>
+                            <GridAggregate>
+                                <GridAggregateColumns>
+                                    <GridAggregateColumn Field="@nameof(InsideRepairItemCartModel.ItemName)" Type="AggregateType.Count">
+                                        <FooterTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                            }
+                                            <div class="aggregate-label">
+                                                <strong>Total Items: @aggregate.Count</strong>
+                                            </div>
+                                        </FooterTemplate>
+                                    </GridAggregateColumn>
+                                    <GridAggregateColumn Field="@nameof(InsideRepairItemCartModel.Quantity)" Type="AggregateType.Sum">
+                                        <FooterTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                                var sum = aggregate.Sum != null ? Convert.ToDecimal(aggregate.Sum) : 0m;
+                                            }
+                                            <div class="aggregate-value">
+                                                <strong>@sum.ToString("N2")</strong>
+                                            </div>
+                                        </FooterTemplate>
+                                    </GridAggregateColumn>
+                                    <GridAggregateColumn Field="@nameof(InsideRepairItemCartModel.Total)" Type="AggregateType.Sum">
+                                        <FooterTemplate>
+                                            @{
+                                                var aggregate = (context as AggregateTemplateContext);
+                                                var sum = aggregate.Sum != null ? Convert.ToDecimal(aggregate.Sum) : 0m;
+                                            }
+                                            <div class="aggregate-value aggregate-total">
+                                                <strong>@sum.ToString("N2")</strong>
+                                            </div>
+                                        </FooterTemplate>
+                                    </GridAggregateColumn>
+                                </GridAggregateColumns>
+                            </GridAggregate>
+                        </GridAggregates>
+
+                        <GridColumns>
+                            <GridColumn HeaderText="Actions" Width="100" TextAlign="TextAlign.Center">
+                                <Template>
+                                    @{
+                                        var item = (context as dynamic);
+                                        <div class="grid-actions">
+                                            <IconButton Icon="IconType.Edit" Variant="ButtonVariant.Edit" Size="ButtonSize.Grid" Title="Edit Item (Insert)" OnClick="@(() => EditCartItem(item))" />
+                                            <IconButton Icon="IconType.Delete" Variant="ButtonVariant.Delete" Size="ButtonSize.Grid" Title="Remove Item (Del)" OnClick="@(() => RemoveItemFromCart(item))" />
+                                        </div>
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field="@nameof(InsideRepairItemCartModel.ItemName)" HeaderText="Item Name" Width="200" />
+                            <GridColumn Field="@nameof(InsideRepairItemCartModel.UnitOfMeasurement)" HeaderText="UOM" Width="80" TextAlign="TextAlign.Center" />
+                            <GridColumn Field="@nameof(InsideRepairItemCartModel.Quantity)" HeaderText="Qty" Width="100" TextAlign="TextAlign.Right" Format="N2" />
+                            <GridColumn Field="@nameof(InsideRepairItemCartModel.Rate)" HeaderText="Rate" Width="110" TextAlign="TextAlign.Right" Format="N2" />
+                            <GridColumn Field="@nameof(InsideRepairItemCartModel.Total)" HeaderText="Total" Width="130" TextAlign="TextAlign.Right" Format="N2">
+                                <Template>
+                                    @{
+                                        var item = (context as dynamic);
+                                        <span class="grid-total">@item.Total.ToString("N2")</span>
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field="@nameof(InsideRepairItemCartModel.IdentificationNo)" HeaderText="Identification" Width="150" />
+                            <GridColumn Field="@nameof(InsideRepairItemCartModel.Remarks)" HeaderText="Remarks" Width="150" />
+                        </GridColumns>
+                    </SfGrid>
+                </div>
+            </div>
+        </div>
+
+        <Footer />
+    </div>
+}
+
+<ToastNotification @ref="_toastNotification" />
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    /* Two Column Layout */
+    .two-column-layout {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+        .two-column-layout > :first-child {
+            flex: 0 0 75%;
+        }
+
+        .two-column-layout > :last-child {
+            flex: 0 0 calc(25% - 16px);
+        }
+
+    /* Section Card Styles */
+    .section-card {
+        background: #ffffff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        margin-bottom: 16px;
+        overflow: hidden;
+    }
+
+    .section-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #e2e8f0;
+        background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .section-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-icon {
+        color: #3b82f6;
+        flex-shrink: 0;
+    }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #0f172a;
+        margin: 0;
+        letter-spacing: -0.2px;
+    }
+
+    .section-body {
+        padding: 16px 20px;
+    }
+
+    /* Form Grid Layout */
+    .form-grid-single {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px 20px;
+    }
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .form-field-full {
+        grid-column: 1 / -1;
+    }
+
+    .form-field-double {
+        grid-column: span 2;
+    }
+
+    .field-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #334155;
+        letter-spacing: 0.1px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .required {
+        color: #ef4444;
+        font-weight: 700;
+    }
+
+    /* Transaction Date and Financial Year Wrapper */
+    .date-year-wrapper {
+        display: flex;
+        gap: 12px;
+        align-items: stretch;
+    }
+
+        .date-year-wrapper > :first-child {
+            flex: 1;
+        }
+
+        .date-year-wrapper > :last-child {
+            flex: 1;
+        }
+
+    /* Financial Grid Layout */
+    .financial-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .financial-row {
+        display: grid;
+        grid-template-columns: 100px 1fr;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .financial-row.total-row {
+            margin-top: 4px;
+            padding-top: 8px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+    .financial-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #475569;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .financial-label-total {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0f172a;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    ::deep .editable-field .e-input-group {
+        border-color: #3b82f6;
+        background: #eff6ff;
+    }
+
+        ::deep .editable-field .e-input-group input {
+            font-weight: 600;
+            color: #1e40af;
+        }
+
+    ::deep .total-field .e-input-group {
+        background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+        border: 2px solid #3b82f6;
+        height: 48px;
+    }
+
+        ::deep .total-field .e-input-group input {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e40af;
+        }
+
+    ::deep .textarea-field-small .e-input-group {
+        height: auto;
+        min-height: 60px;
+    }
+
+        ::deep .textarea-field-small .e-input-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+    /* Add to Cart Section Styles - Single Row Layout */
+    .cart-row-single {
+        display: grid;
+        grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 0.8fr 1.2fr 1.2fr 100px;
+        gap: 12px;
+        align-items: end;
+    }
+
+    .cart-field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .cart-field-item {
+        /* Standard single column for item */
+    }
+
+    .cart-field-small {
+        /* Standard single column */
+    }
+
+    .cart-field-medium {
+        /* Standard single column */
+    }
+
+    .cart-field-button {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .cart-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+        .cart-label .required {
+            color: #dc2626;
+            margin-left: 2px;
+        }
+
+    ::deep .cart-field .e-input-group,
+    ::deep .cart-field .custom-numeric .e-input-group,
+    ::deep .cart-field .custom-autocomplete .e-input-group,
+    ::deep .cart-field .custom-textbox .e-input-group {
+        height: 38px;
+        background: #eff6ff;
+        border: 1px solid #3b82f6;
+    }
+
+        ::deep .cart-field .e-input-group input,
+        ::deep .cart-field .custom-numeric .e-input-group input,
+        ::deep .cart-field .custom-autocomplete .e-input-group input,
+        ::deep .cart-field .custom-textbox .e-input-group input {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e293b;
+            padding: 8px 12px;
+        }
+
+    ::deep .total-field-inline .e-input-group {
+        background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+        border: 2px solid #3b82f6;
+        height: 38px;
+    }
+
+        ::deep .total-field-inline .e-input-group input {
+            font-weight: 700;
+            color: #1e40af;
+        }
+
+
+    /* Professional Grid Styles */
+    .e-grid .e-summaryrow .e-summarycell {
+        background-color: #deecf9;
+    }
+
+    .grid-body {
+        padding: 0 !important;
+    }
+
+    ::deep .professional-grid {
+        border: none;
+    }
+
+        ::deep .professional-grid .e-gridheader {
+            background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        ::deep .professional-grid .e-headercell {
+            background: transparent;
+            color: #475569;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-right: 1px solid #e2e8f0;
+            padding: 12px 8px;
+        }
+
+            ::deep .professional-grid .e-headercell:last-child {
+                border-right: none;
+            }
+
+        ::deep .professional-grid .e-gridcontent {
+            background: #ffffff;
+        }
+
+        ::deep .professional-grid .e-row {
+            transition: background-color 0.2s ease;
+        }
+
+            ::deep .professional-grid .e-row:hover {
+                background-color: #f8fafc;
+            }
+
+            ::deep .professional-grid .e-row.e-altrow {
+                background-color: #fafbfc;
+            }
+
+                ::deep .professional-grid .e-row.e-altrow:hover {
+                    background-color: #f8fafc;
+                }
+
+        ::deep .professional-grid .e-rowcell {
+            border-right: 1px solid #f1f5f9;
+            border-bottom: 1px solid #f1f5f9;
+            padding: 10px 8px;
+            font-size: 13px;
+            color: #1e293b;
+        }
+
+            ::deep .professional-grid .e-rowcell:last-child {
+                border-right: none;
+            }
+
+    .grid-total {
+        color: #1e40af;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    /* Grid Footer Aggregates */
+    ::deep .professional-grid .e-gridfooter {
+        background: linear-gradient(to bottom, #f1f5f9 0%, #e2e8f0 100%);
+        border-top: 2px solid #cbd5e1;
+    }
+
+    ::deep .professional-grid .e-summarycell {
+        font-weight: 600;
+        color: #1e293b;
+        padding: 12px 8px;
+        border-right: 1px solid #cbd5e1;
+    }
+
+        ::deep .professional-grid .e-summarycell:last-child {
+            border-right: none;
+        }
+
+    .aggregate-label {
+        text-align: left;
+        font-size: 13px;
+        color: #475569;
+    }
+
+    .aggregate-value {
+        text-align: right;
+        font-size: 13px;
+        color: #1e293b;
+    }
+
+        .aggregate-value.aggregate-total {
+            color: #1e40af;
+            font-size: 14px;
+        }
+
+            .aggregate-value.aggregate-total strong {
+                font-size: 15px;
+            }
+
+        .aggregate-label strong,
+        .aggregate-value strong {
+            font-weight: 700;
+        }
+
+    /* Empty Grid State */
+    ::deep .professional-grid .e-emptyrow {
+        text-align: center;
+        padding: 48px 24px;
+        color: #94a3b8;
+        font-size: 14px;
+    }
+</style>

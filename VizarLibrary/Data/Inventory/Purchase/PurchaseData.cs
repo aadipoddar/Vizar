@@ -10,6 +10,7 @@ using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.FinancialAccounting;
 using VizarLibrary.Models.Inventory.Item;
 using VizarLibrary.Models.Inventory.Purchase;
+using VizarLibrary.Models.Inventory.Stock;
 using VizarLibrary.Models.Operations;
 
 namespace VizarLibrary.Data.Inventory.Purchase;

@@ -15,56 +15,64 @@ else
         <!-- Main Content Container -->
         <div class="page-container">
 
-            <!-- Service Management Section -->
+            <!-- Repair Management Section -->
             <div class="section-card">
                 <div class="section-header">
                     <div class="section-title-wrapper">
                         <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
                              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                              stroke-linejoin="round">
-                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                            <path
+                            d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
                         </svg>
-                        <h2 class="section-title">Service Management</h2>
+                        <h2 class="section-title">Repair Management</h2>
                     </div>
-                    <p class="section-subtitle">Manage services, types, and schedules</p>
+                    <p class="section-subtitle">Manage inside repairs and view reports</p>
                 </div>
                 <div class="section-body">
                     <div class="dashboard-grid">
-                        <!-- Service -->
-                        <ButtonCard Title="Service" Description="Manage vehicle service records" Color="blue"
-                                    OnClick="() => NavigationManager.NavigateTo(PageRouteNames.Service)">
+                        <!-- Inside Repair -->
+                        <ButtonCard Title="Inside Repair" Description="Manage inside repair transactions" Color="red"
+                                    OnClick="() => NavigationManager.NavigateTo(PageRouteNames.InsideRepair)">
                             <IconContent>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
                                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                      stroke-linejoin="round">
-                                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                                    <path
+                                    d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
                                 </svg>
                             </IconContent>
                         </ButtonCard>
 
-                        <!-- Service Type -->
-                        <ButtonCard Title="Service Type" Description="Manage service types and rates" Color="cyan"
-                                    OnClick="() => NavigationManager.NavigateTo(PageRouteNames.AdminServiceType)">
+                        <!-- Inside Repair Report -->
+                        <ButtonCard Title="Inside Repair Report" Description="View inside repair transaction history"
+                                    Color="orange"                  OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ReportInsideRepair)">
                             <IconContent>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
                                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                      stroke-linejoin="round">
-                                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                    <line x1="16" y1="13" x2="8" y2="13" />
+                                    <line x1="16" y1="17" x2="8" y2="17" />
+                                    <line x1="12" y1="18" x2="12" y2="12" />
                                 </svg>
                             </IconContent>
                         </ButtonCard>
 
-                        <!-- Service Schedule -->
-                        <ButtonCard Title="Service Schedule" Description="Manage service schedules by type" Color="teal"
-                                    OnClick="() => NavigationManager.NavigateTo(PageRouteNames.AdminServiceSchedule)">
+                        <!-- Inside Repair Item Report -->
+                        <ButtonCard Title="Inside Repair Item Report" Description="View detailed item-level repair analysis"
+                                    Color="amber"
+                                    OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ReportInsideRepairItem)">
                             <IconContent>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
                                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                      stroke-linejoin="round">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                                    <line x1="16" y1="2" x2="16" y2="6" />
-                                    <line x1="8" y1="2" x2="8" y2="6" />
-                                    <line x1="3" y1="10" x2="21" y2="10" />
+                                    <rect x="3" y="8" width="18" height="12" rx="2" ry="2" />
+                                    <path d="M3 12h18" />
+                                    <path d="M9 16h6" />
+                                    <path d="M10.5 6.5 12 5l1.5 1.5" />
+                                    <path d="M12 5v4" />
                                 </svg>
                             </IconContent>
                         </ButtonCard>
@@ -85,25 +93,35 @@ else
                 </div>
             </div>
 
-            <!-- Fleet Reports Section -->
+            <!-- Service Management Section -->
             <div class="section-card">
                 <div class="section-header">
                     <div class="section-title-wrapper">
                         <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
                              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                              stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                            <polyline points="14 2 14 8 20 8" />
-                            <line x1="16" y1="13" x2="8" y2="13" />
-                            <line x1="16" y1="17" x2="8" y2="17" />
-                            <line x1="12" y1="18" x2="12" y2="12" />
+                            <path
+                            d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
                         </svg>
-                        <h2 class="section-title">Fleet Reports</h2>
+                        <h2 class="section-title">Service Management</h2>
                     </div>
-                    <p class="section-subtitle">View and analyze fleet service reports</p>
+                    <p class="section-subtitle">Manage services, types, and schedules</p>
                 </div>
                 <div class="section-body">
                     <div class="dashboard-grid">
+                        <!-- Service -->
+                        <ButtonCard Title="Service" Description="Manage vehicle service records" Color="blue"
+                                    OnClick="() => NavigationManager.NavigateTo(PageRouteNames.Service)">
+                            <IconContent>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round">
+                                    <path
+                                    d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                                </svg>
+                            </IconContent>
+                        </ButtonCard>
+
                         <!-- Service Report -->
                         <ButtonCard Title="Service Report" Description="View vehicle service history" Color="cyan"
                                     OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ReportService)">
@@ -149,6 +167,34 @@ else
                                 </svg>
                             </IconContent>
                         </ButtonCard>
+
+                        <!-- Service Type -->
+                        <ButtonCard Title="Service Type" Description="Manage service types and rates" Color="cyan"
+                                    OnClick="() => NavigationManager.NavigateTo(PageRouteNames.AdminServiceType)">
+                            <IconContent>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round">
+                                    <path
+                                    d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                                </svg>
+                            </IconContent>
+                        </ButtonCard>
+
+                        <!-- Service Schedule -->
+                        <ButtonCard Title="Service Schedule" Description="Manage service schedules by type" Color="teal"
+                                    OnClick="() => NavigationManager.NavigateTo(PageRouteNames.AdminServiceSchedule)">
+                            <IconContent>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                    <line x1="16" y1="2" x2="16" y2="6" />
+                                    <line x1="8" y1="2" x2="8" y2="6" />
+                                    <line x1="3" y1="10" x2="21" y2="10" />
+                                </svg>
+                            </IconContent>
+                        </ButtonCard>
                     </div>
                 </div>
             </div>
@@ -160,7 +206,8 @@ else
                         <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
                              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                              stroke-linejoin="round">
-                            <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
+                            <path
+                            d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
                             <circle cx="7" cy="17" r="2" />
                             <path d="M9 17h6" />
                             <circle cx="17" cy="17" r="2" />
@@ -178,7 +225,8 @@ else
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
                                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                      stroke-linejoin="round">
-                                    <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
+                                    <path
+                                    d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
                                     <circle cx="7" cy="17" r="2" />
                                     <path d="M9 17h6" />
                                     <circle cx="17" cy="17" r="2" />
@@ -195,7 +243,8 @@ else
                                      stroke-linejoin="round">
                                     <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
                                     <path d="M15 18H9" />
-                                    <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" />
+                                    <path
+                                    d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" />
                                     <circle cx="17" cy="18" r="2" />
                                     <circle cx="7" cy="18" r="2" />
                                 </svg>
@@ -295,9 +344,9 @@ else
         transition: all 0.3s ease;
     }
 
-        .section-card:hover {
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
-        }
+    .section-card:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+    }
 
     .section-header {
         padding: 20px 24px;

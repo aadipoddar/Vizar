@@ -29,8 +29,9 @@ public static class SettingsKeys
 
     public static string PurchaseTransactionPrefix => "PurchaseTransactionPrefix";
     public static string PurchaseReturnTransactionPrefix => "PurchaseReturnTransactionPrefix";
-    public static string ItemIssueTransactionPrefix => "ItemIssueTransactionPrefix";
     public static string ItemStockAdjustmentTransactionPrefix => "ItemStockAdjustmentTransactionPrefix";
+
+    public static string InsideRepairTransactionPrefix => "InsideRepairTransactionPrefix";
 
     public static string ServiceTransactionPrefix => "ServiceTransactionPrefix";
 
