@@ -79,7 +79,7 @@
     <Folder Include="StoredProcedures\LoadData\Inventory\Purchase" />
     <Folder Include="StoredProcedures\Insert\Inventory" />
     <Folder Include="StoredProcedures\Insert\Inventory\Purchase" />
-    <Folder Include="Views\Inventory\Item" />
+    <Folder Include="Views\Inventory\Stock" />
     <Folder Include="StoredProcedures\Delete" />
     <Folder Include="Tables\Fleet" />
     <Folder Include="Tables\Inventory\ItemIssue" />
@@ -103,8 +103,10 @@
     <Folder Include="StoredProcedures\LoadData\Accounts\FinancialAccounting" />
     <Folder Include="StoredProcedures\LoadData\Accounts\Masters" />
     <Folder Include="Tables\Inventory\Item" />
-    <Folder Include="StoredProcedures\LoadData\Inventory\Item" />
+    <Folder Include="StoredProcedures\LoadData\Inventory\Stock" />
     <Folder Include="StoredProcedures\Insert\Inventory\Item" />
+    <Folder Include="Tables\Inventory\Stock" />
+    <Folder Include="StoredProcedures\Insert\Inventory\Stock" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PublishLocations\AzureVizar.publish.xml" />
@@ -153,7 +155,7 @@
     <Build Include="StoredProcedures\Insert\Inventory\Purchase\Insert_PurchaseDetail.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\Purchase\Insert_PurchaseReturn.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\Purchase\Insert_PurchaseReturnDetail.sql" />
-    <Build Include="Views\Inventory\Item\ItemStockDetails.sql" />
+    <Build Include="Views\Inventory\Stock\ItemStockDetails.sql" />
     <Build Include="StoredProcedures\LoadData\Common\Load_LastTableData_By_Company_FinancialYear.sql" />
     <Build Include="StoredProcedures\Delete\Delete_ItemStock_By_Type_TransactionId.sql" />
     <Build Include="StoredProcedures\Delete\Delete_ItemStock_By_Id.sql" />
@@ -201,16 +203,16 @@
     <Build Include="StoredProcedures\LoadData\Accounts\Masters\Load_FinancialYear_By_DateTime.sql" />
     <Build Include="Tables\Inventory\Item\Item.sql" />
     <Build Include="Tables\Inventory\Item\ItemCategory.sql" />
-    <Build Include="Tables\Inventory\Item\ItemStock.sql" />
     <Build Include="Tables\Inventory\Item\ItemType.sql" />
     <Build Include="Tables\Inventory\Item\Manufacturer.sql" />
     <Build Include="Tables\Inventory\Item\Tax.sql" />
-    <Build Include="StoredProcedures\LoadData\Inventory\Item\Load_ItemStockSummary_By_Garage_Date.sql" />
+    <Build Include="StoredProcedures\LoadData\Inventory\Stock\Load_ItemStockSummary_By_Garage_Date.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\Item\Insert_Item.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\Item\Insert_ItemCategory.sql" />
-    <Build Include="StoredProcedures\Insert\Inventory\Item\Insert_ItemStock.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\Item\Insert_ItemType.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\Item\Insert_Manufacturer.sql" />
     <Build Include="StoredProcedures\Insert\Inventory\Item\Insert_Tax.sql" />
+    <Build Include="Tables\Inventory\Stock\ItemStock.sql" />
+    <Build Include="StoredProcedures\Insert\Inventory\Stock\Insert_ItemStock.sql" />
   </ItemGroup>
 </Project>

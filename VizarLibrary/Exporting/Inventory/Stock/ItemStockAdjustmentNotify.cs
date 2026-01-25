@@ -26,7 +26,7 @@ internal static class ItemStockAdjustmentNotify
 
         var emailData = new MailingUtil.TransactionEmailData
         {
-            TransactionType = "Raw Material Stock Adjustment",
+            TransactionType = "Item Stock Adjustment",
             TransactionNo = stock.TransactionNo,
             Action = NotifyType.Deleted,
             LocationName = "Main Location",
