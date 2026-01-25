@@ -213,5 +213,11 @@
     <Build Include="Views\Fleet\Repair\InsideRepair_Item_Overview.sql" />
     <Build Include="Tables\Fleet\Repair\Garage.sql" />
     <Build Include="StoredProcedures\Insert\Fleet\Repair\Insert_Garage.sql" />
+    <Build Include="Tables\Fleet\Repair\OutsideRepair.sql" />
+    <Build Include="Tables\Fleet\Repair\OutsideRepairDetail.sql" />
+    <Build Include="StoredProcedures\Insert\Fleet\Repair\Insert_OutsideRepair.sql" />
+    <Build Include="StoredProcedures\Insert\Fleet\Repair\Insert_OutsideRepairDetial.sql" />
+    <Build Include="Views\Fleet\Repair\OutsideRepair_Overview.sql" />
+    <Build Include="Views\Fleet\Repair\OutsideRepair_Item_Overview.sql" />
   </ItemGroup>
 </Project>

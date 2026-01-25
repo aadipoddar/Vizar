@@ -86,7 +86,6 @@ public partial class ItemStockAdjustmentPage : IAsyncDisposable
         try
         {
             _garages = await CommonData.LoadTableDataByStatus<GarageModel>(TableNames.Garage);
-            _garages.RemoveAll(g => g.External);
             _garages = [.. _garages.OrderBy(s => s.Name)];
             _garages.Add(new()
             {

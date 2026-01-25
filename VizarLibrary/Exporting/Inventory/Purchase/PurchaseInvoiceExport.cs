@@ -54,7 +54,7 @@ public static class PurchaseInvoiceExport
             Company = company,
             BillTo = party,
             InvoiceType = "PURCHASE INVOICE",
-            Garage = garage?.Name ?? string.Empty,
+            GarageInfo = garage,
             TransactionNo = transaction.TransactionNo,
             TransactionDateTime = transaction.TransactionDateTime,
             TotalAmount = transaction.TotalAmount,

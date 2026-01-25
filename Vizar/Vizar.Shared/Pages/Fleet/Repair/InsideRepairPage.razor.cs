@@ -120,7 +120,6 @@ public partial class InsideRepairPage : IAsyncDisposable
         try
         {
             _garages = await CommonData.LoadTableDataByStatus<GarageModel>(TableNames.Garage);
-            _garages.RemoveAll(s => s.External);
             _garages = [.. _garages.OrderBy(s => s.Name)];
             _selectedGarage = _garages.FirstOrDefault();
             _garages.Add(new()

@@ -1,6 +1,8 @@
 ﻿using Syncfusion.Drawing;
 
 using VizarLibrary.Models.Accounts.Masters;
+using VizarLibrary.Models.Fleet.Repair;
+using VizarLibrary.Models.Fleet.Vehicle;
 
 namespace VizarLibrary.Exporting.Utils;
 
@@ -35,7 +37,9 @@ public class InvoiceData
     public CompanyModel? Company { get; set; }
     public LedgerModel? BillTo { get; set; }
     public string InvoiceType { get; set; } = "INVOICE";
-    public string Garage { get; set; } = string.Empty;
+    public VehicleModel? Vehicle { get; set; }
+    public GarageModel? GarageInfo { get; set; }
+    public string? ApprovedBy { get; set; }
 }
 
 public enum CellAlignment

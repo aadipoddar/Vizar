@@ -100,7 +100,6 @@ public partial class InsideRepairItemReport : IAsyncDisposable
     private async Task LoadGarages()
     {
         _garages = await CommonData.LoadTableDataByStatus<GarageModel>(TableNames.Garage);
-        _garages.RemoveAll(g => g.External);
         _garages.Add(new()
         {
             Id = 0,

@@ -46,7 +46,7 @@ SELECT
 	[pd].[NetRate],
 	[pd].[NetRate] * [pd].[Quantity] AS NetTotal,
 
-	[pd].[Remarks] AS Remarks
+	[pd].[Remarks]
 
 FROM
 	[dbo].[PurchaseReturnDetail] pd

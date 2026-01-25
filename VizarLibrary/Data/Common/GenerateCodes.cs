@@ -22,6 +22,7 @@ public static class GenerateCodes
         Purchase,
         PurchaseReturn,
         InsideRepair,
+        OutsideRepair,
         Service,
         Item,
         ItemType,
@@ -52,8 +53,12 @@ public static class GenerateCodes
                     isDuplicate = purchaseReturn is not null;
                     break;
                 case CodeType.InsideRepair:
-                    var itemIssue = await CommonData.LoadTableDataByTransactionNo<InsideRepairModel>(TableNames.InsideRepair, code, sqlDataAccessTransaction);
-                    isDuplicate = itemIssue is not null;
+                    var insideRepair = await CommonData.LoadTableDataByTransactionNo<InsideRepairModel>(TableNames.InsideRepair, code, sqlDataAccessTransaction);
+                    isDuplicate = insideRepair is not null;
+                    break;
+                case CodeType.OutsideRepair:
+                    var outsideRepair = await CommonData.LoadTableDataByTransactionNo<OutsideRepairModel>(TableNames.OutsideRepair, code, sqlDataAccessTransaction);
+                    isDuplicate = outsideRepair is not null;
                     break;
                 case CodeType.Service:
                     var service = await CommonData.LoadTableDataByTransactionNo<ServiceModel>(TableNames.Service, code, sqlDataAccessTransaction);
@@ -204,6 +209,30 @@ public static class GenerateCodes
         }
 
         return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{insideRepairPrefix}000001", 6, CodeType.InsideRepair, sqlDataAccessTransaction);
+    }
+
+    public static async Task<string> GenerateOutsideRepairTransactionNo(OutsideRepairModel transaction, SqlDataAccessTransaction sqlDataAccessTransaction = null)
+    {
+        var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, transaction.FinancialYearId, sqlDataAccessTransaction);
+        var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId, sqlDataAccessTransaction)).Code;
+        var outsideRepairPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.OutsideRepairTransactionPrefix, sqlDataAccessTransaction)).Value;
+
+        var lastOutsideRepair = await CommonData.LoadLastTableDataByFinancialYear<OutsideRepairModel>(TableNames.OutsideRepair, transaction.FinancialYearId, sqlDataAccessTransaction);
+        if (lastOutsideRepair is not null)
+        {
+            var lastTransactionNo = lastOutsideRepair.TransactionNo;
+            if (lastTransactionNo.StartsWith($"{companyPrefix}{financialYear.YearNo}{outsideRepairPrefix}"))
+            {
+                var lastNumberPart = lastTransactionNo[(companyPrefix.Length + financialYear.YearNo.ToString().Length + outsideRepairPrefix.Length)..];
+                if (int.TryParse(lastNumberPart, out int lastNumber))
+                {
+                    int nextNumber = lastNumber + 1;
+                    return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{outsideRepairPrefix}{nextNumber:D6}", 6, CodeType.InsideRepair, sqlDataAccessTransaction);
+                }
+            }
+        }
+
+        return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{outsideRepairPrefix}000001", 6, CodeType.OutsideRepair, sqlDataAccessTransaction);
     }
 
     public static async Task<string> GenerateServiceTransactionNo(ServiceModel transaction, SqlDataAccessTransaction sqlDataAccessTransaction = null)

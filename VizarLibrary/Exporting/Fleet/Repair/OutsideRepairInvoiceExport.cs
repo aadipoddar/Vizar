@@ -1,45 +1,38 @@
-﻿using VizarLibrary.Data.Common;
+using VizarLibrary.Data.Common;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
 using VizarLibrary.Models.Fleet.Repair;
 using VizarLibrary.Models.Fleet.Vehicle;
-using VizarLibrary.Models.Inventory.Item;
 
 namespace VizarLibrary.Exporting.Fleet.Repair;
 
-public static class InsideRepairInvoiceExport
+public static class OutsideRepairInvoiceExport
 {
     public static async Task<(MemoryStream stream, string fileName)> ExportInvoice(
         int transactionId,
         InvoiceExportType exportType)
     {
-        var transaction = await CommonData.LoadTableDataById<InsideRepairModel>(TableNames.InsideRepair, transactionId) ??
+        var transaction = await CommonData.LoadTableDataById<OutsideRepairModel>(TableNames.OutsideRepair, transactionId) ??
             throw new InvalidOperationException("Transaction not found.");
 
-        var transactionDetails = await CommonData.LoadTableDataByMasterId<InsideRepairDetailModel>(TableNames.InsideRepairDetail, transaction.Id);
+        var transactionDetails = await CommonData.LoadTableDataByMasterId<OutsideRepairDetailModel>(TableNames.OutsideRepairDetail, transaction.Id);
         if (transactionDetails is null || transactionDetails.Count == 0)
             throw new InvalidOperationException("No transaction details found for the transaction.");
 
         var company = await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId) ??
             throw new InvalidOperationException("Company information is missing.");
 
-        var garage = await CommonData.LoadTableDataById<GarageModel>(TableNames.Garage, transaction.GarageId);
+        var vendor = await CommonData.LoadTableDataById<LedgerModel>(TableNames.Ledger, transaction.VendorId);
         var vehicle = await CommonData.LoadTableDataById<VehicleModel>(TableNames.Vehicle, transaction.VehicleId);
         vehicle.OpeningHour = transaction.CurrentHour;
         vehicle.OpeningKM = transaction.CurrentKM;
 
-        var allItems = await CommonData.LoadTableData<ItemModel>(TableNames.Item);
-
         var lineItems = transactionDetails.Select(detail =>
         {
-            var item = allItems.FirstOrDefault(i => i.Id == detail.ItemId);
-            return new InsideRepairItemCartModel
+            return new OutsideRepairItemCartModel
             {
-                ItemId = detail.ItemId,
-                ItemName = item?.Name ?? $"Item #{detail.ItemId}",
-                IdentificationNo = detail.IdentificationNo,
-                UnitOfMeasurement = detail.UnitOfMeasurement,
+                Job = detail.Job,
                 Quantity = detail.Quantity,
                 Rate = detail.Rate,
                 Total = detail.Total,
@@ -56,9 +49,10 @@ public static class InsideRepairInvoiceExport
             Status = transaction.Status,
             PaymentModes = null,
             Company = company,
+            BillTo = vendor,
             Vehicle = vehicle,
-            GarageInfo = garage,
-            InvoiceType = "INSIDE REPAIR INVOICE"
+            ApprovedBy = transaction.ApprovedBy,
+            InvoiceType = "OUTSIDE REPAIR INVOICE"
         };
 
         var summaryFields = new Dictionary<string, string>
@@ -69,16 +63,14 @@ public static class InsideRepairInvoiceExport
         var columnSettings = new List<InvoiceColumnSetting>
         {
             new("#", "#", exportType, CellAlignment.Center, pdfWidth: 25, excelWidth: 5),
-            new(nameof(InsideRepairItemCartModel.ItemName), "Item", exportType, CellAlignment.Left, pdfWidth: 0, excelWidth: 30),
-            new(nameof(InsideRepairItemCartModel.IdentificationNo), "Identification", exportType, CellAlignment.Center, pdfWidth: 50, excelWidth: 15),
-            new(nameof(InsideRepairItemCartModel.UnitOfMeasurement), "UOM", exportType, CellAlignment.Center, pdfWidth: 30, excelWidth: 15),
-            new(nameof(InsideRepairItemCartModel.Quantity), "Qty", exportType, CellAlignment.Right, pdfWidth: 40, excelWidth: 10, "#,##0.00"),
-            new(nameof(InsideRepairItemCartModel.Rate), "Rate", exportType, CellAlignment.Right, pdfWidth: 50, excelWidth: 12, "#,##0.00"),
-            new(nameof(InsideRepairItemCartModel.Total), "Total", exportType, CellAlignment.Right, pdfWidth: 55, excelWidth: 15, "#,##0.00")
+            new(nameof(OutsideRepairItemCartModel.Job), "Job", exportType, CellAlignment.Left, pdfWidth: 0, excelWidth: 40),
+            new(nameof(OutsideRepairItemCartModel.Quantity), "Qty", exportType, CellAlignment.Right, pdfWidth: 50, excelWidth: 10, "#,##0.00"),
+            new(nameof(OutsideRepairItemCartModel.Rate), "Rate", exportType, CellAlignment.Right, pdfWidth: 60, excelWidth: 12, "#,##0.00"),
+            new(nameof(OutsideRepairItemCartModel.Total), "Total", exportType, CellAlignment.Right, pdfWidth: 65, excelWidth: 15, "#,##0.00")
         };
 
         var currentDateTime = await CommonData.LoadCurrentDateTime();
-        string fileName = $"INSIDE_REPAIR_INVOICE_{transaction.TransactionNo}_{currentDateTime:yyyyMMdd_HHmmss}";
+        string fileName = $"OUTSIDE_REPAIR_INVOICE_{transaction.TransactionNo}_{currentDateTime:yyyyMMdd_HHmmss}";
 
         if (exportType == InvoiceExportType.PDF)
         {

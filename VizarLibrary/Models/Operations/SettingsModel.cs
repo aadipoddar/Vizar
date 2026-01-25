@@ -32,6 +32,7 @@ public static class SettingsKeys
     public static string ItemStockAdjustmentTransactionPrefix => "ItemStockAdjustmentTransactionPrefix";
 
     public static string InsideRepairTransactionPrefix => "InsideRepairTransactionPrefix";
+    public static string OutsideRepairTransactionPrefix => "OutsideRepairTransactionPrefix";
 
     public static string ServiceTransactionPrefix => "ServiceTransactionPrefix";
 

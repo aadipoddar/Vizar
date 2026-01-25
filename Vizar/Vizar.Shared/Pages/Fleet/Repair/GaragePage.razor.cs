@@ -77,7 +77,6 @@ public partial class GaragePage : IAsyncDisposable
         {
             Id = garage.Id,
             Name = garage.Name,
-            External = garage.External,
             Remarks = garage.Remarks,
             Status = garage.Status
         };

@@ -37,6 +37,8 @@ public static class TableNames
 
     public static string InsideRepair => "InsideRepair";
     public static string InsideRepairDetail => "InsideRepairDetail";
+    public static string OutsideRepair => "OutsideRepair";
+    public static string OutsideRepairDetail => "OutsideRepairDetail";
 
     public static string ServiceSchedule => "ServiceSchedule";
     public static string ServiceType => "ServiceType";
@@ -105,6 +107,8 @@ public static class StoredProcedureNames
 
     public static string InsertInsideRepair => "Insert_InsideRepair";
     public static string InsertInsideRepairDetail => "Insert_InsideRepairDetail";
+    public static string InsertOutsideRepair => "Insert_OutsideRepair";
+    public static string InsertOutsideRepairDetail => "Insert_OutsideRepairDetail";
 
     public static string InsertServiceType => "Insert_ServiceType";
     public static string InsertServiceSchedule => "Insert_ServiceSchedule";
@@ -132,6 +136,8 @@ public static class ViewNames
 
     public static string InsideRepairOverview => "InsideRepair_Overview";
     public static string InsideRepairItemOverview => "InsideRepair_Item_Overview";
+    public static string OutsideRepairOverview => "OutsideRepair_Overview";
+    public static string OutsideRepairItemOverview => "OutsideRepair_Item_Overview";
 
     public static string ServiceOverview => "Service_Overview";
     public static string GarageServiceItemOverview => "GarageService_Item_Overview";

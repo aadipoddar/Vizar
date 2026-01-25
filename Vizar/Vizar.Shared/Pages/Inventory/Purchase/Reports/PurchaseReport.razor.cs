@@ -127,7 +127,6 @@ public partial class PurchaseReport : IAsyncDisposable
     private async Task LoadGarages()
     {
         _garages = await CommonData.LoadTableDataByStatus<GarageModel>(TableNames.Garage);
-        _garages.RemoveAll(s => s.External);
         _garages.Add(new()
         {
             Id = 0,

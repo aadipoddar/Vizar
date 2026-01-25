@@ -17,6 +17,7 @@ public static class PageRouteNames
 
     public static string FleetDashboard => "/fleet";
     public static string InsideRepair => "/fleet/inside-repair";
+    public static string OutsideRepair => "/fleet/outside-repair";
     public static string Service => "/fleet/service";
     public static string Document => "/fleet/document";
 
@@ -33,6 +34,8 @@ public static class PageRouteNames
     public static string ReportItemStock => "/report/item-stock";
     public static string ReportInsideRepair => "/report/inside-repair";
     public static string ReportInsideRepairItem => "/report/inside-repair-item";
+    public static string ReportOutsideRepair => "/report/outside-repair";
+    public static string ReportOutsideRepairItem => "/report/outside-repair-item";
     public static string ReportService => "/report/service";
     public static string ReportGarageServiceItem => "/report/garage-service-item";
     public static string ReportVehicleServiceItem => "/report/vehicle-service-item";

@@ -28,7 +28,7 @@ SELECT
 	[ird].[Rate],
 	[ird].[Total],
 
-	[ird].[Remarks] AS Remarks,
+	[ird].[Remarks],
 
 	[ir].[CurrentHour],
 	[ir].[CurrentKM],
@@ -73,8 +73,10 @@ OUTER APPLY (
 	SELECT TOP 1 
 		prevMaster.[CurrentHour],
 		prevMaster.[CurrentKM]
-	FROM [dbo].[InsideRepair] prevMaster
+	FROM [dbo].[InsideRepairDetail] prevDetail
+	INNER JOIN [dbo].[InsideRepair] prevMaster ON prevDetail.[MasterId] = prevMaster.Id
 	WHERE prevMaster.[VehicleId] = [ir].[VehicleId]
+		AND prevDetail.[ItemId] = [ird].[ItemId]
 		AND prevMaster.[TransactionDateTime] < [ir].[TransactionDateTime]
 		AND prevMaster.[Status] = 1
 	ORDER BY prevMaster.[TransactionDateTime] DESC, prevMaster.[Id] DESC

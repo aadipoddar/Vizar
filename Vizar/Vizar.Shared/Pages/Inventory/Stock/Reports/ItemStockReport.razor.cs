@@ -94,7 +94,6 @@ public partial class ItemStockReport : IAsyncDisposable
     private async Task LoadGarages()
     {
         _garages = await CommonData.LoadTableDataByStatus<GarageModel>(TableNames.Garage);
-        _garages.RemoveAll(g => g.External);
         _garages = [.. _garages.OrderBy(s => s.Name)];
         _selectedGarage = _garages.FirstOrDefault();
     }

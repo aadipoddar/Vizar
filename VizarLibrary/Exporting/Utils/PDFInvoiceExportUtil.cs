@@ -64,7 +64,7 @@ public static class PDFInvoiceExportUtil
             currentY = DrawInvoiceHeader(graphics, leftMargin, pageWidth, currentY);
 
             // 2. Invoice Type and Number
-            currentY = DrawInvoiceTitle(graphics, invoiceData.InvoiceType, invoiceData.TransactionNo, invoiceData.TransactionDateTime, leftMargin, pageWidth, currentY, invoiceData.Garage);
+            currentY = DrawInvoiceTitle(graphics, invoiceData.InvoiceType, invoiceData.TransactionNo, invoiceData.TransactionDateTime, leftMargin, pageWidth, currentY);
 
             // 2.5. Draw DELETED status badge if Status is false
             if (!invoiceData.Status)
@@ -208,7 +208,7 @@ public static class PDFInvoiceExportUtil
     /// <summary>
     /// Draw invoice type and number
     /// </summary>
-    private static float DrawInvoiceTitle(PdfGraphics graphics, string invoiceType, string invoiceNumber, DateTime transactionDateTime, float leftMargin, float pageWidth, float startY, string outlet = null)
+    private static float DrawInvoiceTitle(PdfGraphics graphics, string invoiceType, string invoiceNumber, DateTime transactionDateTime, float leftMargin, float pageWidth, float startY)
     {
         float currentY = startY;
 
@@ -226,16 +226,7 @@ public static class PDFInvoiceExportUtil
 
         currentY += 16;
 
-        // Draw Outlet label and Invoice Date on same line
-        if (!string.IsNullOrWhiteSpace(outlet))
-        {
-            PdfStandardFont outletFont = new(PdfFontFamily.Helvetica, 10, PdfFontStyle.Bold);
-            PdfBrush outletBrush = new PdfSolidBrush(new PdfColor(100, 100, 100));
-            string outletText = $"Garage: {outlet}";
-            graphics.DrawString(outletText, outletFont, outletBrush, new PointF(leftMargin, currentY));
-        }
-
-        // Invoice Date (right aligned, on same line as outlet)
+        // Invoice Date (right aligned)
         PdfStandardFont dateFont = new(PdfFontFamily.Helvetica, 10);
         string invoiceDateText = $"Invoice Date: {transactionDateTime:dd-MMM-yyyy hh:mm tt}";
         SizeF dateSize = dateFont.MeasureString(invoiceDateText);
@@ -342,7 +333,7 @@ public static class PDFInvoiceExportUtil
             }
         }
 
-        // Right Column - To (Customer/Party) - skip entire section if null
+        // Right Column - To (Customer/Party), Vehicle, and Garage - all optional
         if (billTo != null)
         {
             graphics.DrawString("BILL TO:", labelFont, labelBrush, new PointF(rightColumnX + padding, rightTextY));
@@ -386,6 +377,52 @@ public static class PDFInvoiceExportUtil
                 graphics.DrawString($"GSTIN: {billTo.GSTNo}", valueFont, valueBrush, new PointF(rightColumnX + padding, rightTextY));
                 rightTextY += 9;
             }
+        }
+
+        // Vehicle Information (right column, below BILL TO if present, or at top if BILL TO is null)
+        if (invoiceData.Vehicle != null)
+        {
+            // Add spacing only if BILL TO was rendered
+            if (billTo != null)
+                rightTextY += 5;
+
+            graphics.DrawString("VEHICLE:", labelFont, labelBrush, new PointF(rightColumnX + padding, rightTextY));
+            rightTextY += 10;
+
+            graphics.DrawString(invoiceData.Vehicle.Code ?? string.Empty, valueFont, valueBrush,
+                new PointF(rightColumnX + padding, rightTextY));
+            rightTextY += 9;
+
+            // Display Current KM
+            if (invoiceData.Vehicle.OpeningKM > 0)
+            {
+                graphics.DrawString($"Current KM: {invoiceData.Vehicle.OpeningKM:N0}", valueFont, valueBrush,
+                    new PointF(rightColumnX + padding, rightTextY));
+                rightTextY += 9;
+            }
+
+            // Display Current Hour
+            if (invoiceData.Vehicle.OpeningHour > 0)
+            {
+                graphics.DrawString($"Current Hour: {invoiceData.Vehicle.OpeningHour:N2}", valueFont, valueBrush,
+                    new PointF(rightColumnX + padding, rightTextY));
+                rightTextY += 9;
+            }
+        }
+
+        // Garage Information (right column, below Vehicle if present, or below BILL TO, or at top)
+        if (invoiceData.GarageInfo != null)
+        {
+            // Add spacing if either BILL TO or VEHICLE was rendered
+            if (billTo != null || invoiceData.Vehicle != null)
+                rightTextY += 5;
+
+            graphics.DrawString("GARAGE:", labelFont, labelBrush, new PointF(rightColumnX + padding, rightTextY));
+            rightTextY += 10;
+
+            graphics.DrawString(invoiceData.GarageInfo.Name ?? string.Empty, valueFont, valueBrush,
+                new PointF(rightColumnX + padding, rightTextY));
+            rightTextY += 9;
         }
 
         // Calculate dynamic box height based on content
@@ -680,18 +717,28 @@ public static class PDFInvoiceExportUtil
     /// </summary>
     private static float DrawPaymentMethods(PdfGraphics graphics, InvoiceData invoiceData, float leftMargin, float pageWidth, float startY)
     {
-        // Check if payment modes dictionary has any values
-        if (invoiceData.PaymentModes == null || !invoiceData.PaymentModes.Any(p => p.Value > 0))
-            return startY;
-
         PdfStandardFont labelFont = new(PdfFontFamily.Helvetica, 8, PdfFontStyle.Bold);
         PdfStandardFont valueFont = new(PdfFontFamily.Helvetica, 8, PdfFontStyle.Regular);
+        PdfStandardFont italicFont = new(PdfFontFamily.Helvetica, 8, PdfFontStyle.Italic);
         PdfBrush labelBrush = new PdfSolidBrush(new PdfColor(0, 0, 0));
         PdfBrush valueBrush = new PdfSolidBrush(new PdfColor(37, 99, 235)); // Blue for amounts
 
-        // Position payment methods on the right side (40% of width)
+        // Position right column (40% of width)
         float rightColumnX = leftMargin + (pageWidth - 40) * 0.6f + 20; // Start after amount in words
         float currentY = startY;
+
+        // Draw Approved By if present
+        if (!string.IsNullOrWhiteSpace(invoiceData.ApprovedBy))
+        {
+            graphics.DrawString("Approved By:", labelFont, labelBrush, new PointF(rightColumnX, currentY));
+            currentY += 10;
+            graphics.DrawString(invoiceData.ApprovedBy, italicFont, labelBrush, new PointF(rightColumnX, currentY));
+            currentY += 14;
+        }
+
+        // Check if payment modes dictionary has any values
+        if (invoiceData.PaymentModes == null || !invoiceData.PaymentModes.Any(p => p.Value > 0))
+            return currentY;
 
         graphics.DrawString("Payment Methods:", labelFont, labelBrush, new PointF(rightColumnX, currentY));
         currentY += 12;

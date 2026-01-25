@@ -39,7 +39,7 @@ else
                 <div class="section-body">
                     <div class="form-grid-triple">
                         <!-- Garage Name -->
-                        <div class="form-field form-field-span-2">
+                        <div class="form-field">
                             <label class="field-label">
                                 Garage Name <span class="required">*</span>
                             </label>
@@ -47,17 +47,8 @@ else
                                        FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                         </div>
 
-                        <!-- External Garage -->
-                        <div class="form-field">
-                            <label class="field-label">External Garage</label>
-                            <div class="checkbox-wrapper">
-                                <SfCheckBox @bind-Checked="_garage.External" Label="Is External"
-                                            TChecked="bool" CssClass="custom-checkbox" />
-                            </div>
-                        </div>
-
                         <!-- Remarks -->
-                        <div class="form-field form-field-span-3">
+                        <div class="form-field form-field-span-2">
                             <label class="field-label">Remarks</label>
                             <SfTextBox @bind-Value="_garage.Remarks" Placeholder="Enter remarks (optional)" Multiline="true"
                                        FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox textarea-field-small" />
@@ -118,18 +109,6 @@ else
                             <GridColumn Field="@nameof(GarageModel.Id)" HeaderText="ID" Width="80"
                                         TextAlign="TextAlign.Center" />
                             <GridColumn Field="@nameof(GarageModel.Name)" HeaderText="Name" Width="300" />
-                            <GridColumn Field="@nameof(GarageModel.External)" HeaderText="External" Width="100"
-                                        TextAlign="TextAlign.Center">
-                                <Template>
-                                    @{
-                                        var garage = (context as GarageModel);
-                                        <div class="grid-checkbox"
-                                             style="@(garage.External ? "color: #3b82f6; background: #dbeafe;" : "color: #64748b; background: #f1f5f9;")">
-                                            @(garage.External ? "✓" : "✗")
-                                        </div>
-                                    }
-                                </Template>
-                            </GridColumn>
                             <GridColumn Field="@nameof(GarageModel.Remarks)" HeaderText="Remarks" Width="500" />
                             <GridColumn Field="@nameof(GarageModel.Status)" HeaderText="Status" Width="100"
                                         TextAlign="TextAlign.Center">

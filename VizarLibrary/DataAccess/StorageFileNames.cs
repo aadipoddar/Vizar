@@ -16,6 +16,8 @@ public static class StorageFileNames
 
     public static string InsideRepairDataFileName => "inside_repair_data.json";
     public static string InsideRepairCartDataFileName => "inside_repair_cart_data.json";
+    public static string OutsideRepairDataFileName => "outside_repair_data.json";
+    public static string OutsideRepairCartDataFileName => "outside_repair_cart_data.json";
 
     public static string ServiceDataFileName => "service_data.json";
     public static string ServiceCartDataFileName => "service_cart_data.json";

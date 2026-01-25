@@ -67,7 +67,7 @@ public static class ExcelInvoiceExportUtil
             currentRow = await DrawInvoiceHeader(worksheet, currentRow);
 
             // 2. Invoice Type and Number
-            currentRow = DrawInvoiceTitle(worksheet, invoiceData.InvoiceType, invoiceData.TransactionNo, invoiceData.TransactionDateTime, currentRow, invoiceData.Garage);
+            currentRow = DrawInvoiceTitle(worksheet, invoiceData.InvoiceType, invoiceData.TransactionNo, invoiceData.TransactionDateTime, currentRow);
 
             // 2.5. Draw DELETED status badge if Status is false
             if (!invoiceData.Status)
@@ -172,7 +172,7 @@ public static class ExcelInvoiceExportUtil
     /// <summary>
     /// Draw invoice type and number
     /// </summary>
-    private static int DrawInvoiceTitle(IWorksheet worksheet, string invoiceType, string invoiceNumber, DateTime transactionDateTime, int startRow, string outlet = null)
+    private static int DrawInvoiceTitle(IWorksheet worksheet, string invoiceType, string invoiceNumber, DateTime transactionDateTime, int startRow)
     {
         int currentRow = startRow;
 
@@ -190,16 +190,7 @@ public static class ExcelInvoiceExportUtil
         worksheet.Range[currentRow, 6].CellStyle.HorizontalAlignment = ExcelHAlign.HAlignRight;
         currentRow++;
 
-        // Row 2: Outlet (left) and Invoice Date (right)
-        if (!string.IsNullOrWhiteSpace(outlet))
-        {
-            worksheet.Range[currentRow, 1, currentRow, 5].Merge();
-            worksheet.Range[currentRow, 1].Text = $"Garage: {outlet}";
-            worksheet.Range[currentRow, 1].CellStyle.Font.Bold = true;
-            worksheet.Range[currentRow, 1].CellStyle.Font.Size = 10;
-            worksheet.Range[currentRow, 1].CellStyle.Font.RGBColor = Color.FromArgb(100, 100, 100);
-        }
-
+        // Row 2: Invoice Date (right aligned)
         worksheet.Range[currentRow, 6, currentRow, 10].Merge();
         worksheet.Range[currentRow, 6].Text = $"Invoice Date: {transactionDateTime:dd-MMM-yyyy hh:mm tt}";
         worksheet.Range[currentRow, 6].CellStyle.Font.Size = 10;
@@ -244,12 +235,17 @@ public static class ExcelInvoiceExportUtil
         worksheet.Range[leftRow, 1].CellStyle.Font.Color = ExcelKnownColors.Grey_50_percent;
         leftRow++;
 
-        // BILL TO Section (Right Column)
+        // BILL TO Section (Right Column) - only if present
         if (billTo != null)
         {
             worksheet.Range[rightRow, 6].Text = "BILL TO:";
             worksheet.Range[rightRow, 6].CellStyle.Font.Bold = true;
             worksheet.Range[rightRow, 6].CellStyle.Font.Color = ExcelKnownColors.Grey_50_percent;
+            rightRow++;
+
+            worksheet.Range[rightRow, 6, rightRow, 10].Merge();
+            worksheet.Range[rightRow, 6].Text = billTo.Name;
+            worksheet.Range[rightRow, 6].CellStyle.Font.Bold = true;
             rightRow++;
         }
 
@@ -260,15 +256,6 @@ public static class ExcelInvoiceExportUtil
             worksheet.Range[leftRow, 1].Text = company.Name ?? string.Empty;
             worksheet.Range[leftRow, 1].CellStyle.Font.Bold = true;
             leftRow++;
-        }
-
-        // Bill To Name (Right)
-        if (billTo != null)
-        {
-            worksheet.Range[rightRow, 6, rightRow, 10].Merge();
-            worksheet.Range[rightRow, 6].Text = billTo.Name;
-            worksheet.Range[rightRow, 6].CellStyle.Font.Bold = true;
-            rightRow++;
         }
 
         // Company Address (Left)
@@ -288,7 +275,7 @@ public static class ExcelInvoiceExportUtil
             leftRow++;
         }
 
-        // Bill To Address (Right)
+        // Bill To Address (Right) - grouped with other BILL TO fields
         if (billTo != null && !string.IsNullOrEmpty(billTo.Address))
         {
             worksheet.Range[rightRow, 6, rightRow, 10].Merge();
@@ -312,7 +299,7 @@ public static class ExcelInvoiceExportUtil
             leftRow++;
         }
 
-        // Bill To Phone (Right)
+        // Bill To Phone (Right) - grouped with other BILL TO fields
         if (billTo != null && !string.IsNullOrEmpty(billTo.Phone))
         {
             worksheet.Range[rightRow, 6, rightRow, 10].Merge();
@@ -328,7 +315,7 @@ public static class ExcelInvoiceExportUtil
             leftRow++;
         }
 
-        // Bill To Email (Right)
+        // Bill To Email (Right) - grouped with other BILL TO fields
         if (billTo != null && !string.IsNullOrEmpty(billTo.Email))
         {
             worksheet.Range[rightRow, 6, rightRow, 10].Merge();
@@ -344,11 +331,63 @@ public static class ExcelInvoiceExportUtil
             leftRow++;
         }
 
-        // Bill To GST (Right)
+        // Bill To GST (Right) - grouped with other BILL TO fields
         if (billTo != null && !string.IsNullOrEmpty(billTo.GSTNo))
         {
             worksheet.Range[rightRow, 6, rightRow, 10].Merge();
             worksheet.Range[rightRow, 6].Text = $"GSTIN: {billTo.GSTNo}";
+            rightRow++;
+        }
+
+        // Vehicle Information (right column, continues from where BILL TO ended or starts at beginning)
+        if (invoiceData.Vehicle != null)
+        {
+            // Add spacing only if BILL TO was rendered
+            if (billTo != null)
+                rightRow++;
+
+            worksheet.Range[rightRow, 6].Text = "VEHICLE:";
+            worksheet.Range[rightRow, 6].CellStyle.Font.Bold = true;
+            worksheet.Range[rightRow, 6].CellStyle.Font.Color = ExcelKnownColors.Grey_50_percent;
+            rightRow++;
+
+            worksheet.Range[rightRow, 6, rightRow, 10].Merge();
+            worksheet.Range[rightRow, 6].Text = invoiceData.Vehicle.Code ?? string.Empty;
+            worksheet.Range[rightRow, 6].CellStyle.Font.Bold = true;
+            rightRow++;
+
+            // Display Current KM
+            if (invoiceData.Vehicle.OpeningKM > 0)
+            {
+                worksheet.Range[rightRow, 6, rightRow, 10].Merge();
+                worksheet.Range[rightRow, 6].Text = $"Current KM: {invoiceData.Vehicle.OpeningKM:N0}";
+                rightRow++;
+            }
+
+            // Display Current Hour
+            if (invoiceData.Vehicle.OpeningHour > 0)
+            {
+                worksheet.Range[rightRow, 6, rightRow, 10].Merge();
+                worksheet.Range[rightRow, 6].Text = $"Current Hour: {invoiceData.Vehicle.OpeningHour:N2}";
+                rightRow++;
+            }
+        }
+
+        // Garage Information (right column, continues from where Vehicle ended or BILL TO ended or starts at beginning)
+        if (invoiceData.GarageInfo != null)
+        {
+            // Add spacing if either BILL TO or VEHICLE was rendered
+            if (billTo != null || invoiceData.Vehicle != null)
+                rightRow++;
+
+            worksheet.Range[rightRow, 6].Text = "GARAGE:";
+            worksheet.Range[rightRow, 6].CellStyle.Font.Bold = true;
+            worksheet.Range[rightRow, 6].CellStyle.Font.Color = ExcelKnownColors.Grey_50_percent;
+            rightRow++;
+
+            worksheet.Range[rightRow, 6, rightRow, 10].Merge();
+            worksheet.Range[rightRow, 6].Text = invoiceData.GarageInfo.Name ?? string.Empty;
+            worksheet.Range[rightRow, 6].CellStyle.Font.Bold = true;
             rightRow++;
         }
 
@@ -363,7 +402,7 @@ public static class ExcelInvoiceExportUtil
         worksheet.SetColumnWidth(4, 12);
         // Column 5 is gap
         worksheet.SetColumnWidth(5, 2);
-        // Columns 6-10 for right section (BILL TO)
+        // Columns 6-10 for right section (BILL TO/VEHICLE/GARAGE)
         worksheet.SetColumnWidth(6, 12);
         worksheet.SetColumnWidth(7, 12);
         worksheet.SetColumnWidth(8, 12);
@@ -511,9 +550,22 @@ public static class ExcelInvoiceExportUtil
             }
         }
 
-        // Payment Methods (Right side)
+        // Right side content (Approved By and Payment Methods)
         int paymentRow = startRow;
         int paymentCol = 7;
+
+        // Approved By (Right side) - if present
+        if (!string.IsNullOrWhiteSpace(invoiceData.ApprovedBy))
+        {
+            worksheet.Range[paymentRow, paymentCol].Text = "Approved By:";
+            worksheet.Range[paymentRow, paymentCol].CellStyle.Font.Bold = true;
+            paymentRow++;
+
+            worksheet.Range[paymentRow, paymentCol, paymentRow, paymentCol + 2].Merge();
+            worksheet.Range[paymentRow, paymentCol].Text = invoiceData.ApprovedBy;
+            worksheet.Range[paymentRow, paymentCol].CellStyle.Font.Italic = true;
+            paymentRow++;
+        }
 
         if (invoiceData.PaymentModes != null && invoiceData.PaymentModes.Any(p => p.Value > 0))
         {

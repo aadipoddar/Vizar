@@ -1,7 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[Insert_Garage]
 	@Id INT OUTPUT,
 	@Name VARCHAR(500),
-	@External BIT,
 	@Remarks VARCHAR(MAX),
 	@Status BIT = 1
 AS
@@ -11,14 +10,12 @@ BEGIN
 		INSERT INTO [dbo].[Garage]
 		(
 			[Name],
-			[External],
 			[Remarks],
 			[Status]
 		)
 		VALUES
 		(
 			@Name,
-			@External,
 			@Remarks,
 			@Status
 		);
@@ -31,7 +28,6 @@ BEGIN
 		UPDATE [dbo].[Garage]
 		SET
 			[Name] = @Name,
-			[External] = @External,
 			[Remarks] = @Remarks,
 			[Status] = @Status
 		WHERE [Id] = @Id;

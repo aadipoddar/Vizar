@@ -26,6 +26,7 @@ BEGIN
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ItemStockAdjustmentTransactionPrefix' , N'ISA'	, N'Prefix for Item Stock Adjustment Transaction Numbers')
 
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'InsideRepairTransactionPrefix'	, N'INRP'	, N'Prefix for Inside Repair Transaction Numbers')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'OutsideRepairTransactionPrefix'	, N'OUTRP'	, N'Prefix for Outside Repair Transaction Numbers')
 
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ServiceTransactionPrefix'		, N'SRV'	, N'Prefix for Service Transaction Numbers')
 
