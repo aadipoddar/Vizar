@@ -3,6 +3,7 @@ using VizarLibrary.Data.Common;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Inventory.Stock;
 using VizarLibrary.Exporting.Utils;
+using VizarLibrary.Models.Fleet.Service;
 using VizarLibrary.Models.Inventory.Item;
 
 namespace VizarLibrary.Data.Inventory.Stock;
@@ -18,8 +19,8 @@ public static class ItemStockData
     public static async Task DeleteItemStockByTypeTransactionId(string Type, int TransactionId, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
         await SqlDataAccess.SaveData(StoredProcedureNames.DeleteItemStockByTypeTransactionId, new { Type, TransactionId }, sqlDataAccessTransaction);
 
-    public static async Task DeleteItemStockById(int Id, SqlDataAccessTransaction sqlDataAccessTransaction = null) =>
-        await SqlDataAccess.SaveData(StoredProcedureNames.DeleteItemStockById, new { Id }, sqlDataAccessTransaction);
+    private static async Task DeleteItemStockById(int Id) =>
+        await SqlDataAccess.SaveData(StoredProcedureNames.DeleteItemStockById, new { Id });
 
     public static async Task DeleteItemStockById(int Id, int userId)
     {
@@ -32,11 +33,10 @@ public static class ItemStockData
         await ItemStockAdjustmentNotify.Notify(stock, userId, NotifyType.Deleted);
     }
 
-    public static async Task SaveItemStockAdjustment(DateTime transactionDateTime, List<ItemStockAdjustmentCartModel> cart, int userId)
+    public static async Task SaveItemStockAdjustment(DateTime transactionDateTime, GarageModel garage, List<ItemStockAdjustmentCartModel> cart, int userId)
     {
         var transactionNo = await GenerateCodes.GenerateItemStockAdjustmentTransactionNo(transactionDateTime);
-        // TODO - Change
-        var stockSummary = await LoadItemStockSummaryByGarageDate(1, transactionDateTime, transactionDateTime);
+        var stockSummary = await LoadItemStockSummaryByGarageDate(garage.Id, transactionDateTime, transactionDateTime);
 
         if (cart is null || cart.Count == 0)
             throw new InvalidOperationException("Cannot save stock adjustment with no items.");
@@ -66,6 +66,7 @@ public static class ItemStockData
                         Id = 0,
                         ItemId = item.ItemId,
                         IdentificationNo = item.IdentificationNo,
+                        GarageId = garage.Id,
                         Quantity = adjustmentQuantity,
                         NetRate = null,
                         TransactionId = null,

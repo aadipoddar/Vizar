@@ -13,6 +13,7 @@ using VizarLibrary.Data.Inventory.Purchase;
 using VizarLibrary.Data.Inventory.Stock;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Models.Accounts.Masters;
+using VizarLibrary.Models.Fleet.Service;
 using VizarLibrary.Models.Inventory.Item;
 using VizarLibrary.Models.Operations;
 
@@ -30,10 +31,12 @@ public partial class ItemStockAdjustmentPage : IAsyncDisposable
     private DateTime _transactionDateTime = DateTime.Now;
     private string _transactionNo = string.Empty;
 
+    private GarageModel _selectedGarage = new();
     private FinancialYearModel _selectedFinancialYear = new();
     private ItemModel? _selectedItem = new();
     private ItemStockAdjustmentCartModel _selectedCart = new();
 
+    private List<GarageModel> _garages = [];
     private List<ItemModel> _items = [];
     private List<ItemStockAdjustmentCartModel> _cart = [];
     private List<ItemStockSummaryModel> _stockSummary = [];
@@ -71,9 +74,31 @@ public partial class ItemStockAdjustmentPage : IAsyncDisposable
 
         _transactionDateTime = await CommonData.LoadCurrentDateTime();
         _transactionNo = await GenerateCodes.GenerateItemStockAdjustmentTransactionNo(_transactionDateTime);
+        await LoadGarages();
         await LoadStock();
         await LoadItems();
         await LoadExistingCart();
+    }
+
+    private async Task LoadGarages()
+    {
+        try
+        {
+            _garages = await CommonData.LoadTableDataByStatus<GarageModel>(TableNames.Garage);
+            _garages.RemoveAll(g => g.External);
+            _garages = [.. _garages.OrderBy(s => s.Name)];
+            _garages.Add(new()
+            {
+                Id = 0,
+                Name = "Create New Garage..."
+            });
+
+            _selectedGarage = _garages.FirstOrDefault();
+        }
+        catch (Exception ex)
+        {
+            await _toastNotification.ShowAsync("An Error Occurred While Loading Garages", ex.Message, ToastType.Error);
+        }
     }
 
     private async Task LoadStock()
@@ -81,8 +106,7 @@ public partial class ItemStockAdjustmentPage : IAsyncDisposable
         try
         {
             _selectedFinancialYear = await FinancialYearData.LoadFinancialYearByDateTime(_transactionDateTime);
-            // TODO - Change
-            _stockSummary = await ItemStockData.LoadItemStockSummaryByGarageDate(1, _transactionDateTime, _transactionDateTime);
+            _stockSummary = await ItemStockData.LoadItemStockSummaryByGarageDate(_selectedGarage.Id, _transactionDateTime, _transactionDateTime);
         }
         catch (Exception ex)
         {
@@ -136,6 +160,26 @@ public partial class ItemStockAdjustmentPage : IAsyncDisposable
         _transactionDateTime = args.Value;
         await LoadStock();
         await LoadItems();
+        await SaveTransactionFile();
+    }
+
+    private async Task OnGarageChanged(ChangeEventArgs<GarageModel, GarageModel> args)
+    {
+        if (args is null || args.Value is null)
+            return;
+
+        if (args.Value.Id == 0)
+        {
+            if (FormFactor.GetFormFactor() == "Web")
+                await JSRuntime.InvokeVoidAsync("open", PageRouteNames.AdminGarage, "_blank");
+            else
+                NavigationManager.NavigateTo(PageRouteNames.AdminGarage);
+
+            return;
+        }
+
+        _selectedGarage = args.Value;
+        await LoadStock();
         await SaveTransactionFile();
     }
     #endregion
@@ -304,8 +348,7 @@ public partial class ItemStockAdjustmentPage : IAsyncDisposable
             await _toastNotification.ShowAsync("Invalid Transaction Date", "The selected transaction date does not fall within an active financial year.", ToastType.Error);
             _transactionDateTime = await CommonData.LoadCurrentDateTime();
             _selectedFinancialYear = await FinancialYearData.LoadFinancialYearByDateTime(_transactionDateTime);
-            // TODO - Change
-            _stockSummary = await ItemStockData.LoadItemStockSummaryByGarageDate(1, _transactionDateTime, _transactionDateTime);
+            _stockSummary = await ItemStockData.LoadItemStockSummaryByGarageDate(_selectedGarage.Id, _transactionDateTime, _transactionDateTime);
         }
         #endregion
 
@@ -377,6 +420,12 @@ public partial class ItemStockAdjustmentPage : IAsyncDisposable
             return false;
         }
 
+        if (_selectedGarage is null || _selectedGarage.Id <= 0)
+        {
+            await _toastNotification.ShowAsync("Invalid Garage Selection", "Please select a valid garage for the stock adjustment.", ToastType.Warning);
+            return false;
+        }
+
         return true;
     }
 
@@ -400,7 +449,7 @@ public partial class ItemStockAdjustmentPage : IAsyncDisposable
 
             await _toastNotification.ShowAsync("Processing Transaction", "Please wait while the transaction is being saved...", ToastType.Info);
 
-            await ItemStockData.SaveItemStockAdjustment(_transactionDateTime, _cart, _user.Id);
+            await ItemStockData.SaveItemStockAdjustment(_transactionDateTime, _selectedGarage, _cart, _user.Id);
             await ResetPage();
 
             await _toastNotification.ShowAsync("Save Transaction", "Transaction saved successfully!", ToastType.Success);

@@ -1,6 +1,7 @@
 ﻿@page "/inventory/item-stock-adjustment"
 
 @using VizarLibrary.Models.Accounts.Masters
+@using VizarLibrary.Models.Fleet.Service
 @using VizarLibrary.Models.Inventory
 @using VizarLibrary.Models.Inventory.Item
 
@@ -68,6 +69,22 @@ else
                             </label>
                             <SfTextBox @bind-Value="_transactionNo" Placeholder="Enter Transaction No"
                                        FloatLabelType="FloatLabelType.Never" Readonly=true CssClass="custom-textbox readonly-field" />
+                        </div>
+
+                        <!-- Garage -->
+                        <div class="form-field">
+                            <label class="field-label">
+                                Garage <span class="required">*</span>
+                            </label>
+                            <SfAutoComplete Value="@_selectedGarage" TValue="GarageModel" TItem="GarageModel"
+                                            DataSource="@_garages" Placeholder="Select a Garage"
+                                            FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+                                            FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                            CssClass="custom-autocomplete">
+                                <AutoCompleteEvents TItem="GarageModel" TValue="GarageModel"
+                                                    ValueChange="OnGarageChanged" />
+                                <AutoCompleteFieldSettings Value="Name" />
+                            </SfAutoComplete>
                         </div>
                     </div>
                 </div>
@@ -317,7 +334,7 @@ else
 
     .form-grid-transaction {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         gap: 16px 20px;
     }
 
