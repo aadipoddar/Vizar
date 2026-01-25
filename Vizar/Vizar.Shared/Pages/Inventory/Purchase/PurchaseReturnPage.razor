@@ -2,6 +2,7 @@
 @page "/inventory/purchase-return/{Id:int}"
 
 @using VizarLibrary.Models.Accounts.Masters
+@using VizarLibrary.Models.Fleet.Service
 @using VizarLibrary.Models.Inventory
 @using VizarLibrary.Models.Inventory.Item
 @using VizarLibrary.Models.Inventory.Purchase
@@ -70,18 +71,34 @@ else
 								</SfAutoComplete>
 							</div>
 
-							<!-- Party -->
+							<!-- Vendor -->
 							<div class="form-field">
 								<label class="field-label">
-									Party <span class="required">*</span>
+									Vendor <span class="required">*</span>
 								</label>
-								<SfAutoComplete Value="@_selectedParty" TValue="LedgerModel" TItem="LedgerModel"
-												DataSource="@_parties" Placeholder="Select a Party"
+								<SfAutoComplete Value="@_selectedVendor" TValue="LedgerModel" TItem="LedgerModel"
+												DataSource="@_vendors" Placeholder="Select a Vendor"
 												FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
 												FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
 												CssClass="custom-autocomplete">
 									<AutoCompleteEvents TItem="LedgerModel" TValue="LedgerModel"
-														ValueChange="OnPartyChanged" />
+														ValueChange="OnVendorChanged" />
+									<AutoCompleteFieldSettings Value="Name" />
+								</SfAutoComplete>
+							</div>
+
+							<!-- Garage -->
+							<div class="form-field">
+								<label class="field-label">
+									Garage <span class="required">*</span>
+								</label>
+								<SfAutoComplete Value="@_selectedGarage" TValue="GarageModel" TItem="GarageModel"
+												DataSource="@_garages" Placeholder="Select a Garage"
+												FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+												FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+												CssClass="custom-autocomplete">
+									<AutoCompleteEvents TItem="GarageModel" TValue="GarageModel"
+														ValueChange="OnGarageChanged" />
 									<AutoCompleteFieldSettings Value="Name" />
 								</SfAutoComplete>
 							</div>
@@ -92,8 +109,8 @@ else
 									Transaction Date <span class="required">*</span> / Financial Year
 								</label>
 								<div class="date-year-wrapper">
-									<SfDatePicker Value="@_purchaseReturn.TransactionDateTime" TValue="DateTime"
-												  Format="dd/MM/yy" Placeholder="Select Date" FloatLabelType="FloatLabelType.Never"
+									<SfDatePicker Value="@_purchaseReturn.TransactionDateTime" TValue="DateTime" Format="dd/MM/yy"
+												  Placeholder="Select Date" FloatLabelType="FloatLabelType.Never"
 												  CssClass="custom-datepicker">
 										<DatePickerEvents TValue="DateTime" ValueChange="OnTransactionDateChanged" />
 									</SfDatePicker>
@@ -101,6 +118,17 @@ else
 											   Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never"
 											   CssClass="custom-textbox readonly-field" />
 								</div>
+							</div>
+
+							<!-- Receive Date -->
+							<div class="form-field">
+								<label class="field-label">
+									Receive Date
+								</label>
+								<SfDatePicker @bind-Value="_purchaseReturn.ReceiveDateTime" TValue="DateTime?"
+											  Format="dd/MM/yy" Placeholder="Select Receive Date" FloatLabelType="FloatLabelType.Never"
+											  Min="@_purchaseReturn.TransactionDateTime" CssClass="custom-datepicker">
+								</SfDatePicker>
 							</div>
 
 							<!-- Transaction No with Auto-generate -->
@@ -668,7 +696,7 @@ else
 
 	.form-grid-single {
 		display: grid;
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: repeat(3, 1fr);
 		gap: 16px 20px;
 	}
 

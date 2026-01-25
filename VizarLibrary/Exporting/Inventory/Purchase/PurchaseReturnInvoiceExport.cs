@@ -2,6 +2,7 @@ using VizarLibrary.Data.Common;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
+using VizarLibrary.Models.Fleet.Service;
 using VizarLibrary.Models.Inventory.Item;
 using VizarLibrary.Models.Inventory.Purchase;
 
@@ -19,9 +20,10 @@ public static class PurchaseReturnInvoiceExport
             throw new InvalidOperationException("No transaction details found for the transaction.");
 
         var company = await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId);
-        var party = await CommonData.LoadTableDataById<LedgerModel>(TableNames.Ledger, transaction.PartyId);
-        if (company is null || party is null)
-            throw new InvalidOperationException("Company or party information is missing.");
+        var party = await CommonData.LoadTableDataById<LedgerModel>(TableNames.Ledger, transaction.VendorId);
+        var garage = await CommonData.LoadTableDataById<GarageModel>(TableNames.Garage, transaction.GarageId);
+        if (company is null || party is null || garage is null)
+            throw new InvalidOperationException("Company or party or garage information is missing.");
 
         var allItems = await CommonData.LoadTableData<ItemModel>(TableNames.Item);
 
@@ -52,7 +54,7 @@ public static class PurchaseReturnInvoiceExport
             Company = company,
             BillTo = party,
             InvoiceType = "PURCHASE RETURN INVOICE",
-            Garage = party?.Name ?? string.Empty,
+            Garage = garage?.Name ?? string.Empty,
             TransactionNo = transaction.TransactionNo,
             TransactionDateTime = transaction.TransactionDateTime,
             TotalAmount = transaction.TotalAmount,

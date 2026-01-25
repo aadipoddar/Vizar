@@ -22,11 +22,11 @@ internal static class PurchaseReturnNotify
             TransactionType = "Purchase Return",
             TransactionNo = purchaseReturn.TransactionNo,
             Action = type,
-            LocationName = purchaseReturn.PartyName,
+            LocationName = purchaseReturn.VendorName,
             Details = new Dictionary<string, string>
             {
                 ["Transaction Number"] = purchaseReturn.TransactionNo,
-                ["Vendor"] = purchaseReturn.PartyName,
+                ["Vendor"] = purchaseReturn.VendorName,
                 ["Transaction Date"] = purchaseReturn.TransactionDateTime.ToString("dd MMM yyyy, hh:mm tt"),
                 ["Total Items"] = purchaseReturn.TotalItems.ToString(),
                 ["Total Quantity"] = purchaseReturn.TotalQuantity.FormatSmartDecimal(),

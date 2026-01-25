@@ -177,6 +177,9 @@ public static class PurchaseReturnData
         if (update)
             await ItemStockData.DeleteItemStockByTypeTransactionId(nameof(StockType.PurchaseReturn), purchaseReturn.Id, sqlDataAccessTransaction);
 
+        if (purchaseReturn.ReceiveDateTime is null)
+            return;
+
         foreach (var item in purchaseReturnDetails)
         {
             var insertedId = await ItemStockData.InsertItemStock(new()
@@ -189,7 +192,7 @@ public static class PurchaseReturnData
                 TransactionId = purchaseReturn.Id,
                 Type = nameof(StockType.PurchaseReturn),
                 TransactionNo = purchaseReturn.TransactionNo,
-                TransactionDateTime = purchaseReturn.TransactionDateTime
+                TransactionDateTime = purchaseReturn.ReceiveDateTime.Value
             }, sqlDataAccessTransaction);
 
             if (insertedId <= 0)
@@ -229,7 +232,7 @@ public static class PurchaseReturnData
                 ReferenceId = purchaseReturnOverview.Id,
                 ReferenceType = nameof(ReferenceTypes.PurchaseReturn),
                 ReferenceNo = purchaseReturnOverview.TransactionNo,
-                LedgerId = purchaseReturnOverview.PartyId,
+                LedgerId = purchaseReturnOverview.VendorId,
                 Debit = purchaseReturnOverview.TotalAmount,
                 Credit = null,
                 Remarks = $"Party Account Posting For Purchase Return Bill {purchaseReturnOverview.TransactionNo}",

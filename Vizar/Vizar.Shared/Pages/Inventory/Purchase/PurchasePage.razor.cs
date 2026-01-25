@@ -854,6 +854,12 @@ public partial class PurchasePage : IAsyncDisposable
             return false;
         }
 
+        if (_purchase.ReceiveDateTime.HasValue && _purchase.ReceiveDateTime < _purchase.TransactionDateTime)
+        {
+            await _toastNotification.ShowAsync("Invalid Receive Date", "The receive date cannot be earlier than the transaction date. Please correct the receive date.", ToastType.Error);
+            return false;
+        }
+
         if (_purchase.Id > 0)
         {
             var existingPurchase = await CommonData.LoadTableDataById<PurchaseModel>(TableNames.Purchase, _purchase.Id);

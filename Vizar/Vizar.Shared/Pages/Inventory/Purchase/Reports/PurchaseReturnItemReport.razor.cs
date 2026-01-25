@@ -11,6 +11,7 @@ using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Inventory.Purchase;
 using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
+using VizarLibrary.Models.Fleet.Service;
 using VizarLibrary.Models.Inventory.Purchase;
 using VizarLibrary.Models.Operations;
 
@@ -33,10 +34,12 @@ public partial class PurchaseReturnItemReport : IAsyncDisposable
     private DateTime _toDate = DateTime.Now.Date;
 
     private CompanyModel _selectedCompany = new();
-    private LedgerModel _selectedParty = new();
+    private LedgerModel _selectedVendor = new();
+    private GarageModel _selectedGarage = new();
 
     private List<CompanyModel> _companies = [];
-    private List<LedgerModel> _parties = [];
+    private List<LedgerModel> _vendors = [];
+    private List<GarageModel> _garages = [];
     private List<PurchaseReturnItemOverviewModel> _transactionOverviews = [];
 
     private SfGrid<PurchaseReturnItemOverviewModel> _sfGrid;
@@ -73,7 +76,8 @@ public partial class PurchaseReturnItemReport : IAsyncDisposable
 
         await LoadDates();
         await LoadCompanies();
-        await LoadParties();
+        await LoadVendors();
+        await LoadGarages();
         await LoadTransactionOverviews();
         await StartAutoRefresh();
     }
@@ -96,16 +100,28 @@ public partial class PurchaseReturnItemReport : IAsyncDisposable
         _selectedCompany = _companies.FirstOrDefault(_ => _.Id == 0);
     }
 
-    private async Task LoadParties()
+    private async Task LoadVendors()
     {
-        _parties = await CommonData.LoadTableDataByStatus<LedgerModel>(TableNames.Ledger);
-        _parties.Add(new()
+        _vendors = await CommonData.LoadTableDataByStatus<LedgerModel>(TableNames.Ledger);
+        _vendors.Add(new()
         {
             Id = 0,
-            Name = "All Parties"
+            Name = "All Vendors"
         });
-        _parties = [.. _parties.OrderBy(s => s.Name)];
-        _selectedParty = _parties.FirstOrDefault(_ => _.Id == 0);
+        _vendors = [.. _vendors.OrderBy(s => s.Name)];
+        _selectedVendor = _vendors.FirstOrDefault(_ => _.Id == 0);
+    }
+
+    private async Task LoadGarages()
+    {
+        _garages = await CommonData.LoadTableDataByStatus<GarageModel>(TableNames.Garage);
+        _garages.Add(new()
+        {
+            Id = 0,
+            Name = "All Garages"
+        });
+        _garages = [.. _garages.OrderBy(s => s.Name)];
+        _selectedGarage = _garages.FirstOrDefault(_ => _.Id == 0);
     }
 
     private async Task LoadTransactionOverviews()
@@ -128,8 +144,11 @@ public partial class PurchaseReturnItemReport : IAsyncDisposable
             if (_selectedCompany?.Id > 0)
                 _transactionOverviews = [.. _transactionOverviews.Where(_ => _.CompanyId == _selectedCompany.Id)];
 
-            if (_selectedParty?.Id > 0)
-                _transactionOverviews = [.. _transactionOverviews.Where(_ => _.PartyId == _selectedParty.Id)];
+            if (_selectedVendor?.Id > 0)
+                _transactionOverviews = [.. _transactionOverviews.Where(_ => _.VendorId == _selectedVendor.Id)];
+
+            if (_selectedGarage?.Id > 0)
+                _transactionOverviews = [.. _transactionOverviews.Where(_ => _.GarageId == _selectedGarage.Id)];
 
             _transactionOverviews = [.. _transactionOverviews.OrderBy(_ => _.TransactionDateTime)];
 
@@ -182,9 +201,15 @@ public partial class PurchaseReturnItemReport : IAsyncDisposable
         await LoadTransactionOverviews();
     }
 
-    private async Task OnPartyChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<LedgerModel, LedgerModel> args)
+    private async Task OnVendorChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<LedgerModel, LedgerModel> args)
     {
-        _selectedParty = args.Value;
+        _selectedVendor = args.Value;
+        await LoadTransactionOverviews();
+    }
+
+    private async Task OnGarageChanged(Syncfusion.Blazor.DropDowns.ChangeEventArgs<GarageModel, GarageModel> args)
+    {
+        _selectedGarage = args.Value;
         await LoadTransactionOverviews();
     }
 
@@ -218,7 +243,8 @@ public partial class PurchaseReturnItemReport : IAsyncDisposable
                     dateRangeEnd,
                     _showAllColumns,
                     _showSummary,
-                    _selectedParty?.Id > 0 ? _selectedParty : null,
+                    _selectedGarage?.Id > 0 ? _selectedGarage : null,
+                    _selectedVendor?.Id > 0 ? _selectedVendor : null,
                     _selectedCompany?.Id > 0 ? _selectedCompany : null
                 );
 
@@ -258,7 +284,8 @@ public partial class PurchaseReturnItemReport : IAsyncDisposable
                     dateRangeEnd,
                     _showAllColumns,
                     _showSummary,
-                    _selectedParty?.Id > 0 ? _selectedParty : null,
+                    _selectedGarage?.Id > 0 ? _selectedGarage : null,
+                    _selectedVendor?.Id > 0 ? _selectedVendor : null,
                     _selectedCompany?.Id > 0 ? _selectedCompany : null
                 );
 

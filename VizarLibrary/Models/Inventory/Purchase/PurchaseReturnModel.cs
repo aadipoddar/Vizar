@@ -5,8 +5,10 @@ public class PurchaseReturnModel
     public int Id { get; set; }
     public string TransactionNo { get; set; }
     public int CompanyId { get; set; }
-    public int PartyId { get; set; }
+    public int VendorId { get; set; }
+    public int GarageId { get; set; }
     public DateTime TransactionDateTime { get; set; }
+    public DateTime? ReceiveDateTime { get; set; }
     public int FinancialYearId { get; set; }
     public int TotalItems { get; set; }
     public decimal TotalQuantity { get; set; }
@@ -39,7 +41,7 @@ public class PurchaseReturnDetailModel
     public int MasterId { get; set; }
     public int ItemId { get; set; }
     public string? IdentificationNo { get; set; }
-	public decimal Quantity { get; set; }
+    public decimal Quantity { get; set; }
     public string UnitOfMeasurement { get; set; }
     public decimal Rate { get; set; }
     public decimal BaseTotal { get; set; }
@@ -64,8 +66,8 @@ public class PurchaseReturnItemCartModel
 {
     public int ItemId { get; set; }
     public string ItemName { get; set; }
-	public string? IdentificationNo { get; set; }
-	public decimal Quantity { get; set; }
+    public string? IdentificationNo { get; set; }
+    public decimal Quantity { get; set; }
     public string UnitOfMeasurement { get; set; }
     public decimal Rate { get; set; }
     public decimal BaseTotal { get; set; }
@@ -91,20 +93,23 @@ public class PurchaseReturnOverviewModel
     public string TransactionNo { get; set; }
     public int CompanyId { get; set; }
     public string CompanyName { get; set; }
-    public int PartyId { get; set; }
-    public string PartyName { get; set; }
+    public int VendorId { get; set; }
+    public string VendorName { get; set; }
+    public int GarageId { get; set; }
+    public string GarageName { get; set; }
     public DateTime TransactionDateTime { get; set; }
+    public DateTime? ReceiveDateTime { get; set; }
     public int FinancialYearId { get; set; }
     public string FinancialYear { get; set; }
 
-	public int TotalItems { get; set; }
-	public decimal TotalQuantity { get; set; }
-	public decimal BaseTotal { get; set; }
-	public decimal ItemDiscountAmount { get; set; }
-	public decimal TotalAfterItemDiscount { get; set; }
-	public decimal TotalInclusiveTaxAmount { get; set; }
-	public decimal TotalExtraTaxAmount { get; set; }
-	public decimal TotalAfterTax { get; set; }
+    public int TotalItems { get; set; }
+    public decimal TotalQuantity { get; set; }
+    public decimal BaseTotal { get; set; }
+    public decimal ItemDiscountAmount { get; set; }
+    public decimal TotalAfterItemDiscount { get; set; }
+    public decimal TotalInclusiveTaxAmount { get; set; }
+    public decimal TotalExtraTaxAmount { get; set; }
+    public decimal TotalAfterTax { get; set; }
 
     public decimal OtherChargesPercent { get; set; }
     public decimal OtherChargesAmount { get; set; }
@@ -132,25 +137,28 @@ public class PurchaseReturnItemOverviewModel
     public int Id { get; set; }
     public string ItemName { get; set; }
     public string ItemCode { get; set; }
-	public int ItemItemId { get; set; }
-	public string ItemItemName { get; set; }
-	public int ItemCategoryId { get; set; }
+    public int ItemItemId { get; set; }
+    public string ItemItemName { get; set; }
+    public int ItemCategoryId { get; set; }
     public string ItemCategoryName { get; set; }
-	public int ManufacturerId { get; set; }
-	public string ManufacturerName { get; set; }
+    public int ManufacturerId { get; set; }
+    public string ManufacturerName { get; set; }
 
-	public int MasterId { get; set; }
+    public int MasterId { get; set; }
     public string TransactionNo { get; set; }
     public DateTime TransactionDateTime { get; set; }
+    public DateTime? ReceiveDateTime { get; set; }
     public int CompanyId { get; set; }
     public string CompanyName { get; set; }
-    public int PartyId { get; set; }
-    public string PartyName { get; set; }
+    public int VendorId { get; set; }
+    public string VendorName { get; set; }
+    public int GarageId { get; set; }
+    public string GarageName { get; set; }
     public string? PurchaseReturnRemarks { get; set; }
 
     public string? IdentificationNo { get; set; }
-	public string UnitOfMeasurement { get; set; }
-	public decimal Quantity { get; set; }
+    public string UnitOfMeasurement { get; set; }
+    public decimal Quantity { get; set; }
     public decimal Rate { get; set; }
     public decimal BaseTotal { get; set; }
     public decimal DiscountPercent { get; set; }

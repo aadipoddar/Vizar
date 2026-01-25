@@ -1,5 +1,6 @@
 using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.Masters;
+using VizarLibrary.Models.Fleet.Service;
 using VizarLibrary.Models.Inventory.Purchase;
 
 namespace VizarLibrary.Exporting.Inventory.Purchase;
@@ -13,6 +14,7 @@ public static class PurchaseReturnReportExport
         DateOnly? dateRangeEnd = null,
         bool showAllColumns = true,
         bool showSummary = false,
+        GarageModel garage = null,
         LedgerModel party = null,
         CompanyModel company = null)
     {
@@ -20,8 +22,10 @@ public static class PurchaseReturnReportExport
         {
             [nameof(PurchaseReturnOverviewModel.TransactionNo)] = new() { DisplayName = "Trans No", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(PurchaseReturnOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy hh:mm tt", Alignment = CellAlignment.Center, IncludeInTotal = false },
+            [nameof(PurchaseReturnOverviewModel.ReceiveDateTime)] = new() { DisplayName = "Receive", Format = "dd-MMM-yyyy", Alignment = CellAlignment.Center, IncludeInTotal = false },
             [nameof(PurchaseReturnOverviewModel.CompanyName)] = new() { DisplayName = "Company", Alignment = CellAlignment.Left, IncludeInTotal = false },
-            [nameof(PurchaseReturnOverviewModel.PartyName)] = new() { DisplayName = "Party", Alignment = CellAlignment.Left, IncludeInTotal = false },
+            [nameof(PurchaseReturnOverviewModel.VendorName)] = new() { DisplayName = "Vendor", Alignment = CellAlignment.Left, IncludeInTotal = false },
+            [nameof(PurchaseReturnOverviewModel.GarageName)] = new() { DisplayName = "Garage", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(PurchaseReturnOverviewModel.FinancialYear)] = new() { DisplayName = "Financial Year", Alignment = CellAlignment.Center, IncludeInTotal = false },
             [nameof(PurchaseReturnOverviewModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(PurchaseReturnOverviewModel.CreatedByName)] = new() { DisplayName = "Created By", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -52,7 +56,8 @@ public static class PurchaseReturnReportExport
         {
             columnOrder =
             [
-                nameof(PurchaseReturnOverviewModel.PartyName),
+                nameof(PurchaseReturnOverviewModel.VendorName),
+                nameof(PurchaseReturnOverviewModel.GarageName),
                 nameof(PurchaseReturnOverviewModel.TotalItems),
                 nameof(PurchaseReturnOverviewModel.TotalQuantity),
                 nameof(PurchaseReturnOverviewModel.BaseTotal),
@@ -68,7 +73,10 @@ public static class PurchaseReturnReportExport
             ];
 
             if (party is not null)
-                columnOrder.Remove(nameof(PurchaseReturnOverviewModel.PartyName));
+                columnOrder.Remove(nameof(PurchaseReturnOverviewModel.VendorName));
+
+            if (garage is not null)
+                columnOrder.Remove(nameof(PurchaseReturnOverviewModel.GarageName));
         }
 
         else if (showAllColumns)
@@ -77,7 +85,9 @@ public static class PurchaseReturnReportExport
             [
                 nameof(PurchaseReturnOverviewModel.TransactionNo),
                 nameof(PurchaseReturnOverviewModel.TransactionDateTime),
-                nameof(PurchaseReturnOverviewModel.PartyName),
+                nameof(PurchaseReturnOverviewModel.ReceiveDateTime),
+                nameof(PurchaseReturnOverviewModel.VendorName),
+                nameof(PurchaseReturnOverviewModel.GarageName),
                 nameof(PurchaseReturnOverviewModel.CompanyName),
                 nameof(PurchaseReturnOverviewModel.FinancialYear),
                 nameof(PurchaseReturnOverviewModel.TotalItems),
@@ -104,19 +114,23 @@ public static class PurchaseReturnReportExport
             ];
 
             if (party is not null)
-                columnOrder.Remove(nameof(PurchaseReturnOverviewModel.PartyName));
+                columnOrder.Remove(nameof(PurchaseReturnOverviewModel.VendorName));
 
             if (company is not null)
                 columnOrder.Remove(nameof(PurchaseReturnOverviewModel.CompanyName));
+
+            if (garage is not null)
+                columnOrder.Remove(nameof(PurchaseReturnOverviewModel.GarageName));
         }
 
         else
         {
             columnOrder =
             [
-                nameof(PurchaseReturnOverviewModel.PartyName),
+                nameof(PurchaseReturnOverviewModel.VendorName),
                 nameof(PurchaseReturnOverviewModel.TransactionNo),
                 nameof(PurchaseReturnOverviewModel.TransactionDateTime),
+                nameof(PurchaseReturnOverviewModel.ReceiveDateTime),
                 nameof(PurchaseReturnOverviewModel.TotalQuantity),
                 nameof(PurchaseReturnOverviewModel.TotalAfterTax),
                 nameof(PurchaseReturnOverviewModel.OtherChargesPercent),
@@ -125,7 +139,10 @@ public static class PurchaseReturnReportExport
             ];
 
             if (party is not null)
-                columnOrder.Remove(nameof(PurchaseReturnOverviewModel.PartyName));
+                columnOrder.Remove(nameof(PurchaseReturnOverviewModel.VendorName));
+
+            if (garage is not null)
+                columnOrder.Remove(nameof(PurchaseReturnOverviewModel.GarageName));
         }
 
         string fileName = $"PURCHASE_RETURN_REPORT";
@@ -174,6 +191,7 @@ public static class PurchaseReturnReportExport
         DateOnly? dateRangeEnd = null,
         bool showAllColumns = true,
         bool showSummary = false,
+        GarageModel garage = null,
         LedgerModel party = null,
         CompanyModel company = null)
     {
@@ -184,8 +202,10 @@ public static class PurchaseReturnReportExport
             [nameof(PurchaseReturnItemOverviewModel.ItemCategoryName)] = new() { DisplayName = "Category", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(PurchaseReturnItemOverviewModel.TransactionNo)] = new() { DisplayName = "Trans No", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(PurchaseReturnItemOverviewModel.TransactionDateTime)] = new() { DisplayName = "Trans Date", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
+            [nameof(PurchaseReturnItemOverviewModel.ReceiveDateTime)] = new() { DisplayName = "Receive", Format = "dd-MMM-yyyy", Alignment = CellAlignment.Center, IncludeInTotal = false },
             [nameof(PurchaseReturnItemOverviewModel.CompanyName)] = new() { DisplayName = "Company", Alignment = CellAlignment.Left, IncludeInTotal = false },
-            [nameof(PurchaseReturnItemOverviewModel.PartyName)] = new() { DisplayName = "Party", Alignment = CellAlignment.Left, IncludeInTotal = false },
+            [nameof(PurchaseReturnItemOverviewModel.VendorName)] = new() { DisplayName = "Vendor", Alignment = CellAlignment.Left, IncludeInTotal = false },
+            [nameof(PurchaseReturnItemOverviewModel.GarageName)] = new() { DisplayName = "Garage", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(PurchaseReturnItemOverviewModel.PurchaseReturnRemarks)] = new() { DisplayName = "Purchase Return Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(PurchaseReturnItemOverviewModel.Remarks)] = new() { DisplayName = "Item Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(PurchaseReturnItemOverviewModel.IdentificationNo)] = new() { DisplayName = "Identification", Alignment = CellAlignment.Left, IncludeInTotal = false },
@@ -239,8 +259,10 @@ public static class PurchaseReturnReportExport
                 nameof(PurchaseReturnItemOverviewModel.ItemCategoryName),
                 nameof(PurchaseReturnItemOverviewModel.TransactionNo),
                 nameof(PurchaseReturnItemOverviewModel.TransactionDateTime),
+                nameof(PurchaseReturnItemOverviewModel.ReceiveDateTime),
                 nameof(PurchaseReturnItemOverviewModel.CompanyName),
-                nameof(PurchaseReturnItemOverviewModel.PartyName),
+                nameof(PurchaseReturnItemOverviewModel.VendorName),
+                nameof(PurchaseReturnItemOverviewModel.GarageName),
                 nameof(PurchaseReturnItemOverviewModel.IdentificationNo),
                 nameof(PurchaseReturnItemOverviewModel.Quantity),
                 nameof(PurchaseReturnItemOverviewModel.Rate),
@@ -264,10 +286,13 @@ public static class PurchaseReturnReportExport
             ];
 
             if (party is not null)
-                columnOrder.Remove(nameof(PurchaseReturnItemOverviewModel.PartyName));
+                columnOrder.Remove(nameof(PurchaseReturnItemOverviewModel.VendorName));
 
             if (company is not null)
                 columnOrder.Remove(nameof(PurchaseReturnItemOverviewModel.CompanyName));
+
+            if (garage is not null)
+                columnOrder.Remove(nameof(PurchaseReturnItemOverviewModel.GarageName));
         }
 
         else
@@ -278,14 +303,16 @@ public static class PurchaseReturnReportExport
                 nameof(PurchaseReturnItemOverviewModel.ItemCode),
                 nameof(PurchaseReturnItemOverviewModel.TransactionNo),
                 nameof(PurchaseReturnItemOverviewModel.TransactionDateTime),
-                nameof(PurchaseReturnItemOverviewModel.PartyName),
+                nameof(PurchaseReturnItemOverviewModel.ReceiveDateTime),
+                nameof(PurchaseReturnItemOverviewModel.VendorName),
+                nameof(PurchaseReturnItemOverviewModel.GarageName),
                 nameof(PurchaseReturnItemOverviewModel.Quantity),
                 nameof(PurchaseReturnItemOverviewModel.NetRate),
                 nameof(PurchaseReturnItemOverviewModel.NetTotal)
             ];
 
             if (party is not null)
-                columnOrder.Remove(nameof(PurchaseReturnItemOverviewModel.PartyName));
+                columnOrder.Remove(nameof(PurchaseReturnItemOverviewModel.VendorName));
         }
 
         string fileName = $"PURCHASE_RETURN_ITEM_REPORT";

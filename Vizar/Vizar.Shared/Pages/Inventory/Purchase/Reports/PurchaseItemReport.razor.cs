@@ -78,7 +78,7 @@ public partial class PurchaseItemReport : IAsyncDisposable
 
         await LoadDates();
         await LoadCompanies();
-        await LoadParties();
+        await LoadVendors();
         await LoadGarages();
         await LoadTransactionOverviews();
         await StartAutoRefresh();
@@ -102,7 +102,7 @@ public partial class PurchaseItemReport : IAsyncDisposable
         _selectedCompany = _companies.FirstOrDefault(_ => _.Id == 0);
     }
 
-    private async Task LoadParties()
+    private async Task LoadVendors()
     {
         _vendors = await CommonData.LoadTableDataByStatus<LedgerModel>(TableNames.Ledger);
         _vendors.Add(new()
@@ -147,8 +147,10 @@ public partial class PurchaseItemReport : IAsyncDisposable
 
             if (_selectedVendor?.Id > 0)
                 _transactionOverviews = [.. _transactionOverviews.Where(_ => _.VendorId == _selectedVendor.Id)];
+
             if (_selectedGarage?.Id > 0)
                 _transactionOverviews = [.. _transactionOverviews.Where(_ => _.GarageId == _selectedGarage.Id)];
+
             _transactionOverviews = [.. _transactionOverviews.OrderBy(_ => _.TransactionDateTime)];
 
             if (_showTransactionReturns)
@@ -199,7 +201,7 @@ public partial class PurchaseItemReport : IAsyncDisposable
             _transactionReturnOverviews = [.. _transactionReturnOverviews.Where(_ => _.CompanyId == _selectedCompany.Id)];
 
         if (_selectedVendor?.Id > 0)
-            _transactionReturnOverviews = [.. _transactionReturnOverviews.Where(_ => _.PartyId == _selectedVendor.Id)];
+            _transactionReturnOverviews = [.. _transactionReturnOverviews.Where(_ => _.VendorId == _selectedVendor.Id)];
 
         _transactionReturnOverviews = [.. _transactionReturnOverviews.OrderBy(_ => _.TransactionDateTime)];
 
@@ -222,10 +224,13 @@ public partial class PurchaseItemReport : IAsyncDisposable
             ManufacturerName = pr.ManufacturerName,
             CompanyId = pr.CompanyId,
             CompanyName = pr.CompanyName,
-            VendorId = pr.PartyId,
-            VendorName = pr.PartyName,
+            VendorId = pr.VendorId,
+            VendorName = pr.VendorName,
+            GarageId = pr.GarageId,
+            GarageName = pr.GarageName,
             TransactionNo = pr.TransactionNo,
             TransactionDateTime = pr.TransactionDateTime,
+            ReceiveDateTime = pr.ReceiveDateTime,
             PurchaseRemarks = pr.PurchaseReturnRemarks,
             Quantity = -pr.Quantity,
             IdentificationNo = pr.IdentificationNo,

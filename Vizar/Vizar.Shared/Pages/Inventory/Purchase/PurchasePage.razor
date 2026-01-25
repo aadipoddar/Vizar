@@ -127,7 +127,7 @@ else
                                 </label>
                                 <SfDatePicker @bind-Value="_purchase.ReceiveDateTime" TValue="DateTime?" Format="dd/MM/yy"
                                               Placeholder="Select Receive Date (Optional)" FloatLabelType="FloatLabelType.Never"
-                                              CssClass="custom-datepicker" />
+                                              Min="@_purchase.TransactionDateTime" CssClass="custom-datepicker" />
                             </div>
 
                             <!-- Transaction No with Auto-generate -->
