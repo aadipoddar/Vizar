@@ -123,9 +123,19 @@ else
                                 <label class="field-label">
                                     Purchase Transaction Reference
                                 </label>
-                                <SfTextBox Value="@(_purchase?.TransactionNo)" Readonly="true"
-                                           Placeholder="Not Linked" FloatLabelType="FloatLabelType.Never"
-                                           CssClass="custom-textbox readonly-field" />
+                                <div class="purchase-reference-wrapper">
+                                    <SfTextBox Value="@(_purchase?.TransactionNo)" Readonly="true"
+                                               Placeholder="Not Linked" FloatLabelType="FloatLabelType.Never"
+                                               CssClass="custom-textbox readonly-field" />
+                                    <div class="purchase-reference-actions">
+                                        <IconButton Icon="IconType.View" Variant="ButtonVariant.View" Size="ButtonSize.Small"
+                                                    Title="View Purchase Transaction" Disabled="_isProcessing"
+                                                    OnClick="ViewPurchase" />
+                                        <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Size="ButtonSize.Small"
+                                                    Title="Download Purchase PDF" Disabled="_isProcessing"
+                                                    OnClick="DownloadPurchasePdf" />
+                                    </div>
+                                </div>
                             </div>
                         }
 
@@ -379,6 +389,23 @@ else
         .date-year-wrapper > :last-child {
             flex: 1;
         }
+
+    /* Purchase Reference Wrapper */
+    .purchase-reference-wrapper {
+        display: flex;
+        gap: 8px;
+        align-items: stretch;
+    }
+
+        .purchase-reference-wrapper > :first-child {
+            flex: 1;
+        }
+
+    .purchase-reference-actions {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
 
     /* Cart Row - Simplified for Purchase Order */
     .cart-row-simple {

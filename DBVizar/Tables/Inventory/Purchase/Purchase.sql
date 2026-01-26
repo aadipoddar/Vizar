@@ -35,7 +35,7 @@
     CONSTRAINT [FK_Purchase_ToCompany] FOREIGN KEY ([CompanyId]) REFERENCES [Company]([Id]),
     CONSTRAINT [FK_Purchase_ToLedger] FOREIGN KEY ([VendorId]) REFERENCES [Ledger]([Id]), 
     CONSTRAINT [FK_Purchase_ToGarage] FOREIGN KEY ([GarageId]) REFERENCES [Garage]([Id]),
-	CONSTRAINT [FK_Purchase_ToPurchaseOrder] FOREIGN KEY ([PurchaseOrderId]) REFERENCES [Purchase]([Id]),
+	CONSTRAINT [FK_Purchase_ToPurchaseOrder] FOREIGN KEY ([PurchaseOrderId]) REFERENCES [PurchaseOrder]([Id]),
     CONSTRAINT [FK_Purchase_ToFinancialYear] FOREIGN KEY ([FinancialYearId]) REFERENCES [dbo].[FinancialYear]([Id]),
     CONSTRAINT [FK_Purchase_ToUser] FOREIGN KEY ([CreatedBy]) REFERENCES [User]([Id]),
 	CONSTRAINT [FK_Purchase_LastModifiedBy_ToUser] FOREIGN KEY ([LastModifiedBy]) REFERENCES [User]([Id])

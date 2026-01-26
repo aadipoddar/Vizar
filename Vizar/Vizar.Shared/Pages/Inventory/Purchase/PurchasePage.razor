@@ -104,6 +104,35 @@ else
                                 </SfAutoComplete>
                             </div>
 
+                            <!-- Purchase Order -->
+                            <div class="form-field">
+                                <label class="field-label">
+                                    Purchase Order (Optional)
+                                </label>
+                                <div class="purchase-order-wrapper">
+                                    <SfAutoComplete Value="@_selectedPurchaseOrder" TValue="PurchaseOrderModel?" TItem="PurchaseOrderModel"
+                                                    DataSource="@_purchaseOrders" Placeholder="Select Purchase Order"
+                                                    FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+                                                    FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                                    CssClass="custom-autocomplete">
+                                        <AutoCompleteEvents TItem="PurchaseOrderModel" TValue="PurchaseOrderModel?"
+                                                            ValueChange="OnPurchaseOrderChanged" />
+                                        <AutoCompleteFieldSettings Value="TransactionNo" />
+                                    </SfAutoComplete>
+                                    @if (_selectedPurchaseOrder?.Id > 0)
+                                    {
+                                        <div class="purchase-order-actions">
+                                            <IconButton Icon="IconType.View" Variant="ButtonVariant.View" Size="ButtonSize.Small"
+                                                        Title="View Purchase Order" Disabled="_isProcessing"
+                                                        OnClick="NavigateToSelectedPurchaseOrderPage" />
+                                            <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Size="ButtonSize.Small"
+                                                        Title="Download Purchase Order PDF" Disabled="_isProcessing"
+                                                        OnClick="DownloadSelectedPurchaseOrderPdf" />
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
                             <!-- Transaction Date and Financial Year -->
                             <div class="form-field">
                                 <label class="field-label">
@@ -149,7 +178,7 @@ else
                             </div>
 
                             <!-- Remarks -->
-                            <div class="form-field form-field-full">
+                            <div class="form-field">
                                 <label class="field-label">
                                     Remarks / Narration
                                 </label>
@@ -763,6 +792,23 @@ else
             font-size: 13px;
             font-weight: 500;
         }
+
+    /* Purchase Order Wrapper */
+    .purchase-order-wrapper {
+        display: flex;
+        gap: 8px;
+        align-items: stretch;
+    }
+
+        .purchase-order-wrapper > :first-child {
+            flex: 1;
+        }
+
+    .purchase-order-actions {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
 
     /* Action Buttons */
     .action-buttons {

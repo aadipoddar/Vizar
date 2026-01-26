@@ -52,9 +52,9 @@ INNER JOIN
 INNER JOIN
 	[dbo].[Garage] g ON po.[GarageId] = g.Id
 LEFT JOIN
-	[dbo].[Purchase] p ON po.PurchaseId = p.Id
+	[dbo].[Purchase] p ON po.PurchaseId = p.Id AND p.Status = 1
 LEFT JOIN
-	[dbo].[PurchaseDetail] pd ON p.Id = pd.MasterId AND i.Id = pd.ItemId
+	[dbo].[PurchaseDetail] pd ON p.Id = pd.MasterId AND i.Id = pd.ItemId AND pd.Status = 1
 
 WHERE
 	[po].[Status] = 1 AND

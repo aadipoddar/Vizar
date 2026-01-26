@@ -38,6 +38,7 @@ public partial class PurchasePage : IAsyncDisposable
     private CompanyModel _selectedCompany = new();
     private LedgerModel _selectedVendor = new();
     private GarageModel _selectedGarage = new();
+    private PurchaseOrderModel? _selectedPurchaseOrder = new();
     private FinancialYearModel _selectedFinancialYear = new();
     private ItemModel? _selectedItem = new();
     private PurchaseItemCartModel _selectedCart = new();
@@ -46,6 +47,7 @@ public partial class PurchasePage : IAsyncDisposable
     private List<CompanyModel> _companies = [];
     private List<LedgerModel> _vendors = [];
     private List<GarageModel> _garages = [];
+    private List<PurchaseOrderModel> _purchaseOrders = [];
     private List<ItemModel> _items = [];
     private List<TaxModel> _taxes = [];
     private List<PurchaseItemCartModel> _cart = [];
@@ -183,6 +185,7 @@ public partial class PurchasePage : IAsyncDisposable
                     CompanyId = _selectedCompany.Id,
                     VendorId = _selectedVendor.Id,
                     GarageId = _selectedGarage.Id,
+                    PurchaseOrderId = null,
                     TransactionDateTime = await CommonData.LoadCurrentDateTime(),
                     ReceiveDateTime = null,
                     FinancialYearId = (await FinancialYearData.LoadFinancialYearByDateTime(await CommonData.LoadCurrentDateTime())).Id,
@@ -235,6 +238,30 @@ public partial class PurchasePage : IAsyncDisposable
             {
                 _selectedGarage = _garages.FirstOrDefault();
                 _purchase.GarageId = _selectedGarage.Id;
+            }
+
+            _purchaseOrders = await PurchaseOrderData.LoadPurchaseOrderByGarageVendorPending(_selectedGarage.Id, _selectedVendor.Id);
+            _purchaseOrders = [.. _purchaseOrders.OrderByDescending(s => s.TransactionDateTime)];
+
+            if (_purchase.PurchaseOrderId is not null && _purchase.PurchaseOrderId > 0)
+            {
+                if (Id > 0)
+                {
+                    var purchaseOrder = await CommonData.LoadTableDataById<PurchaseOrderModel>(TableNames.PurchaseOrder, _purchase.PurchaseOrderId.Value);
+                    if (purchaseOrder is not null)
+                    {
+                        if (_purchaseOrders.FirstOrDefault(s => s.Id == purchaseOrder.Id) is null)
+                            _purchaseOrders.Insert(0, purchaseOrder);
+                    }
+                }
+
+                _selectedPurchaseOrder = _purchaseOrders.FirstOrDefault(s => s.Id == _purchase.PurchaseOrderId);
+            }
+
+            else
+            {
+                _selectedPurchaseOrder = null;
+                _purchase.PurchaseOrderId = null;
             }
 
             _selectedFinancialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, _purchase.FinancialYearId);
@@ -329,6 +356,29 @@ public partial class PurchasePage : IAsyncDisposable
             await SaveTransactionFile();
         }
     }
+
+    private async Task LoadOrders()
+    {
+        _purchaseOrders = await PurchaseOrderData.LoadPurchaseOrderByGarageVendorPending(_selectedGarage.Id, _selectedVendor.Id);
+        _purchaseOrders = [.. _purchaseOrders.OrderByDescending(s => s.TransactionDateTime)];
+
+        if (Id > 0 && _purchase.PurchaseOrderId is not null && _purchase.PurchaseOrderId > 0)
+        {
+            var purchaseOrder = await CommonData.LoadTableDataById<PurchaseOrderModel>(TableNames.PurchaseOrder, _purchase.PurchaseOrderId.Value);
+            if (purchaseOrder is not null)
+            {
+                if (_purchaseOrders.FirstOrDefault(s => s.Id == purchaseOrder.Id) is null)
+                    _purchaseOrders.Insert(0, purchaseOrder);
+            }
+
+            _selectedPurchaseOrder = _purchaseOrders.FirstOrDefault(s => s.Id == _purchase.PurchaseOrderId);
+        }
+        else
+        {
+            _selectedPurchaseOrder = null;
+            _purchase.PurchaseOrderId = null;
+        }
+    }
     #endregion
 
     #region Change Events
@@ -371,6 +421,7 @@ public partial class PurchasePage : IAsyncDisposable
         _selectedVendor = args.Value;
         _purchase.VendorId = _selectedVendor.Id;
 
+        await LoadOrders();
         await LoadItems();
         await SaveTransactionFile();
     }
@@ -392,6 +443,51 @@ public partial class PurchasePage : IAsyncDisposable
 
         _selectedGarage = args.Value;
         _purchase.GarageId = _selectedGarage.Id;
+
+        await LoadOrders();
+        await SaveTransactionFile();
+    }
+
+    private async Task OnPurchaseOrderChanged(ChangeEventArgs<PurchaseOrderModel?, PurchaseOrderModel?> args)
+    {
+        if (args.Value is null)
+        {
+            _selectedPurchaseOrder = null;
+            _purchase.PurchaseOrderId = null;
+            return;
+        }
+
+        _selectedPurchaseOrder = args.Value;
+        _purchase.PurchaseOrderId = _selectedPurchaseOrder.Id;
+        _cart.Clear();
+
+        var purchaseOrderItems = await CommonData.LoadTableDataByMasterId<PurchaseOrderDetailModel>(TableNames.PurchaseOrderDetail, _selectedPurchaseOrder.Id);
+        foreach (var item in purchaseOrderItems)
+        {
+            if (_items.FirstOrDefault(s => s.Id == item.ItemId) is null)
+            {
+                var orderItem = await CommonData.LoadTableDataById<ItemModel>(TableNames.Item, item.ItemId);
+                await _toastNotification.ShowAsync("Item Not Found", $"The item {orderItem?.Name} (ID: {orderItem.Id}) in the selected order was not found in the available items list. It may have been deleted or is inaccessible.", ToastType.Error);
+                continue;
+            }
+
+            var isSameState = _selectedVendor is null || _selectedVendor.StateUTId == _selectedCompany.StateUTId;
+
+            _cart.Add(new()
+            {
+                ItemId = item.ItemId,
+                ItemName = _items.FirstOrDefault(s => s.Id == item.ItemId)?.Name ?? "",
+                Quantity = item.Quantity,
+                UnitOfMeasurement = item.UnitOfMeasurement,
+                Remarks = item.Remarks,
+                Rate = _items.FirstOrDefault(s => s.Id == item.ItemId)?.Rate ?? 0,
+                DiscountPercent = 0,
+                CGSTPercent = _taxes.FirstOrDefault(s => s.Id == _items.FirstOrDefault(p => p.Id == item.ItemId)?.TaxId).CGST,
+                SGSTPercent = isSameState ? _taxes.FirstOrDefault(s => s.Id == _items.FirstOrDefault(p => p.Id == item.ItemId)?.TaxId).SGST : 0,
+                IGSTPercent = isSameState ? 0 : _taxes.FirstOrDefault(s => s.Id == _items.FirstOrDefault(p => p.Id == item.ItemId)?.TaxId).IGST,
+                InclusiveTax = _taxes.FirstOrDefault(s => s.Id == _items.FirstOrDefault(p => p.Id == item.ItemId)?.TaxId).Inclusive
+            });
+        }
 
         await SaveTransactionFile();
     }
@@ -854,6 +950,12 @@ public partial class PurchasePage : IAsyncDisposable
             return false;
         }
 
+        if (_purchase.ReceiveDateTime.HasValue)
+        {
+            var currentDateTime = await CommonData.LoadCurrentDateTime();
+            _purchase.ReceiveDateTime = DateOnly.FromDateTime(_purchase.ReceiveDateTime.Value).ToDateTime(new TimeOnly(currentDateTime.Hour, currentDateTime.Minute, currentDateTime.Second));
+        }
+
         if (_purchase.ReceiveDateTime.HasValue && _purchase.ReceiveDateTime < _purchase.TransactionDateTime)
         {
             await _toastNotification.ShowAsync("Invalid Receive Date", "The receive date cannot be earlier than the transaction date. Please correct the receive date.", ToastType.Error);
@@ -879,6 +981,28 @@ public partial class PurchasePage : IAsyncDisposable
         _purchase.Remarks = _purchase.Remarks?.Trim();
         if (string.IsNullOrWhiteSpace(_purchase.Remarks))
             _purchase.Remarks = null;
+
+        if (_selectedPurchaseOrder is null)
+            _purchase.PurchaseOrderId = null;
+        else
+        {
+            if (_selectedPurchaseOrder.VendorId == _purchase.VendorId && _selectedPurchaseOrder.GarageId == _purchase.GarageId)
+                _purchase.PurchaseOrderId = _selectedPurchaseOrder.Id;
+            else
+            {
+                _selectedPurchaseOrder = null;
+                _purchase.PurchaseOrderId = null;
+
+                await _toastNotification.ShowAsync("Purchase Order Mismatch", "The selected purchase order does not match the selected vendor or garage. The purchase order selection has been cleared.", ToastType.Error);
+                return false;
+            }
+        }
+
+        if (_selectedPurchaseOrder is not null && _selectedPurchaseOrder.TransactionDateTime > _purchase.TransactionDateTime)
+        {
+            await _toastNotification.ShowAsync("Invalid Transaction Date", "The transaction date cannot be earlier than the purchase order date. Please correct the transaction date.", ToastType.Error);
+            return false;
+        }
 
         return true;
     }
@@ -1100,6 +1224,52 @@ public partial class PurchasePage : IAsyncDisposable
             await JSRuntime.InvokeVoidAsync("open", PageRouteNames.ReportPurchaseItem, "_blank");
         else
             NavigationManager.NavigateTo(PageRouteNames.ReportPurchaseItem);
+    }
+
+    private async Task NavigateToSelectedPurchaseOrderPage()
+    {
+        if (_selectedPurchaseOrder is null)
+        {
+            await _toastNotification.ShowAsync("No Purchase Order Selected", "Please select an purchase order to view its details.", ToastType.Error);
+            return;
+        }
+
+        if (FormFactor.GetFormFactor() == "Web")
+            await JSRuntime.InvokeVoidAsync("open", $"{PageRouteNames.PurchaseOrder}/{_selectedPurchaseOrder.Id}", "_blank");
+        else
+            NavigationManager.NavigateTo($"{PageRouteNames.PurchaseOrder}/{_selectedPurchaseOrder.Id}");
+    }
+
+    private async Task DownloadSelectedPurchaseOrderPdf()
+    {
+        if (_selectedPurchaseOrder is null)
+        {
+            await _toastNotification.ShowAsync("No Purchase Order Selected", "Please select a purchase order to download its invoice.", ToastType.Error);
+            return;
+        }
+
+        if (_isProcessing)
+            return;
+
+        try
+        {
+            _isProcessing = true;
+            StateHasChanged();
+            await _toastNotification.ShowAsync("Processing", "Generating PDF invoice...", ToastType.Info);
+
+            var (pdfStream, fileName) = await PurchaseOrderInvoiceExport.ExportInvoice(_selectedPurchaseOrder.Id, InvoiceExportType.PDF);
+            await SaveAndViewService.SaveAndView(fileName, pdfStream);
+
+            await _toastNotification.ShowAsync("Invoice Downloaded", "The PDF invoice has been downloaded successfully.", ToastType.Success);
+        }
+        catch (Exception ex)
+        {
+            await _toastNotification.ShowAsync("An Error Occurred While Downloading Invoice", ex.Message, ToastType.Error);
+        }
+        finally
+        {
+            _isProcessing = false;
+        }
     }
 
     private void NavigateToDashboard() =>

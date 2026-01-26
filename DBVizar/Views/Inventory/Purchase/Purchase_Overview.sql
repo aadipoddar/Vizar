@@ -60,7 +60,7 @@ INNER JOIN
 INNER JOIN
 	[dbo].[Garage] AS g ON p.GarageId = g.Id
 LEFT JOIN
-	[dbo].[PurchaseOrder] AS po ON p.PurchaseOrderId = po.Id
+	[dbo].[PurchaseOrder] AS po ON p.PurchaseOrderId = po.Id AND po.Status = 1
 INNER JOIN
 	[dbo].[FinancialYear] AS fy ON p.FinancialYearId = fy.Id
 INNER JOIN

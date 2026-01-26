@@ -74,9 +74,9 @@ INNER JOIN
 INNER JOIN
 	[dbo].[Garage] g ON p.[GarageId] = g.Id
 LEFT JOIN
-	[dbo].[PurchaseOrder] po ON p.PurchaseOrderId = po.Id
+	[dbo].[PurchaseOrder] po ON p.PurchaseOrderId = po.Id AND po.Status = 1
 LEFT JOIN
-	[dbo].[PurchaseOrderDetail] pod ON po.Id = pod.MasterId AND pd.ItemId = pod.ItemId
+	[dbo].[PurchaseOrderDetail] pod ON po.Id = pod.MasterId AND pd.ItemId = pod.ItemId AND pod.Status = 1
 
 WHERE
 	[p].[Status] = 1 AND

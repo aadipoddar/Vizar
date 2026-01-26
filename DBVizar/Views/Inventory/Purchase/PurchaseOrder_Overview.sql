@@ -43,7 +43,7 @@ INNER JOIN
 INNER JOIN
 	[dbo].[Garage] AS g ON po.GarageId = g.Id
 LEFT JOIN
-	[dbo].[Purchase] p ON po.PurchaseId = p.Id
+	[dbo].[Purchase] p ON po.PurchaseId = p.Id AND p.Status = 1
 INNER JOIN
 	[dbo].[FinancialYear] AS fy ON po.FinancialYearId = fy.Id
 INNER JOIN

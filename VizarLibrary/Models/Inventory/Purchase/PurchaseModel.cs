@@ -101,7 +101,7 @@ public class PurchaseOverviewModel
 
     public int? PurchaseOrderId { get; set; }
     public string? PurchaseOrderTransactionNo { get; set; }
-    public DateTime? PurchaseDateTime { get; set; }
+    public DateTime? PurchaseOrderDateTime { get; set; }
     public int? PurchaseOrderTotalItems { get; set; }
     public decimal? PurchaseOrderTotalQuantity { get; set; }
 

@@ -272,20 +272,12 @@ else
                                         Visible="@(_showAllColumns && !_showSummary)" />
                             <GridColumn Field="@nameof(PurchaseOrderOverviewModel.VendorName)" HeaderText="Vendor" Width="200" />
                             <GridColumn Field="@nameof(PurchaseOrderOverviewModel.GarageName)" HeaderText="Garage" Width="200" />
-                            <GridColumn Field="@nameof(PurchaseOrderOverviewModel.PurchaseTransactionNo)" HeaderText="Purchase Trans No"
-                                        Width="170" Visible="@(_showAllColumns && !_showSummary)" />
-                            <GridColumn Field="@nameof(PurchaseOrderOverviewModel.PurchaseDateTime)" HeaderText="Purchase Date"
-                                        Width="150" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime"
-                                        Visible="@(_showAllColumns && !_showSummary)" />
-                            <GridColumn Field="@nameof(PurchaseOrderOverviewModel.PurchaseReceiveDateTime)" HeaderText="Purchase Receive"
-                                        Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime"
-                                        Visible="@(_showAllColumns && !_showSummary)" />
-                            <GridColumn Field="@nameof(PurchaseOrderOverviewModel.FinancialYear)" HeaderText="Financial Year"
-                                        Width="150" Visible="@(_showAllColumns && !_showSummary)" />
-                            <GridColumn Field="@nameof(PurchaseOrderOverviewModel.TotalItems)" HeaderText="Items" Width="100"
-                                        Format="N0" TextAlign="TextAlign.Right" />
-                            <GridColumn Field="@nameof(PurchaseOrderOverviewModel.TotalQuantity)" HeaderText="Quantity"
-                                        Width="120" Format="N2" TextAlign="TextAlign.Right" />
+                            <GridColumn Field="@nameof(PurchaseOrderOverviewModel.PurchaseTransactionNo)" HeaderText="Purchase Trans No" Width="170" Visible="@(!_showSummary)" />
+                            <GridColumn Field="@nameof(PurchaseOrderOverviewModel.PurchaseDateTime)" HeaderText="Purchase Date" Width="150" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime" Visible="@(_showAllColumns && !_showSummary)" />
+                            <GridColumn Field="@nameof(PurchaseOrderOverviewModel.PurchaseReceiveDateTime)" HeaderText="Purchase Receive" Width="150" Format="dd/MM/yy" Type="ColumnType.DateTime" Visible="@(_showAllColumns && !_showSummary)" />
+                            <GridColumn Field="@nameof(PurchaseOrderOverviewModel.FinancialYear)" HeaderText="Financial Year" Width="150" Visible="@(_showAllColumns && !_showSummary)" />
+                            <GridColumn Field="@nameof(PurchaseOrderOverviewModel.TotalItems)" HeaderText="Items" Width="100" Format="N0" TextAlign="TextAlign.Right" />
+                            <GridColumn Field="@nameof(PurchaseOrderOverviewModel.TotalQuantity)" HeaderText="Quantity" Width="120" Format="N2" TextAlign="TextAlign.Right" />
                             <GridColumn Field="@nameof(PurchaseOrderOverviewModel.Remarks)" HeaderText="Remarks" Width="200"
                                         Visible="@(_showAllColumns && !_showSummary)" />
                             <GridColumn Field="@nameof(PurchaseOrderOverviewModel.CreatedByName)" HeaderText="Created By"
