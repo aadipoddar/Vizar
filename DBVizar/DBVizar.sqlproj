@@ -219,5 +219,12 @@
     <Build Include="StoredProcedures\Insert\Fleet\Repair\Insert_OutsideRepairDetial.sql" />
     <Build Include="Views\Fleet\Repair\OutsideRepair_Overview.sql" />
     <Build Include="Views\Fleet\Repair\OutsideRepair_Item_Overview.sql" />
+    <Build Include="Tables\Inventory\Purchase\PurchaseOrder.sql" />
+    <Build Include="Tables\Inventory\Purchase\PurchaseOrderDetail.sql" />
+    <Build Include="StoredProcedures\Insert\Inventory\Purchase\Insert_PurchaseOrder.sql" />
+    <Build Include="StoredProcedures\Insert\Inventory\Purchase\Insert_PurchaseOrderDetail.sql" />
+    <Build Include="Views\Inventory\Purchase\PurchaseOrder_Overview.sql" />
+    <Build Include="Views\Inventory\Purchase\PurchaseOrder_Item_Overview.sql" />
+    <Build Include="StoredProcedures\LoadData\Inventory\Purchase\Load_PurchaseOrder_By_Vendor_Pending.sql" />
   </ItemGroup>
 </Project>

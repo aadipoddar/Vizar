@@ -19,6 +19,7 @@ public static class GenerateCodes
     {
         Accounting,
         Ledger,
+        PurchaseOrder,
         Purchase,
         PurchaseReturn,
         InsideRepair,
@@ -43,6 +44,10 @@ public static class GenerateCodes
                 case CodeType.Accounting:
                     var accounting = await CommonData.LoadTableDataByTransactionNo<AccountingModel>(TableNames.Accounting, code, sqlDataAccessTransaction);
                     isDuplicate = accounting is not null;
+                    break;
+                case CodeType.PurchaseOrder:
+                    var purchaseOrder = await CommonData.LoadTableDataByTransactionNo<PurchaseOrderModel>(TableNames.PurchaseOrder, code, sqlDataAccessTransaction);
+                    isDuplicate = purchaseOrder is not null;
                     break;
                 case CodeType.Purchase:
                     var purchase = await CommonData.LoadTableDataByTransactionNo<PurchaseModel>(TableNames.Purchase, code, sqlDataAccessTransaction);
@@ -137,6 +142,30 @@ public static class GenerateCodes
         }
 
         return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{accountingPrefix}000001", 6, CodeType.Accounting, sqlDataAccessTransaction);
+    }
+
+    public static async Task<string> GeneratePurchaseOrderTransactionNo(PurchaseOrderModel transaction, SqlDataAccessTransaction sqlDataAccessTransaction = null)
+    {
+        var financialYear = await CommonData.LoadTableDataById<FinancialYearModel>(TableNames.FinancialYear, transaction.FinancialYearId, sqlDataAccessTransaction);
+        var companyPrefix = (await CommonData.LoadTableDataById<CompanyModel>(TableNames.Company, transaction.CompanyId, sqlDataAccessTransaction)).Code;
+        var purchaseOrderPrefix = (await SettingsData.LoadSettingsByKey(SettingsKeys.PurchaseOrderTransactionPrefix, sqlDataAccessTransaction)).Value;
+
+        var lastPurchaseOrder = await CommonData.LoadLastTableDataByCompanyFinancialYear<PurchaseOrderModel>(TableNames.PurchaseOrder, transaction.CompanyId, transaction.FinancialYearId, sqlDataAccessTransaction);
+        if (lastPurchaseOrder is not null)
+        {
+            var lastTransactionNo = lastPurchaseOrder.TransactionNo;
+            if (lastTransactionNo.StartsWith($"{companyPrefix}{financialYear.YearNo}{purchaseOrderPrefix}"))
+            {
+                var lastNumberPart = lastTransactionNo[(companyPrefix.Length + financialYear.YearNo.ToString().Length + purchaseOrderPrefix.Length)..];
+                if (int.TryParse(lastNumberPart, out int lastNumber))
+                {
+                    int nextNumber = lastNumber + 1;
+                    return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{purchaseOrderPrefix}{nextNumber:D6}", 6, CodeType.PurchaseOrder, sqlDataAccessTransaction);
+                }
+            }
+        }
+
+        return await CheckDuplicateCode($"{companyPrefix}{financialYear.YearNo}{purchaseOrderPrefix}000001", 6, CodeType.PurchaseOrder, sqlDataAccessTransaction);
     }
 
     public static async Task<string> GeneratePurchaseTransactionNo(PurchaseModel transaction, SqlDataAccessTransaction sqlDataAccessTransaction = null)

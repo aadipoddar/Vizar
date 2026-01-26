@@ -35,6 +35,21 @@ else
                 </div>
                 <div class="section-body">
                     <div class="dashboard-grid">
+                        <!-- Purchase Order -->
+                        <ButtonCard Title="Purchase Order" Description="Create and manage purchase orders" Color="indigo"
+                                    OnClick="() => NavigationManager.NavigateTo(PageRouteNames.PurchaseOrder)">
+                            <IconContent>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                    <path d="M9 15h6" />
+                                    <path d="M12 12v6" />
+                                </svg>
+                            </IconContent>
+                        </ButtonCard>
+
                         <!-- Purchase -->
                         <ButtonCard Title="Purchase" Description="Manage purchase transactions" Color="blue"
                                     OnClick="() => NavigationManager.NavigateTo(PageRouteNames.Purchase)">
@@ -83,6 +98,38 @@ else
                 </div>
                 <div class="section-body">
                     <div class="dashboard-grid">
+                        <!-- Purchase Order Report -->
+                        <ButtonCard Title="Purchase Order Report" Description="View purchase order transactions" Color="violet"
+                                    OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ReportPurchaseOrder)">
+                            <IconContent>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round">
+                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                                    <path d="M8 7h8" />
+                                    <path d="M8 11h8" />
+                                </svg>
+                            </IconContent>
+                        </ButtonCard>
+
+                        <!-- Purchase Order Item Report -->
+                        <ButtonCard Title="Purchase Order Item Report" Description="View detailed purchase order items" Color="purple"
+                                    OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ReportPurchaseOrderItem)">
+                            <IconContent>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                    <line x1="8" y1="13" x2="16" y2="13" />
+                                    <line x1="8" y1="17" x2="16" y2="17" />
+                                    <circle cx="10" cy="10" r="1" />
+                                    <circle cx="14" cy="10" r="1" />
+                                </svg>
+                            </IconContent>
+                        </ButtonCard>
+
                         <!-- Purchase Report -->
                         <ButtonCard Title="Purchase Report" Description="View purchase transaction history" Color="cyan"
                                     OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ReportPurchase)">

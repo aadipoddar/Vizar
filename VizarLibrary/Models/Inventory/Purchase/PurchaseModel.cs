@@ -7,6 +7,7 @@ public class PurchaseModel
     public int CompanyId { get; set; }
     public int VendorId { get; set; }
     public int GarageId { get; set; }
+    public int? PurchaseOrderId { get; set; }
     public DateTime TransactionDateTime { get; set; }
     public DateTime? ReceiveDateTime { get; set; }
     public int FinancialYearId { get; set; }
@@ -97,6 +98,13 @@ public class PurchaseOverviewModel
     public string VendorName { get; set; }
     public int GarageId { get; set; }
     public string GarageName { get; set; }
+
+    public int? PurchaseOrderId { get; set; }
+    public string? PurchaseOrderTransactionNo { get; set; }
+    public DateTime? PurchaseDateTime { get; set; }
+    public int? PurchaseOrderTotalItems { get; set; }
+    public decimal? PurchaseOrderTotalQuantity { get; set; }
+
     public DateTime TransactionDateTime { get; set; }
     public DateTime? ReceiveDateTime { get; set; }
     public int FinancialYearId { get; set; }
@@ -146,6 +154,12 @@ public class PurchaseItemOverviewModel
 
     public int MasterId { get; set; }
     public string TransactionNo { get; set; }
+
+    public int? PurchaseOrderId { get; set; }
+    public string? PurchaseOrderTransactionNo { get; set; }
+    public DateTime? PurchaseOrderDateTime { get; set; }
+    public decimal? PurchaseOrderQuantity { get; set; }
+
     public DateTime TransactionDateTime { get; set; }
     public DateTime? ReceiveDateTime { get; set; }
     public int CompanyId { get; set; }

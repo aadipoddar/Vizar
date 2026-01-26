@@ -9,6 +9,13 @@ SELECT
 	[l].[Name] AS VendorName,
 	[p].[GarageId],
 	[g].[Name] AS GarageName,
+
+	[p].[PurchaseOrderId],
+	[po].[TransactionNo] AS PurchaseOrderTransactionNo,
+	[po].[TransactionDateTime] AS PurchaseOrderDateTime,
+	[po].[TotalItems] AS PurchaseOrderTotalItems,
+	[po].[TotalQuantity] AS PurchaseOrderTotalQuantity,
+
 	[p].[TransactionDateTime],
 	[p].[ReceiveDateTime],
 	[p].[FinancialYearId],
@@ -52,6 +59,8 @@ INNER JOIN
 	[dbo].[Ledger] AS l ON p.[VendorId] = l.Id
 INNER JOIN
 	[dbo].[Garage] AS g ON p.GarageId = g.Id
+LEFT JOIN
+	[dbo].[PurchaseOrder] AS po ON p.PurchaseOrderId = po.Id
 INNER JOIN
 	[dbo].[FinancialYear] AS fy ON p.FinancialYearId = fy.Id
 INNER JOIN

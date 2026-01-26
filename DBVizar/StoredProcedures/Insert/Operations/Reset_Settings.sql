@@ -21,6 +21,7 @@ BEGIN
 
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'FinancialAccountingTransactionPrefix'	, N'FAT'	, N'Prefix for Financial Accounting Transaction Numbers')
 	
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'PurchaseOrderTransactionPrefix'	, N'PO'		, N'Prefix for Purchase Order Transaction Numbers')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'PurchaseTransactionPrefix'		, N'PUR'	, N'Prefix for Purchase Transaction Numbers')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'PurchaseReturnTransactionPrefix'	, N'PURRET'	, N'Prefix for Purchase Return Transaction Numbers')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'ItemStockAdjustmentTransactionPrefix' , N'ISA'	, N'Prefix for Item Stock Adjustment Transaction Numbers')

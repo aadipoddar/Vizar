@@ -24,6 +24,8 @@ public static class TableNames
     public static string Tax => "Tax";
     public static string ItemStock => "ItemStock";
 
+    public static string PurchaseOrder => "PurchaseOrder";
+    public static string PurchaseOrderDetail => "PurchaseOrderDetail";
     public static string Purchase => "Purchase";
     public static string PurchaseDetail => "PurchaseDetail";
     public static string PurchaseReturn => "PurchaseReturn";
@@ -68,6 +70,7 @@ public static class StoredProcedureNames
     public static string LoadAccountingByVoucherReference => "Load_Accounting_By_Voucher_Reference";
     public static string LoadTrialBalanceByCompanyDate => "Load_TrialBalance_By_Company_Date";
 
+    public static string LoadPurchaseOrderByGarageVendorPending => "Load_PurchaseOrder_By_Garage_Vendor_Pending";
     public static string LoadItemByVendorPurchaseDateTime => "Load_Item_By_Vendor_PurchaseDateTime";
     public static string LoadItemStockSummaryByGarageDate => "Load_ItemStockSummary_By_Garage_Date";
 
@@ -95,6 +98,8 @@ public static class StoredProcedureNames
     public static string InsertTax => "Insert_Tax";
     public static string InsertItemStock => "Insert_ItemStock";
 
+    public static string InsertPurchaseOrder => "Insert_PurchaseOrder";
+    public static string InsertPurchaseOrderDetail => "Insert_PurchaseOrderDetail";
     public static string InsertPurchase => "Insert_Purchase";
     public static string InsertPurchaseDetail => "Insert_PurchaseDetail";
     public static string InsertPurchaseReturn => "Insert_PurchaseReturn";
@@ -129,6 +134,8 @@ public static class ViewNames
 
     public static string ItemStockDetails => "ItemStockDetails";
 
+    public static string PurchaseOrderOverview => "PurchaseOrder_Overview";
+    public static string PurchaseOrderItemOverview => "PurchaseOrder_Item_Overview";
     public static string PurchaseOverview => "Purchase_Overview";
     public static string PurchaseItemOverview => "Purchase_Item_Overview";
     public static string PurchaseReturnOverview => "PurchaseReturn_Overview";

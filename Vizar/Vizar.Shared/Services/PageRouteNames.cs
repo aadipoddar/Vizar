@@ -11,6 +11,7 @@ public static class PageRouteNames
     public static string FinancialAccounting => "/accounts/financial-accounting";
 
     public static string InventoryDashboard => "/inventory";
+    public static string PurchaseOrder => "/inventory/purchase-order";
     public static string Purchase => "/inventory/purchase";
     public static string PurchaseReturn => "/inventory/purchase-return";
     public static string ItemStockAdjustment => "/inventory/item-stock-adjustment";
@@ -27,6 +28,8 @@ public static class PageRouteNames
     public static string ReportTrialBalance => "/report/trial-balance";
     public static string ReportProfitAndLoss => "/report/profit-and-loss";
     public static string ReportBalanceSheet => "/report/balance-sheet";
+    public static string ReportPurchaseOrder => "/report/purchase-order";
+    public static string ReportPurchaseOrderItem => "/report/purchase-order-item";
     public static string ReportPurchase => "/report/purchase";
     public static string ReportPurchaseReturn => "/report/purchase-return";
     public static string ReportPurchaseItem => "/report/purchase-item";

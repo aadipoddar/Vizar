@@ -8,7 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Inventory\Purchase\" />
     <Folder Include="Exporting\Accounts\FinancialAccounting\" />
     <Folder Include="Exporting\Utils\" />
     <Folder Include="Models\Accounts\" />

@@ -13,6 +13,12 @@ SELECT
 
 	[p].[Id] AS MasterId,
 	[p].[TransactionNo],
+
+	[p].[PurchaseOrderId],
+	[po].[TransactionNo] AS PurchaseOrderTransactionNo,
+	[po].[TransactionDateTime] AS PurchaseOrderDateTime,
+	[pod].[Quantity] AS PurchaseOrderQuantity,
+	
 	[p].[TransactionDateTime],
 	[p].[ReceiveDateTime],
 	[c].[Id] AS CompanyId,
@@ -67,6 +73,10 @@ INNER JOIN
 	[dbo].[Ledger] l ON p.[VendorId] = l.Id
 INNER JOIN
 	[dbo].[Garage] g ON p.[GarageId] = g.Id
+LEFT JOIN
+	[dbo].[PurchaseOrder] po ON p.PurchaseOrderId = po.Id
+LEFT JOIN
+	[dbo].[PurchaseOrderDetail] pod ON po.Id = pod.MasterId AND pd.ItemId = pod.ItemId
 
 WHERE
 	[p].[Status] = 1 AND

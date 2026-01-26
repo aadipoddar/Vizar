@@ -64,6 +64,10 @@ public static class PurchaseData
 
             await FinancialYearData.ValidateFinancialYear(purchase.TransactionDateTime, sqlDataAccessTransaction);
 
+            if (purchase.PurchaseOrderId is not null && purchase.PurchaseOrderId > 0)
+                await PurchaseOrderData.UnlinkPurchaseOrderFromPurchase(purchase, sqlDataAccessTransaction);
+
+            purchase.PurchaseOrderId = null;
             purchase.Status = false;
             await InsertPurchase(purchase, sqlDataAccessTransaction);
             await ItemStockData.DeleteItemStockByTypeTransactionId(nameof(StockType.Purchase), purchase.Id, sqlDataAccessTransaction);
@@ -133,9 +137,10 @@ public static class PurchaseData
             return purchase.Id;
         }
 
+        var existingPurchase = purchase;
         if (update)
         {
-            var existingPurchase = await CommonData.LoadTableDataById<PurchaseModel>(TableNames.Purchase, purchase.Id, sqlDataAccessTransaction);
+            existingPurchase = await CommonData.LoadTableDataById<PurchaseModel>(TableNames.Purchase, purchase.Id, sqlDataAccessTransaction);
             await FinancialYearData.ValidateFinancialYear(existingPurchase.TransactionDateTime, sqlDataAccessTransaction);
         }
 
@@ -145,6 +150,7 @@ public static class PurchaseData
         purchaseDetails ??= ConvertCartToDetails(cart, purchase.Id);
         await SaveTransactionDetail(purchase, purchaseDetails, update, sqlDataAccessTransaction);
         await SaveItemStock(purchase, purchaseDetails, update, sqlDataAccessTransaction);
+        await UpdatePurchaseOrder(purchase, existingPurchase, update, sqlDataAccessTransaction);
         await SaveAccounting(purchase, update, sqlDataAccessTransaction);
         await UpdateItemRateAndUOMOnPurchase(purchaseDetails, sqlDataAccessTransaction);
 
@@ -206,6 +212,15 @@ public static class PurchaseData
             if (id <= 0)
                 throw new InvalidOperationException("Failed to save raw material stock entry.");
         }
+    }
+
+    private static async Task UpdatePurchaseOrder(PurchaseModel purchase, PurchaseModel previousPurchase, bool update, SqlDataAccessTransaction sqlDataAccessTransaction)
+    {
+        if (update)
+            await PurchaseOrderData.UnlinkPurchaseOrderFromPurchase(previousPurchase, sqlDataAccessTransaction);
+
+        if (purchase.PurchaseOrderId is not null)
+            await PurchaseOrderData.LinkPurchaseOrderToPurchase(purchase, sqlDataAccessTransaction);
     }
 
     private static async Task SaveAccounting(PurchaseModel purchase, bool update, SqlDataAccessTransaction sqlDataAccessTransaction)

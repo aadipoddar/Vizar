@@ -26,8 +26,13 @@ public static class PurchaseReportExport
             [nameof(PurchaseOverviewModel.CompanyName)] = new() { DisplayName = "Company", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(PurchaseOverviewModel.VendorName)] = new() { DisplayName = "Vendor", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(PurchaseOverviewModel.GarageName)] = new() { DisplayName = "Garage", Alignment = CellAlignment.Left, IncludeInTotal = false },
+            [nameof(PurchaseOverviewModel.PurchaseOrderTransactionNo)] = new() { DisplayName = "PO Trans No", Alignment = CellAlignment.Left, IncludeInTotal = false },
+            [nameof(PurchaseOverviewModel.PurchaseDateTime)] = new() { DisplayName = "PO Date", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
+            [nameof(PurchaseOverviewModel.PurchaseOrderTotalItems)] = new() { DisplayName = "PO Items", Format = "#,##0", Alignment = CellAlignment.Right, IncludeInTotal = false },
+            [nameof(PurchaseOverviewModel.PurchaseOrderTotalQuantity)] = new() { DisplayName = "PO Qty", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = false },
             [nameof(PurchaseOverviewModel.FinancialYear)] = new() { DisplayName = "Financial Year", Alignment = CellAlignment.Center, IncludeInTotal = false },
             [nameof(PurchaseOverviewModel.Remarks)] = new() { DisplayName = "Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
+            [nameof(PurchaseOverviewModel.DocumentUrl)] = new() { DisplayName = "Document", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(PurchaseOverviewModel.CreatedByName)] = new() { DisplayName = "Created By", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(PurchaseOverviewModel.CreatedAt)] = new() { DisplayName = "Created At", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
             [nameof(PurchaseOverviewModel.CreatedFromPlatform)] = new() { DisplayName = "Created Platform", Alignment = CellAlignment.Center, IncludeInTotal = false },
@@ -89,6 +94,10 @@ public static class PurchaseReportExport
                 nameof(PurchaseOverviewModel.VendorName),
                 nameof(PurchaseOverviewModel.GarageName),
                 nameof(PurchaseOverviewModel.CompanyName),
+                nameof(PurchaseOverviewModel.PurchaseOrderTransactionNo),
+                nameof(PurchaseOverviewModel.PurchaseDateTime),
+                nameof(PurchaseOverviewModel.PurchaseOrderTotalItems),
+                nameof(PurchaseOverviewModel.PurchaseOrderTotalQuantity),
                 nameof(PurchaseOverviewModel.FinancialYear),
                 nameof(PurchaseOverviewModel.TotalItems),
                 nameof(PurchaseOverviewModel.TotalQuantity),
@@ -105,6 +114,7 @@ public static class PurchaseReportExport
                 nameof(PurchaseOverviewModel.RoundOffAmount),
                 nameof(PurchaseOverviewModel.TotalAmount),
                 nameof(PurchaseOverviewModel.Remarks),
+                nameof(PurchaseOverviewModel.DocumentUrl),
                 nameof(PurchaseOverviewModel.CreatedByName),
                 nameof(PurchaseOverviewModel.CreatedAt),
                 nameof(PurchaseOverviewModel.CreatedFromPlatform),
@@ -161,7 +171,7 @@ public static class PurchaseReportExport
                 columnOrder,
                 useBuiltInStyle: false,
                 useLandscape: showAllColumns || showSummary,
-                new() { ["Company"] = company?.Name ?? null, ["Party"] = vendor?.Name ?? null }
+                new() { ["Company"] = company?.Name ?? null, ["Vendor"] = vendor?.Name ?? null, ["Garage"] = garage?.Name ?? null }
             );
 
             return (stream, fileName + ".pdf");
@@ -176,7 +186,7 @@ public static class PurchaseReportExport
                 dateRangeEnd,
                 columnSettings,
                 columnOrder,
-                new() { ["Company"] = company?.Name ?? null, ["Party"] = vendor?.Name ?? null }
+                new() { ["Company"] = company?.Name ?? null, ["Vendor"] = vendor?.Name ?? null, ["Garage"] = garage?.Name ?? null }
             );
 
             return (stream, fileName + ".xlsx");
@@ -205,9 +215,13 @@ public static class PurchaseReportExport
             [nameof(PurchaseItemOverviewModel.CompanyName)] = new() { DisplayName = "Company", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(PurchaseItemOverviewModel.VendorName)] = new() { DisplayName = "Vendor", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(PurchaseItemOverviewModel.GarageName)] = new() { DisplayName = "Garage", Alignment = CellAlignment.Left, IncludeInTotal = false },
+            [nameof(PurchaseItemOverviewModel.PurchaseOrderTransactionNo)] = new() { DisplayName = "PO Trans No", Alignment = CellAlignment.Left, IncludeInTotal = false },
+            [nameof(PurchaseItemOverviewModel.PurchaseOrderDateTime)] = new() { DisplayName = "PO Date", Format = "dd-MMM-yyyy hh:mm", Alignment = CellAlignment.Center, IncludeInTotal = false },
+            [nameof(PurchaseItemOverviewModel.PurchaseOrderQuantity)] = new() { DisplayName = "PO Qty", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true, HighlightNegative = true },
             [nameof(PurchaseItemOverviewModel.PurchaseRemarks)] = new() { DisplayName = "Purchase Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(PurchaseItemOverviewModel.Remarks)] = new() { DisplayName = "Item Remarks", Alignment = CellAlignment.Left, IncludeInTotal = false },
             [nameof(PurchaseItemOverviewModel.IdentificationNo)] = new() { DisplayName = "Identification", Alignment = CellAlignment.Left, IncludeInTotal = false },
+            [nameof(PurchaseItemOverviewModel.UnitOfMeasurement)] = new() { DisplayName = "UOM", Alignment = CellAlignment.Center, IncludeInTotal = false },
             [nameof(PurchaseItemOverviewModel.InclusiveTax)] = new() { DisplayName = "Incl Tax", Alignment = CellAlignment.Center, IncludeInTotal = false },
             [nameof(PurchaseItemOverviewModel.Quantity)] = new() { DisplayName = "Qty", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = true, HighlightNegative = true },
             [nameof(PurchaseItemOverviewModel.Rate)] = new() { DisplayName = "Rate", Format = "#,##0.00", Alignment = CellAlignment.Right, IncludeInTotal = false },
@@ -266,7 +280,11 @@ public static class PurchaseReportExport
                 nameof(PurchaseItemOverviewModel.CompanyName),
                 nameof(PurchaseItemOverviewModel.VendorName),
                 nameof(PurchaseItemOverviewModel.GarageName),
+                nameof(PurchaseItemOverviewModel.PurchaseOrderTransactionNo),
+                nameof(PurchaseItemOverviewModel.PurchaseOrderDateTime),
                 nameof(PurchaseItemOverviewModel.IdentificationNo),
+                nameof(PurchaseItemOverviewModel.UnitOfMeasurement),
+                nameof(PurchaseItemOverviewModel.PurchaseOrderQuantity),
                 nameof(PurchaseItemOverviewModel.Quantity),
                 nameof(PurchaseItemOverviewModel.Rate),
                 nameof(PurchaseItemOverviewModel.BaseTotal),
@@ -309,6 +327,8 @@ public static class PurchaseReportExport
                 nameof(PurchaseItemOverviewModel.ReceiveDateTime),
                 nameof(PurchaseItemOverviewModel.VendorName),
                 nameof(PurchaseItemOverviewModel.GarageName),
+                nameof(PurchaseItemOverviewModel.PurchaseOrderTransactionNo),
+                nameof(PurchaseItemOverviewModel.UnitOfMeasurement),
                 nameof(PurchaseItemOverviewModel.Quantity),
                 nameof(PurchaseItemOverviewModel.NetRate),
                 nameof(PurchaseItemOverviewModel.NetTotal)
@@ -336,7 +356,7 @@ public static class PurchaseReportExport
                 columnOrder,
                 useBuiltInStyle: false,
                 useLandscape: showAllColumns || showSummary,
-                new() { ["Company"] = company?.Name ?? null, ["Party"] = vendor?.Name ?? null }
+                new() { ["Company"] = company?.Name ?? null, ["Vendor"] = vendor?.Name ?? null, ["Garage"] = garage?.Name ?? null }
             );
 
             return (stream, fileName + ".pdf");
@@ -351,7 +371,7 @@ public static class PurchaseReportExport
                 dateRangeEnd,
                 columnSettings,
                 columnOrder,
-                new() { ["Company"] = company?.Name ?? null, ["Party"] = vendor?.Name ?? null }
+                new() { ["Company"] = company?.Name ?? null, ["Vendor"] = vendor?.Name ?? null, ["Garage"] = garage?.Name ?? null }
             );
 
             return (stream, fileName + ".xlsx");

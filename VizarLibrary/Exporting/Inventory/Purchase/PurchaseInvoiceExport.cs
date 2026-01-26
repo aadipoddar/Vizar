@@ -25,6 +25,10 @@ public static class PurchaseInvoiceExport
         if (company is null || party is null || garage is null)
             throw new InvalidOperationException("Company or vendor or garage information is missing.");
 
+        PurchaseOrderModel purchaseOrder = null;
+        if (transaction.PurchaseOrderId is not null && transaction.PurchaseOrderId > 0)
+            purchaseOrder = await CommonData.LoadTableDataById<PurchaseOrderModel>(TableNames.PurchaseOrder, transaction.PurchaseOrderId.Value);
+
         var allItems = await CommonData.LoadTableData<ItemModel>(TableNames.Item);
 
         var lineItems = transactionDetails.Select(detail =>
@@ -59,6 +63,8 @@ public static class PurchaseInvoiceExport
             TransactionDateTime = transaction.TransactionDateTime,
             TotalAmount = transaction.TotalAmount,
             Remarks = transaction.Remarks ?? string.Empty,
+            ReferenceTransactionNo = purchaseOrder?.TransactionNo,
+            ReferenceDateTime = purchaseOrder?.TransactionDateTime,
             Status = transaction.Status,
             PaymentModes = null
         };

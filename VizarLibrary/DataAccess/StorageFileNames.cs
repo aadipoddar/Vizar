@@ -8,6 +8,8 @@ public static class StorageFileNames
     public static string FinancialAccountingDataFileName => "financial_accounting_data.json";
     public static string FinancialAccountingCartDataFileName => "financial_accounting_cart_data.json";
 
+    public static string PurchaseOrderDataFileName => "purchase_order_data.json";
+    public static string PurchaseOrderCartDataFileName => "purchase_order_cart_data.json";
     public static string PurchaseDataFileName => "purchase_data.json";
     public static string PurchaseCartDataFileName => "purchase_cart_data.json";
     public static string PurchaseReturnDataFileName => "purchase_return_data.json";
