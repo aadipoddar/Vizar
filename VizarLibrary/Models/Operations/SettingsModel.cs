@@ -20,10 +20,10 @@ public static class SettingsKeys
     public static string ItemCodePrefix => "ItemCodePrefix";
     public static string ItemTypeCodePrefix => "ItemTypeCodePrefix";
     public static string ItemCategoryCodePrefix => "ItemCategoryCodePrefix";
-    public static string DocumentTypeCodePrefix => "DocumentTypeCodePrefix";
-    public static string ServiceTypeCodePrefix => "ServiceTypeCodePrefix";
     public static string ManufacturerCodePrefix => "ManufacturerCodePrefix";
     public static string VehicleTypeCodePrefix => "VehicleTypeCodePrefix";
+    public static string DocumentTypeCodePrefix => "DocumentTypeCodePrefix";
+    public static string ServiceTypeCodePrefix => "ServiceTypeCodePrefix";
 
     public static string FinancialAccountingTransactionPrefix => "FinancialAccountingTransactionPrefix";
 
@@ -43,9 +43,12 @@ public static class SettingsKeys
 
     public static string PurchaseVoucherId => "PurchaseVoucherId";
     public static string PurchaseReturnVoucherId => "PurchaseReturnVoucherId";
-    public static string PurchaseLedgerId => "PurchaseLedgerId";
+    public static string OutsideRepairVoucherId => "OutsideRepairVoucherId";
+
     public static string CashLedgerId => "CashLedgerId";
     public static string GSTLedgerId => "GSTLedgerId";
+    public static string PurchaseLedgerId => "PurchaseLedgerId";
+    public static string OutsideRepairLedgerId => "OutsideRepairLedgerId";
 
     public static string AutoRefreshReportTimer => "AutoRefreshReportTimer";
 }

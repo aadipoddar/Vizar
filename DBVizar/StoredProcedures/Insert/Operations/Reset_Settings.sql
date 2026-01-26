@@ -37,9 +37,13 @@ BEGIN
 	
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'PurchaseVoucherId'			, N'3', N'Voucher type for Purchase transactions')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'PurchaseReturnVoucherId'		, N'4', N'Voucher type for Purchase Return transactions')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'OutsideRepairVoucherId'		, N'5', N'Voucher type for Outside Repair transactions')
 	
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'CashLedgerId'				, N'1', N'Cash ledger account for Cash Entries')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'GSTLedgerId'					, N'1004', N'GST ledger account for GST Tax Entries')
 	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'PurchaseLedgerId'			, N'1003', N'Ledger account for Purchase entries')
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'OutsideRepairLedgerId'		, N'1005', N'Ledger account for Outside Repair entries')
+
+	INSERT INTO [dbo].[Settings] ([Key], [Value], [Description]) VALUES (N'AutoRefreshReportTimer'		, N'5', N'Auto refresh interval for reports in minutes')
 
 END

@@ -243,7 +243,7 @@ public static class PurchaseData
                 LedgerId = purchaseOverview.VendorId,
                 Debit = null,
                 Credit = purchaseOverview.TotalAmount,
-                Remarks = $"Party Account Posting For Purchase Bill {purchaseOverview.TransactionNo}",
+                Remarks = $"Vendor Account Posting For Purchase Bill {purchaseOverview.TransactionNo}",
             });
 
         if (purchaseOverview.TotalAmount - purchaseOverview.TotalExtraTaxAmount > 0)

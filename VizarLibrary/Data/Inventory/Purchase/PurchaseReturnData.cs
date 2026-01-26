@@ -236,7 +236,7 @@ public static class PurchaseReturnData
                 LedgerId = purchaseReturnOverview.VendorId,
                 Debit = purchaseReturnOverview.TotalAmount,
                 Credit = null,
-                Remarks = $"Party Account Posting For Purchase Return Bill {purchaseReturnOverview.TransactionNo}",
+                Remarks = $"Vendor Account Posting For Purchase Return Bill {purchaseReturnOverview.TransactionNo}",
             });
 
         if (purchaseReturnOverview.TotalAmount - purchaseReturnOverview.TotalExtraTaxAmount > 0)

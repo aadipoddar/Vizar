@@ -1,9 +1,13 @@
-﻿using VizarLibrary.Data.Accounts.Masters;
+﻿using VizarLibrary.Data.Accounts.FinancialAccounting;
+using VizarLibrary.Data.Accounts.Masters;
 using VizarLibrary.Data.Common;
+using VizarLibrary.Data.Operations;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Fleet.Repair;
 using VizarLibrary.Exporting.Utils;
+using VizarLibrary.Models.Accounts.FinancialAccounting;
 using VizarLibrary.Models.Fleet.Repair;
+using VizarLibrary.Models.Operations;
 
 namespace VizarLibrary.Data.Fleet.Repair;
 
@@ -102,6 +106,7 @@ public static class OutsideRepairData
         outsideRepair.Id = await InsertOutsideRepair(outsideRepair, sqlDataAccessTransaction);
         outsideRepairDetails ??= ConvertCartToDetails(cart, outsideRepair.Id);
         await SaveTransactionDetail(outsideRepair, outsideRepairDetails, update, sqlDataAccessTransaction);
+        await SaveAccounting(outsideRepair, update, sqlDataAccessTransaction);
 
         return outsideRepair.Id;
     }
@@ -132,5 +137,81 @@ public static class OutsideRepairData
             if (id <= 0)
                 throw new InvalidOperationException("Failed to save item issue detail item.");
         }
+    }
+
+    private static async Task SaveAccounting(OutsideRepairModel outsideRepair, bool update, SqlDataAccessTransaction sqlDataAccessTransaction)
+    {
+        if (update)
+        {
+            var outsideRepairVoucher = await SettingsData.LoadSettingsByKey(SettingsKeys.OutsideRepairVoucherId, sqlDataAccessTransaction);
+            var existingAccounting = await AccountingData.LoadAccountingByVoucherReference(int.Parse(outsideRepairVoucher.Value), outsideRepair.Id, outsideRepair.TransactionNo, sqlDataAccessTransaction);
+            if (existingAccounting is not null && existingAccounting.Id > 0)
+            {
+                existingAccounting.Status = false;
+                existingAccounting.LastModifiedBy = outsideRepair.LastModifiedBy;
+                existingAccounting.LastModifiedAt = outsideRepair.LastModifiedAt;
+                existingAccounting.LastModifiedFromPlatform = outsideRepair.LastModifiedFromPlatform;
+
+                await AccountingData.DeleteTransaction(existingAccounting, sqlDataAccessTransaction);
+            }
+        }
+
+        var outsideRepairOverview = await CommonData.LoadTableDataById<OutsideRepairOverviewModel>(ViewNames.OutsideRepairOverview, outsideRepair.Id, sqlDataAccessTransaction);
+        if (outsideRepairOverview is null)
+            return;
+
+        if (outsideRepairOverview.TotalAmount == 0)
+            return;
+
+        var outsideRepairLedger = await SettingsData.LoadSettingsByKey(SettingsKeys.OutsideRepairLedgerId, sqlDataAccessTransaction);
+
+        var accountingCart = new List<AccountingItemCartModel>
+        {
+            new()
+            {
+                ReferenceId = outsideRepairOverview.Id,
+                ReferenceType = nameof(ReferenceTypes.OutsideRepair),
+                ReferenceNo = outsideRepairOverview.TransactionNo,
+                LedgerId = outsideRepairOverview.VendorId,
+                Debit = null,
+                Credit = outsideRepairOverview.TotalAmount,
+                Remarks = $"Vendor Account Posting For Outside Repair Bill {outsideRepairOverview.TransactionNo}",
+            },
+
+            new()
+            {
+                ReferenceId = outsideRepairOverview.Id,
+                ReferenceType = nameof(ReferenceTypes.OutsideRepair),
+                ReferenceNo = outsideRepairOverview.TransactionNo,
+                LedgerId = int.Parse(outsideRepairLedger.Value),
+                Debit = outsideRepairOverview.TotalAmount,
+                Credit = null,
+                Remarks = $"Outside Repair Account Posting For Outside Repair Bill {outsideRepairOverview.TransactionNo}",
+            }
+        };
+
+        var voucher = await SettingsData.LoadSettingsByKey(SettingsKeys.OutsideRepairVoucherId, sqlDataAccessTransaction);
+        var accounting = new AccountingModel
+        {
+            Id = 0,
+            TransactionNo = "",
+            CompanyId = outsideRepairOverview.CompanyId,
+            VoucherId = int.Parse(voucher.Value),
+            ReferenceId = outsideRepairOverview.Id,
+            ReferenceNo = outsideRepairOverview.TransactionNo,
+            TransactionDateTime = outsideRepairOverview.TransactionDateTime,
+            FinancialYearId = outsideRepairOverview.FinancialYearId,
+            TotalDebitLedgers = accountingCart.Count(a => a.Debit.HasValue),
+            TotalCreditLedgers = accountingCart.Count(a => a.Credit.HasValue),
+            TotalDebitAmount = accountingCart.Sum(a => a.Debit ?? 0),
+            TotalCreditAmount = accountingCart.Sum(a => a.Credit ?? 0),
+            Remarks = outsideRepairOverview.Remarks,
+            CreatedBy = outsideRepairOverview.CreatedBy,
+            CreatedAt = outsideRepairOverview.CreatedAt,
+            CreatedFromPlatform = outsideRepairOverview.CreatedFromPlatform,
+            Status = true
+        };
+
+        await AccountingData.SaveTransaction(accounting, accountingCart, null, false, sqlDataAccessTransaction);
     }
 }

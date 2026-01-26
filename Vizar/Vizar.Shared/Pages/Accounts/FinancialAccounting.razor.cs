@@ -12,6 +12,7 @@ using VizarLibrary.Data.Common;
 using VizarLibrary.Data.Operations;
 using VizarLibrary.DataAccess;
 using VizarLibrary.Exporting.Accounts.FinancialAccounting;
+using VizarLibrary.Exporting.Fleet.Repair;
 using VizarLibrary.Exporting.Inventory.Purchase;
 using VizarLibrary.Exporting.Utils;
 using VizarLibrary.Models.Accounts.FinancialAccounting;
@@ -892,6 +893,7 @@ public partial class FinancialAccounting : IAsyncDisposable
         {
             var purchaseVoucher = await SettingsData.LoadSettingsByKey(SettingsKeys.PurchaseVoucherId);
             var purchaseReturnVoucher = await SettingsData.LoadSettingsByKey(SettingsKeys.PurchaseReturnVoucherId);
+            var outsideRepairVoucher = await SettingsData.LoadSettingsByKey(SettingsKeys.OutsideRepairVoucherId);
 
             if (_accounting.VoucherId == int.Parse(purchaseVoucher.Value))
             {
@@ -907,6 +909,14 @@ public partial class FinancialAccounting : IAsyncDisposable
                     await JSRuntime.InvokeVoidAsync("open", $"{PageRouteNames.PurchaseReturn}/{_accounting.ReferenceId.Value}", "_blank");
                 else
                     NavigationManager.NavigateTo($"{PageRouteNames.PurchaseReturn}/{_accounting.ReferenceId.Value}");
+            }
+
+            else if (_accounting.VoucherId == int.Parse(outsideRepairVoucher.Value))
+            {
+                if (FormFactor.GetFormFactor() == "Web")
+                    await JSRuntime.InvokeVoidAsync("open", $"{PageRouteNames.OutsideRepair}/{_accounting.ReferenceId.Value}", "_blank");
+                else
+                    NavigationManager.NavigateTo($"{PageRouteNames.OutsideRepair}/{_accounting.ReferenceId.Value}");
             }
 
             else
@@ -930,6 +940,7 @@ public partial class FinancialAccounting : IAsyncDisposable
         {
             var purchaseVoucher = await SettingsData.LoadSettingsByKey(SettingsKeys.PurchaseVoucherId);
             var purchaseReturnVoucher = await SettingsData.LoadSettingsByKey(SettingsKeys.PurchaseReturnVoucherId);
+            var outsideRepairVoucher = await SettingsData.LoadSettingsByKey(SettingsKeys.OutsideRepairVoucherId);
 
             if (_accounting.VoucherId == int.Parse(purchaseVoucher.Value))
             {
@@ -940,6 +951,12 @@ public partial class FinancialAccounting : IAsyncDisposable
             else if (_accounting.VoucherId == int.Parse(purchaseReturnVoucher.Value))
             {
                 var (pdfStream, fileName) = await PurchaseReturnInvoiceExport.ExportInvoice(_accounting.ReferenceId.Value, InvoiceExportType.PDF);
+                await SaveAndViewService.SaveAndView(fileName, pdfStream);
+            }
+
+            else if (_accounting.VoucherId == int.Parse(outsideRepairVoucher.Value))
+            {
+                var (pdfStream, fileName) = await OutsideRepairInvoiceExport.ExportInvoice(_accounting.ReferenceId.Value, InvoiceExportType.PDF);
                 await SaveAndViewService.SaveAndView(fileName, pdfStream);
             }
 
@@ -983,6 +1000,14 @@ public partial class FinancialAccounting : IAsyncDisposable
                     NavigationManager.NavigateTo($"{PageRouteNames.PurchaseReturn}/{_selectedAccountingLedger.ReferenceId.Value}");
             }
 
+            else if (_selectedAccountingLedger.ReferenceType.ToString() == nameof(ReferenceTypes.OutsideRepair))
+            {
+                if (FormFactor.GetFormFactor() == "Web")
+                    await JSRuntime.InvokeVoidAsync("open", $"{PageRouteNames.OutsideRepair}/{_selectedAccountingLedger.ReferenceId.Value}", "_blank");
+                else
+                    NavigationManager.NavigateTo($"{PageRouteNames.OutsideRepair}/{_selectedAccountingLedger.ReferenceId.Value}");
+            }
+
             else
                 await _toastNotification.ShowAsync("Unsupported Voucher Type", "The voucher type associated with the reference transaction is not supported for viewing.", ToastType.Error);
         }
@@ -1011,6 +1036,12 @@ public partial class FinancialAccounting : IAsyncDisposable
             else if (_selectedAccountingLedger.ReferenceType.ToString() == nameof(ReferenceTypes.PurchaseReturn))
             {
                 var (pdfStream, fileName) = await PurchaseReturnInvoiceExport.ExportInvoice(_selectedAccountingLedger.ReferenceId.Value, InvoiceExportType.PDF);
+                await SaveAndViewService.SaveAndView(fileName, pdfStream);
+            }
+
+            else if (_selectedAccountingLedger.ReferenceType.ToString() == nameof(ReferenceTypes.OutsideRepair))
+            {
+                var (pdfStream, fileName) = await OutsideRepairInvoiceExport.ExportInvoice(_selectedAccountingLedger.ReferenceId.Value, InvoiceExportType.PDF);
                 await SaveAndViewService.SaveAndView(fileName, pdfStream);
             }
 

@@ -53,7 +53,8 @@ public class AccountingItemCartModel
 public enum ReferenceTypes
 {
     Purchase,
-    PurchaseReturn
+    PurchaseReturn,
+    OutsideRepair
 }
 
 public class AccountingOverviewModel
