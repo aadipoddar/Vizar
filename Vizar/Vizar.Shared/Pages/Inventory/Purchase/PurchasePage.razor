@@ -368,68 +368,64 @@ else
                     <div class="cart-amounts-row">
                         <!-- Item Name (below item field) -->
                         <div class="amount-field amount-field-item">
-                            <div class="amount-display identification-field">
-                                <label class="cart-label">Remarks</label>
-                                <SfTextBox @bind-Value="_selectedCart.Remarks" Placeholder="Item Narration..."
-                                           FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox identification-input" />
-                            </div>
+                            <label class="cart-label">Remarks</label>
+                            <SfTextBox @bind-Value="_selectedCart.Remarks" Placeholder="Item Narration..."
+                                       FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                         </div>
 
                         <!-- UOM (below Quantity) -->
-                        <div class="amount-field amount-field-small">
-                            <div class="amount-display identification-field">
-                                <label class="cart-label">UOM</label>
-                                <SfTextBox @bind-Value="_selectedCart.UnitOfMeasurement" Placeholder="UOM..."
-                                           FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox identification-input" />
-                            </div>
+                        <div class="amount-field">
+                            <label class="cart-label">UOM</label>
+                            <SfTextBox @bind-Value="_selectedCart.UnitOfMeasurement" Placeholder="UOM..."
+                                       FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                         </div>
 
                         <!-- Base Total (below Rate) -->
-                        <div class="amount-field amount-field-small">
-                            <div class="amount-display empty-display">
-                                <span class="amount-label">Base</span>
-                                <span class="amount-value">@_selectedCart.BaseTotal.ToString("N2")</span>
-                            </div>
+                        <div class="amount-field">
+                            <label class="cart-label">Base</label>
+                            <SfNumericTextBox Value="@_selectedCart.BaseTotal" TValue="decimal" Readonly="true"
+                                              ShowSpinButton="false" FloatLabelType="FloatLabelType.Never"
+                                              CssClass="custom-numeric readonly-field" Format="N2" />
                         </div>
 
                         <!-- Discount Amount (below Disc %) -->
-                        <div class="amount-field amount-field-small">
-                            <div class="amount-display empty-display">
-                                <span class="amount-label">Disc Amt</span>
-                                <span class="amount-value discount-amt">@_selectedCart.DiscountAmount.ToString("N2")</span>
-                            </div>
+                        <div class="amount-field">
+                            <label class="cart-label">Disc Amt</label>
+                            <SfNumericTextBox Value="@_selectedCart.DiscountAmount" TValue="decimal" Readonly="true"
+                                              ShowSpinButton="false" FloatLabelType="FloatLabelType.Never"
+                                              CssClass="custom-numeric readonly-field" Format="N2" />
                         </div>
 
                         <!-- CGST Amount (below CGST %) -->
-                        <div class="amount-field amount-field-small">
-                            <div class="amount-display empty-display">
-                                <span class="amount-label">CGST Amt</span>
-                                <span class="amount-value">@_selectedCart.CGSTAmount.ToString("N2")</span>
-                            </div>
+                        <div class="amount-field">
+                            <label class="cart-label">CGST Amt</label>
+                            <SfNumericTextBox Value="@_selectedCart.CGSTAmount" TValue="decimal" Readonly="true"
+                                              ShowSpinButton="false" FloatLabelType="FloatLabelType.Never"
+                                              CssClass="custom-numeric readonly-field" Format="N2" />
                         </div>
 
                         <!-- SGST Amount (below SGST %) -->
-                        <div class="amount-field amount-field-small">
-                            <div class="amount-display empty-display">
-                                <span class="amount-label">SGST Amt</span>
-                                <span class="amount-value">@_selectedCart.SGSTAmount.ToString("N2")</span>
-                            </div>
+                        <div class="amount-field">
+                            <label class="cart-label">SGST Amt</label>
+                            <SfNumericTextBox Value="@_selectedCart.SGSTAmount" TValue="decimal" Readonly="true"
+                                              ShowSpinButton="false" FloatLabelType="FloatLabelType.Never"
+                                              CssClass="custom-numeric readonly-field" Format="N2" />
                         </div>
 
                         <!-- IGST Amount (below IGST %) -->
-                        <div class="amount-field amount-field-small">
-                            <div class="amount-display empty-display">
-                                <span class="amount-label">IGST Amt</span>
-                                <span class="amount-value">@_selectedCart.IGSTAmount.ToString("N2")</span>
-                            </div>
+                        <div class="amount-field">
+                            <label class="cart-label">IGST Amt</label>
+                            <SfNumericTextBox Value="@_selectedCart.IGSTAmount" TValue="decimal" Readonly="true"
+                                              ShowSpinButton="false" FloatLabelType="FloatLabelType.Never"
+                                              CssClass="custom-numeric readonly-field" Format="N2" />
                         </div>
 
-                        <!-- Total and Checkbox (below Remarks) -->
-                        <div class="amount-field amount-field-medium">
-                            <div class="amount-display total-display">
-                                <span class="amount-label">Total</span>
-                                <span class="amount-value">@_selectedCart.Total.ToString("N2")</span>
-                            </div>
+                        <!-- Total (below Identification No) -->
+                        <div class="amount-field">
+                            <label class="cart-label">Total</label>
+                            <SfNumericTextBox Value="@_selectedCart.Total" TValue="decimal" Readonly="true"
+                                              ShowSpinButton="false" FloatLabelType="FloatLabelType.Never"
+                                              CssClass="custom-numeric readonly-field" Format="N2" />
                         </div>
 
                         <!-- Add Button (below Tax Incl. checkbox) -->
@@ -654,10 +650,6 @@ else
 <ToastNotification @ref="_toastNotification" />
 
 <style>
-    * {
-        box-sizing: border-box;
-    }
-
     /* Two Column Layout */
     .two-column-layout {
         display: flex;
@@ -673,81 +665,11 @@ else
             flex: 0 0 calc(25% - 16px);
         }
 
-    /* Section Card Styles */
-    .section-card {
-        background: #ffffff;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        margin-bottom: 16px;
-        overflow: hidden;
-    }
-
-    .section-header {
-        padding: 16px 20px;
-        border-bottom: 1px solid #e2e8f0;
-        background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
-    }
-
-    .section-title-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .section-icon {
-        color: #3b82f6;
-        flex-shrink: 0;
-    }
-
-    .section-title {
-        font-size: 16px;
-        font-weight: 600;
-        color: #0f172a;
-        margin: 0;
-        letter-spacing: -0.2px;
-    }
-
-    .section-body {
-        padding: 16px 20px;
-    }
-
     /* Form Grid Layout */
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px 20px;
-    }
-
     .form-grid-single {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 16px 20px;
-    }
-
-    .form-field {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-
-    .form-field-full {
-        grid-column: 1 / -1;
-    }
-
-    .field-label {
-        font-size: 13px;
-        font-weight: 600;
-        color: #334155;
-        letter-spacing: 0.1px;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-    }
-
-    .required {
-        color: #ef4444;
-        font-weight: 700;
     }
 
     /* Transaction Date and Financial Year Wrapper */
@@ -810,72 +732,6 @@ else
         align-items: center;
     }
 
-    /* Action Buttons */
-    .action-buttons {
-        display: flex;
-        gap: 12px;
-    }
-
-    .btn-primary,
-    .btn-secondary {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        height: 44px;
-        padding: 0 24px;
-        border: none;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        letter-spacing: 0.3px;
-        flex: 1;
-    }
-
-        .btn-primary svg,
-        .btn-secondary svg {
-            flex-shrink: 0;
-        }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-        color: #ffffff;
-        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-    }
-
-        .btn-primary:hover {
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-            transform: translateY(-1px);
-            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-            box-shadow: 0 1px 4px rgba(59, 130, 246, 0.3);
-        }
-
-    .btn-secondary {
-        background: #ffffff;
-        color: #64748b;
-        border: 2px solid #e2e8f0;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    }
-
-        .btn-secondary:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-            color: #475569;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary:active {
-            transform: translateY(0);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-
     /* Financial Grid Layout */
     .financial-grid {
         display: flex;
@@ -926,12 +782,6 @@ else
         white-space: nowrap;
     }
 
-    .financial-divider {
-        height: 1px;
-        background: #e2e8f0;
-        margin: 4px 0;
-    }
-
     ::deep .editable-field .e-input-group {
         border-color: #3b82f6;
         background: #eff6ff;
@@ -968,16 +818,6 @@ else
             color: #1e40af;
         }
 
-    ::deep .textarea-field .e-input-group {
-        height: auto;
-        min-height: 80px;
-    }
-
-        ::deep .textarea-field .e-input-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
     ::deep .textarea-field-small .e-input-group {
         height: auto;
         min-height: 60px;
@@ -1005,10 +845,6 @@ else
 
     .cart-field-item {
         grid-column: span 2;
-    }
-
-    .cart-field-small {
-        /* Standard single column */
     }
 
     .cart-field-medium {
@@ -1079,111 +915,17 @@ else
     .amount-field {
         display: flex;
         flex-direction: column;
+        gap: 4px;
     }
 
     .amount-field-item {
         grid-column: span 2;
     }
 
-    .amount-field-small {
-        /* Standard single column */
-    }
-
-    .amount-field-medium {
-        grid-column: span 1;
-    }
-
     .amount-field-button {
         display: flex;
         align-items: center;
         justify-content: center;
-    }
-
-    .amount-display {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        padding: 8px 12px;
-        background: #ffffff;
-        border-radius: 6px;
-        border: 1px solid #e2e8f0;
-        min-height: 58px;
-    }
-
-        .amount-display.identification-field {
-            padding: 0;
-            background: transparent;
-            border: none;
-            min-height: 38px;
-            justify-content: center;
-        }
-
-        .amount-display.empty-display {
-            background: #f8fafc;
-        }
-
-        .amount-display.total-display {
-            background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
-            border: 2px solid #3b82f6;
-        }
-
-            .amount-display.total-display .amount-label {
-                color: #1e40af;
-            }
-
-            .amount-display.total-display .amount-value {
-                color: #1e40af;
-                font-size: 16px;
-            }
-
-    ::deep .identification-field .identification-input .e-input-group {
-        height: 38px;
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-    }
-
-        ::deep .identification-field .identification-input .e-input-group input {
-            font-size: 13px;
-            color: #64748b;
-            font-weight: 500;
-            padding: 8px 12px;
-        }
-
-            ::deep .identification-field .identification-input .e-input-group input::placeholder {
-                color: #94a3b8;
-                font-style: italic;
-            }
-
-    .amount-label {
-        font-size: 10px;
-        font-weight: 600;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-    }
-
-    .amount-value {
-        font-size: 14px;
-        font-weight: 700;
-        color: #1e293b;
-        text-align: right;
-        width: 100%;
-        display: block;
-    }
-
-        .amount-value.discount-amt {
-            color: #dc2626;
-        }
-
-    .checkbox-display {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 8px;
-        background: #f8fafc;
-        border-radius: 6px;
-        border: 1px solid #e2e8f0;
-        min-height: 58px;
     }
 
     ::deep .custom-checkbox {
@@ -1194,294 +936,4 @@ else
         ::deep .custom-checkbox label {
             white-space: nowrap;
         }
-
-    /* Professional Grid Styles */
-    .e-grid .e-summaryrow .e-summarycell {
-        background-color: #deecf9;
-    }
-
-    .grid-body {
-        padding: 0 !important;
-    }
-
-    ::deep .professional-grid {
-        border: none;
-    }
-
-        ::deep .professional-grid .e-gridheader {
-            background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%);
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        ::deep .professional-grid .e-headercell {
-            background: transparent;
-            color: #475569;
-            font-weight: 600;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            border-right: 1px solid #e2e8f0;
-            padding: 12px 8px;
-        }
-
-            ::deep .professional-grid .e-headercell:last-child {
-                border-right: none;
-            }
-
-        ::deep .professional-grid .e-gridcontent {
-            background: #ffffff;
-        }
-
-        ::deep .professional-grid .e-row {
-            transition: background-color 0.2s ease;
-        }
-
-            ::deep .professional-grid .e-row:hover {
-                background-color: #f8fafc;
-            }
-
-            ::deep .professional-grid .e-row.e-altrow {
-                background-color: #fafbfc;
-            }
-
-                ::deep .professional-grid .e-row.e-altrow:hover {
-                    background-color: #f8fafc;
-                }
-
-        ::deep .professional-grid .e-rowcell {
-            border-right: 1px solid #f1f5f9;
-            border-bottom: 1px solid #f1f5f9;
-            padding: 10px 8px;
-            font-size: 13px;
-            color: #1e293b;
-        }
-
-            ::deep .professional-grid .e-rowcell:last-child {
-                border-right: none;
-            }
-
-    .grid-discount {
-        color: #dc2626;
-        font-weight: 600;
-    }
-
-    .grid-total {
-        color: #1e40af;
-        font-weight: 700;
-        font-size: 14px;
-    }
-
-    .grid-checkbox {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        line-height: 20px;
-        text-align: center;
-        border-radius: 4px;
-        font-weight: 700;
-        font-size: 14px;
-    }
-
-    /* Grid Footer Aggregates */
-    ::deep .professional-grid .e-gridfooter {
-        background: linear-gradient(to bottom, #f1f5f9 0%, #e2e8f0 100%);
-        border-top: 2px solid #cbd5e1;
-    }
-
-    ::deep .professional-grid .e-summarycell {
-        font-weight: 600;
-        color: #1e293b;
-        padding: 12px 8px;
-        border-right: 1px solid #cbd5e1;
-    }
-
-        ::deep .professional-grid .e-summarycell:last-child {
-            border-right: none;
-        }
-
-    .aggregate-label {
-        text-align: left;
-        font-size: 13px;
-        color: #475569;
-    }
-
-    .aggregate-value {
-        text-align: right;
-        font-size: 13px;
-        color: #1e293b;
-    }
-
-        .aggregate-value.aggregate-discount {
-            color: #dc2626;
-        }
-
-        .aggregate-value.aggregate-total {
-            color: #1e40af;
-            font-size: 14px;
-        }
-
-            .aggregate-value.aggregate-total strong {
-                font-size: 15px;
-            }
-
-        .aggregate-label strong,
-        .aggregate-value strong {
-            font-weight: 700;
-        }
-
-    /* Dialog Button Styles */
-    .dialog-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 12px 20px;
-        border: none;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-    }
-
-        .dialog-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
-        }
-
-        .dialog-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-        }
-
-        .dialog-btn svg {
-            flex-shrink: 0;
-        }
-
-    .dialog-btn-primary {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        color: white;
-    }
-
-        .dialog-btn-primary:hover {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-        }
-
-    .dialog-btn-info {
-        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-        color: white;
-    }
-
-        .dialog-btn-info:hover {
-            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-        }
-
-    .dialog-btn-danger {
-        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-        color: white;
-    }
-
-        .dialog-btn-danger:hover {
-            background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
-        }
-
-    /* Custom Uploader Styles */
-    ::deep .custom-uploader .e-upload {
-        border: none;
-        background: transparent;
-    }
-
-    ::deep .custom-uploader .e-file-select-wrap {
-        padding: 0;
-    }
-
-    ::deep .custom-uploader .e-file-select {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        color: white;
-        border: none;
-        padding: 12px 32px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 14px;
-        box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
-        transition: all 0.2s ease;
-    }
-
-        ::deep .custom-uploader .e-file-select:hover {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
-        }
-
-    ::deep .custom-uploader .e-file-drop {
-        border: none;
-        background: transparent;
-        min-height: auto;
-    }
-
-    ::deep .custom-uploader .e-upload-files {
-        margin-top: 16px;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 12px;
-        background: white;
-    }
-
-    ::deep .custom-uploader .e-upload-file-list {
-        padding: 8px;
-        background: #f8fafc;
-        border-radius: 6px;
-        border: 1px solid #e2e8f0;
-    }
-
-    ::deep .custom-uploader .e-file-name {
-        font-size: 14px;
-        color: #0f172a;
-        font-weight: 500;
-    }
-
-    ::deep .custom-uploader .e-file-size {
-        font-size: 12px;
-        color: #64748b;
-    }
-
-    ::deep .custom-uploader .e-file-status {
-        font-size: 12px;
-        color: #10b981;
-        font-weight: 600;
-    }
-
-    ::deep .custom-uploader .e-icons.e-file-delete-btn,
-    ::deep .custom-uploader .e-icons.e-file-remove-btn {
-        color: #dc2626;
-        font-size: 18px;
-        transition: all 0.2s ease;
-    }
-
-        ::deep .custom-uploader .e-icons.e-file-delete-btn:hover,
-        ::deep .custom-uploader .e-icons.e-file-remove-btn:hover {
-            color: #991b1b;
-            transform: scale(1.1);
-        }
-
-    ::deep .custom-uploader .e-upload-progress-wrap {
-        height: 4px;
-        background: #e2e8f0;
-        border-radius: 2px;
-        overflow: hidden;
-    }
-
-    ::deep .custom-uploader .e-upload-progress-bar {
-        background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
-        height: 100%;
-    }
-
-    /* Empty Grid State */
-    ::deep .professional-grid .e-emptyrow {
-        text-align: center;
-        padding: 48px 24px;
-        color: #94a3b8;
-        font-size: 14px;
-    }
 </style>

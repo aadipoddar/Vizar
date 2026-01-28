@@ -14,9 +14,12 @@ else
         <Header Title="Tax Management" Subtitle="Manage taxes and details" ShowHome="true" ShowBack="true" ShowLogout="true"
                 OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
             <RightContent>
-                <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Title="Export to Excel (Ctrl + E)" Disabled="_isProcessing" OnClick="ExportExcel" />
-                <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Title="Export to PDF (Ctrl + P)" Disabled="_isProcessing" OnClick="ExportPdf" />
-                <IconButton Icon="IconType.Save" Variant="ButtonVariant.Save" Title="Save Tax (Ctrl + S)" Disabled="_isProcessing" OnClick="SaveTax" />
+                <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Title="Export to Excel (Ctrl + E)"
+                            Disabled="_isProcessing" OnClick="ExportExcel" />
+                <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Title="Export to PDF (Ctrl + P)"
+                            Disabled="_isProcessing" OnClick="ExportPdf" />
+                <IconButton Icon="IconType.Save" Variant="ButtonVariant.Save" Title="Save Tax (Ctrl + S)"
+                            Disabled="_isProcessing" OnClick="SaveTax" />
                 <IconButton Icon="IconType.New" Title="New Tax (Ctrl + N)" Disabled="_isProcessing" OnClick="ResetPage" />
             </RightContent>
         </Header>
@@ -114,16 +117,18 @@ else
                         <h2 class="section-title">Taxes List</h2>
                     </div>
                     <div class="header-actions">
-                        <ToggleDeletedButton Disabled="@_isProcessing" ShowDeleted="@_showDeleted" OnToggle="ToggleDeleted" />
+                        <ToggleDeletedButton Disabled="@_isProcessing" ShowDeleted="@_showDeleted"
+                                             OnToggle="ToggleDeleted" />
                     </div>
                 </div>
                 <div class="section-body grid-body">
-                    <SfGrid @ref="_sfGrid" DataSource="@_taxes" AllowPaging="true" AllowSorting="true" AllowFiltering="true" 
+                    <SfGrid @ref="_sfGrid" DataSource="@_taxes" AllowPaging="true" AllowSorting="true" AllowFiltering="true"
                             AllowResizing="true" CssClass="professional-grid" Toolbar="@(new List<string>() { "Search" })">
                         <GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
                         <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
                         <GridColumns>
-                            <GridColumn HeaderText="Actions" Width="120" TextAlign="TextAlign.Center" AllowFiltering="false">
+                            <GridColumn HeaderText="Actions" Width="120" TextAlign="TextAlign.Center"
+                                        AllowFiltering="false">
                                 <Template>
                                     @{
                                         var tax = (context as TaxModel);
@@ -131,24 +136,34 @@ else
                                         <div class="grid-actions">
                                             @if (tax.Status)
                                             {
-                                                <IconButton Icon="IconType.Edit" Variant="ButtonVariant.Edit" Size="ButtonSize.Grid" Title="Edit (Insert)" OnClick="@(() => OnEditTax(tax))" />
-                                                <IconButton Icon="IconType.Delete" Variant="ButtonVariant.Delete" Size="ButtonSize.Grid" Title="Delete (Delete)" OnClick="@(() => ShowDeleteConfirmation(tax.Id, tax.Name))" />
+                                                <IconButton Icon="IconType.Edit" Variant="ButtonVariant.Edit" Size="ButtonSize.Grid"
+                                                            Title="Edit (Insert)" OnClick="@(() => OnEditTax(tax))" />
+                                                <IconButton Icon="IconType.Delete" Variant="ButtonVariant.Delete"
+                                                            Size="ButtonSize.Grid" Title="Delete (Delete)"
+                                                            OnClick="@(() => ShowDeleteConfirmation(tax.Id, tax.Name))" />
                                             }
                                             else
                                             {
-                                                <IconButton Icon="IconType.Recover" Variant="ButtonVariant.Recover" Size="ButtonSize.Grid" Title="Recover (Delete)" OnClick="@(() => ShowRecoverConfirmation(tax.Id, tax.Name))" />
+                                                <IconButton Icon="IconType.Recover" Variant="ButtonVariant.Recover"
+                                                            Size="ButtonSize.Grid" Title="Recover (Delete)"
+                                                            OnClick="@(() => ShowRecoverConfirmation(tax.Id, tax.Name))" />
                                             }
                                         </div>
                                     }
                                 </Template>
                             </GridColumn>
-                            <GridColumn Field="@nameof(TaxModel.Id)" HeaderText="ID" Width="80" TextAlign="TextAlign.Center" />
+                            <GridColumn Field="@nameof(TaxModel.Id)" HeaderText="ID" Width="80"
+                                        TextAlign="TextAlign.Center" />
                             <GridColumn Field="@nameof(TaxModel.Name)" HeaderText="Name" Width="200" />
                             <GridColumn Field="@nameof(TaxModel.Code)" HeaderText="Code" Width="150" />
-                            <GridColumn Field="@nameof(TaxModel.CGST)" HeaderText="CGST %" Width="120" Format="N2" TextAlign="TextAlign.Right" />
-                            <GridColumn Field="@nameof(TaxModel.SGST)" HeaderText="SGST %" Width="120" Format="N2" TextAlign="TextAlign.Right" />
-                            <GridColumn Field="@nameof(TaxModel.IGST)" HeaderText="IGST %" Width="120" Format="N2" TextAlign="TextAlign.Right" />
-                            <GridColumn Field="@nameof(TaxModel.Inclusive)" HeaderText="Inclusive" Width="100" TextAlign="TextAlign.Center">
+                            <GridColumn Field="@nameof(TaxModel.CGST)" HeaderText="CGST %" Width="120" Format="N2"
+                                        TextAlign="TextAlign.Right" />
+                            <GridColumn Field="@nameof(TaxModel.SGST)" HeaderText="SGST %" Width="120" Format="N2"
+                                        TextAlign="TextAlign.Right" />
+                            <GridColumn Field="@nameof(TaxModel.IGST)" HeaderText="IGST %" Width="120" Format="N2"
+                                        TextAlign="TextAlign.Right" />
+                            <GridColumn Field="@nameof(TaxModel.Inclusive)" HeaderText="Inclusive" Width="100"
+                                        TextAlign="TextAlign.Center">
                                 <Template>
                                     @{
                                         var tax = (context as TaxModel);
@@ -159,7 +174,8 @@ else
                                     }
                                 </Template>
                             </GridColumn>
-                            <GridColumn Field="@nameof(TaxModel.Extra)" HeaderText="Extra" Width="100" TextAlign="TextAlign.Center">
+                            <GridColumn Field="@nameof(TaxModel.Extra)" HeaderText="Extra" Width="100"
+                                        TextAlign="TextAlign.Center">
                                 <Template>
                                     @{
                                         var tax = (context as TaxModel);
@@ -171,7 +187,8 @@ else
                                 </Template>
                             </GridColumn>
                             <GridColumn Field="@nameof(TaxModel.Remarks)" HeaderText="Remarks" Width="300" />
-                            <GridColumn Field="@nameof(TaxModel.Status)" HeaderText="Status" Width="100" TextAlign="TextAlign.Center">
+                            <GridColumn Field="@nameof(TaxModel.Status)" HeaderText="Status" Width="100"
+                                        TextAlign="TextAlign.Center">
                                 <Template>
                                     @{
                                         var tax = (context as TaxModel);
@@ -200,128 +217,4 @@ else
 <RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Tax" IdentifierLabel="Tax Name"
                            IdentifierValue="@_recoverTaxName" Disabled="@_isProcessing" OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
-<!-- Toast Notification -->
 <ToastNotification @ref="_toastNotification" />
-
-<style>
-    * {
-        box-sizing: border-box;
-    }
-
-    /* Section Card */
-    .section-card {
-        background: #ffffff;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        margin-bottom: 24px;
-        overflow: hidden;
-    }
-
-    .section-header {
-        padding: 20px 24px;
-        border-bottom: 2px solid #e2e8f0;
-        background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .section-title-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .header-actions {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-    }
-
-    .section-icon {
-        color: #3b82f6;
-        flex-shrink: 0;
-    }
-
-    .section-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: #0f172a;
-        margin: 0;
-        letter-spacing: -0.3px;
-    }
-
-    .section-body {
-        padding: 24px;
-    }
-
-    /* Form Grid */
-    .form-grid-triple {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-        align-items: start;
-    }
-
-    .form-field {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .form-field-span-2 {
-        grid-column: span 2;
-    }
-
-    .form-field-span-3 {
-        grid-column: span 3;
-    }
-
-    .field-label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #475569;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-        margin-bottom: 2px;
-    }
-
-    .required {
-        color: #dc2626;
-        margin-left: 2px;
-    }
-
-    /* Grid Body */
-    .grid-body {
-        padding: 0;
-    }
-
-    .professional-grid {
-        border: none;
-    }
-
-    .grid-checkbox {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 24px;
-        height: 24px;
-        border-radius: 4px;
-        font-weight: 700;
-        font-size: 14px;
-    }
-
-    /* Responsive Design */
-    @@media (max-width: 1024px) {
-        .form-grid-triple {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @@media (max-width: 768px) {
-        .form-grid-triple {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>

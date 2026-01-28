@@ -11,7 +11,8 @@
 else
 {
     <div style="display: flex; flex-direction: column; min-height: 100vh;">
-        <Header Title="Accounting Dashboard" Subtitle="Access all accounting modules and reports" ShowLogout="true" ShowHome="true" OnLogoutClick="Logout" OnHomeClick="NavigateToDashboard" />
+        <Header Title="Accounting Dashboard" Subtitle="Access all accounting modules and reports" ShowLogout="true"
+                ShowHome="true" OnLogoutClick="Logout" OnHomeClick="NavigateToDashboard" />
 
         <!-- Main Content Container -->
         <div class="page-container">
@@ -33,7 +34,8 @@ else
                 <div class="section-body">
                     <div class="dashboard-grid">
                         <!-- Financial Accounting -->
-                        <ButtonCard Title="Financial Accounting" Description="Record journal entries and transactions"Color="blue" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.FinancialAccounting)">
+                        <ButtonCard Title="Financial Accounting" Description="Record journal entries and transactions"
+                                    Color="blue" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.FinancialAccounting)">
                             <IconContent>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
                                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -240,7 +242,8 @@ else
                                      stroke-linejoin="round">
                                     <circle cx="12" cy="12" r="10" />
                                     <line x1="2" y1="12" x2="22" y2="12" />
-                                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                                    <path
+                                    d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
                                 </svg>
                             </IconContent>
                         </ButtonCard>
@@ -266,7 +269,8 @@ else
                                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                      stroke-linejoin="round">
                                     <circle cx="12" cy="12" r="3" />
-                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                                    <path
+                                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
                                 </svg>
                             </IconContent>
                         </ButtonCard>
@@ -279,75 +283,3 @@ else
         <Footer />
     </div>
 }
-
-<style>
-    * {
-        box-sizing: border-box;
-    }
-
-    /* Section Card */
-    .section-card {
-        background: #ffffff;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        margin-bottom: 24px;
-        overflow: hidden;
-        transition: all 0.3s ease;
-    }
-
-        .section-card:hover {
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
-        }
-
-    .section-header {
-        padding: 20px 24px;
-        border-bottom: 2px solid #e2e8f0;
-        background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
-    }
-
-    .section-title-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 8px;
-    }
-
-    .section-icon {
-        color: #3b82f6;
-        flex-shrink: 0;
-    }
-
-    .section-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: #0f172a;
-        margin: 0;
-        letter-spacing: -0.3px;
-    }
-
-    .section-subtitle {
-        font-size: 13px;
-        color: #64748b;
-        margin: 0;
-        padding-left: 34px;
-        font-weight: 400;
-    }
-
-    .section-body {
-        padding: 24px;
-    }
-
-    /* Dashboard Grid */
-    .dashboard-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 24px;
-        width: 100%;
-        margin-bottom: 32px;
-    }
-
-        .dashboard-grid:last-child {
-            margin-bottom: 0;
-        }
-</style>

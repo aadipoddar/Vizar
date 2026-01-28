@@ -9,12 +9,8 @@
 else
 {
     <div style="display: flex; flex-direction: column; min-height: 100vh;">
-        <Header Title="Inventory Dashboard"
-                Subtitle="Access all inventory modules and reports"
-                ShowLogout="true"
-                ShowHome="true"
-                OnLogoutClick="Logout"
-                OnHomeClick="NavigateToDashboard" />
+        <Header Title="Inventory Dashboard" Subtitle="Access all inventory modules and reports" ShowLogout="true"
+                ShowHome="true" OnLogoutClick="Logout" OnHomeClick="NavigateToDashboard" />
 
         <!-- Main Content Container -->
         <div class="page-container">
@@ -23,8 +19,9 @@ else
             <div class="section-card">
                 <div class="section-header">
                     <div class="section-title-wrapper">
-                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
-                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round">
                             <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
                             <line x1="3" y1="6" x2="21" y2="6" />
                             <path d="M16 10a4 4 0 0 1-8 0" />
@@ -84,8 +81,9 @@ else
             <div class="section-card">
                 <div class="section-header">
                     <div class="section-title-wrapper">
-                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
-                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                             <polyline points="14 2 14 8 20 8" />
                             <line x1="16" y1="13" x2="8" y2="13" />
@@ -99,8 +97,8 @@ else
                 <div class="section-body">
                     <div class="dashboard-grid">
                         <!-- Purchase Order Report -->
-                        <ButtonCard Title="Purchase Order Report" Description="View purchase order transactions" Color="violet"
-                                    OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ReportPurchaseOrder)">
+                        <ButtonCard Title="Purchase Order Report" Description="View purchase order transactions"
+                                    Color="violet" OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ReportPurchaseOrder)">
                             <IconContent>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
                                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -114,7 +112,8 @@ else
                         </ButtonCard>
 
                         <!-- Purchase Order Item Report -->
-                        <ButtonCard Title="Purchase Order Item Report" Description="View detailed purchase order items" Color="purple"
+                        <ButtonCard Title="Purchase Order Item Report" Description="View detailed purchase order items"
+                                    Color="purple"
                                     OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ReportPurchaseOrderItem)">
                             <IconContent>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
@@ -172,7 +171,8 @@ else
                         </ButtonCard>
 
                         <!-- Purchase Return Item Report -->
-                        <ButtonCard Title="Purchase Return Item Report" Description="View detailed purchase return items" Color="amber"
+                        <ButtonCard Title="Purchase Return Item Report" Description="View detailed purchase return items"
+                                    Color="amber"
                                     OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ReportPurchaseReturnItem)">
                             <IconContent>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
@@ -193,8 +193,9 @@ else
             <div class="section-card">
                 <div class="section-header">
                     <div class="section-title-wrapper">
-                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round">
                             <line x1="12" y1="19" x2="12" y2="5" />
                             <polyline points="5 12 12 5 19 12" />
                             <rect x="3" y="19" width="18" height="4" />
@@ -206,14 +207,15 @@ else
                 <div class="section-body">
                     <div class="dashboard-grid">
                         <!-- Item Stock Adjustment -->
-                        <ButtonCard Title="Item Stock Adjustment" Description="Adjust item stock levels"
-                                    Color="purple"
+                        <ButtonCard Title="Item Stock Adjustment" Description="Adjust item stock levels" Color="purple"
                                     OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ItemStockAdjustment)">
                             <IconContent>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round">
                                     <line x1="16.5" y1="9.4" x2="7.5" y2="4.21" />
-                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                                    <path
+                                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                                     <polyline points="7.5 4.21 12 6.81 16.5 4.21" />
                                     <line x1="12" y1="22" x2="12" y2="12" />
                                 </svg>
@@ -224,8 +226,9 @@ else
                         <ButtonCard Title="Item Stock" Description="View current item stock levels" Color="blue"
                                     OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ReportItemStock)">
                             <IconContent>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round">
                                     <ellipse cx="12" cy="5" rx="9" ry="3" />
                                     <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
                                     <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
@@ -240,9 +243,11 @@ else
             <div class="section-card">
                 <div class="section-header">
                     <div class="section-title-wrapper">
-                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
-                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                             <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
                             <line x1="12" y1="22.08" x2="12" y2="12" />
                         </svg>
@@ -256,9 +261,11 @@ else
                         <ButtonCard Title="Item" Description="Manage items inventory" Color="blue"
                                     OnClick="() => NavigationManager.NavigateTo(PageRouteNames.AdminItem)">
                             <IconContent>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round">
+                                    <path
+                                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                                     <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
                                     <line x1="12" y1="22.08" x2="12" y2="12" />
                                 </svg>
@@ -269,8 +276,9 @@ else
                         <ButtonCard Title="Item Category" Description="Manage item categories" Color="cyan"
                                     OnClick="() => NavigationManager.NavigateTo(PageRouteNames.AdminItemCategory)">
                             <IconContent>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round">
                                     <rect x="3" y="3" width="7" height="7" />
                                     <rect x="14" y="3" width="7" height="7" />
                                     <rect x="14" y="14" width="7" height="7" />
@@ -283,8 +291,9 @@ else
                         <ButtonCard Title="Item Type" Description="Manage item types" Color="purple"
                                     OnClick="() => NavigationManager.NavigateTo(PageRouteNames.AdminItemType)">
                             <IconContent>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round">
                                     <path d="M3 3h7v7H3z" />
                                     <path d="M14 3h7v7h-7z" />
                                     <path d="M14 14h7v7h-7z" />
@@ -301,8 +310,9 @@ else
                         <ButtonCard Title="Manufacturer" Description="Manage manufacturers" Color="orange"
                                     OnClick="() => NavigationManager.NavigateTo(PageRouteNames.AdminManufacturer)">
                             <IconContent>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round">
                                     <path d="m2 8 2 2-2 2 2 2-2 2" />
                                     <path d="m22 8-2 2 2 2-2 2 2 2" />
                                     <rect width="8" height="14" x="8" y="5" rx="1" />
@@ -316,8 +326,9 @@ else
                         <ButtonCard Title="Tax" Description="Manage tax configurations" Color="emerald"
                                     OnClick="() => NavigationManager.NavigateTo(PageRouteNames.AdminTax)">
                             <IconContent>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round">
                                     <circle cx="12" cy="12" r="10" />
                                     <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" />
                                     <path d="M12 18V6" />
@@ -332,71 +343,3 @@ else
         <Footer />
     </div>
 }
-
-<style>
-    * {
-        box-sizing: border-box;
-    }
-
-    /* Section Card */
-    .section-card {
-        background: #ffffff;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        margin-bottom: 24px;
-        overflow: hidden;
-        transition: all 0.3s ease;
-    }
-
-        .section-card:hover {
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
-        }
-
-    .section-header {
-        padding: 20px 24px;
-        border-bottom: 2px solid #e2e8f0;
-        background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
-    }
-
-    .section-title-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 8px;
-    }
-
-    .section-icon {
-        color: #3b82f6;
-        flex-shrink: 0;
-    }
-
-    .section-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: #0f172a;
-        margin: 0;
-        letter-spacing: -0.3px;
-    }
-
-    .section-subtitle {
-        font-size: 13px;
-        color: #64748b;
-        margin: 0;
-        padding-left: 34px;
-        font-weight: 400;
-    }
-
-    .section-body {
-        padding: 24px;
-    }
-
-    /* Dashboard Grid - Flexbox for consistent card sizing */
-    .dashboard-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 24px;
-        width: 100%;
-        margin-bottom: 32px;
-    }
-</style>

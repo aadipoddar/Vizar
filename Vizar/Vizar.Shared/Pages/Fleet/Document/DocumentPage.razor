@@ -13,13 +13,19 @@
 else
 {
     <div style="display: flex; flex-direction: column; min-height: 100vh;">
-        <Header Title="Document Management" Subtitle="Manage documents and details" ShowHome="true" ShowBack="true" ShowLogout="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
+        <Header Title="Document Management" Subtitle="Manage documents and details" ShowHome="true" ShowBack="true"
+                ShowLogout="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
             <RightContent>
-                <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Title="Export to Excel (Ctrl + E)" Disabled="_isProcessing" OnClick="ExportExcel" />
-                <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Title="Export to PDF (Ctrl + P)" Disabled="_isProcessing" OnClick="ExportPdf" />
-                <IconButton Icon="IconType.Save" Variant="ButtonVariant.Save" Title="Save Document (Ctrl + S)" Disabled="_isProcessing" OnClick="SaveDocument" />
-                <IconButton Icon="IconType.Upload" Title="Upload Document (Ctrl + U)" Disabled="_isProcessing" OnClick="UploadDocument" />
-                <IconButton Icon="IconType.New" Title="New Document (Ctrl + N)" Disabled="_isProcessing" OnClick="ResetPage" />
+                <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Title="Export to Excel (Ctrl + E)"
+                            Disabled="_isProcessing" OnClick="ExportExcel" />
+                <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Title="Export to PDF (Ctrl + P)"
+                            Disabled="_isProcessing" OnClick="ExportPdf" />
+                <IconButton Icon="IconType.Save" Variant="ButtonVariant.Save" Title="Save Document (Ctrl + S)"
+                            Disabled="_isProcessing" OnClick="SaveDocument" />
+                <IconButton Icon="IconType.Upload" Title="Upload Document (Ctrl + U)" Disabled="_isProcessing"
+                            OnClick="UploadDocument" />
+                <IconButton Icon="IconType.New" Title="New Document (Ctrl + N)" Disabled="_isProcessing"
+                            OnClick="ResetPage" />
             </RightContent>
         </Header>
 
@@ -30,8 +36,9 @@ else
             <div class="section-card">
                 <div class="section-header">
                     <div class="section-title-wrapper">
-                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round">
                             <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" />
                         </svg>
                         <h2 class="section-title">Document Details</h2>
@@ -54,8 +61,8 @@ else
                                 Renewal Date <span class="required">*</span>
                             </label>
                             <SfDatePicker TValue="DateTime" @bind-Value="_document.TransactionDateTime"
-                                          Placeholder="Select Renewal Date" Format="dd-MM-yyyy"
-                                          FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+                                          Placeholder="Select Renewal Date" Format="dd-MM-yyyy" FloatLabelType="FloatLabelType.Never"
+                                          CssClass="custom-textbox" />
                         </div>
 
                         <!-- Document Type -->
@@ -68,7 +75,8 @@ else
                                             DataSource="@_documentTypes" Placeholder="Select document type"
                                             FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox">
                                 <AutoCompleteFieldSettings Value="Name" />
-                                <AutoCompleteEvents TItem="DocumentTypeModel" TValue="DocumentTypeModel" ValueChange="OnDocumentTypeChanged" />
+                                <AutoCompleteEvents TItem="DocumentTypeModel" TValue="DocumentTypeModel"
+                                                    ValueChange="OnDocumentTypeChanged" />
                             </SfAutoComplete>
                         </div>
 
@@ -79,17 +87,20 @@ else
                             </label>
                             <SfAutoComplete TValue="VehicleModel" TItem="VehicleModel" DataSource="@_vehicles"
                                             Value="@(_vehicles.FirstOrDefault(v => v.Id == _document.VehicleId))"
-                                            Placeholder="Select Vehicle" FloatLabelType="FloatLabelType.Never"
-                                            AllowFiltering="true" FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-                                            CssClass="custom-autocomplete">
-                                <AutoCompleteEvents TItem="VehicleModel" TValue="VehicleModel" ValueChange="OnVehicleChanged" />
+                                            Placeholder="Select Vehicle" FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
+                                            FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
+                                <AutoCompleteEvents TItem="VehicleModel" TValue="VehicleModel"
+                                                    ValueChange="OnVehicleChanged" />
                                 <AutoCompleteFieldSettings Value="Code" />
                                 <AutoCompleteTemplates TItem="VehicleModel">
                                     <ItemTemplate>
                                         @{
                                             var vehicle = context as VehicleModel;
                                         }
-                                        <span>@vehicle.Code @(!string.IsNullOrEmpty(vehicle.ShortCode) ? $"({vehicle.ShortCode})" : "")</span>
+                                        <span>
+                                            @vehicle.Code @(!string.IsNullOrEmpty(vehicle.ShortCode) ?
+                                            $"({vehicle.ShortCode})" : "")
+                                        </span>
                                     </ItemTemplate>
                                 </AutoCompleteTemplates>
                             </SfAutoComplete>
@@ -99,16 +110,16 @@ else
                         <div class="form-field">
                             <label class="field-label">Current Hour</label>
                             <SfNumericTextBox TValue="decimal?" @bind-Value="_document.CurrentHour"
-                                              Placeholder="Enter current hour" Format="N2" Min="0"
-                                              ShowSpinButton="false" FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric" />
+                                              Placeholder="Enter current hour" Format="N2" Min="0" ShowSpinButton="false"
+                                              FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric" />
                         </div>
 
                         <!-- Current KM -->
                         <div class="form-field">
                             <label class="field-label">Current KM</label>
                             <SfNumericTextBox TValue="decimal?" @bind-Value="_document.CurrentKM"
-                                              Placeholder="Enter current KM" Format="N2" Min="0"
-                                              ShowSpinButton="false" FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric" />
+                                              Placeholder="Enter current KM" Format="N2" Min="0" ShowSpinButton="false"
+                                              FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric" />
                         </div>
 
                         <!-- Rate -->
@@ -116,9 +127,9 @@ else
                             <label class="field-label">
                                 Rate <span class="required">*</span>
                             </label>
-                            <SfNumericTextBox TValue="decimal" @bind-Value="_document.Rate"
-                                              Placeholder="Enter rate" Format="N2" Min="0"
-                                              ShowSpinButton="false" FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric" />
+                            <SfNumericTextBox TValue="decimal" @bind-Value="_document.Rate" Placeholder="Enter rate"
+                                              Format="N2" Min="0" ShowSpinButton="false" FloatLabelType="FloatLabelType.Never"
+                                              CssClass="custom-numeric" />
                         </div>
 
                         <!-- Renewal Date -->
@@ -134,8 +145,8 @@ else
                         <!-- Remarks -->
                         <div class="form-field form-field-span-3">
                             <label class="field-label">Remarks</label>
-                            <SfTextBox @bind-Value="_document.Remarks" Placeholder="Enter remarks (optional)" Multiline="true"
-                                       FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
+                            <SfTextBox @bind-Value="_document.Remarks" Placeholder="Enter remarks (optional)"
+                                       Multiline="true" FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                         </div>
                     </div>
                 </div>
@@ -145,24 +156,28 @@ else
             <div class="section-card">
                 <div class="section-header">
                     <div class="section-title-wrapper">
-                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round">
                             <path d="M9 11l3 3L22 4" />
                             <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                         </svg>
                         <h2 class="section-title">Documents List</h2>
                     </div>
                     <div class="header-actions">
-                        <ToggleDeletedButton Disabled="@_isProcessing" ShowDeleted="@_showDeleted" OnToggle="ToggleDeleted" />
+                        <ToggleDeletedButton Disabled="@_isProcessing" ShowDeleted="@_showDeleted"
+                                             OnToggle="ToggleDeleted" />
                     </div>
                 </div>
                 <div class="section-body grid-body">
-                    <SfGrid @ref="_sfGrid" DataSource="@_documents" AllowPaging="true" AllowSorting="true" AllowFiltering="true"
-                            AllowResizing="true" CssClass="professional-grid" Toolbar="@(new List<string>() { "Search" })">
+                    <SfGrid @ref="_sfGrid" DataSource="@_documents" AllowPaging="true" AllowSorting="true"
+                            AllowFiltering="true" AllowResizing="true" CssClass="professional-grid"
+                            Toolbar="@(new List<string>() { "Search" })">
                         <GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
                         <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
                         <GridColumns>
-                            <GridColumn HeaderText="Actions" Width="120" TextAlign="TextAlign.Center" AllowFiltering="false">
+                            <GridColumn HeaderText="Actions" Width="120" TextAlign="TextAlign.Center"
+                                        AllowFiltering="false">
                                 <Template>
                                     @{
                                         var item = (context as DocumentOverviewModel);
@@ -170,45 +185,69 @@ else
                                         <div class="grid-actions">
                                             @if (item.Status)
                                             {
-                                                <IconButton Icon="IconType.Edit" Variant="ButtonVariant.Edit" Size="ButtonSize.Grid" Title="Edit (Insert)" OnClick="@(() => OnEditDocument(item))" />
-                                                <IconButton Icon="IconType.Download" Variant="ButtonVariant.Default" Size="ButtonSize.Grid" Title="Download Original" Disabled="@(string.IsNullOrEmpty(item.DocumentUrl) || _isProcessing)" OnClick="@(() => DownloadOriginalInvoice(item.DocumentUrl))" />
-                                                <IconButton Icon="IconType.Delete" Variant="ButtonVariant.Delete" Size="ButtonSize.Grid" Title="Delete (Delete)" OnClick="@(() => ShowDeleteConfirmation(item.Id, item.TransactionNo))" />
+                                                <IconButton Icon="IconType.Edit" Variant="ButtonVariant.Edit" Size="ButtonSize.Grid"
+                                                            Title="Edit (Insert)" OnClick="@(() => OnEditDocument(item))" />
+                                                <IconButton Icon="IconType.Download" Variant="ButtonVariant.Default"
+                                                            Size="ButtonSize.Grid" Title="Download Original"
+                                                            Disabled="@(string.IsNullOrEmpty(item.DocumentUrl) || _isProcessing)"
+                                                            OnClick="@(() => DownloadOriginalInvoice(item.DocumentUrl))" />
+                                                <IconButton Icon="IconType.Delete" Variant="ButtonVariant.Delete"
+                                                            Size="ButtonSize.Grid" Title="Delete (Delete)"
+                                                            OnClick="@(() => ShowDeleteConfirmation(item.Id, item.TransactionNo))" />
                                             }
                                             else
                                             {
-                                                <IconButton Icon="IconType.Recover" Variant="ButtonVariant.Recover" Size="ButtonSize.Grid" Title="Recover (Delete)" OnClick="@(() => ShowRecoverConfirmation(item.Id, item.TransactionNo))" />
+                                                <IconButton Icon="IconType.Recover" Variant="ButtonVariant.Recover"
+                                                            Size="ButtonSize.Grid" Title="Recover (Delete)"
+                                                            OnClick="@(() => ShowRecoverConfirmation(item.Id, item.TransactionNo))" />
                                             }
                                         </div>
                                     }
                                 </Template>
                             </GridColumn>
-                            <GridColumn Field="@nameof(DocumentOverviewModel.Id)" HeaderText="ID" Width="80" TextAlign="TextAlign.Center" />
-                            <GridColumn Field="@nameof(DocumentOverviewModel.TransactionNo)" HeaderText="Document No" Width="200" />
-                            <GridColumn Field="@nameof(DocumentOverviewModel.TransactionDateTime)" HeaderText="Renewal Date" Width="150" Format="dd-MMM-yyyy" TextAlign="TextAlign.Center" />
-                            <GridColumn Field="@nameof(DocumentOverviewModel.FinancialYear)" HeaderText="Financial Year" Width="180" TextAlign="TextAlign.Center" />
+                            <GridColumn Field="@nameof(DocumentOverviewModel.Id)" HeaderText="ID" Width="80"
+                                        TextAlign="TextAlign.Center" />
+                            <GridColumn Field="@nameof(DocumentOverviewModel.TransactionNo)" HeaderText="Document No"
+                                        Width="200" />
+                            <GridColumn Field="@nameof(DocumentOverviewModel.TransactionDateTime)" HeaderText="Renewal Date"
+                                        Width="150" Format="dd-MMM-yyyy" TextAlign="TextAlign.Center" />
+                            <GridColumn Field="@nameof(DocumentOverviewModel.FinancialYear)" HeaderText="Financial Year"
+                                        Width="180" TextAlign="TextAlign.Center" />
                             <GridColumn Field="@nameof(DocumentOverviewModel.DocumentType)" HeaderText="Type" Width="150" />
                             <GridColumn Field="@nameof(DocumentOverviewModel.Vehicle)" HeaderText="Vehicle" Width="150" />
-                            <GridColumn Field="@nameof(DocumentOverviewModel.CurrentHour)" HeaderText="Hour" Width="120" Format="N2" TextAlign="TextAlign.Right" />
-                            <GridColumn Field="@nameof(DocumentOverviewModel.CurrentKM)" HeaderText="KM" Width="120" Format="N2" TextAlign="TextAlign.Right" />
-                            <GridColumn Field="@nameof(DocumentOverviewModel.Rate)" HeaderText="Rate" Width="100" Format="N2" TextAlign="TextAlign.Right" />
-                            <GridColumn Field="@nameof(DocumentOverviewModel.RenewalDate)" HeaderText="Next Renewal Date" Width="150" Format="dd-MMM-yyyy" TextAlign="TextAlign.Center" />
-                            <GridColumn Field="@nameof(DocumentOverviewModel.Status)" HeaderText="Status" Width="100" TextAlign="TextAlign.Center">
+                            <GridColumn Field="@nameof(DocumentOverviewModel.CurrentHour)" HeaderText="Hour" Width="120"
+                                        Format="N2" TextAlign="TextAlign.Right" />
+                            <GridColumn Field="@nameof(DocumentOverviewModel.CurrentKM)" HeaderText="KM" Width="120"
+                                        Format="N2" TextAlign="TextAlign.Right" />
+                            <GridColumn Field="@nameof(DocumentOverviewModel.Rate)" HeaderText="Rate" Width="100"
+                                        Format="N2" TextAlign="TextAlign.Right" />
+                            <GridColumn Field="@nameof(DocumentOverviewModel.RenewalDate)" HeaderText="Next Renewal Date"
+                                        Width="150" Format="dd-MMM-yyyy" TextAlign="TextAlign.Center" />
+                            <GridColumn Field="@nameof(DocumentOverviewModel.Status)" HeaderText="Status" Width="100"
+                                        TextAlign="TextAlign.Center">
                                 <Template>
                                     @{
                                         var document = (context as DocumentOverviewModel);
-                                        <div class="grid-checkbox" style="@(document.Status ? "color: #10b981; background: #d1fae5;" : "color: #dc2626; background: #fee2e2;")">
+                                        <div class="grid-checkbox"
+                                             style="@(document.Status ? "color: #10b981; background: #d1fae5;" : "color: #dc2626; background: #fee2e2;")">
                                             @(document.Status ? "✓" : "✗")
                                         </div>
                                     }
                                 </Template>
                             </GridColumn>
                             <GridColumn Field="@nameof(DocumentOverviewModel.Remarks)" HeaderText="Remarks" Width="200" />
-                            <GridColumn Field="@nameof(DocumentOverviewModel.CreatedByName)" HeaderText="Created By" Width="150" />
-                            <GridColumn Field="@nameof(DocumentOverviewModel.CreatedAt)" HeaderText="Created At" Width="160" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime" />
-                            <GridColumn Field="@nameof(DocumentOverviewModel.CreatedFromPlatform)" HeaderText="Created Platform" Width="200" />
-                            <GridColumn Field="@nameof(DocumentOverviewModel.LastModifiedByUserName)" HeaderText="Modified By" Width="150" />
-                            <GridColumn Field="@nameof(DocumentOverviewModel.LastModifiedAt)" HeaderText="Modified At" Width="160" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime" />
-                            <GridColumn Field="@nameof(DocumentOverviewModel.LastModifiedFromPlatform)" HeaderText="Modified Platform" Width="200" />
+                            <GridColumn Field="@nameof(DocumentOverviewModel.CreatedByName)" HeaderText="Created By"
+                                        Width="150" />
+                            <GridColumn Field="@nameof(DocumentOverviewModel.CreatedAt)" HeaderText="Created At" Width="160"
+                                        Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime" />
+                            <GridColumn Field="@nameof(DocumentOverviewModel.CreatedFromPlatform)"
+                                        HeaderText="Created Platform" Width="200" />
+                            <GridColumn Field="@nameof(DocumentOverviewModel.LastModifiedByUserName)"
+                                        HeaderText="Modified By" Width="150" />
+                            <GridColumn Field="@nameof(DocumentOverviewModel.LastModifiedAt)" HeaderText="Modified At"
+                                        Width="160" Format="dd/MM/yy hh:mm tt" Type="ColumnType.DateTime" />
+                            <GridColumn Field="@nameof(DocumentOverviewModel.LastModifiedFromPlatform)"
+                                        HeaderText="Modified Platform" Width="200" />
                         </GridColumns>
                     </SfGrid>
                 </div>
@@ -220,158 +259,18 @@ else
     </div>
 }
 
-<DocumentUploadDialog @ref="_uploadDocumentDialog"
-                      Title="Upload Original Document"
+<DocumentUploadDialog @ref="_uploadDocumentDialog" Title="Upload Original Document"
                       InfoMessage="Upload the original document for record keeping and future reference."
-                      ExistingDocumentUrl="@_document.DocumentUrl"
-                      ShowInterpretButton="false"
-                      @bind-IsVisible="_isUploadDialogVisible"
-                      UploaderReference="_sfDocumentUploader"
-                      OnFileChange="OnUploaderFileChange"
-                      OnFileRemove="OnRemoveFile"
-                      OnDownloadClick="DownloadExistingDocument"
-                      OnRemoveClick="RemoveExistingDocument"
-                      OnClose="CloseUploadDialog" />
+                      ExistingDocumentUrl="@_document.DocumentUrl" ShowInterpretButton="false" @bind-IsVisible="_isUploadDialogVisible"
+                      UploaderReference="_sfDocumentUploader" OnFileChange="OnUploaderFileChange" OnFileRemove="OnRemoveFile"
+                      OnDownloadClick="DownloadExistingDocument" OnRemoveClick="RemoveExistingDocument" OnClose="CloseUploadDialog" />
 
-<DeleteConfirmationDialog @ref="_deleteConfirmationDialog"
-                          EntityName="Document"
-                          IdentifierLabel="Document Name"
-                          IdentifierValue="@_deleteDocumentName"
-                          IsPermanentDelete="false"
-                          Disabled="@_isProcessing"
-                          OnConfirm="ConfirmDelete"
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Document" IdentifierLabel="Document Name"
+                          IdentifierValue="@_deleteDocumentName" IsPermanentDelete="false" Disabled="@_isProcessing" OnConfirm="ConfirmDelete"
                           OnCancel="CancelDelete" />
 
-<RecoverConfirmationDialog @ref="_recoverConfirmationDialog"
-                           EntityName="Document"
-                           IdentifierLabel="Document Name"
-                           IdentifierValue="@_recoverDocumentName"
-                           Disabled="@_isProcessing"
-                           OnConfirm="ConfirmRecover"
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Document" IdentifierLabel="Document Name"
+                           IdentifierValue="@_recoverDocumentName" Disabled="@_isProcessing" OnConfirm="ConfirmRecover"
                            OnCancel="CancelRecover" />
 
-<!-- Toast Notification -->
 <ToastNotification @ref="_toastNotification" />
-
-<style>
-    * {
-        box-sizing: border-box;
-    }
-
-    /* Section Card */
-    .section-card {
-        background: #ffffff;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        margin-bottom: 24px;
-        overflow: hidden;
-    }
-
-    .section-header {
-        padding: 20px 24px;
-        border-bottom: 2px solid #e2e8f0;
-        background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .section-title-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .header-actions {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-    }
-
-    .section-icon {
-        color: #3b82f6;
-        flex-shrink: 0;
-    }
-
-    .section-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: #0f172a;
-        margin: 0;
-        letter-spacing: -0.3px;
-    }
-
-    .section-body {
-        padding: 24px;
-    }
-
-    /* Form Grid */
-    .form-grid-triple {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-        align-items: start;
-    }
-
-    .form-field {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .form-field-span-2 {
-        grid-column: span 2;
-    }
-
-    .form-field-span-3 {
-        grid-column: span 3;
-    }
-
-    .field-label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #475569;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-        margin-bottom: 2px;
-    }
-
-    .required {
-        color: #dc2626;
-        margin-left: 2px;
-    }
-
-    /* Grid Body */
-    .grid-body {
-        padding: 0;
-    }
-
-    .professional-grid {
-        border: none;
-    }
-
-    .grid-checkbox {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 24px;
-        height: 24px;
-        border-radius: 4px;
-        font-weight: 700;
-        font-size: 14px;
-    }
-
-    /* Responsive Design */
-    @@media (max-width: 1024px) {
-        .form-grid-triple {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @@media (max-width: 768px) {
-        .form-grid-triple {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>

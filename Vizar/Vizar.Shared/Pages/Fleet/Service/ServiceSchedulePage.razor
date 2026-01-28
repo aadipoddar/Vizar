@@ -12,140 +12,163 @@
 else
 {
     <div style="display: flex; flex-direction: column; min-height: 100vh;">
-        <Header Title="Service Schedule Management" Subtitle="Manage service schedules and intervals" ShowHome="true" ShowBack="true" ShowLogout="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
+        <Header Title="Service Schedule Management" Subtitle="Manage service schedules and intervals" ShowHome="true"
+                ShowBack="true" ShowLogout="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack"
+                OnLogoutClick="Logout">
             <RightContent>
-                <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Title="Export to Excel (Ctrl + E)" Disabled="_isProcessing" OnClick="ExportExcel" />
-                <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Title="Export to PDF (Ctrl + P)" Disabled="_isProcessing" OnClick="ExportPdf" />
-                <IconButton Icon="IconType.Save" Variant="ButtonVariant.Save" Title="Save Service Schedule (Ctrl + S)" Disabled="_isProcessing" OnClick="SaveServiceSchedule" />
-                <IconButton Icon="IconType.New" Title="New Service Schedule (Ctrl + N)" Disabled="_isProcessing" OnClick="ResetPage" />
+                <IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Title="Export to Excel (Ctrl + E)"
+                            Disabled="_isProcessing" OnClick="ExportExcel" />
+                <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Title="Export to PDF (Ctrl + P)"
+                            Disabled="_isProcessing" OnClick="ExportPdf" />
+                <IconButton Icon="IconType.Save" Variant="ButtonVariant.Save" Title="Save Service Schedule (Ctrl + S)"
+                            Disabled="_isProcessing" OnClick="SaveServiceSchedule" />
+                <IconButton Icon="IconType.New" Title="New Service Schedule (Ctrl + N)" Disabled="_isProcessing"
+                            OnClick="ResetPage" />
             </RightContent>
         </Header>
 
         <!-- Main Content Container -->
         <div class="page-container">
 
-        <!-- Service Schedule Entry Section -->
-        <div class="section-card">
-            <div class="section-header">
-                <div class="section-title-wrapper">
-                    <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" />
-                    </svg>
-                    <h2 class="section-title">Service Schedule Details</h2>
-                </div>
-            </div>
-            <div class="section-body">
-                <div class="form-grid-triple">
-                    <!-- Service Type -->
-                    <div class="form-field">
-                        <label class="field-label">
-                            Service Type <span class="required">*</span>
-                        </label>
-                        <SfDropDownList TValue="int" TItem="ServiceTypeModel" @bind-Value="_serviceSchedule.ServiceTypeId"
-                                        DataSource="@_serviceTypes" Placeholder="Select service type"
-                                        FloatLabelType="FloatLabelType.Never" CssClass="custom-dropdown">
-                            <DropDownListFieldSettings Value="Id" Text="Name" />
-                        </SfDropDownList>
-                    </div>
-
-                    <!-- Vehicle Type -->
-                    <div class="form-field">
-                        <label class="field-label">
-                            Vehicle Type <span class="required">*</span>
-                        </label>
-                        <SfDropDownList TValue="int" TItem="VehicleTypeModel" @bind-Value="_serviceSchedule.VehicleTypeId"
-                                        DataSource="@_vehicleTypes" Placeholder="Select vehicle type"
-                                        FloatLabelType="FloatLabelType.Never" CssClass="custom-dropdown">
-                            <DropDownListFieldSettings Value="Id" Text="Name" />
-                        </SfDropDownList>
-                    </div>
-
-                    <!-- Interval Days -->
-                    <div class="form-field">
-                        <label class="field-label">
-                            Interval Days <span class="required">*</span>
-                        </label>
-                        <SfNumericTextBox @bind-Value="_serviceSchedule.IntervalDays" Placeholder="Enter interval days"
-                                          FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox"
-                                          Min="1" Format="N0" ShowSpinButton="true" />
+            <!-- Service Schedule Entry Section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5" />
+                        </svg>
+                        <h2 class="section-title">Service Schedule Details</h2>
                     </div>
                 </div>
-            </div>
-        </div>
+                <div class="section-body">
+                    <div class="form-grid-triple">
+                        <!-- Service Type -->
+                        <div class="form-field">
+                            <label class="field-label">
+                                Service Type <span class="required">*</span>
+                            </label>
+                            <SfDropDownList TValue="int" TItem="ServiceTypeModel"
+                                            @bind-Value="_serviceSchedule.ServiceTypeId" DataSource="@_serviceTypes"
+                                            Placeholder="Select service type" FloatLabelType="FloatLabelType.Never"
+                                            CssClass="custom-dropdown">
+                                <DropDownListFieldSettings Value="Id" Text="Name" />
+                            </SfDropDownList>
+                        </div>
 
-        <!-- Service Schedules List Section -->
-        <div class="section-card">
-            <div class="section-header">
-                <div class="section-title-wrapper">
-                    <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 11l3 3L22 4" />
-                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-                    </svg>
-                    <h2 class="section-title">Service Schedules List</h2>
-                </div>
-                <div class="header-actions">
-                    <ToggleDeletedButton Disabled="@_isProcessing" ShowDeleted="@_showDeleted" OnToggle="ToggleDeleted" />
-                </div>
-            </div>
-            <div class="section-body grid-body">
-                <SfGrid @ref="_sfGrid" DataSource="@_serviceSchedules" AllowPaging="true" AllowSorting="true" AllowFiltering="true"
-                        AllowResizing="true" CssClass="professional-grid" Toolbar="@(new List<string>() { "Search" })">
-                    <GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
-                    <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
-                    <GridColumns>
-                        <GridColumn HeaderText="Actions" Width="120" TextAlign="TextAlign.Center" AllowFiltering="false">
-                            <Template>
-                                @{
-                                    var serviceSchedule = (context as ServiceScheduleModel);
+                        <!-- Vehicle Type -->
+                        <div class="form-field">
+                            <label class="field-label">
+                                Vehicle Type <span class="required">*</span>
+                            </label>
+                            <SfDropDownList TValue="int" TItem="VehicleTypeModel"
+                                            @bind-Value="_serviceSchedule.VehicleTypeId" DataSource="@_vehicleTypes"
+                                            Placeholder="Select vehicle type" FloatLabelType="FloatLabelType.Never"
+                                            CssClass="custom-dropdown">
+                                <DropDownListFieldSettings Value="Id" Text="Name" />
+                            </SfDropDownList>
+                        </div>
 
-                                    <div class="grid-actions">
-                                        @if (serviceSchedule.Status)
-                                        {
-                                            <IconButton Icon="IconType.Edit" Variant="ButtonVariant.Edit" Size="ButtonSize.Grid" Title="Edit (Insert)" OnClick="@(() => OnEditServiceSchedule(serviceSchedule))" />
-                                            <IconButton Icon="IconType.Delete" Variant="ButtonVariant.Delete" Size="ButtonSize.Grid" Title="Delete (Delete)" OnClick="@(() => ShowDeleteConfirmation(serviceSchedule.Id, GetServiceTypeName(serviceSchedule.ServiceTypeId), GetVehicleTypeName(serviceSchedule.VehicleTypeId)))" />
-                                        }
-                                        else
-                                        {
-                                            <IconButton Icon="IconType.Recover" Variant="ButtonVariant.Recover" Size="ButtonSize.Grid" Title="Recover (Delete)" OnClick="@(() => ShowRecoverConfirmation(serviceSchedule.Id, GetServiceTypeName(serviceSchedule.ServiceTypeId), GetVehicleTypeName(serviceSchedule.VehicleTypeId)))" />
-                                        }
-                                    </div>
-                                }
-                            </Template>
-                        </GridColumn>
-                        <GridColumn Field="@nameof(ServiceScheduleModel.Id)" HeaderText="ID" Width="80" TextAlign="TextAlign.Center" />
-                        <GridColumn HeaderText="Service Type" Width="250">
-                            <Template>
-                                @{
-                                    var serviceSchedule = (context as ServiceScheduleModel);
-                                    <span>@GetServiceTypeName(serviceSchedule.ServiceTypeId)</span>
-                                }
-                            </Template>
-                        </GridColumn>
-                        <GridColumn HeaderText="Vehicle Type" Width="250">
-                            <Template>
-                                @{
-                                    var serviceSchedule = (context as ServiceScheduleModel);
-                                    <span>@GetVehicleTypeName(serviceSchedule.VehicleTypeId)</span>
-                                }
-                            </Template>
-                        </GridColumn>
-                        <GridColumn Field="@nameof(ServiceScheduleModel.IntervalDays)" HeaderText="Interval Days" Width="150" TextAlign="TextAlign.Center" />
-                        <GridColumn Field="@nameof(ServiceScheduleModel.Status)" HeaderText="Status" Width="100" TextAlign="TextAlign.Center">
-                            <Template>
-                                @{
-                                    var serviceSchedule = (context as ServiceScheduleModel);
-                                    <div class="grid-checkbox" style="@(serviceSchedule.Status ? "color: #10b981; background: #d1fae5;" : "color: #dc2626; background: #fee2e2;")">
-                                        @(serviceSchedule.Status ? "✓" : "✗")
-                                    </div>
-                                }
-                            </Template>
-                        </GridColumn>
-                    </GridColumns>
-                </SfGrid>
+                        <!-- Interval Days -->
+                        <div class="form-field">
+                            <label class="field-label">
+                                Interval Days <span class="required">*</span>
+                            </label>
+                            <SfNumericTextBox @bind-Value="_serviceSchedule.IntervalDays" Placeholder="Enter interval days"
+                                              FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" Min="1" Format="N0"
+                                              ShowSpinButton="true" />
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+
+            <!-- Service Schedules List Section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <path d="M9 11l3 3L22 4" />
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                        </svg>
+                        <h2 class="section-title">Service Schedules List</h2>
+                    </div>
+                    <div class="header-actions">
+                        <ToggleDeletedButton Disabled="@_isProcessing" ShowDeleted="@_showDeleted"
+                                             OnToggle="ToggleDeleted" />
+                    </div>
+                </div>
+                <div class="section-body grid-body">
+                    <SfGrid @ref="_sfGrid" DataSource="@_serviceSchedules" AllowPaging="true" AllowSorting="true"
+                            AllowFiltering="true" AllowResizing="true" CssClass="professional-grid"
+                            Toolbar="@(new List<string>() { "Search" })">
+                        <GridPageSettings PageSize="20" PageSizes="@(new string[] { "20", "50", "100", "200", "All" })" />
+                        <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel" />
+                        <GridColumns>
+                            <GridColumn HeaderText="Actions" Width="120" TextAlign="TextAlign.Center"
+                                        AllowFiltering="false">
+                                <Template>
+                                    @{
+                                        var serviceSchedule = (context as ServiceScheduleModel);
+
+                                        <div class="grid-actions">
+                                            @if (serviceSchedule.Status)
+                                            {
+                                                <IconButton Icon="IconType.Edit" Variant="ButtonVariant.Edit" Size="ButtonSize.Grid"
+                                                            Title="Edit (Insert)"
+                                                            OnClick="@(() => OnEditServiceSchedule(serviceSchedule))" />
+                                                <IconButton Icon="IconType.Delete" Variant="ButtonVariant.Delete"
+                                                            Size="ButtonSize.Grid" Title="Delete (Delete)"
+                                                            OnClick="@(() => ShowDeleteConfirmation(serviceSchedule.Id, GetServiceTypeName(serviceSchedule.ServiceTypeId), GetVehicleTypeName(serviceSchedule.VehicleTypeId)))" />
+                                            }
+                                            else
+                                            {
+                                                <IconButton Icon="IconType.Recover" Variant="ButtonVariant.Recover"
+                                                            Size="ButtonSize.Grid" Title="Recover (Delete)"
+                                                            OnClick="@(() => ShowRecoverConfirmation(serviceSchedule.Id, GetServiceTypeName(serviceSchedule.ServiceTypeId), GetVehicleTypeName(serviceSchedule.VehicleTypeId)))" />
+                                            }
+                                        </div>
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field="@nameof(ServiceScheduleModel.Id)" HeaderText="ID" Width="80"
+                                        TextAlign="TextAlign.Center" />
+                            <GridColumn HeaderText="Service Type" Width="250">
+                                <Template>
+                                    @{
+                                        var serviceSchedule = (context as ServiceScheduleModel);
+                                        <span>@GetServiceTypeName(serviceSchedule.ServiceTypeId)</span>
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn HeaderText="Vehicle Type" Width="250">
+                                <Template>
+                                    @{
+                                        var serviceSchedule = (context as ServiceScheduleModel);
+                                        <span>@GetVehicleTypeName(serviceSchedule.VehicleTypeId)</span>
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field="@nameof(ServiceScheduleModel.IntervalDays)" HeaderText="Interval Days"
+                                        Width="150" TextAlign="TextAlign.Center" />
+                            <GridColumn Field="@nameof(ServiceScheduleModel.Status)" HeaderText="Status" Width="100"
+                                        TextAlign="TextAlign.Center">
+                                <Template>
+                                    @{
+                                        var serviceSchedule = (context as ServiceScheduleModel);
+                                        <div class="grid-checkbox"
+                                             style="@(serviceSchedule.Status ? "color: #10b981; background: #d1fae5;" : "color: #dc2626; background: #fee2e2;")">
+                                            @(serviceSchedule.Status ? "✓" : "✗")
+                                        </div>
+                                    }
+                                </Template>
+                            </GridColumn>
+                        </GridColumns>
+                    </SfGrid>
+                </div>
+            </div>
 
         </div>
 
@@ -153,145 +176,12 @@ else
     </div>
 }
 
-<DeleteConfirmationDialog @ref="_deleteConfirmationDialog"
-                          EntityName="Service Schedule"
-                          IdentifierLabel="Service Schedule"
-                          IdentifierValue="@_deleteServiceScheduleName"
-                          IsPermanentDelete="false"
-                          Disabled="@_isProcessing"
-                          OnConfirm="ConfirmDelete"
-                          OnCancel="CancelDelete" />
+<DeleteConfirmationDialog @ref="_deleteConfirmationDialog" EntityName="Service Schedule"
+                          IdentifierLabel="Service Schedule" IdentifierValue="@_deleteServiceScheduleName" IsPermanentDelete="false"
+                          Disabled="@_isProcessing" OnConfirm="ConfirmDelete" OnCancel="CancelDelete" />
 
-<RecoverConfirmationDialog @ref="_recoverConfirmationDialog"
-                           EntityName="Service Schedule"
-                           IdentifierLabel="Service Schedule"
-                           IdentifierValue="@_recoverServiceScheduleName"
-                           Disabled="@_isProcessing"
-                           OnConfirm="ConfirmRecover"
-                           OnCancel="CancelRecover" />
+<RecoverConfirmationDialog @ref="_recoverConfirmationDialog" EntityName="Service Schedule"
+                           IdentifierLabel="Service Schedule" IdentifierValue="@_recoverServiceScheduleName" Disabled="@_isProcessing"
+                           OnConfirm="ConfirmRecover" OnCancel="CancelRecover" />
 
-<!-- Toast Notification -->
 <ToastNotification @ref="_toastNotification" />
-
-<style>
-    * {
-        box-sizing: border-box;
-    }
-
-    /* Section Card */
-    .section-card {
-        background: #ffffff;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        margin-bottom: 24px;
-        overflow: hidden;
-    }
-
-    .section-header {
-        padding: 20px 24px;
-        border-bottom: 2px solid #e2e8f0;
-        background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .section-title-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .header-actions {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-    }
-
-    .section-icon {
-        color: #3b82f6;
-        flex-shrink: 0;
-    }
-
-    .section-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: #0f172a;
-        margin: 0;
-        letter-spacing: -0.3px;
-    }
-
-    .section-body {
-        padding: 24px;
-    }
-
-    /* Form Grid */
-    .form-grid-triple {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-        align-items: start;
-    }
-
-    .form-field {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .form-field-span-2 {
-        grid-column: span 2;
-    }
-
-    .form-field-span-3 {
-        grid-column: span 3;
-    }
-
-    .field-label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #475569;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-        margin-bottom: 2px;
-    }
-
-    .required {
-        color: #dc2626;
-        margin-left: 2px;
-    }
-
-    /* Grid Body */
-    .grid-body {
-        padding: 0;
-    }
-
-    .professional-grid {
-        border: none;
-    }
-
-    .grid-checkbox {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 24px;
-        height: 24px;
-        border-radius: 4px;
-        font-weight: 700;
-        font-size: 14px;
-    }
-
-    /* Responsive Design */
-    @@media (max-width: 1024px) {
-        .form-grid-triple {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @@media (max-width: 768px) {
-        .form-grid-triple {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>

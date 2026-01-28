@@ -399,10 +399,6 @@ else
 <ToastNotification @ref="_toastNotification" />
 
 <style>
-	* {
-		box-sizing: border-box;
-	}
-
 	/* Two Column Layout */
 	.two-column-layout {
 		display: flex;
@@ -418,45 +414,6 @@ else
 		flex: 0 0 calc(25% - 16px);
 	}
 
-	/* Section Card Styles */
-	.section-card {
-		background: #ffffff;
-		border-radius: 12px;
-		border: 1px solid #e2e8f0;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-		margin-bottom: 16px;
-		overflow: hidden;
-	}
-
-	.section-header {
-		padding: 16px 20px;
-		border-bottom: 1px solid #e2e8f0;
-		background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
-	}
-
-	.section-title-wrapper {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-	}
-
-	.section-icon {
-		color: #3b82f6;
-		flex-shrink: 0;
-	}
-
-	.section-title {
-		font-size: 16px;
-		font-weight: 600;
-		color: #0f172a;
-		margin: 0;
-		letter-spacing: -0.2px;
-	}
-
-	.section-body {
-		padding: 16px 20px;
-	}
-
 	/* Form Grid Layout */
 	.form-grid-single {
 		display: grid;
@@ -464,33 +421,8 @@ else
 		gap: 16px 20px;
 	}
 
-	.form-field {
-		display: flex;
-		flex-direction: column;
-		gap: 6px;
-	}
-
-	.form-field-full {
-		grid-column: 1 / -1;
-	}
-
 	.form-field-double {
 		grid-column: span 2;
-	}
-
-	.field-label {
-		font-size: 13px;
-		font-weight: 600;
-		color: #334155;
-		letter-spacing: 0.1px;
-		display: flex;
-		align-items: center;
-		gap: 4px;
-	}
-
-	.required {
-		color: #ef4444;
-		font-weight: 700;
 	}
 
 	/* Transaction Date and Financial Year Wrapper */
@@ -677,128 +609,5 @@ else
 	::deep .total-field-inline .e-input-group input {
 		font-weight: 700;
 		color: #1e40af;
-	}
-
-
-	/* Professional Grid Styles */
-	.e-grid .e-summaryrow .e-summarycell {
-		background-color: #deecf9;
-	}
-
-	.grid-body {
-		padding: 0 !important;
-	}
-
-	::deep .professional-grid {
-		border: none;
-	}
-
-	::deep .professional-grid .e-gridheader {
-		background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%);
-		border-bottom: 2px solid #e2e8f0;
-	}
-
-	::deep .professional-grid .e-headercell {
-		background: transparent;
-		color: #475569;
-		font-weight: 600;
-		font-size: 12px;
-		text-transform: uppercase;
-		letter-spacing: 0.3px;
-		border-right: 1px solid #e2e8f0;
-		padding: 12px 8px;
-	}
-
-	::deep .professional-grid .e-headercell:last-child {
-		border-right: none;
-	}
-
-	::deep .professional-grid .e-gridcontent {
-		background: #ffffff;
-	}
-
-	::deep .professional-grid .e-row {
-		transition: background-color 0.2s ease;
-	}
-
-	::deep .professional-grid .e-row:hover {
-		background-color: #f8fafc;
-	}
-
-	::deep .professional-grid .e-row.e-altrow {
-		background-color: #fafbfc;
-	}
-
-	::deep .professional-grid .e-row.e-altrow:hover {
-		background-color: #f8fafc;
-	}
-
-	::deep .professional-grid .e-rowcell {
-		border-right: 1px solid #f1f5f9;
-		border-bottom: 1px solid #f1f5f9;
-		padding: 10px 8px;
-		font-size: 13px;
-		color: #1e293b;
-	}
-
-	::deep .professional-grid .e-rowcell:last-child {
-		border-right: none;
-	}
-
-	.grid-total {
-		color: #1e40af;
-		font-weight: 700;
-		font-size: 14px;
-	}
-
-	/* Grid Footer Aggregates */
-	::deep .professional-grid .e-gridfooter {
-		background: linear-gradient(to bottom, #f1f5f9 0%, #e2e8f0 100%);
-		border-top: 2px solid #cbd5e1;
-	}
-
-	::deep .professional-grid .e-summarycell {
-		font-weight: 600;
-		color: #1e293b;
-		padding: 12px 8px;
-		border-right: 1px solid #cbd5e1;
-	}
-
-	::deep .professional-grid .e-summarycell:last-child {
-		border-right: none;
-	}
-
-	.aggregate-label {
-		text-align: left;
-		font-size: 13px;
-		color: #475569;
-	}
-
-	.aggregate-value {
-		text-align: right;
-		font-size: 13px;
-		color: #1e293b;
-	}
-
-	.aggregate-value.aggregate-total {
-		color: #1e40af;
-		font-size: 14px;
-	}
-
-	.aggregate-value.aggregate-total strong {
-		font-size: 15px;
-	}
-
-	.aggregate-label strong,
-	.aggregate-value strong {
-		font-weight: 700;
-	}
-
-	/* Empty Grid State */
-	::deep .professional-grid .e-emptyrow {
-		text-align: center;
-		padding: 48px 24px;
-		color: #94a3b8;
-		font-size: 14px;
 	}
 </style>

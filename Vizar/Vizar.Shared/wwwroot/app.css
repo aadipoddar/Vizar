@@ -195,3 +195,393 @@ h1:focus {
 	color: #64748b;
 	font-weight: 500;
 }
+
+/* ============================================
+   Section Card Styles
+   Common card container for page sections
+   ============================================ */
+.section-card {
+	background: #ffffff;
+	border-radius: 12px;
+	border: 1px solid #e2e8f0;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	margin-bottom: 16px;
+	overflow: hidden;
+}
+
+.section-header {
+	padding: 16px 20px;
+	border-bottom: 1px solid #e2e8f0;
+	background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+}
+
+.section-title-wrapper {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.section-icon {
+	color: #3b82f6;
+	flex-shrink: 0;
+}
+
+.section-title {
+	font-size: 16px;
+	font-weight: 600;
+	color: #0f172a;
+	margin: 0;
+	letter-spacing: -0.2px;
+}
+
+.section-subtitle {
+	font-size: 13px;
+	color: #64748b;
+	margin: 0;
+	padding-left: 34px;
+	font-weight: 400;
+}
+
+.section-body {
+	padding: 16px 20px;
+}
+
+/* ============================================
+   Dashboard Grid Layout
+   Flexbox layout for dashboard button cards
+   ============================================ */
+.dashboard-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 24px;
+	width: 100%;
+	margin-bottom: 32px;
+}
+
+.dashboard-grid:last-child {
+	margin-bottom: 0;
+}
+
+/* ============================================
+   Form Field Styles
+   Common form field layout and labels
+   ============================================ */
+.form-field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.form-field-full {
+	grid-column: 1 / -1;
+}
+
+.field-label {
+	font-size: 13px;
+	font-weight: 600;
+	color: #334155;
+	letter-spacing: 0.1px;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.required {
+	color: #ef4444;
+	font-weight: 700;
+}
+
+.form-field-span-2 {
+	grid-column: span 2;
+}
+
+.form-field-span-3 {
+	grid-column: span 3;
+}
+
+/* ============================================
+   Form Grid Layouts
+   Common grid layouts for form fields
+   ============================================ */
+.form-grid-triple {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 16px;
+	align-items: start;
+}
+
+.form-grid-quad {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 16px;
+	align-items: start;
+}
+
+.form-grid-five {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	gap: 16px;
+	align-items: start;
+}
+
+.form-field-span-4 {
+	grid-column: span 4;
+}
+
+.form-field-span-5 {
+	grid-column: span 5;
+}
+
+/* ============================================
+   Header Actions
+   Common container for section header buttons
+   ============================================ */
+.header-actions {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+}
+
+/* Section header with actions */
+.section-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+/* ============================================
+   Grid Body and Professional Grid Styles
+   Common styling for Syncfusion grids
+   ============================================ */
+.grid-body {
+	padding: 0 !important;
+}
+
+.professional-grid {
+	border: none;
+}
+
+.professional-grid .e-gridheader {
+	background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%);
+	border-bottom: 2px solid #e2e8f0;
+}
+
+.professional-grid .e-headercell {
+	background: transparent;
+	color: #475569;
+	font-weight: 600;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.3px;
+	border-right: 1px solid #e2e8f0;
+	padding: 12px 8px;
+}
+
+.professional-grid .e-headercell:last-child {
+	border-right: none;
+}
+
+.professional-grid .e-gridcontent {
+	background: #ffffff;
+}
+
+.professional-grid .e-row {
+	transition: background-color 0.2s ease;
+}
+
+.professional-grid .e-row:hover {
+	background-color: #f8fafc;
+}
+
+.professional-grid .e-row.e-altrow {
+	background-color: #fafbfc;
+}
+
+.professional-grid .e-row.e-altrow:hover {
+	background-color: #f8fafc;
+}
+
+.professional-grid .e-rowcell {
+	border-right: 1px solid #f1f5f9;
+	border-bottom: 1px solid #f1f5f9;
+	padding: 10px 8px;
+	font-size: 13px;
+	color: #1e293b;
+}
+
+.professional-grid .e-rowcell:last-child {
+	border-right: none;
+}
+
+/* Grid Footer Aggregates */
+.professional-grid .e-gridfooter {
+	background-color: #deecf9 !important;
+	border-top: 2px solid #cbd5e1;
+}
+
+.professional-grid .e-summarycell {
+	background-color: #deecf9 !important;
+	font-weight: 600;
+	color: #1e293b;
+	padding: 12px 8px;
+	border-right: 1px solid #cbd5e1;
+}
+
+.professional-grid .e-summarycell:last-child {
+	border-right: none;
+}
+
+/* Empty Grid State */
+.professional-grid .e-emptyrow {
+	text-align: center;
+	padding: 48px 24px;
+	color: #94a3b8;
+	font-size: 14px;
+}
+
+/* Grid Cell Value Styles */
+.grid-discount {
+	color: #dc2626;
+	font-weight: 600;
+}
+
+.grid-total {
+	color: #1e40af;
+	font-weight: 700;
+	font-size: 14px;
+}
+
+.grid-checkbox {
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	line-height: 20px;
+	text-align: center;
+	border-radius: 4px;
+	font-weight: 700;
+	font-size: 14px;
+}
+
+/* Aggregate Label and Value Styles */
+.aggregate-label {
+	text-align: left;
+	font-size: 13px;
+	color: #475569;
+}
+
+.aggregate-value {
+	text-align: right;
+	font-size: 13px;
+	color: #1e293b;
+}
+
+.aggregate-value.aggregate-discount {
+	color: #dc2626;
+}
+
+.aggregate-value.aggregate-total {
+	color: #1e40af;
+	font-size: 14px;
+}
+
+.aggregate-value.aggregate-total strong {
+	font-size: 15px;
+}
+
+.aggregate-label strong,
+.aggregate-value strong {
+	font-weight: 700;
+}
+
+/* ============================================
+   Syncfusion Grid Summary Row Styling
+   Light blue background for totals/aggregates
+   ============================================ */
+.e-grid .e-gridfooter,
+.e-grid .e-summaryrow,
+.e-grid .e-summaryrow .e-summarycell,
+.professional-grid .e-gridfooter,
+.professional-grid .e-summaryrow,
+.professional-grid .e-summarycell {
+	background-color: #deecf9 !important;
+}
+
+/* ============================================
+   Grid Cell Value Colors (Debit/Credit)
+   ============================================ */
+.grid-debit {
+	color: #dc2626;
+	font-weight: 600;
+}
+
+.grid-credit {
+	color: #059669;
+	font-weight: 600;
+}
+
+.aggregate-value.aggregate-debit {
+	color: #dc2626;
+}
+
+.aggregate-value.aggregate-credit {
+	color: #059669;
+}
+
+/* ============================================
+   Filters Container and Grid Layout
+   ============================================ */
+.filters-container {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.filters-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 250px));
+	gap: 12px;
+	align-items: end;
+}
+
+/* ============================================
+   Dual Grid Container (for side-by-side grids)
+   ============================================ */
+.dual-grid-container {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 24px;
+	padding: 24px;
+}
+
+.grid-section {
+	background: #ffffff;
+	border-radius: 8px;
+	border: 1px solid #e2e8f0;
+	overflow: hidden;
+}
+
+.grid-section-header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 16px;
+	background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%);
+	border-bottom: 2px solid #e2e8f0;
+}
+
+.grid-section-icon {
+	flex-shrink: 0;
+}
+
+.grid-section-title {
+	font-size: 15px;
+	font-weight: 600;
+	color: #0f172a;
+	margin: 0;
+}
+
+.grid-section-count {
+	font-size: 12px;
+	color: #64748b;
+	margin-left: auto;
+}

@@ -11,7 +11,13 @@ public partial class ToggleDetailsButton
 	public bool ShowAllColumns { get; set; } = false;
 
 	[Parameter]
+	public string? TextWhenExpanded { get; set; }
+
+	[Parameter]
+	public string? TextWhenCollapsed { get; set; }
+
+	[Parameter]
 	public EventCallback OnToggle { get; set; }
 
-    private async Task HandleClick() => await OnToggle.InvokeAsync();
+	private async Task HandleClick() => await OnToggle.InvokeAsync();
 }

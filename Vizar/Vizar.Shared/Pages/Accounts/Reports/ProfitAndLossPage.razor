@@ -13,15 +13,23 @@
 else
 {
 	<div style="display: flex; flex-direction: column; min-height: 100vh;">
-		<Header Title="Profit & Loss" Subtitle="View profit & loss for specified period" ShowHome="true" ShowBack="true" ShowLogout="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
+		<Header Title="Profit & Loss" Subtitle="View profit & loss for specified period" ShowHome="true" ShowBack="true"
+				ShowLogout="true" OnHomeClick="NavigateToDashboard" OnBackClick="NavigateBack" OnLogoutClick="Logout">
 			<RightContent>
-				<IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Title="Export to Excel (Ctrl + E)" Disabled="_isProcessing" OnClick="ExportExcel" />
-				<IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Title="Export to PDF (Ctrl + P)" Disabled="_isProcessing" OnClick="ExportPdf" />
-				<IconButton Icon="IconType.Refresh" Title="Refresh Data (Ctrl + R)" Disabled="_isProcessing" OnClick="LoadProfitAndLoss" />
-				<IconButton Icon="IconType.Report" Title="Ledger Report (Ctrl + I)" Disabled="_isProcessing" OnClick="NavigateToLedgerReport" />
-				<IconButton Icon="IconType.TrialBalance" Title="Trial Balance (Ctrl + T)" Disabled="_isProcessing" OnClick="NavigateToTrialBalance" />
-				<IconButton Icon="IconType.BalanceSheet" Title="Balance Sheet (Alt+ B)" Disabled="_isProcessing" OnClick="NavigateToBalanceSheet" />
-				<IconButton Icon="IconType.New" Title="New Transaction (Ctrl + N)" Disabled="_isProcessing" OnClick="NavigateToTransactionPage" />
+				<IconButton Icon="IconType.Excel" Variant="ButtonVariant.Excel" Title="Export to Excel (Ctrl + E)"
+							Disabled="_isProcessing" OnClick="ExportExcel" />
+				<IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Title="Export to PDF (Ctrl + P)"
+							Disabled="_isProcessing" OnClick="ExportPdf" />
+				<IconButton Icon="IconType.Refresh" Title="Refresh Data (Ctrl + R)" Disabled="_isProcessing"
+							OnClick="LoadProfitAndLoss" />
+				<IconButton Icon="IconType.Report" Title="Ledger Report (Ctrl + I)" Disabled="_isProcessing"
+							OnClick="NavigateToLedgerReport" />
+				<IconButton Icon="IconType.TrialBalance" Title="Trial Balance (Ctrl + T)" Disabled="_isProcessing"
+							OnClick="NavigateToTrialBalance" />
+				<IconButton Icon="IconType.BalanceSheet" Title="Balance Sheet (Alt+ B)" Disabled="_isProcessing"
+							OnClick="NavigateToBalanceSheet" />
+				<IconButton Icon="IconType.New" Title="New Transaction (Ctrl + N)" Disabled="_isProcessing"
+							OnClick="NavigateToTransactionPage" />
 			</RightContent>
 		</Header>
 
@@ -119,7 +127,8 @@ else
 								<GridAggregates>
 									<GridAggregate>
 										<GridAggregateColumns>
-											<GridAggregateColumn Field="@nameof(TrialBalanceModel.LedgerName)" Type="AggregateType.Count">
+											<GridAggregateColumn Field="@nameof(TrialBalanceModel.LedgerName)"
+																 Type="AggregateType.Count">
 												<FooterTemplate>
 													@{
 														var aggregate = (context as AggregateTemplateContext);
@@ -129,7 +138,8 @@ else
 													</div>
 												</FooterTemplate>
 											</GridAggregateColumn>
-											<GridAggregateColumn Field="@nameof(TrialBalanceModel.OpeningBalance)" Type="AggregateType.Sum" Format="N2">
+											<GridAggregateColumn Field="@nameof(TrialBalanceModel.OpeningBalance)"
+																 Type="AggregateType.Sum" Format="N2">
 												<FooterTemplate>
 													@{
 														var aggregate = (context as AggregateTemplateContext);
@@ -139,7 +149,8 @@ else
 													}
 												</FooterTemplate>
 											</GridAggregateColumn>
-											<GridAggregateColumn Field="@nameof(TrialBalanceModel.Credit)" Type="AggregateType.Sum" Format="N2">
+											<GridAggregateColumn Field="@nameof(TrialBalanceModel.Credit)"
+																 Type="AggregateType.Sum" Format="N2">
 												<FooterTemplate>
 													@{
 														var aggregate = (context as AggregateTemplateContext);
@@ -149,7 +160,8 @@ else
 													}
 												</FooterTemplate>
 											</GridAggregateColumn>
-											<GridAggregateColumn Field="@nameof(TrialBalanceModel.ClosingBalance)" Type="AggregateType.Sum" Format="N2">
+											<GridAggregateColumn Field="@nameof(TrialBalanceModel.ClosingBalance)"
+																 Type="AggregateType.Sum" Format="N2">
 												<FooterTemplate>
 													@{
 														var aggregate = (context as AggregateTemplateContext);
@@ -164,9 +176,13 @@ else
 								</GridAggregates>
 
 								<GridColumns>
-									<GridColumn Field="@nameof(TrialBalanceModel.LedgerName)" HeaderText="Ledger Name" Width="250" />
-									<GridColumn Field="@nameof(TrialBalanceModel.GroupName)" HeaderText="Group" Width="150" Visible="_showAllColumns" />
-									<GridColumn Field="@nameof(TrialBalanceModel.OpeningBalance)" HeaderText="Opening Balance" Width="140" TextAlign="TextAlign.Right" Visible="_showAllColumns">
+									<GridColumn Field="@nameof(TrialBalanceModel.LedgerName)" HeaderText="Ledger Name"
+												Width="250" />
+									<GridColumn Field="@nameof(TrialBalanceModel.GroupName)" HeaderText="Group" Width="150"
+												Visible="_showAllColumns" />
+									<GridColumn Field="@nameof(TrialBalanceModel.OpeningBalance)"
+												HeaderText="Opening Balance" Width="140" TextAlign="TextAlign.Right"
+												Visible="_showAllColumns">
 										<Template>
 											@{
 												var item = (context as TrialBalanceModel);
@@ -174,7 +190,8 @@ else
 											}
 										</Template>
 									</GridColumn>
-									<GridColumn Field="@nameof(TrialBalanceModel.Credit)" HeaderText="Period Credit" Width="140" TextAlign="TextAlign.Right" Visible="_showAllColumns">
+									<GridColumn Field="@nameof(TrialBalanceModel.Credit)" HeaderText="Period Credit"
+												Width="140" TextAlign="TextAlign.Right" Visible="_showAllColumns">
 										<Template>
 											@{
 												var item = (context as TrialBalanceModel);
@@ -182,7 +199,8 @@ else
 											}
 										</Template>
 									</GridColumn>
-									<GridColumn Field="@nameof(TrialBalanceModel.ClosingBalance)" HeaderText="Closing Balance" Width="140" TextAlign="TextAlign.Right">
+									<GridColumn Field="@nameof(TrialBalanceModel.ClosingBalance)"
+												HeaderText="Closing Balance" Width="140" TextAlign="TextAlign.Right">
 										<Template>
 											@{
 												var item = (context as TrialBalanceModel);
@@ -220,7 +238,8 @@ else
 								<GridAggregates>
 									<GridAggregate>
 										<GridAggregateColumns>
-											<GridAggregateColumn Field="@nameof(TrialBalanceModel.LedgerName)" Type="AggregateType.Count">
+											<GridAggregateColumn Field="@nameof(TrialBalanceModel.LedgerName)"
+																 Type="AggregateType.Count">
 												<FooterTemplate>
 													@{
 														var aggregate = (context as AggregateTemplateContext);
@@ -230,7 +249,8 @@ else
 													</div>
 												</FooterTemplate>
 											</GridAggregateColumn>
-											<GridAggregateColumn Field="@nameof(TrialBalanceModel.OpeningBalance)" Type="AggregateType.Sum" Format="N2">
+											<GridAggregateColumn Field="@nameof(TrialBalanceModel.OpeningBalance)"
+																 Type="AggregateType.Sum" Format="N2">
 												<FooterTemplate>
 													@{
 														var aggregate = (context as AggregateTemplateContext);
@@ -240,7 +260,8 @@ else
 													}
 												</FooterTemplate>
 											</GridAggregateColumn>
-											<GridAggregateColumn Field="@nameof(TrialBalanceModel.Debit)" Type="AggregateType.Sum" Format="N2">
+											<GridAggregateColumn Field="@nameof(TrialBalanceModel.Debit)"
+																 Type="AggregateType.Sum" Format="N2">
 												<FooterTemplate>
 													@{
 														var aggregate = (context as AggregateTemplateContext);
@@ -250,7 +271,8 @@ else
 													}
 												</FooterTemplate>
 											</GridAggregateColumn>
-											<GridAggregateColumn Field="@nameof(TrialBalanceModel.ClosingBalance)" Type="AggregateType.Sum" Format="N2">
+											<GridAggregateColumn Field="@nameof(TrialBalanceModel.ClosingBalance)"
+																 Type="AggregateType.Sum" Format="N2">
 												<FooterTemplate>
 													@{
 														var aggregate = (context as AggregateTemplateContext);
@@ -265,9 +287,13 @@ else
 								</GridAggregates>
 
 								<GridColumns>
-									<GridColumn Field="@nameof(TrialBalanceModel.LedgerName)" HeaderText="Ledger Name" Width="250" />
-									<GridColumn Field="@nameof(TrialBalanceModel.GroupName)" HeaderText="Group" Width="150" Visible="_showAllColumns" />
-									<GridColumn Field="@nameof(TrialBalanceModel.OpeningBalance)" HeaderText="Opening Balance" Width="140" TextAlign="TextAlign.Right" Visible="_showAllColumns">
+									<GridColumn Field="@nameof(TrialBalanceModel.LedgerName)" HeaderText="Ledger Name"
+												Width="250" />
+									<GridColumn Field="@nameof(TrialBalanceModel.GroupName)" HeaderText="Group" Width="150"
+												Visible="_showAllColumns" />
+									<GridColumn Field="@nameof(TrialBalanceModel.OpeningBalance)"
+												HeaderText="Opening Balance" Width="140" TextAlign="TextAlign.Right"
+												Visible="_showAllColumns">
 										<Template>
 											@{
 												var item = (context as TrialBalanceModel);
@@ -275,7 +301,8 @@ else
 											}
 										</Template>
 									</GridColumn>
-									<GridColumn Field="@nameof(TrialBalanceModel.Debit)" HeaderText="Period Debit" Width="140" TextAlign="TextAlign.Right" Visible="_showAllColumns">
+									<GridColumn Field="@nameof(TrialBalanceModel.Debit)" HeaderText="Period Debit"
+												Width="140" TextAlign="TextAlign.Right" Visible="_showAllColumns">
 										<Template>
 											@{
 												var item = (context as TrialBalanceModel);
@@ -283,7 +310,8 @@ else
 											}
 										</Template>
 									</GridColumn>
-									<GridColumn Field="@nameof(TrialBalanceModel.ClosingBalance)" HeaderText="Closing Balance" Width="140" TextAlign="TextAlign.Right">
+									<GridColumn Field="@nameof(TrialBalanceModel.ClosingBalance)"
+												HeaderText="Closing Balance" Width="140" TextAlign="TextAlign.Right">
 										<Template>
 											@{
 												var item = (context as TrialBalanceModel);
@@ -329,7 +357,10 @@ else
 							</div>
 							<div class="card-content">
 								<div class="card-label">Total Income</div>
-								<div class="card-value credit-amount">₹@_incomeTrialBalance.Sum(x => x.ClosingBalance).ToString("N2")</div>
+								<div class="card-value credit-amount">
+									₹@_incomeTrialBalance.Sum(x =>
+																										x.ClosingBalance).ToString("N2")
+								</div>
 								<div class="card-breakdown">
 									<span class="breakdown-item">@_incomeTrialBalance.Count ledgers</span>
 								</div>
@@ -348,7 +379,10 @@ else
 							</div>
 							<div class="card-content">
 								<div class="card-label">Total Expenses</div>
-								<div class="card-value debit-amount">₹@_expenseTrialBalance.Sum(x => x.ClosingBalance).ToString("N2")</div>
+								<div class="card-value debit-amount">
+									₹@_expenseTrialBalance.Sum(x =>
+																									x.ClosingBalance).ToString("N2")
+								</div>
 								<div class="card-breakdown">
 									<span class="breakdown-item">@_expenseTrialBalance.Count ledgers</span>
 								</div>
@@ -408,261 +442,13 @@ else
 <ToastNotification @ref="_toastNotification" />
 
 <style>
-	* {
-		box-sizing: border-box;
-	}
-
-	/* Section Card Styles */
-	.section-card {
-		background: #ffffff;
-		border-radius: 12px;
-		border: 1px solid #e2e8f0;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-		margin-bottom: 24px;
-		overflow: hidden;
-	}
-
-	.section-header {
-		padding: 20px 24px;
-		border-bottom: 1px solid #e2e8f0;
-		background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-
-	.section-title-wrapper {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-	}
-
-	.section-icon {
-		color: #3b82f6;
-		flex-shrink: 0;
-	}
-
-	.section-title {
-		font-size: 16px;
-		font-weight: 600;
-		color: #0f172a;
-		margin: 0;
-		letter-spacing: -0.2px;
-	}
-
-	/* Header Actions Container */
-	.header-actions {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-	}
-
-	.section-body {
-		padding: 24px;
-	}
-
-	.grid-body {
-		padding: 0 !important;
-	}
-
-	/* Filters Container and Grid Layout */
-	.filters-container {
-		display: flex;
-		flex-direction: column;
-		gap: 16px;
-	}
-
-	.filters-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(180px, 250px));
-		gap: 12px;
-		align-items: end;
-	}
-
-	.form-field {
-		display: flex;
-		flex-direction: column;
-		gap: 6px;
-		max-width: 250px;
-	}
-
-	.field-label {
-		font-size: 12px;
-		font-weight: 600;
-		color: #334155;
-		letter-spacing: 0.1px;
-	}
-
-	/* Professional Grid Styles */
-	.e-grid .e-summaryrow .e-summarycell {
-		background-color: #deecf9;
-	}
-
-	::deep .professional-grid {
-		border: none;
-	}
-
-		::deep .professional-grid .e-gridheader {
-			background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%);
-			border-bottom: 2px solid #e2e8f0;
-		}
-
-		::deep .professional-grid .e-headercell {
-			background: transparent;
-			color: #475569;
-			font-weight: 600;
-			font-size: 12px;
-			text-transform: uppercase;
-			letter-spacing: 0.3px;
-			border-right: 1px solid #e2e8f0;
-			padding: 12px 8px;
-		}
-
-			::deep .professional-grid .e-headercell:last-child {
-				border-right: none;
-			}
-
-		::deep .professional-grid .e-gridcontent {
-			background: #ffffff;
-		}
-
-		::deep .professional-grid .e-row {
-			transition: background-color 0.2s ease;
-		}
-
-			::deep .professional-grid .e-row:hover {
-				background-color: #f8fafc;
-			}
-
-			::deep .professional-grid .e-row.e-altrow {
-				background-color: #fafbfc;
-			}
-
-				::deep .professional-grid .e-row.e-altrow:hover {
-					background-color: #f8fafc;
-				}
-
-		::deep .professional-grid .e-rowcell {
-			border-right: 1px solid #f1f5f9;
-			border-bottom: 1px solid #f1f5f9;
-			padding: 10px 8px;
-			font-size: 13px;
-			color: #1e293b;
-		}
-
-			::deep .professional-grid .e-rowcell:last-child {
-				border-right: none;
-			}
-
-		/* Grid Pager Styling */
-		::deep .professional-grid .e-gridpager {
-			background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
-			border-top: 2px solid #e2e8f0;
-			padding: 12px 16px;
-		}
-
-		/* Empty Grid State */
-		::deep .professional-grid .e-emptyrow {
-			text-align: center;
-			padding: 48px 24px;
-			color: #94a3b8;
-			font-size: 14px;
-		}
-
-	/* Grid Cell Text Coloring */
-	.grid-debit {
-		color: #dc2626;
-		font-weight: 600;
-	}
-
-	.grid-credit {
-		color: #059669;
-		font-weight: 600;
-	}
-
-	.grid-total {
-		color: #1e40af;
-		font-weight: 700;
-		font-size: 14px;
-	}
-
-	/* Grid Footer Aggregates */
-	::deep .professional-grid .e-gridfooter {
-		background: linear-gradient(to bottom, #f1f5f9 0%, #e2e8f0 100%);
-		border-top: 2px solid #cbd5e1;
-	}
-
-	::deep .professional-grid .e-summarycell {
-		font-weight: 600;
-		color: #1e293b;
-		padding: 12px 8px;
-		border-right: 1px solid #cbd5e1;
-	}
-
-		::deep .professional-grid .e-summarycell:last-child {
-			border-right: none;
-		}
-
-	.aggregate-value.aggregate-debit {
-		color: #dc2626;
-	}
-
-	.aggregate-value.aggregate-credit {
-		color: #059669;
-	}
-
-	.aggregate-label {
-		color: #1e40af;
-		font-size: 14px;
-	}
-
-	/* Dual Grid Container */
-	.dual-grid-container {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 24px;
-		padding: 24px;
-	}
-
-	.grid-section {
-		background: #ffffff;
-		border-radius: 8px;
-		border: 1px solid #e2e8f0;
-		overflow: hidden;
-	}
-
-	.grid-section-header {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		padding: 12px 16px;
-		background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%);
-		border-bottom: 2px solid #e2e8f0;
-	}
-
-	.grid-section-icon {
-		flex-shrink: 0;
-	}
-
+	/* P&L Section Colors */
 	.income-section .grid-section-icon {
 		color: #059669;
 	}
 
 	.expense-section .grid-section-icon {
 		color: #dc2626;
-	}
-
-	.grid-section-title {
-		font-size: 15px;
-		font-weight: 600;
-		color: #0f172a;
-		margin: 0;
-	}
-
-	.grid-section-count {
-		font-size: 12px;
-		color: #64748b;
-		margin-left: auto;
 	}
 
 	/* Profit & Loss Summary Section */
@@ -688,21 +474,21 @@ else
 		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 	}
 
-		.balance-info-card:hover {
-			transform: translateY(-2px);
-			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-		}
+	.balance-info-card:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	}
 
-		.balance-info-card .card-icon {
-			width: 36px;
-			height: 36px;
-			border-radius: 7px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			flex-shrink: 0;
-			transition: all 0.2s ease;
-		}
+	.balance-info-card .card-icon {
+		width: 36px;
+		height: 36px;
+		border-radius: 7px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		transition: all 0.2s ease;
+	}
 
 	.income-card .card-icon {
 		background: linear-gradient(135deg, #059669 0%, #10b981 100%);
@@ -779,34 +565,5 @@ else
 	.breakdown-item {
 		display: inline-flex;
 		white-space: nowrap;
-	}
-
-	/* Responsive Design */
-	@@media (max-width: 1400px) {
-		.filters-grid {
-			grid-template-columns: repeat(2, 1fr);
-		}
-
-		.dual-grid-container {
-			grid-template-columns: 1fr;
-		}
-	}
-
-	@@media (max-width: 768px) {
-		.filters-grid {
-			grid-template-columns: 1fr;
-		}
-
-		.dual-grid-container {
-			padding: 16px;
-		}
-
-		.profit-loss-grid {
-			grid-template-columns: 1fr;
-		}
-
-		.balance-info-card .card-value {
-			font-size: 20px;
-		}
 	}
 </style>

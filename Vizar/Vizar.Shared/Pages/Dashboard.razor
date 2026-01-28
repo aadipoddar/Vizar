@@ -55,11 +55,8 @@ else if (_isUpdating)
 else
 {
     <div style="display: flex; flex-direction: column; min-height: 100vh;">
-        <Header Title="Main Dashboard"
-                Subtitle="Quick access to all modules and operations"
-                UserName="@_user?.Name"
-                ShowLogout="true"
-                OnLogoutClick="Logout" />
+        <Header Title="Main Dashboard" Subtitle="Quick access to all modules and operations" UserName="@_user?.Name"
+                ShowLogout="true" OnLogoutClick="Logout" />
 
         <!-- Main Content Container -->
         <div class="page-container">
@@ -71,9 +68,8 @@ else
                     <ButtonCard Title="Accounts" Description="Access accounting dashboard" Color="purple"
                                 OnClick="() => NavigationManager.NavigateTo(PageRouteNames.AccountsDashboard)">
                         <IconContent>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                 stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <line x1="12" y1="1" x2="12" y2="23" />
                                 <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                             </svg>
@@ -84,10 +80,10 @@ else
                     <ButtonCard Title="Inventory" Description="Access inventory dashboard" Color="orange"
                                 OnClick="() => NavigationManager.NavigateTo(PageRouteNames.InventoryDashboard)">
                         <IconContent>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                 stroke-linejoin="round">
-                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                                 <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
                                 <line x1="12" y1="22.08" x2="12" y2="12" />
                             </svg>
@@ -98,9 +94,8 @@ else
                     <ButtonCard Title="Fleet" Description="Access fleet dashboard" Color="blue"
                                 OnClick="() => NavigationManager.NavigateTo(PageRouteNames.FleetDashboard)">
                         <IconContent>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                 stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M5 11 6.5 6.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11" />
                                 <rect x="3" y="11" width="18" height="5" rx="1" />
                                 <path d="M3 13h18" />
@@ -114,9 +109,8 @@ else
                     <ButtonCard Title="Reports" Description="Access reports dashboard" Color="teal"
                                 OnClick="() => NavigationManager.NavigateTo(PageRouteNames.ReportDashboard)">
                         <IconContent>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                 stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M3 3v18h18" />
                                 <path d="M18 17V9" />
                                 <path d="M13 17V5" />
@@ -129,11 +123,11 @@ else
                     <ButtonCard Title="Admin" Description="Access admin dashboard" Color="indigo"
                                 OnClick="() => NavigationManager.NavigateTo(PageRouteNames.AdminDashboard)">
                         <IconContent>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                 stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="3" />
-                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                                <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
                             </svg>
                         </IconContent>
                     </ButtonCard>
@@ -146,10 +140,6 @@ else
 }
 
 <style>
-    * {
-        box-sizing: border-box;
-    }
-
     /* Dashboard Grid */
     .dashboard-grid {
         display: flex;
@@ -159,9 +149,9 @@ else
         margin-bottom: 32px;
     }
 
-        .dashboard-grid:last-child {
-            margin-bottom: 0;
-        }
+    .dashboard-grid:last-child {
+        margin-bottom: 0;
+    }
 
     /* Single card row */
     .dashboard-grid-single {
@@ -172,13 +162,13 @@ else
         margin-bottom: 32px;
     }
 
-        /* Fixed card width */
-        .dashboard-grid .dashboard-card,
-        .dashboard-grid-single .dashboard-card {
-            width: 240px !important;
-            min-width: 240px !important;
-            max-width: 240px !important;
-        }
+    /* Fixed card width */
+    .dashboard-grid .dashboard-card,
+    .dashboard-grid-single .dashboard-card {
+        width: 240px !important;
+        min-width: 240px !important;
+        max-width: 240px !important;
+    }
 
     /* Update Progress Overlay */
     .update-overlay {
@@ -273,16 +263,16 @@ else
         overflow: hidden;
     }
 
-        .progress-bar-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            animation: shimmer 1.5s infinite;
-        }
+    .progress-bar-fill::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        animation: shimmer 1.5s infinite;
+    }
 
     .time-remaining {
         display: flex;
@@ -293,9 +283,9 @@ else
         justify-content: center;
     }
 
-        .time-remaining svg {
-            color: #94a3b8;
-        }
+    .time-remaining svg {
+        color: #94a3b8;
+    }
 
     .update-status {
         display: flex;
