@@ -1,0 +1,92 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET 10.0
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+    
+    - name: Install .NET MAUI Workload
+      run: dotnet workload install maui --skip-sign-check
+    
+    - name: Create Secrets.local_secrets.cs
+      run: |
+        $secretsContent = @"
+        namespace VizarLibrary.DataAccess;
+
+        public static partial class Secrets
+        {
+            static Secrets()
+            {
+                AzureConnectionString = "${{ secrets.AzureConnectionString }}";
+
+                AzureBlobStorageConnectionString = "${{ secrets.AzureBlobStorageConnectionString }}";
+                AzureBlobStorageAccountKey = "${{ secrets.AzureBlobStorageAccountKey }}";
+
+                SyncfusionLicense = "${{ secrets.SyncfusionLicense }}";
+
+                EmailPassword = "${{ secrets.EmailPassword }}";
+
+                ToEmail = "${{ secrets.ToEmail }}";
+            }
+        }
+        "@
+        Set-Content -Path "VizarLibrary/DataAccess/Secrets.local_secrets.cs" -Value $secretsContent
+    
+    - name: Setup Keystore
+      run: |
+        # Decode base64 keystore and save it
+        $keystoreBase64 = "${{ secrets.ANDROID_KEYSTORE_BASE64 }}"
+        $keystoreBytes = [System.Convert]::FromBase64String($keystoreBase64)
+        $keystorePath = "Vizar/Vizar/vizar.keystore"
+        [System.IO.File]::WriteAllBytes($keystorePath, $keystoreBytes)
+        echo "Keystore created at: $keystorePath"
+    
+    - name: Restore dependencies
+      run: dotnet restore Vizar/Vizar/Vizar.csproj
+    
+    - name: Build Signed Android APK
+      run: |
+        dotnet publish Vizar/Vizar/Vizar.csproj `
+          -f net10.0-android `
+          -c Release `
+          -p:AndroidPackageFormat=apk `
+          -p:AndroidKeyStore=true `
+          -p:AndroidSigningKeyStore=vizar.keystore `
+          -p:AndroidSigningKeyAlias=vizar `
+          -p:AndroidSigningKeyPass="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" `
+          -p:AndroidSigningStorePass="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" `
+          -o Vizar/Vizar/publish/android
+    
+    - name: Find APK
+      id: find-apk
+      run: |
+        $apkPath = Get-ChildItem -Path "Vizar/Vizar/publish/android" -Filter "*.apk" -Recurse | Select-Object -First 1 -ExpandProperty FullName
+        echo "APK found at: $apkPath"
+        echo "apk-path=$apkPath" >> $env:GITHUB_OUTPUT
+        
+        # Copy to root with a simpler name for easier download
+        Copy-Item $apkPath -Destination "Vizar-signed.apk"
+    
+    - name: Upload Android APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-apk
+        path: Vizar-signed.apk
+        retention-days: 30
+    
+    - name: Build Summary
+      run: |
+        echo "✅ Successfully built signed Android APK"
+        echo "📱 Download the artifact from the Actions tab to test on your device"
