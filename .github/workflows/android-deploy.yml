@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Deploy for Android
 
 on:
   push:
@@ -6,8 +6,17 @@ on:
   workflow_dispatch:
 
 jobs:
+  version-check:
+    uses: ./.github/workflows/version-checks.yml
+
+  setup-secrets:
+    uses: ./.github/workflows/setup-secrets.yml
+    secrets: inherit
+
   build:
     runs-on: windows-latest
+    needs: [version-check, setup-secrets]
+    if: needs.version-check.outputs.should-deploy == 'true'
 
     steps:
     - uses: actions/checkout@v4
@@ -19,30 +28,6 @@ jobs:
     
     - name: Install .NET MAUI Workload
       run: dotnet workload install maui --skip-sign-check
-    
-    - name: Create Secrets.local_secrets.cs
-      run: |
-        $secretsContent = @"
-        namespace VizarLibrary.DataAccess;
-
-        public static partial class Secrets
-        {
-            static Secrets()
-            {
-                AzureConnectionString = "${{ secrets.AzureConnectionString }}";
-
-                AzureBlobStorageConnectionString = "${{ secrets.AzureBlobStorageConnectionString }}";
-                AzureBlobStorageAccountKey = "${{ secrets.AzureBlobStorageAccountKey }}";
-
-                SyncfusionLicense = "${{ secrets.SyncfusionLicense }}";
-
-                EmailPassword = "${{ secrets.EmailPassword }}";
-
-                ToEmail = "${{ secrets.ToEmail }}";
-            }
-        }
-        "@
-        Set-Content -Path "VizarLibrary/DataAccess/Secrets.local_secrets.cs" -Value $secretsContent
     
     - name: Setup Keystore
       run: |
@@ -69,24 +54,45 @@ jobs:
           -p:AndroidSigningStorePass="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" `
           -o Vizar/Vizar/publish/android
     
-    - name: Find APK
+    - name: Find and Rename APK
       id: find-apk
       run: |
         $apkPath = Get-ChildItem -Path "Vizar/Vizar/publish/android" -Filter "*.apk" -Recurse | Select-Object -First 1 -ExpandProperty FullName
         echo "APK found at: $apkPath"
-        echo "apk-path=$apkPath" >> $env:GITHUB_OUTPUT
         
-        # Copy to root with a simpler name for easier download
-        Copy-Item $apkPath -Destination "Vizar-signed.apk"
+        # Rename to match UpdateManager expectations: Vizar.apk
+        Copy-Item $apkPath -Destination "Vizar.apk"
+        echo "APK renamed to: Vizar.apk"
     
-    - name: Upload Android APK Artifact
+    - name: Upload Android Build Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: android-apk
-        path: Vizar-signed.apk
-        retention-days: 30
+        name: android-release
+        path: Vizar.apk
+
+  deploy:
+    runs-on: windows-latest
+    needs: [version-check, build]
+    if: needs.version-check.outputs.should-deploy == 'true'
+    permissions:
+      contents: write
+
+    steps:
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v4
+      with:
+        name: android-release
     
-    - name: Build Summary
+    - name: Upload APK to Existing Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ needs.version-check.outputs.current-version }}
+        files: Vizar.apk
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Deployment Summary
       run: |
-        echo "✅ Successfully built signed Android APK"
-        echo "📱 Download the artifact from the Actions tab to test on your device"
+        echo "🚀 Successfully deployed Vizar Android APK to release ${{ needs.version-check.outputs.current-version }}"

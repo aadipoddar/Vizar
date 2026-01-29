@@ -61,7 +61,7 @@ public partial class Dashboard : IAsyncDisposable
         });
 
         // Use appropriate file name based on platform
-        var setupFileName = Factor.Contains("Desktop") ? "Vizar" : "com.aadisoft.vizar";
+        var setupFileName = "Vizar";
         await UpdateService.UpdateAppAsync("aadipoddar", "Vizar", setupFileName, progress);
 
         _isUpdating = false;
