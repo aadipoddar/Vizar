@@ -272,10 +272,6 @@ h1:focus {
 	gap: 6px;
 }
 
-.form-field-full {
-	grid-column: 1 / -1;
-}
-
 .field-label {
 	font-size: 13px;
 	font-weight: 600;
@@ -291,45 +287,17 @@ h1:focus {
 	font-weight: 700;
 }
 
-.form-field-span-2 {
-	grid-column: span 2;
-}
-
-.form-field-span-3 {
-	grid-column: span 3;
-}
-
 /* ============================================
    Form Grid Layouts
    Common grid layouts for form fields
    ============================================ */
-.form-grid-triple {
+
+/* Universal form grid - auto-fits columns based on available space */
+.form-grid {
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 16px;
+	grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+	gap: 16px 20px;
 	align-items: start;
-}
-
-.form-grid-quad {
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	gap: 16px;
-	align-items: start;
-}
-
-.form-grid-five {
-	display: grid;
-	grid-template-columns: repeat(5, 1fr);
-	gap: 16px;
-	align-items: start;
-}
-
-.form-field-span-4 {
-	grid-column: span 4;
-}
-
-.form-field-span-5 {
-	grid-column: span 5;
 }
 
 /* ============================================
@@ -584,4 +552,84 @@ h1:focus {
 	font-size: 12px;
 	color: #64748b;
 	margin-left: auto;
+}
+
+/* Two Column Layout (75-25 split) */
+.two-column-layout {
+	display: flex;
+	gap: 16px;
+	margin-bottom: 16px;
+}
+
+.two-column-layout> :first-child {
+	flex: 0 0 75%;
+}
+
+.two-column-layout> :last-child {
+	flex: 0 0 calc(25% - 16px);
+}
+
+/* Financial Grid Layout */
+.financial-grid {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.financial-row {
+	display: grid;
+	grid-template-columns: 100px 1fr;
+	align-items: center;
+	gap: 10px;
+}
+
+.financial-row-dual {
+	display: grid;
+	grid-template-columns: 100px 1fr;
+	align-items: center;
+	gap: 10px;
+}
+
+.dual-inputs {
+	display: grid;
+	grid-template-columns: 1.5fr 1.5fr;
+	gap: 8px;
+	align-items: center;
+}
+
+.financial-row.total-row {
+	margin-top: 4px;
+	padding-top: 8px;
+	border-top: 2px solid #e2e8f0;
+}
+
+.financial-label {
+	font-size: 13px;
+	font-weight: 500;
+	color: #475569;
+	text-align: right;
+	white-space: nowrap;
+}
+
+.financial-label-total {
+	font-size: 14px;
+	font-weight: 700;
+	color: #0f172a;
+	text-align: right;
+	white-space: nowrap;
+}
+
+/* Transaction Date and Financial Year Wrapper */
+.date-year-wrapper {
+	display: flex;
+	gap: 12px;
+	align-items: stretch;
+}
+
+.date-year-wrapper> :first-child {
+	flex: 1;
+}
+
+.date-year-wrapper> :last-child {
+	flex: 1;
 }

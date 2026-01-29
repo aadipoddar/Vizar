@@ -54,7 +54,7 @@ else
                         </div>
                     </div>
                     <div class="section-body">
-                        <div class="form-grid-transaction">
+                        <div class="form-grid">
                             <!-- Company -->
                             <div class="form-field">
                                 <label class="field-label">
@@ -369,20 +369,6 @@ else
             flex: 1;
         }
 
-    /* Transaction Date and Financial Year Wrapper */
-    .date-year-wrapper {
-        display: flex;
-        gap: 12px;
-        align-items: stretch;
-    }
-
-        .date-year-wrapper > :first-child {
-            flex: 1;
-        }
-
-        .date-year-wrapper > :last-child {
-            flex: 1;
-        }
 
     /* Transaction Number with Auto-generate Checkbox */
     .transaction-no-wrapper {
@@ -412,29 +398,6 @@ else
             font-weight: 500;
         }
 
-    /* Form Grid Variations */
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px 20px;
-    }
-
-    .form-grid-single {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px 20px;
-    }
-
-    .form-grid-transaction {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 16px 20px;
-    }
-
-    .form-field-span-3 {
-        grid-column: span 3;
-    }
-
     ::deep .stock-field .e-input-group {
         background: #fef3c7;
         border-color: #f59e0b;
@@ -444,62 +407,6 @@ else
             color: #92400e;
             font-weight: 600;
             text-align: center;
-        }
-
-    ::deep .editable-field .e-input-group {
-        border-color: #3b82f6;
-        background: #eff6ff;
-    }
-
-        ::deep .editable-field .e-input-group input {
-            font-weight: 600;
-            color: #1e40af;
-        }
-
-    ::deep .small-input .e-input-group {
-        width: 100%;
-    }
-
-        ::deep .small-input .e-input-group input {
-            text-align: center;
-            padding: 8px;
-        }
-
-    ::deep .discount-field .e-input-group input {
-        color: #dc2626;
-        font-weight: 500;
-    }
-
-    ::deep .total-field .e-input-group {
-        background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
-        border: 2px solid #3b82f6;
-        height: 48px;
-    }
-
-        ::deep .total-field .e-input-group input {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1e40af;
-        }
-
-    ::deep .textarea-field .e-input-group {
-        height: auto;
-        min-height: 80px;
-    }
-
-        ::deep .textarea-field .e-input-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-    ::deep .textarea-field-small .e-input-group {
-        height: auto;
-        min-height: 60px;
-    }
-
-        ::deep .textarea-field-small .e-input-group textarea {
-            resize: vertical;
-            min-height: 60px;
         }
 
     /* Add to Cart Section Styles */
@@ -515,26 +422,6 @@ else
         display: flex;
         flex-direction: column;
         gap: 4px;
-    }
-
-    .cart-field-item {
-        /* Item field - 2fr */
-    }
-
-    .cart-field-stock {
-        /* Current Stock field - 1fr */
-    }
-
-    .cart-field-small {
-        /* Qty, UOM, Rate - 1fr each */
-    }
-
-    .cart-field-remarks {
-        /* Remarks - 2fr */
-    }
-
-    .cart-field-total {
-        /* Total - 1.2fr */
     }
 
     .cart-field-button {

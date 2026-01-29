@@ -50,7 +50,7 @@ else
                     </div>
                 </div>
                 <div class="section-body">
-                    <div class="form-grid-single">
+                    <div class="form-grid">
                         <!-- Company -->
                         <div class="form-field">
                             <label class="field-label">
@@ -296,28 +296,6 @@ else
 <ToastNotification @ref="_toastNotification" />
 
 <style>
-    /* Form Grid Layout */
-    .form-grid-single {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px 20px;
-    }
-
-    /* Transaction Date and Financial Year Wrapper */
-    .date-year-wrapper {
-        display: flex;
-        gap: 12px;
-        align-items: stretch;
-    }
-
-        .date-year-wrapper > :first-child {
-            flex: 1;
-        }
-
-        .date-year-wrapper > :last-child {
-            flex: 1;
-        }
-
     /* Purchase Reference Wrapper */
     .purchase-reference-wrapper {
         display: flex;
@@ -385,10 +363,6 @@ else
 
     /* Responsive Design */
     @@media (max-width: 1200px) {
-        .form-grid-single {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
         .cart-row-simple {
             flex-wrap: wrap;
         }
@@ -407,10 +381,6 @@ else
     }
 
     @@media (max-width: 768px) {
-        .form-grid-single {
-            grid-template-columns: 1fr;
-        }
-
         .cart-row-simple {
             flex-direction: column;
         }
@@ -422,10 +392,6 @@ else
         .cart-field-button {
             flex: 1 1 100%;
             min-width: 100%;
-        }
-
-        .date-year-wrapper {
-            flex-direction: column;
         }
     }
 </style>

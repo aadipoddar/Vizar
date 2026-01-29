@@ -43,25 +43,21 @@ else
                     </div>
                 </div>
                 <div class="section-body">
-                    <div class="form-grid-transaction">
+                    <div class="form-grid">
                         <!-- Transaction Date and Financial Year -->
                         <div class="form-field">
                             <label class="field-label">
-                                Transaction Date <span class="required">*</span>
+                                Transaction Date <span class="required">*</span> / Financial Year
                             </label>
-                            <SfDatePicker Value="@_transactionDateTime" TValue="DateTime" Format="dd/MM/yy"
-                                          Placeholder="Select Date" FloatLabelType="FloatLabelType.Never" CssClass="custom-datepicker">
-                                <DatePickerEvents TValue="DateTime" ValueChange="OnTransactionDateChanged" />
-                            </SfDatePicker>
-                        </div>
-
-                        <div class="form-field">
-                            <label class="field-label">
-                                Financial Year
-                            </label>
-                            <SfTextBox Value="@($"{_selectedFinancialYear?.StartDate:yyyy} to {_selectedFinancialYear?.EndDate:yyyy}")"
-                                       Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never"
-                                       CssClass="custom-textbox readonly-field" />
+                            <div class="date-year-wrapper">
+                                <SfDatePicker Value="@_transactionDateTime" TValue="DateTime" Format="dd/MM/yy"
+                                              Placeholder="Select Date" FloatLabelType="FloatLabelType.Never" CssClass="custom-datepicker">
+                                    <DatePickerEvents TValue="DateTime" ValueChange="OnTransactionDateChanged" />
+                                </SfDatePicker>
+                                <SfTextBox Value="@($"{_selectedFinancialYear?.StartDate:yyyy} to {_selectedFinancialYear?.EndDate:yyyy}")"
+                                           Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never"
+                                           CssClass="custom-textbox readonly-field" />
+                            </div>
                         </div>
 
                         <!-- Transaction No -->
@@ -108,7 +104,7 @@ else
                 <div class="section-body">
                     <div class="adjustment-form">
                         <!-- Item Selection -->
-                        <div class="form-field form-field-item">
+                        <div class="form-field">
                             <label class="field-label">Item Name <span class="required">*</span></label>
                             <SfAutoComplete @ref="_sfItemAutoComplete" Value="@_selectedItem" TValue="ItemModel ?"
                                             TItem="ItemModel" DataSource="@_items" Placeholder="Select Item (Ctrl + E)"
@@ -278,25 +274,6 @@ else
 <ToastNotification @ref="_toastNotification" />
 
 <style>
-    /* Form Grid Layout */
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px 20px;
-    }
-
-    .form-grid-single {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px 20px;
-    }
-
-    .form-grid-transaction {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 16px 20px;
-    }
-
     /* Adjustment Form Layout */
     .adjustment-form {
         display: grid;
@@ -305,82 +282,9 @@ else
         align-items: end;
     }
 
-    .form-field-item {
-        grid-column: span 1;
-    }
-
     .form-field-button {
         display: flex;
         flex-direction: column;
         gap: 6px;
     }
-
-    /* Total Field Highlight */
-    ::deep .total-field-highlight .e-input-group {
-        background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
-        border: 2px solid #3b82f6;
-    }
-
-        ::deep .total-field-highlight .e-input-group input {
-            color: #1e40af;
-            font-weight: 700;
-            font-size: 15px;
-        }
-
-    ::deep .editable-field .e-input-group {
-        border-color: #3b82f6;
-        background: #eff6ff;
-    }
-
-        ::deep .editable-field .e-input-group input {
-            font-weight: 600;
-            color: #1e40af;
-        }
-
-    ::deep .small-input .e-input-group {
-        width: 100%;
-    }
-
-        ::deep .small-input .e-input-group input {
-            text-align: center;
-            padding: 8px;
-        }
-
-    ::deep .discount-field .e-input-group input {
-        color: #dc2626;
-        font-weight: 500;
-    }
-
-    ::deep .total-field .e-input-group {
-        background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
-        border: 2px solid #3b82f6;
-        height: 48px;
-    }
-
-        ::deep .total-field .e-input-group input {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1e40af;
-        }
-
-    ::deep .textarea-field .e-input-group {
-        height: auto;
-        min-height: 80px;
-    }
-
-        ::deep .textarea-field .e-input-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-    ::deep .textarea-field-small .e-input-group {
-        height: auto;
-        min-height: 60px;
-    }
-
-        ::deep .textarea-field-small .e-input-group textarea {
-            resize: vertical;
-            min-height: 60px;
-        }
-
 </style>

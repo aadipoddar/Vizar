@@ -53,7 +53,7 @@ else
                         </div>
                     </div>
                     <div class="section-body">
-                        <div class="form-grid-single">
+                        <div class="form-grid">
                             <!-- Company -->
                             <div class="form-field">
                                 <label class="field-label">
@@ -150,7 +150,7 @@ else
                             </div>
 
                             <!-- Remarks -->
-                            <div class="form-field form-field-double">
+                            <div class="form-field">
                                 <label class="field-label">
                                     Remarks / Narration
                                 </label>
@@ -383,115 +383,6 @@ else
 <ToastNotification @ref="_toastNotification" />
 
 <style>
-    /* Two Column Layout */
-    .two-column-layout {
-        display: flex;
-        gap: 16px;
-        margin-bottom: 16px;
-    }
-
-        .two-column-layout > :first-child {
-            flex: 0 0 75%;
-        }
-
-        .two-column-layout > :last-child {
-            flex: 0 0 calc(25% - 16px);
-        }
-
-    /* Form Grid Layout */
-    .form-grid-single {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px 20px;
-    }
-
-    .form-field-double {
-        grid-column: span 2;
-    }
-
-    /* Transaction Date and Financial Year Wrapper */
-    .date-year-wrapper {
-        display: flex;
-        gap: 12px;
-        align-items: stretch;
-    }
-
-        .date-year-wrapper > :first-child {
-            flex: 1;
-        }
-
-        .date-year-wrapper > :last-child {
-            flex: 1;
-        }
-
-    /* Financial Grid Layout */
-    .financial-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-
-    .financial-row {
-        display: grid;
-        grid-template-columns: 100px 1fr;
-        align-items: center;
-        gap: 10px;
-    }
-
-        .financial-row.total-row {
-            margin-top: 4px;
-            padding-top: 8px;
-            border-top: 2px solid #e2e8f0;
-        }
-
-    .financial-label {
-        font-size: 13px;
-        font-weight: 500;
-        color: #475569;
-        text-align: right;
-        white-space: nowrap;
-    }
-
-    .financial-label-total {
-        font-size: 14px;
-        font-weight: 700;
-        color: #0f172a;
-        text-align: right;
-        white-space: nowrap;
-    }
-
-    ::deep .editable-field .e-input-group {
-        border-color: #3b82f6;
-        background: #eff6ff;
-    }
-
-        ::deep .editable-field .e-input-group input {
-            font-weight: 600;
-            color: #1e40af;
-        }
-
-    ::deep .total-field .e-input-group {
-        background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
-        border: 2px solid #3b82f6;
-        height: 48px;
-    }
-
-        ::deep .total-field .e-input-group input {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1e40af;
-        }
-
-    ::deep .textarea-field-small .e-input-group {
-        height: auto;
-        min-height: 60px;
-    }
-
-        ::deep .textarea-field-small .e-input-group textarea {
-            resize: vertical;
-            min-height: 60px;
-        }
-
     /* Add to Cart Section Styles - Single Row Layout */
     .cart-row-single {
         display: grid;
@@ -504,18 +395,6 @@ else
         display: flex;
         flex-direction: column;
         gap: 4px;
-    }
-
-    .cart-field-item {
-        /* Standard single column for item */
-    }
-
-    .cart-field-small {
-        /* Standard single column */
-    }
-
-    .cart-field-medium {
-        /* Standard single column */
     }
 
     .cart-field-button {

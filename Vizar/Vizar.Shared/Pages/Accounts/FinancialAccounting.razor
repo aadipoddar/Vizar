@@ -63,7 +63,7 @@ else
                         </div>
                     </div>
                     <div class="section-body">
-                        <div class="form-grid-transaction">
+                        <div class="form-grid">
                             <!-- Company -->
                             <div class="form-field">
                                 <label class="field-label">
@@ -232,7 +232,7 @@ else
                                             TItem="LedgerModel" DataSource="@_ledgers" Placeholder="Select Ledger (Ctrl + E)"
                                             FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
                                             FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
-                                <AutoCompleteEvents TItem="LedgerModel" TValue="LedgerModel?"                    ValueChange="OnItemChanged" />
+                                <AutoCompleteEvents TItem="LedgerModel" TValue="LedgerModel?" ValueChange="OnItemChanged" />
                                 <AutoCompleteFieldSettings Value="Name" />
                             </SfAutoComplete>
                         </div>
@@ -417,43 +417,6 @@ else
 <ToastNotification @ref="_toastNotification" />
 
 <style>
-    /* Two Column Layout */
-    .two-column-layout {
-        display: flex;
-        gap: 16px;
-        margin-bottom: 16px;
-    }
-
-    .two-column-layout> :first-child {
-        flex: 0 0 75%;
-    }
-
-    .two-column-layout> :last-child {
-        flex: 0 0 calc(25% - 16px);
-    }
-
-    /* Form Grid Layout */
-    .form-grid-transaction {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 16px 20px;
-    }
-
-    /* Transaction Date and Financial Year Wrapper */
-    .date-year-wrapper {
-        display: flex;
-        gap: 12px;
-        align-items: stretch;
-    }
-
-    .date-year-wrapper> :first-child {
-        flex: 1;
-    }
-
-    .date-year-wrapper> :last-child {
-        flex: 1;
-    }
-
     /* Transaction Number Wrapper */
     .transaction-no-wrapper {
         display: flex;
@@ -506,48 +469,6 @@ else
         cursor: not-allowed;
     }
 
-    /* Financial Grid Layout */
-    .financial-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .financial-row {
-        display: grid;
-        grid-template-columns: 120px 1fr;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .financial-row.total-row {
-        margin-top: 4px;
-        padding-top: 12px;
-        border-top: 2px solid #e2e8f0;
-    }
-
-    .financial-label {
-        font-size: 13px;
-        font-weight: 600;
-        color: #475569;
-        text-align: right;
-        white-space: nowrap;
-    }
-
-    .financial-label-total {
-        font-size: 14px;
-        font-weight: 700;
-        color: #0f172a;
-        text-align: right;
-        white-space: nowrap;
-    }
-
-    .financial-divider {
-        height: 1px;
-        background: #e2e8f0;
-        margin: 4px 0;
-    }
-
     ::deep .balanced-field .e-input-group {
         background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
         border: 2px solid #10b981;
@@ -568,16 +489,6 @@ else
         color: #991b1b;
         font-weight: 700;
         font-size: 16px;
-    }
-
-    ::deep .textarea-field-small .e-input-group {
-        height: auto;
-        min-height: 60px;
-    }
-
-    ::deep .textarea-field-small .e-input-group textarea {
-        resize: vertical;
-        min-height: 60px;
     }
 
     /* Add to Cart Section Styles */

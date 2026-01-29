@@ -42,7 +42,7 @@ else
                     </div>
                 </div>
                 <div class="section-body">
-                    <div class="form-grid-quad">
+                    <div class="form-grid">
                         <!-- Ledger Name -->
                         <div class="form-field">
                             <label class="field-label">
@@ -140,14 +140,14 @@ else
                         </div>
 
                         <!-- Address -->
-                        <div class="form-field form-field-span-4">
+                        <div class="form-field">
                             <label class="field-label">Address</label>
                             <SfTextBox @bind-Value="_ledger.Address" Placeholder="Enter Address" Multiline="true"
                                        FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                         </div>
 
                         <!-- Remarks -->
-                        <div class="form-field form-field-span-4">
+                        <div class="form-field">
                             <label class="field-label">Remarks</label>
                             <SfTextBox @bind-Value="_ledger.Remarks" Placeholder="Enter remarks (optional)" Multiline="true"
                                        FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
