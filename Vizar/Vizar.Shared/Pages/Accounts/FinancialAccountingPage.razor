@@ -118,11 +118,9 @@ else
                                 <label class="field-label">
                                     Transaction No
                                 </label>
-                                <div class="transaction-no-wrapper">
-                                    <SfTextBox @bind-Value="_accounting.TransactionNo" Placeholder="Enter Transaction No"
-                                               FloatLabelType="FloatLabelType.Never" Readonly="true"
-                                               CssClass="custom-textbox readonly-field" />
-                                </div>
+                                <SfTextBox @bind-Value="_accounting.TransactionNo" Placeholder="Enter Transaction No"
+                                           FloatLabelType="FloatLabelType.Never" Readonly="true"
+                                           CssClass="custom-textbox readonly-field" />
                             </div>
 
                             @if (_accounting.Id > 0 && _accounting.ReferenceId is not null && _accounting.ReferenceId > 0)
@@ -197,8 +195,7 @@ else
                                 <label class="financial-label-total">Difference:</label>
                                 <SfNumericTextBox Value="@(_accounting.TotalDebitAmount - _accounting.TotalCreditAmount)"
                                                   TValue="decimal" Readonly="true" ShowSpinButton="false" Format="N2" Placeholder="0.00"
-                                                  FloatLabelType="FloatLabelType.Never"
-                                                  CssClass='@($"custom-numeric {(_accounting.TotalDebitAmount - _accounting.TotalCreditAmount == 0 ? "balanced-field" : "unbalanced-field")}")' />
+                                                  FloatLabelType="FloatLabelType.Never" CssClass="custom-numeric readonly-field" />
                             </div>
                         </div>
                     </div>
@@ -400,40 +397,3 @@ else
 }
 
 <ToastNotification @ref="_toastNotification" />
-
-<style>
-    /* Transaction Number Wrapper */
-    .transaction-no-wrapper {
-        display: flex;
-        gap: 12px;
-        align-items: stretch;
-    }
-
-        .transaction-no-wrapper > :first-child {
-            flex: 1;
-        }
-
-    ::deep .balanced-field .e-input-group {
-        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-        border: 2px solid #10b981;
-    }
-
-        ::deep .balanced-field .e-input-group input {
-            color: #065f46;
-            font-weight: 700;
-            font-size: 16px;
-        }
-
-    ::deep .unbalanced-field .e-input-group {
-        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-        border: 2px solid #ef4444;
-    }
-
-        ::deep .unbalanced-field .e-input-group input {
-            color: #991b1b;
-            font-weight: 700;
-            font-size: 16px;
-        }
-
-    /* Add to Cart Section Styles */
-</style>

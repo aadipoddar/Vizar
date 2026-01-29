@@ -514,13 +514,6 @@ h1:focus {
 /* ============================================
    Dual Grid Container (for side-by-side grids)
    ============================================ */
-.dual-grid-container {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 24px;
-	padding: 24px;
-}
-
 .grid-section {
 	background: #ffffff;
 	border-radius: 8px;
@@ -567,6 +560,17 @@ h1:focus {
 
 .two-column-layout> :last-child {
 	flex: 0 0 calc(25% - 16px);
+}
+
+/* Transaction Number with Auto-generate Checkbox */
+.transaction-no-wrapper {
+	display: flex;
+	gap: 12px;
+	align-items: stretch;
+}
+
+.transaction-no-wrapper> :first-child {
+	flex: 1;
 }
 
 /* Financial Grid Layout */

@@ -334,89 +334,55 @@ else
                     </div>
                     <div class="section-body">
                         <div class="trial-balance-grid">
-                            <!-- Opening Balance Card -->
-                            <div class="balance-info-card opening-card">
-                                <div class="card-icon">
+                            <BalanceInfoCard Label="Opening Balance"                                          Value="@($"₹{_selectedTrialBalance.OpeningBalance:N2}")"
+                                             Breakdown="@($"Dr: ₹{_selectedTrialBalance.OpeningDebit:N2} • Cr: ₹{_selectedTrialBalance.OpeningCredit:N2}")"
+                                             Variant="BalanceInfoCard.CardVariant.Opening">
+                                <Icon>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                          stroke-linejoin="round">
                                         <circle cx="12" cy="12" r="10" />
                                         <polyline points="12 6 12 12 16 14" />
                                     </svg>
-                                </div>
-                                <div class="card-content">
-                                    <div class="card-label">Opening Balance</div>
-                                    <div class="card-value">₹@_selectedTrialBalance.OpeningBalance.ToString("N2")</div>
-                                    <div class="card-breakdown">
-                                        <span class="breakdown-item">
-                                            Dr:
-                                            ₹@_selectedTrialBalance.OpeningDebit.ToString("N2")
-                                        </span>
-                                        <span class="breakdown-item">
-                                            Cr:
-                                            ₹@_selectedTrialBalance.OpeningCredit.ToString("N2")
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
+                                </Icon>
+                            </BalanceInfoCard>
 
-                            <!-- Period Debit Card -->
-                            <div class="balance-info-card debit-card">
-                                <div class="card-icon">
+                            <BalanceInfoCard Label="Period Debit" Value="@($"₹{_selectedTrialBalance.Debit:N2}")"
+                                             Variant="BalanceInfoCard.CardVariant.Debit">
+                                <Icon>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                          stroke-linejoin="round">
                                         <line x1="12" y1="5" x2="12" y2="19" />
                                         <polyline points="19 12 12 19 5 12" />
                                     </svg>
-                                </div>
-                                <div class="card-content">
-                                    <div class="card-label">Period Debit</div>
-                                    <div class="card-value debit-amount">₹@_selectedTrialBalance.Debit.ToString("N2")</div>
-                                </div>
-                            </div>
+                                </Icon>
+                            </BalanceInfoCard>
 
-                            <!-- Period Credit Card -->
-                            <div class="balance-info-card credit-card">
-                                <div class="card-icon">
+                            <BalanceInfoCard Label="Period Credit"                            Value="@($"₹{_selectedTrialBalance.Credit:N2}")"
+                                             Variant="BalanceInfoCard.CardVariant.Credit">
+                                <Icon>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                          stroke-linejoin="round">
                                         <line x1="12" y1="19" x2="12" y2="5" />
                                         <polyline points="5 12 12 5 19 12" />
                                     </svg>
-                                </div>
-                                <div class="card-content">
-                                    <div class="card-label">Period Credit</div>
-                                    <div class="card-value credit-amount">₹@_selectedTrialBalance.Credit.ToString("N2")</div>
-                                </div>
-                            </div>
+                                </Icon>
+                            </BalanceInfoCard>
 
-                            <!-- Closing Balance Card -->
-                            <div class="balance-info-card closing-card">
-                                <div class="card-icon">
+                            <BalanceInfoCard Label="Closing Balance"           Value="@($"₹{_selectedTrialBalance.ClosingBalance:N2}")"
+                                             Breakdown="@($"Dr: ₹{_selectedTrialBalance.ClosingDebit:N2} • Cr: ₹{_selectedTrialBalance.ClosingCredit:N2}")"
+                                             Variant="BalanceInfoCard.CardVariant.Closing">
+                                <Icon>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                          stroke-linejoin="round">
                                         <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
                                         <line x1="1" y1="10" x2="23" y2="10" />
                                     </svg>
-                                </div>
-                                <div class="card-content">
-                                    <div class="card-label">Closing Balance</div>
-                                    <div class="card-value">₹@_selectedTrialBalance.ClosingBalance.ToString("N2")</div>
-                                    <div class="card-breakdown">
-                                        <span class="breakdown-item">
-                                            Dr:
-                                            ₹@_selectedTrialBalance.ClosingDebit.ToString("N2")
-                                        </span>
-                                        <span class="breakdown-item">
-                                            Cr:
-                                            ₹@_selectedTrialBalance.ClosingCredit.ToString("N2")
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
+                                </Icon>
+                            </BalanceInfoCard>
                         </div>
                     </div>
                 </div>
@@ -454,103 +420,6 @@ else
         gap: 14px;
     }
 
-    .balance-info-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 14px;
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        transition: all 0.2s ease;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    }
-
-    .balance-info-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .balance-info-card .card-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 7px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        transition: all 0.2s ease;
-    }
-
-    .opening-card .card-icon {
-        background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
-        color: #ffffff;
-    }
-
-    .debit-card .card-icon {
-        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
-        color: #ffffff;
-    }
-
-    .credit-card .card-icon {
-        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-        color: #ffffff;
-    }
-
-    .closing-card .card-icon {
-        background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
-        color: #ffffff;
-    }
-
-    .balance-info-card:hover .card-icon {
-        transform: scale(1.05);
-    }
-
-    .balance-info-card .card-content {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .balance-info-card .card-label {
-        font-size: 11px;
-        font-weight: 600;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-        margin-bottom: 5px;
-    }
-
-    .balance-info-card .card-value {
-        font-size: 18px;
-        font-weight: 700;
-        color: #0f172a;
-        margin-bottom: 3px;
-        line-height: 1.2;
-    }
-
-    .balance-info-card .debit-amount {
-        color: #dc2626;
-    }
-
-    .balance-info-card .credit-amount {
-        color: #059669;
-    }
-
-    .balance-info-card .card-breakdown {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 10px;
-        font-weight: 500;
-        margin-top: 5px;
-        color: #64748b;
-    }
-
-    .breakdown-item {
-        display: inline-flex;
-        white-space: nowrap;
-    }
-
     .badge {
         display: inline-block;
         padding: 3px 8px;
@@ -570,19 +439,5 @@ else
         background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
         color: #166534;
         border: 1px solid #bbf7d0;
-    }
-
-    @@media (max-width: 768px) {
-        .filters-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .trial-balance-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .balance-info-card .card-value {
-            font-size: 20px;
-        }
     }
 </style>

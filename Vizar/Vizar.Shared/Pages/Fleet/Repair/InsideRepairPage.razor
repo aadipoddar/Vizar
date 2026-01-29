@@ -262,7 +262,7 @@ else
                             <label class="cart-label">Total</label>
                             <SfNumericTextBox Value="@_selectedCart.Total" Readonly="true" TValue="decimal"
                                               ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
-                                              CssClass="custom-numeric total-field-inline" />
+                                              CssClass="custom-numeric readonly-field" />
                         </div>
 
                         <div class="cart-field">
@@ -381,17 +381,3 @@ else
 }
 
 <ToastNotification @ref="_toastNotification" />
-
-<style>
-    ::deep .total-field-inline .e-input-group {
-        background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
-        border: 2px solid #3b82f6;
-        height: 38px;
-    }
-
-        ::deep .total-field-inline .e-input-group input {
-            font-weight: 700;
-            color: #1e40af;
-        }
-
-</style>
