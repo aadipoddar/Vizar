@@ -109,7 +109,7 @@ else
                                 <label class="field-label">
                                     Purchase Order (Optional)
                                 </label>
-                                <div class="purchase-order-wrapper">
+                                <div class="reference-wrapper">
                                     <SfAutoComplete Value="@_selectedPurchaseOrder" TValue="PurchaseOrderModel?" TItem="PurchaseOrderModel"
                                                     DataSource="@_purchaseOrders" Placeholder="Select Purchase Order"
                                                     FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
@@ -121,7 +121,7 @@ else
                                     </SfAutoComplete>
                                     @if (_selectedPurchaseOrder?.Id > 0)
                                     {
-                                        <div class="purchase-order-actions">
+                                        <div class="reference-actions">
                                             <IconButton Icon="IconType.View" Variant="ButtonVariant.View" Size="ButtonSize.Small"
                                                         Title="View Purchase Order" Disabled="_isProcessing"
                                                         OnClick="NavigateToSelectedPurchaseOrderPage" />
@@ -169,7 +169,7 @@ else
                                     <SfTextBox @bind-Value="_purchase.TransactionNo" Placeholder="Enter Transaction No"
                                                FloatLabelType="FloatLabelType.Never" Readonly="@_autoGenerateTransactionNo"
                                                CssClass="@(_autoGenerateTransactionNo ? "custom-textbox readonly-field" : "custom-textbox")" />
-                                    <div class="auto-generate-checkbox">
+                                    <div class="checkbox-wrapper">
                                         <SfCheckBox @bind-Checked="_autoGenerateTransactionNo" Label="Auto Generate"
                                                     TChecked="bool" ValueChange="OnAutoGenerateTransactionNoChecked"
                                                     CssClass="custom-checkbox" />
@@ -282,8 +282,8 @@ else
                 </div>
                 <div class="section-body">
                     <!-- First Row: Item Selection and Basic Info -->
-                    <div class="cart-row">
-                        <div class="cart-field cart-field-item">
+                    <div class="cart-input-row">
+                        <div class="cart-field cart-field-wide">
                             <label class="cart-label">Item <span class="required">*</span></label>
                             <SfAutoComplete @ref="_sfItemAutoComplete" Value="@_selectedItem"
                                             TValue="ItemModel ?" TItem="ItemModel" DataSource="@_items"
@@ -356,7 +356,7 @@ else
                                        FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                         </div>
 
-                        <div class="cart-field cart-field-button">
+                        <div class="cart-field">
                             <div class="checkbox-wrapper">
                                 <SfCheckBox @bind-Checked="_selectedCart.InclusiveTax" Label="Tax Incl." TChecked="bool"
                                             ValueChange="OnItemInclusiveTaxChanged" CssClass="custom-checkbox" />
@@ -365,23 +365,23 @@ else
                     </div>
 
                     <!-- Second Row: Readonly Amounts Aligned with Percentages -->
-                    <div class="cart-amounts-row">
+                    <div class="cart-input-row">
                         <!-- Item Name (below item field) -->
-                        <div class="amount-field amount-field-item">
+                        <div class="cart-field cart-field-wide">
                             <label class="cart-label">Remarks</label>
                             <SfTextBox @bind-Value="_selectedCart.Remarks" Placeholder="Item Narration..."
                                        FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                         </div>
 
                         <!-- UOM (below Quantity) -->
-                        <div class="amount-field">
+                        <div class="cart-field">
                             <label class="cart-label">UOM</label>
                             <SfTextBox @bind-Value="_selectedCart.UnitOfMeasurement" Placeholder="UOM..."
                                        FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                         </div>
 
                         <!-- Base Total (below Rate) -->
-                        <div class="amount-field">
+                        <div class="cart-field">
                             <label class="cart-label">Base</label>
                             <SfNumericTextBox Value="@_selectedCart.BaseTotal" TValue="decimal" Readonly="true"
                                               ShowSpinButton="false" FloatLabelType="FloatLabelType.Never"
@@ -389,7 +389,7 @@ else
                         </div>
 
                         <!-- Discount Amount (below Disc %) -->
-                        <div class="amount-field">
+                        <div class="cart-field">
                             <label class="cart-label">Disc Amt</label>
                             <SfNumericTextBox Value="@_selectedCart.DiscountAmount" TValue="decimal" Readonly="true"
                                               ShowSpinButton="false" FloatLabelType="FloatLabelType.Never"
@@ -397,7 +397,7 @@ else
                         </div>
 
                         <!-- CGST Amount (below CGST %) -->
-                        <div class="amount-field">
+                        <div class="cart-field">
                             <label class="cart-label">CGST Amt</label>
                             <SfNumericTextBox Value="@_selectedCart.CGSTAmount" TValue="decimal" Readonly="true"
                                               ShowSpinButton="false" FloatLabelType="FloatLabelType.Never"
@@ -405,7 +405,7 @@ else
                         </div>
 
                         <!-- SGST Amount (below SGST %) -->
-                        <div class="amount-field">
+                        <div class="cart-field">
                             <label class="cart-label">SGST Amt</label>
                             <SfNumericTextBox Value="@_selectedCart.SGSTAmount" TValue="decimal" Readonly="true"
                                               ShowSpinButton="false" FloatLabelType="FloatLabelType.Never"
@@ -413,7 +413,7 @@ else
                         </div>
 
                         <!-- IGST Amount (below IGST %) -->
-                        <div class="amount-field">
+                        <div class="cart-field">
                             <label class="cart-label">IGST Amt</label>
                             <SfNumericTextBox Value="@_selectedCart.IGSTAmount" TValue="decimal" Readonly="true"
                                               ShowSpinButton="false" FloatLabelType="FloatLabelType.Never"
@@ -421,7 +421,7 @@ else
                         </div>
 
                         <!-- Total (below Identification No) -->
-                        <div class="amount-field">
+                        <div class="cart-field">
                             <label class="cart-label">Total</label>
                             <SfNumericTextBox Value="@_selectedCart.Total" TValue="decimal" Readonly="true"
                                               ShowSpinButton="false" FloatLabelType="FloatLabelType.Never"
@@ -429,7 +429,7 @@ else
                         </div>
 
                         <!-- Add Button (below Tax Incl. checkbox) -->
-                        <div class="amount-field amount-field-button">
+                        <div class="cart-field">
                             <IconButton Icon="IconType.Add" Variant="ButtonVariant.Add" Text="Add" Title="Add to Cart" OnClick="AddItemToCart" />
                         </div>
                     </div>
@@ -668,146 +668,4 @@ else
             flex: 1;
         }
 
-    .auto-generate-checkbox {
-        display: flex;
-        align-items: center;
-        padding: 0 16px;
-        background: #f8fafc;
-        border: 1px solid #cbd5e1;
-        border-radius: 6px;
-        white-space: nowrap;
-        min-width: 140px;
-        justify-content: center;
-    }
-
-        .auto-generate-checkbox ::deep .custom-checkbox {
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-    /* Purchase Order Wrapper */
-    .purchase-order-wrapper {
-        display: flex;
-        gap: 8px;
-        align-items: stretch;
-    }
-
-        .purchase-order-wrapper > :first-child {
-            flex: 1;
-        }
-
-    .purchase-order-actions {
-        display: flex;
-        gap: 6px;
-        align-items: center;
-    }
-
-    /* Add to Cart Section Styles */
-    .cart-row {
-        display: grid;
-        grid-template-columns: 2fr repeat(7, 1fr) 1.5fr 100px;
-        gap: 12px;
-        align-items: end;
-        margin-bottom: 12px;
-    }
-
-    .cart-field {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .cart-field-item {
-        grid-column: span 2;
-    }
-
-    .cart-field-medium {
-        grid-column: span 1;
-    }
-
-    .cart-field-button {
-        display: flex;
-        align-items: flex-end;
-    }
-
-    .cart-label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #475569;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-    }
-
-        .cart-label .required {
-            color: #dc2626;
-            margin-left: 2px;
-        }
-
-    ::deep .cart-field .e-input-group,
-    ::deep .cart-field .custom-numeric .e-input-group,
-    ::deep .cart-field .custom-autocomplete .e-input-group,
-    ::deep .cart-field .custom-textbox .e-input-group {
-        height: 38px;
-        background: #eff6ff;
-        border: 1px solid #3b82f6;
-    }
-
-        ::deep .cart-field .e-input-group input,
-        ::deep .cart-field .custom-numeric .e-input-group input,
-        ::deep .cart-field .custom-autocomplete .e-input-group input,
-        ::deep .cart-field .custom-textbox .e-input-group input {
-            font-size: 14px;
-            font-weight: 500;
-            color: #1e293b;
-            padding: 8px 12px;
-        }
-
-    /* Checkbox Wrapper in Cart Row */
-    .checkbox-wrapper {
-        height: 38px;
-        display: flex;
-        align-items: center;
-        padding: 0 12px;
-        background: #f8fafc;
-        border: 1px solid #cbd5e1;
-        border-radius: 6px;
-    }
-
-    ::deep .checkbox-wrapper .custom-checkbox {
-        font-size: 13px;
-        font-weight: 500;
-    }
-
-    /* Cart Amounts Row - Aligned with Input Fields Above */
-    .cart-amounts-row {
-        display: grid;
-        grid-template-columns: 2fr repeat(7, 1fr) 1.5fr 100px;
-        gap: 12px;
-        margin-top: 8px;
-    }
-
-    .amount-field {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .amount-field-item {
-        grid-column: span 2;
-    }
-
-    .amount-field-button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    ::deep .custom-checkbox {
-        font-size: 12px;
-        font-weight: 500;
-    }
-
-        ::deep .custom-checkbox label {
-            white-space: nowrap;
-        }
 </style>

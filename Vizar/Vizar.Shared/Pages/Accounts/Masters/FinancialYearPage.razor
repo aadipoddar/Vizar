@@ -70,8 +70,10 @@ else
                         <!-- Locked Checkbox -->
                         <div class="form-field">
                             <label class="field-label">Locked</label>
-                            <SfCheckBox @bind-Checked="_financialYear.Locked" Label="Is Locked"
-                                        CssClass="custom-checkbox" />
+                            <div class="checkbox-wrapper">
+                                <SfCheckBox @bind-Checked="_financialYear.Locked" Label="Is Locked"
+                                            CssClass="custom-checkbox" />
+                            </div>
                         </div>
 
                         <!-- Remarks -->

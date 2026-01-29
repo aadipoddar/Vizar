@@ -21,7 +21,7 @@ using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages.Accounts;
 
-public partial class FinancialAccounting : IAsyncDisposable
+public partial class FinancialAccountingPage : IAsyncDisposable
 {
     private HotKeysContext _hotKeysContext;
 

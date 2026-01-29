@@ -633,3 +633,100 @@ h1:focus {
 .date-year-wrapper> :last-child {
 	flex: 1;
 }
+
+/* Reference Wrapper - used for purchase order, references, etc. */
+.reference-wrapper {
+	display: flex;
+	gap: 8px;
+	align-items: stretch;
+}
+
+.reference-wrapper> :first-child {
+	flex: 1;
+}
+
+.reference-actions {
+	display: flex;
+	gap: 6px;
+	align-items: center;
+}
+
+/* ============================================
+   Cart Input Section Styles
+   Common styles for add-to-cart input forms
+   ============================================ */
+.cart-input-row {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+	gap: 12px;
+	align-items: end;
+	margin-bottom: 12px;
+}
+
+.cart-input-row:last-child {
+	margin-bottom: 0;
+}
+
+.cart-field {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+}
+
+/* Span 2 columns for wider fields (item name, remarks) */
+.cart-field-wide {
+	grid-column: span 2;
+}
+
+.cart-label {
+	font-size: 12px;
+	font-weight: 600;
+	color: #475569;
+	text-transform: uppercase;
+	letter-spacing: 0.3px;
+}
+
+.cart-label .required {
+	color: #dc2626;
+	margin-left: 2px;
+}
+
+.cart-field .e-input-group,
+.cart-field .custom-numeric .e-input-group,
+.cart-field .custom-autocomplete .e-input-group,
+.cart-field .custom-textbox .e-input-group {
+	height: 32px;
+	background: #eff6ff;
+	border: 1px solid #3b82f6;
+}
+
+.cart-field .e-input-group input,
+.cart-field .custom-numeric .e-input-group input,
+.cart-field .custom-autocomplete .e-input-group input,
+.cart-field .custom-textbox .e-input-group input {
+	font-size: 14px;
+	font-weight: 500;
+	color: #1e293b;
+	padding: 8px 12px;
+}
+
+/* ============================================
+   Checkbox Wrapper
+   Common checkbox wrapper for forms and cart
+   ============================================ */
+.checkbox-wrapper {
+	height: 32px;
+	display: flex;
+	align-items: center;
+	padding: 0 12px;
+	background: #f8fafc;
+	border: 1px solid #cbd5e1;
+	border-radius: 6px;
+	white-space: nowrap;
+}
+
+.checkbox-wrapper .custom-checkbox {
+	font-size: 13px;
+	font-weight: 500;
+}

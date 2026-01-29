@@ -142,8 +142,8 @@ else
                 </div>
                 <div class="section-body">
                     <!-- Single Row: All Components -->
-                    <div class="cart-row">
-                        <div class="cart-field cart-field-item">
+                    <div class="cart-input-row">
+                        <div class="cart-field cart-field-wide">
                             <label class="cart-label">Service Type<span class="required">*</span></label>
                             <SfAutoComplete @ref="_sfItemAutoComplete" Value="@_selectedServiceType" TValue="ServiceTypeModel ?"
                                             TItem="ServiceTypeModel" DataSource="@_serviceTypes" Placeholder="Select Service Type (Ctrl + E)"
@@ -155,7 +155,7 @@ else
                             </SfAutoComplete>
                         </div>
 
-                        <div class="cart-field cart-field-small">
+                        <div class="cart-field">
                             <label class="cart-label">Qty</label>
                             <SfNumericTextBox Value="@_selectedCart.Quantity" TValue="decimal" Min="0" ShowSpinButton="false"
                                               Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
@@ -164,7 +164,7 @@ else
                             </SfNumericTextBox>
                         </div>
 
-                        <div class="cart-field cart-field-small">
+                        <div class="cart-field">
                             <label class="cart-label">Rate</label>
                             <SfNumericTextBox Value="@_selectedCart.Rate" TValue="decimal" Min="0" ShowSpinButton="false"
                                               Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
@@ -173,13 +173,13 @@ else
                             </SfNumericTextBox>
                         </div>
 
-                        <div class="cart-field cart-field-remarks">
+                        <div class="cart-field cart-field-wide">
                             <label class="cart-label">Remarks</label>
                             <SfTextBox @bind-Value="_selectedCart.Remarks" Placeholder="Item Narration..."
                                        FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                         </div>
 
-                        <div class="cart-field cart-field-total">
+                        <div class="cart-field">
                             <label class="cart-label">Total</label>
                             <SfNumericTextBox Value="@_selectedCart.Total" TValue="decimal" Readonly="true"
                                               ShowSpinButton="false" FloatLabelType="FloatLabelType.Never"
@@ -188,8 +188,8 @@ else
                     </div>
 
                     <!-- Second Row: Vehicle Details -->
-                    <div class="cart-row cart-row-vehicle">
-                        <div class="cart-field cart-field-vehicle">
+                    <div class="cart-input-row">
+                        <div class="cart-field cart-field-wide">
                             <label class="cart-label">Vehicle</label>
                             <SfAutoComplete TValue="VehicleModel" TItem="VehicleModel" DataSource="@_vehicles"
                                             Value="@(_vehicles.FirstOrDefault(v => v.Id == _selectedCart.VehicleId))"
@@ -210,7 +210,7 @@ else
                             </SfAutoComplete>
                         </div>
 
-                        <div class="cart-field cart-field-small">
+                        <div class="cart-field">
                             <label class="cart-label">Current Hour</label>
                             <SfNumericTextBox Value="@_selectedCart.CurrentHour" TValue="decimal?" ShowSpinButton="false"
                                               Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
@@ -219,7 +219,7 @@ else
                             </SfNumericTextBox>
                         </div>
 
-                        <div class="cart-field cart-field-small">
+                        <div class="cart-field">
                             <label class="cart-label">Current KM</label>
                             <SfNumericTextBox Value="@_selectedCart.CurrentKM" TValue="decimal?" ShowSpinButton="false"
                                               Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
@@ -228,7 +228,7 @@ else
                             </SfNumericTextBox>
                         </div>
 
-                        <div class="cart-field cart-field-stock">
+                        <div class="cart-field">
                             <label class="cart-label">Previous Service</label>
                             <SfDatePicker Value="@(_lastVehicleService?.TransactionDateTime)" TValue="DateTime ?"
                                           Readonly="true" Format="dd/MM/yy"
@@ -237,7 +237,7 @@ else
                                           TabIndex="-1" />
                         </div>
 
-                        <div class="cart-field cart-field-stock">
+                        <div class="cart-field">
                             <label class="cart-label">Next Due</label>
                             <SfDatePicker Value="@(_lastVehicleService?.NextDueDate)" TValue="DateTime ?"
                                           Readonly="true" Format="dd/MM/yy"
@@ -246,7 +246,7 @@ else
                                           TabIndex="-1" />
                         </div>
 
-                        <div class="cart-field cart-field-stock">
+                        <div class="cart-field">
                             <label class="cart-label" style="visibility: hidden;">Action</label>
                             <IconButton Icon="IconType.Add" Variant="ButtonVariant.Add" Text="Add" Title="Add to Cart" OnClick="AddItemToCart" />
                         </div>
@@ -381,23 +381,6 @@ else
             flex: 1;
         }
 
-    .auto-generate-checkbox {
-        display: flex;
-        align-items: center;
-        padding: 0 16px;
-        background: #f8fafc;
-        border: 1px solid #cbd5e1;
-        border-radius: 6px;
-        white-space: nowrap;
-        min-width: 140px;
-        justify-content: center;
-    }
-
-        .auto-generate-checkbox ::deep .custom-checkbox {
-            font-size: 13px;
-            font-weight: 500;
-        }
-
     ::deep .stock-field .e-input-group {
         background: #fef3c7;
         border-color: #f59e0b;
@@ -408,81 +391,4 @@ else
             font-weight: 600;
             text-align: center;
         }
-
-    /* Add to Cart Section Styles */
-    .cart-row {
-        display: grid;
-        grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
-        gap: 12px;
-        align-items: end;
-        margin-bottom: 12px;
-    }
-
-    .cart-field {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .cart-field-button {
-        /* Add button - 120px */
-    }
-
-    .cart-label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #475569;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-    }
-
-        .cart-label .required {
-            color: #dc2626;
-            margin-left: 2px;
-        }
-
-    ::deep .cart-field .e-input-group,
-    ::deep .cart-field .custom-numeric .e-input-group,
-    ::deep .cart-field .custom-autocomplete .e-input-group,
-    ::deep .cart-field .custom-textbox .e-input-group {
-        height: 38px;
-        background: #eff6ff;
-        border: 1px solid #3b82f6;
-    }
-
-        ::deep .cart-field .e-input-group input,
-        ::deep .cart-field .custom-numeric .e-input-group input,
-        ::deep .cart-field .custom-autocomplete .e-input-group input,
-        ::deep .cart-field .custom-textbox .e-input-group input {
-            font-size: 14px;
-            font-weight: 500;
-            color: #1e293b;
-            padding: 8px 12px;
-        }
-
-    /* Checkbox Wrapper in Cart Row */
-    .checkbox-wrapper {
-        height: 38px;
-        display: flex;
-        align-items: center;
-        padding: 0 12px;
-        background: #f8fafc;
-        border: 1px solid #cbd5e1;
-        border-radius: 6px;
-    }
-
-    ::deep .checkbox-wrapper .custom-checkbox {
-        font-size: 13px;
-        font-weight: 500;
-    }
-
-    ::deep .custom-checkbox {
-        font-size: 12px;
-        font-weight: 500;
-    }
-
-        ::deep .custom-checkbox label {
-            white-space: nowrap;
-        }
-
 </style>

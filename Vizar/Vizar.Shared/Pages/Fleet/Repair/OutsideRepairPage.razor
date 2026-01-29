@@ -164,7 +164,7 @@ else
 									<SfTextBox @bind-Value="_outsideRepair.TransactionNo" Placeholder="Enter Transaction No"
 											   FloatLabelType="FloatLabelType.Never" Readonly="@_autoGenerateTransactionNo"
 											   CssClass="@(_autoGenerateTransactionNo ? "custom-textbox readonly-field" : "custom-textbox")" />
-									<div class="auto-generate-checkbox">
+								<div class="checkbox-wrapper">
 										<SfCheckBox @bind-Checked="_autoGenerateTransactionNo" Label="Auto Generate"
 													TChecked="bool" ValueChange="OnAutoGenerateTransactionNoChecked"
 													CssClass="custom-checkbox" />
@@ -244,15 +244,15 @@ else
 				</div>
 				<div class="section-body">
 					<!-- Single Row: All Cart Fields -->
-					<div class="cart-row-single">
-						<div class="cart-field cart-field-job">
+					<div class="cart-input-row">
+						<div class="cart-field cart-field-wide">
 							<label class="cart-label">Job / Work Description <span class="required">*</span></label>
 							<SfTextBox @ref="_sfJobTextBox" @bind-Value="_selectedCart.Job"
 									   Placeholder="Enter Job Description (Ctrl + E)" FloatLabelType="FloatLabelType.Never"
 									   CssClass="custom-textbox" />
 						</div>
 
-						<div class="cart-field cart-field-small">
+						<div class="cart-field">
 							<label class="cart-label">Qty</label>
 							<SfNumericTextBox Value="@_selectedCart.Quantity" TValue="decimal" Min="0"
 											  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
@@ -261,7 +261,7 @@ else
 							</SfNumericTextBox>
 						</div>
 
-						<div class="cart-field cart-field-small">
+						<div class="cart-field">
 							<label class="cart-label">Rate</label>
 							<SfNumericTextBox Value="@_selectedCart.Rate" TValue="decimal" Min="0" ShowSpinButton="false"
 											  Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
@@ -270,20 +270,20 @@ else
 							</SfNumericTextBox>
 						</div>
 
-						<div class="cart-field cart-field-small">
+						<div class="cart-field">
 							<label class="cart-label">Total</label>
 							<SfNumericTextBox Value="@_selectedCart.Total" Readonly="true" TValue="decimal"
 											  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
 											  CssClass="custom-numeric total-field-inline" />
 						</div>
 
-						<div class="cart-field cart-field-medium">
+						<div class="cart-field">
 							<label class="cart-label">Remarks</label>
 							<SfTextBox @bind-Value="_selectedCart.Remarks" Placeholder="Job Remarks..."
 									   FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
 						</div>
 
-						<div class="cart-field cart-field-button">
+						<div class="cart-field">
 							<label class="cart-label">&nbsp;</label>
 							<IconButton Icon="IconType.Add" Variant="ButtonVariant.Add" Text="Add" Title="Add to Cart"
 										OnClick="AddJobToCart" />
@@ -410,74 +410,6 @@ else
 		flex: 1;
 	}
 
-	.auto-generate-checkbox {
-		display: flex;
-		align-items: center;
-		padding: 0 16px;
-		background: #f8fafc;
-		border: 1px solid #cbd5e1;
-		border-radius: 6px;
-		white-space: nowrap;
-		min-width: 140px;
-		justify-content: center;
-	}
-
-	.auto-generate-checkbox ::deep .custom-checkbox {
-		font-size: 13px;
-		font-weight: 500;
-	}
-
-	/* Add to Cart Section Styles - Single Row Layout */
-	.cart-row-single {
-		display: grid;
-		grid-template-columns: 2.5fr 0.8fr 0.8fr 0.8fr 1.5fr 100px;
-		gap: 12px;
-		align-items: end;
-	}
-
-	.cart-field {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-	}
-
-	.cart-field-button {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-	}
-
-	.cart-label {
-		font-size: 12px;
-		font-weight: 600;
-		color: #475569;
-		text-transform: uppercase;
-		letter-spacing: 0.3px;
-	}
-
-	.cart-label .required {
-		color: #dc2626;
-		margin-left: 2px;
-	}
-
-	::deep .cart-field .e-input-group,
-	::deep .cart-field .custom-numeric .e-input-group,
-	::deep .cart-field .custom-autocomplete .e-input-group,
-	::deep .cart-field .custom-textbox .e-input-group {
-		height: 38px;
-		background: #eff6ff;
-		border: 1px solid #3b82f6;
-	}
-
-	::deep .cart-field .e-input-group input,
-	::deep .cart-field .custom-numeric .e-input-group input,
-	::deep .cart-field .custom-autocomplete .e-input-group input,
-	::deep .cart-field .custom-textbox .e-input-group input {
-		font-size: 14px;
-		font-weight: 500;
-		color: #1e293b;
-		padding: 8px 12px;
-	}
 
 	::deep .total-field-inline .e-input-group {
 		background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);

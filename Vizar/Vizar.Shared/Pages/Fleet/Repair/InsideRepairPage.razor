@@ -220,8 +220,8 @@ else
                 </div>
                 <div class="section-body">
                     <!-- Single Row: All Cart Fields -->
-                    <div class="cart-row-single">
-                        <div class="cart-field cart-field-item">
+                    <div class="cart-input-row">
+                        <div class="cart-field cart-field-wide">
                             <label class="cart-label">Item <span class="required">*</span></label>
                             <SfAutoComplete @ref="_sfItemAutoComplete" Value="@_selectedItem"
                                             TValue="ItemModel ?" TItem="ItemModel" DataSource="@_items"
@@ -234,13 +234,13 @@ else
                             </SfAutoComplete>
                         </div>
 
-                        <div class="cart-field cart-field-small">
+                        <div class="cart-field">
                             <label class="cart-label">UOM</label>
                             <SfTextBox @bind-Value="_selectedCart.UnitOfMeasurement" Placeholder="UOM..."
                                        FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                         </div>
 
-                        <div class="cart-field cart-field-small">
+                        <div class="cart-field">
                             <label class="cart-label">Qty</label>
                             <SfNumericTextBox Value="@_selectedCart.Quantity" TValue="decimal" Min="0"
                                               ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
@@ -249,7 +249,7 @@ else
                             </SfNumericTextBox>
                         </div>
 
-                        <div class="cart-field cart-field-small">
+                        <div class="cart-field">
                             <label class="cart-label">Rate</label>
                             <SfNumericTextBox Value="@_selectedCart.Rate" TValue="decimal" Min="0" ShowSpinButton="false"
                                               Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
@@ -258,26 +258,26 @@ else
                             </SfNumericTextBox>
                         </div>
 
-                        <div class="cart-field cart-field-small">
+                        <div class="cart-field">
                             <label class="cart-label">Total</label>
                             <SfNumericTextBox Value="@_selectedCart.Total" Readonly="true" TValue="decimal"
                                               ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
                                               CssClass="custom-numeric total-field-inline" />
                         </div>
 
-                        <div class="cart-field cart-field-medium">
+                        <div class="cart-field">
                             <label class="cart-label">Identification No</label>
                             <SfTextBox @bind-Value="_selectedCart.IdentificationNo" Placeholder="Item Identification No..."
                                        FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                         </div>
 
-                        <div class="cart-field cart-field-medium">
+                        <div class="cart-field">
                             <label class="cart-label">Remarks</label>
                             <SfTextBox @bind-Value="_selectedCart.Remarks" Placeholder="Item Narration..."
                                        FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                         </div>
 
-                        <div class="cart-field cart-field-button">
+                        <div class="cart-field">
                             <label class="cart-label">&nbsp;</label>
                             <IconButton Icon="IconType.Add" Variant="ButtonVariant.Add" Text="Add" Title="Add to Cart" OnClick="AddItemToCart" />
                         </div>
@@ -383,58 +383,6 @@ else
 <ToastNotification @ref="_toastNotification" />
 
 <style>
-    /* Add to Cart Section Styles - Single Row Layout */
-    .cart-row-single {
-        display: grid;
-        grid-template-columns: 2fr 0.8fr 0.8fr 0.8fr 0.8fr 1.2fr 1.2fr 100px;
-        gap: 12px;
-        align-items: end;
-    }
-
-    .cart-field {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .cart-field-button {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .cart-label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #475569;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-    }
-
-        .cart-label .required {
-            color: #dc2626;
-            margin-left: 2px;
-        }
-
-    ::deep .cart-field .e-input-group,
-    ::deep .cart-field .custom-numeric .e-input-group,
-    ::deep .cart-field .custom-autocomplete .e-input-group,
-    ::deep .cart-field .custom-textbox .e-input-group {
-        height: 38px;
-        background: #eff6ff;
-        border: 1px solid #3b82f6;
-    }
-
-        ::deep .cart-field .e-input-group input,
-        ::deep .cart-field .custom-numeric .e-input-group input,
-        ::deep .cart-field .custom-autocomplete .e-input-group input,
-        ::deep .cart-field .custom-textbox .e-input-group input {
-            font-size: 14px;
-            font-weight: 500;
-            color: #1e293b;
-            padding: 8px 12px;
-        }
-
     ::deep .total-field-inline .e-input-group {
         background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
         border: 2px solid #3b82f6;

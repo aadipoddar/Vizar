@@ -107,10 +107,9 @@ else
                                                   CssClass="custom-datepicker">
                                         <DatePickerEvents TValue="DateTime" ValueChange="OnTransactionDateChanged" />
                                     </SfDatePicker>
-                                    <SfTextBox
-                                    Value="@($"{_selectedFinancialYear?.StartDate:yyyy} to {_selectedFinancialYear?.EndDate:yyyy}")"
-                                    Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never"
-                                    CssClass="custom-textbox readonly-field" />
+                                    <SfTextBox Value="@($"{_selectedFinancialYear?.StartDate:yyyy} to {_selectedFinancialYear?.EndDate:yyyy}")"
+                                               Readonly="true" Placeholder="Financial Year" FloatLabelType="FloatLabelType.Never"
+                                               CssClass="custom-textbox readonly-field" />
                                 </div>
                             </div>
 
@@ -226,38 +225,38 @@ else
                         <div class="cart-field cart-field-wide">
                             <label class="cart-label">Ledger <span class="required">*</span></label>
                             <div class="reference-wrapper">
-                                <SfAutoComplete @ref="_sfLedgerAutoComplete" Value="@_selectedLedger" TValue="LedgerModel?"
+                                <SfAutoComplete @ref="_sfLedgerAutoComplete" Value="@_selectedLedger" TValue="LedgerModel ?"
                                                 TItem="LedgerModel" DataSource="@_ledgers" Placeholder="Select Ledger (Ctrl + E)"
                                                 FloatLabelType="FloatLabelType.Never" AllowFiltering="true"
                                                 FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains" CssClass="custom-autocomplete">
-                                    <AutoCompleteEvents TItem="LedgerModel" TValue="LedgerModel?" ValueChange="OnItemChanged" />
+                                    <AutoCompleteEvents TItem="LedgerModel" TValue="LedgerModel ?" ValueChange="OnItemChanged" />
                                     <AutoCompleteFieldSettings Value="Name" />
                                 </SfAutoComplete>
-                                <IconButton Icon="IconType.Get" Variant="ButtonVariant.Get" Size="ButtonSize.Small" 
+                                <IconButton Icon="IconType.Get" Variant="ButtonVariant.Get" Size="ButtonSize.Small"
                                             Title="Get References" OnClick="GetReferences" />
                             </div>
                         </div>
 
-                            <div class="cart-field cart-field-wide">
-                                <label class="cart-label">Ref No</label>
-                                <div class="reference-wrapper">
-                                    <SfAutoComplete Value="@_selectedAccountingLedger" TValue="AccountingLedgerOverviewModel"
-                                                    TItem="AccountingLedgerOverviewModel" DataSource="@_accountingLedgers"
-                                                    Placeholder="Select Reference" FloatLabelType="FloatLabelType.Never"
-                                                    AllowFiltering="true" FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
-                                                    CssClass="custom-autocomplete">
-                                        <AutoCompleteEvents TItem="AccountingLedgerOverviewModel"
-                                                            TValue="AccountingLedgerOverviewModel" ValueChange="OnReferenceChanged" />
-                                        <AutoCompleteFieldSettings Value="ReferenceNo" />
-                                    </SfAutoComplete>
-                                    <div class="reference-actions">
-                                        <IconButton Icon="IconType.View" Variant="ButtonVariant.View" Size="ButtonSize.Small"
-                                                    Title="View Invoice" OnClick="ViewCartReferenceInvoice" />
-                                        <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Size="ButtonSize.Small"
-                                                    Title="Download PDF Invoice" OnClick="DownloadCartReferenceInvoice" />
-                                    </div>
+                        <div class="cart-field cart-field-wide">
+                            <label class="cart-label">Ref No</label>
+                            <div class="reference-wrapper">
+                                <SfAutoComplete Value="@_selectedAccountingLedger" TValue="AccountingLedgerOverviewModel"
+                                                TItem="AccountingLedgerOverviewModel" DataSource="@_accountingLedgers"
+                                                Placeholder="Select Reference" FloatLabelType="FloatLabelType.Never"
+                                                AllowFiltering="true" FilterType="Syncfusion.Blazor.DropDowns.FilterType.Contains"
+                                                CssClass="custom-autocomplete">
+                                    <AutoCompleteEvents TItem="AccountingLedgerOverviewModel"
+                                                        TValue="AccountingLedgerOverviewModel" ValueChange="OnReferenceChanged" />
+                                    <AutoCompleteFieldSettings Value="ReferenceNo" />
+                                </SfAutoComplete>
+                                <div class="reference-actions">
+                                    <IconButton Icon="IconType.View" Variant="ButtonVariant.View" Size="ButtonSize.Small"
+                                                Title="View Invoice" OnClick="ViewCartReferenceInvoice" />
+                                    <IconButton Icon="IconType.Pdf" Variant="ButtonVariant.Pdf" Size="ButtonSize.Small"
+                                                Title="Download PDF Invoice" OnClick="DownloadCartReferenceInvoice" />
                                 </div>
                             </div>
+                        </div>
 
                         <div class="cart-field">
                             <label class="cart-label">Debit</label>
@@ -410,31 +409,31 @@ else
         align-items: stretch;
     }
 
-    .transaction-no-wrapper> :first-child {
-        flex: 1;
-    }
+        .transaction-no-wrapper > :first-child {
+            flex: 1;
+        }
 
     ::deep .balanced-field .e-input-group {
         background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
         border: 2px solid #10b981;
     }
 
-    ::deep .balanced-field .e-input-group input {
-        color: #065f46;
-        font-weight: 700;
-        font-size: 16px;
-    }
+        ::deep .balanced-field .e-input-group input {
+            color: #065f46;
+            font-weight: 700;
+            font-size: 16px;
+        }
 
     ::deep .unbalanced-field .e-input-group {
         background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
         border: 2px solid #ef4444;
     }
 
-    ::deep .unbalanced-field .e-input-group input {
-        color: #991b1b;
-        font-weight: 700;
-        font-size: 16px;
-    }
+        ::deep .unbalanced-field .e-input-group input {
+            color: #991b1b;
+            font-weight: 700;
+            font-size: 16px;
+        }
 
     /* Add to Cart Section Styles */
 </style>

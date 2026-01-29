@@ -53,6 +53,7 @@ public partial class IconButton
                 ButtonVariant.Add => "icon-btn-add",
                 ButtonVariant.Recover => "icon-btn-recover",
                 ButtonVariant.Logout => "icon-btn-logout",
+                ButtonVariant.Get => "icon-btn-get",
                 _ => string.Empty
             },
 
@@ -107,7 +108,8 @@ public enum IconType
     Reset,
     Recover,
     VehicleIssueItem,
-    GarageIssueItem
+    GarageIssueItem,
+    Get
 }
 
 public enum ButtonVariant
@@ -121,7 +123,8 @@ public enum ButtonVariant
     Delete,
     Add,
     Recover,
-    Logout
+    Logout,
+    Get
 }
 
 public enum ButtonSize
