@@ -156,7 +156,7 @@ else
                         </div>
 
                         <div class="cart-field">
-                            <label class="cart-label">Qty</label>
+                            <label class="cart-label">Qty<span class="required">*</span></label>
                             <SfNumericTextBox Value="@_selectedCart.Quantity" TValue="decimal" Min="0" ShowSpinButton="false"
                                               Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
                                               CssClass="custom-numeric editable-field">
@@ -165,7 +165,7 @@ else
                         </div>
 
                         <div class="cart-field">
-                            <label class="cart-label">Rate</label>
+                            <label class="cart-label">Rate<span class="required">*</span></label>
                             <SfNumericTextBox Value="@_selectedCart.Rate" TValue="decimal" Min="0" ShowSpinButton="false"
                                               Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
                                               CssClass="custom-numeric editable-field">
@@ -190,7 +190,7 @@ else
                     <!-- Second Row: Vehicle Details -->
                     <div class="cart-input-row">
                         <div class="cart-field cart-field-wide">
-                            <label class="cart-label">Vehicle</label>
+                            <label class="cart-label">Vehicle<span class="required">*</span></label>
                             <SfAutoComplete TValue="VehicleModel" TItem="VehicleModel" DataSource="@_vehicles"
                                             Value="@(_vehicles.FirstOrDefault(v => v.Id == _selectedCart.VehicleId))"
                                             Placeholder="Select Vehicle" FloatLabelType="FloatLabelType.Never"

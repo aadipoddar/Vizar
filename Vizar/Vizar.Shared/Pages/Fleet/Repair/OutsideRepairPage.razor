@@ -253,7 +253,7 @@ else
 						</div>
 
 						<div class="cart-field">
-							<label class="cart-label">Qty</label>
+							<label class="cart-label">Qty<span class="required">*</span></label>
 							<SfNumericTextBox Value="@_selectedCart.Quantity" TValue="decimal" Min="0"
 											  ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
 											  CssClass="custom-numeric editable-field">
@@ -262,7 +262,7 @@ else
 						</div>
 
 						<div class="cart-field">
-							<label class="cart-label">Rate</label>
+							<label class="cart-label">Rate<span class="required">*</span></label>
 							<SfNumericTextBox Value="@_selectedCart.Rate" TValue="decimal" Min="0" ShowSpinButton="false"
 											  Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
 											  CssClass="custom-numeric editable-field">

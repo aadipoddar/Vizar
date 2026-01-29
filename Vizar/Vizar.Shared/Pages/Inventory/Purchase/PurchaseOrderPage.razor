@@ -191,13 +191,13 @@ else
                         </div>
 
                         <div class="cart-field">
-                            <label class="cart-label">UOM</label>
+                            <label class="cart-label">UOM<span class="required">*</span></label>
                             <SfTextBox @bind-Value="_selectedCart.UnitOfMeasurement" Placeholder="Unit of Measurement..."
                                        FloatLabelType="FloatLabelType.Never" CssClass="custom-textbox" />
                         </div>
 
                         <div class="cart-field">
-                            <label class="cart-label">Quantity</label>
+                            <label class="cart-label">Quantity<span class="required">*</span></label>
                             <SfNumericTextBox Value="@_selectedCart.Quantity" TValue="decimal" Min="0"
                                               ShowSpinButton="false" Placeholder="0.00" FloatLabelType="FloatLabelType.Never"
                                               CssClass="custom-numeric editable-field">

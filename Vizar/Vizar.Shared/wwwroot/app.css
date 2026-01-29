@@ -1,3 +1,43 @@
+/* ================================================================
+   VIZAR APPLICATION STYLESHEET
+   ================================================================ */
+
+:root {
+	/* Colors */
+	--primary-blue: #3b82f6;
+	--dark-blue: #1e40af;
+	--red: #dc2626;
+	--bright-red: #ef4444;
+	--error-red: #e50000;
+	--green: #059669;
+	--success-green: #26b050;
+
+	/* Grays */
+	--gray-50: #f8fafc;
+	--gray-100: #f1f5f9;
+	--gray-200: #e2e8f0;
+	--gray-300: #cbd5e1;
+	--gray-400: #94a3b8;
+	--gray-500: #64748b;
+	--gray-600: #475569;
+	--gray-700: #334155;
+	--gray-800: #1e293b;
+	--gray-900: #0f172a;
+
+	/* Backgrounds */
+	--bg-white: #ffffff;
+	--bg-light: #fafbfc;
+	--bg-blue-light: #eff6ff;
+	--bg-summary: #deecf9;
+
+	/* Spacing */
+	--border-radius: 6px;
+	--border-radius-lg: 12px;
+}
+
+/* ================================================================
+   1. BASE STYLES & RESET
+   ================================================================ */
 html,
 body {
 	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -8,12 +48,6 @@ a,
 	color: #006bb7;
 }
 
-.btn-primary {
-	color: #fff;
-	background-color: #1b6ec2;
-	border-color: #1861ac;
-}
-
 .btn:focus,
 .btn:active:focus,
 .btn-link.nav-link:focus,
@@ -22,24 +56,23 @@ a,
 	box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
-.content {
-	padding-top: 1.1rem;
-}
-
 h1:focus {
 	outline: none;
 }
 
+/* ================================================================
+   2. FORM VALIDATION & ERROR STATES
+   ================================================================ */
 .valid.modified:not([type=checkbox]) {
-	outline: 1px solid #26b050;
+	outline: 1px solid var(--success-green);
 }
 
 .invalid {
-	outline: 1px solid #e50000;
+	outline: 1px solid var(--error-red);
 }
 
 .validation-message {
-	color: #e50000;
+	color: var(--error-red);
 }
 
 .blazor-error-boundary {
@@ -52,47 +85,9 @@ h1:focus {
 	content: "An error has occurred."
 }
 
-.darker-border-checkbox.form-check-input {
-	border-color: #929292;
-}
-
-.form-floating>.form-control-plaintext::placeholder,
-.form-floating>.form-control::placeholder {
-	color: var(--bs-secondary-color);
-	text-align: end;
-}
-
-.form-floating>.form-control-plaintext:focus::placeholder,
-.form-floating>.form-control:focus::placeholder {
-	text-align: start;
-}
-
-/* ============================================
-   Syncfusion AutoComplete/DropDown Styling
-   Improved visibility for focused/selected items
-   ============================================ */
-.e-popup .e-dropdownbase .e-list-item.e-item-focus,
-.e-popup .e-dropdownbase .e-list-item.e-active,
-.e-popup .e-dropdownbase .e-list-item.e-active.e-hover,
-.e-popup .e-dropdownbase .e-list-item.e-hover,
-.e-dropdownbase .e-list-item.e-item-focus,
-.e-dropdownbase .e-list-item.e-active,
-.e-dropdownbase .e-list-item.e-active.e-hover,
-.e-dropdownbase .e-list-item.e-hover,
-.e-ddl.e-popup .e-list-item.e-item-focus,
-.e-ddl.e-popup .e-list-item.e-active,
-.e-ddl.e-popup .e-list-item.e-hover,
-.e-autocomplete.e-popup .e-list-item.e-item-focus,
-.e-autocomplete.e-popup .e-list-item.e-active,
-.e-autocomplete.e-popup .e-list-item.e-hover {
-	background-color: #3b82f6 !important;
-	color: #ffffff !important;
-}
-
-/* ============================================
-   Page Container
-   Common container for all main page content
-   ============================================ */
+/* ================================================================
+   3. PAGE LAYOUT & CONTAINERS
+   ================================================================ */
 .page-container {
 	padding: 16px 32px;
 	width: 100%;
@@ -101,10 +96,7 @@ h1:focus {
 	flex: 1;
 }
 
-/* ============================================
-   Grid Action Buttons Container
-   Used in all grid templates for action buttons
-   ============================================ */
+/* Grid Action Buttons Container - used in all grids */
 .grid-actions {
 	display: flex;
 	flex-direction: row;
@@ -113,10 +105,116 @@ h1:focus {
 	gap: 8px;
 }
 
-/* ============================================
-   Syncfusion Component Overrides
-   Common input styling for Syncfusion components
-   ============================================ */
+/* Header Actions Container */
+.header-actions {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+}
+
+/* ================================================================
+   4. SECTION CARDS
+   Common card container for page sections
+   ================================================================ */
+.section-card {
+	background: var(--bg-white);
+	border-radius: var(--border-radius-lg);
+	border: 1px solid var(--gray-200);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	margin-bottom: 16px;
+	overflow: hidden;
+}
+
+.section-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 16px 20px;
+	border-bottom: 1px solid var(--gray-200);
+	background: linear-gradient(to bottom, var(--bg-white) 0%, var(--gray-50) 100%);
+}
+
+.section-title-wrapper {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.section-icon {
+	color: var(--primary-blue);
+	flex-shrink: 0;
+}
+
+.section-title {
+	font-size: 16px;
+	font-weight: 600;
+	color: var(--gray-900);
+	margin: 0;
+	letter-spacing: -0.2px;
+}
+
+.section-subtitle {
+	font-size: 13px;
+	color: var(--gray-500);
+	margin: 0;
+	padding-left: 34px;
+	font-weight: 400;
+}
+
+.section-body {
+	padding: 16px 20px;
+}
+
+.grid-body {
+	padding: 0 !important;
+}
+
+/* ================================================================
+   5. FORM FIELDS & LABELS
+   ================================================================ */
+.form-field,
+.cart-field {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+}
+
+.field-label,
+.cart-label {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--gray-600);
+	letter-spacing: 0.1px;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.cart-label {
+	text-transform: uppercase;
+	letter-spacing: 0.3px;
+}
+
+.required {
+	color: var(--bright-red);
+	font-weight: 700;
+	margin-left: 2px;
+}
+
+/* ================================================================
+   6. FORM GRID LAYOUTS
+   ================================================================ */
+.form-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+	gap: 16px 20px;
+	align-items: start;
+}
+
+/* ================================================================
+   7. SYNCFUSION INPUT COMPONENTS
+   ================================================================ */
 .custom-numeric .e-input {
 	text-align: right;
 }
@@ -138,9 +236,9 @@ h1:focus {
 .custom-textbox .e-input-group,
 .custom-numeric .e-input-group,
 .custom-daterange .e-input-group {
-	border: 1px solid #cbd5e1;
-	border-radius: 6px;
-	background: #ffffff;
+	border: 1px solid var(--gray-300);
+	border-radius: var(--border-radius);
+	background: var(--bg-white);
 	transition: all 0.2s ease;
 	height: 40px;
 }
@@ -150,7 +248,7 @@ h1:focus {
 .custom-textbox .e-input-group:hover,
 .custom-numeric .e-input-group:not(.e-disabled):hover,
 .custom-daterange .e-input-group:hover {
-	border-color: #94a3b8;
+	border-color: var(--gray-400);
 }
 
 .custom-autocomplete .e-input-group.e-input-focus,
@@ -158,7 +256,7 @@ h1:focus {
 .custom-textbox .e-input-group.e-input-focus,
 .custom-numeric .e-input-group.e-input-focus,
 .custom-daterange .e-input-group.e-input-focus {
-	border-color: #3b82f6;
+	border-color: var(--primary-blue);
 	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
@@ -169,7 +267,7 @@ h1:focus {
 .custom-numeric .e-input-group input,
 .custom-daterange .e-input-group input {
 	font-size: 14px;
-	color: #1e293b;
+	color: var(--gray-800);
 	padding: 8px 12px;
 }
 
@@ -183,238 +281,140 @@ h1:focus {
 .custom-textbox .e-input-group textarea::placeholder,
 .custom-numeric .e-input-group input::placeholder,
 .custom-daterange .e-input-group input::placeholder {
-	color: #94a3b8;
+	color: var(--gray-400);
 }
 
 .readonly-field .e-input-group {
-	background: #f8fafc;
+	background: var(--gray-50);
 	cursor: not-allowed;
 }
 
 .readonly-field .e-input-group input {
-	color: #64748b;
+	color: var(--gray-500);
 	font-weight: 500;
 }
 
-/* ============================================
-   Section Card Styles
-   Common card container for page sections
-   ============================================ */
-.section-card {
-	background: #ffffff;
-	border-radius: 12px;
-	border: 1px solid #e2e8f0;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-	margin-bottom: 16px;
-	overflow: hidden;
+/* ================================================================
+   8. SYNCFUSION DROPDOWNS & AUTOCOMPLETE
+   ================================================================ */
+.e-popup .e-dropdownbase .e-list-item.e-item-focus,
+.e-popup .e-dropdownbase .e-list-item.e-active,
+.e-popup .e-dropdownbase .e-list-item.e-active.e-hover,
+.e-popup .e-dropdownbase .e-list-item.e-hover,
+.e-dropdownbase .e-list-item.e-item-focus,
+.e-dropdownbase .e-list-item.e-active,
+.e-dropdownbase .e-list-item.e-active.e-hover,
+.e-dropdownbase .e-list-item.e-hover,
+.e-ddl.e-popup .e-list-item.e-item-focus,
+.e-ddl.e-popup .e-list-item.e-active,
+.e-ddl.e-popup .e-list-item.e-hover,
+.e-autocomplete.e-popup .e-list-item.e-item-focus,
+.e-autocomplete.e-popup .e-list-item.e-active,
+.e-autocomplete.e-popup .e-list-item.e-hover {
+	background-color: var(--primary-blue) !important;
+	color: var(--bg-white) !important;
 }
 
-.section-header {
-	padding: 16px 20px;
-	border-bottom: 1px solid #e2e8f0;
-	background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
-}
-
-.section-title-wrapper {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-}
-
-.section-icon {
-	color: #3b82f6;
-	flex-shrink: 0;
-}
-
-.section-title {
-	font-size: 16px;
-	font-weight: 600;
-	color: #0f172a;
-	margin: 0;
-	letter-spacing: -0.2px;
-}
-
-.section-subtitle {
-	font-size: 13px;
-	color: #64748b;
-	margin: 0;
-	padding-left: 34px;
-	font-weight: 400;
-}
-
-.section-body {
-	padding: 16px 20px;
-}
-
-/* ============================================
-   Dashboard Grid Layout
-   Flexbox layout for dashboard button cards
-   ============================================ */
-.dashboard-grid {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 24px;
-	width: 100%;
-	margin-bottom: 32px;
-}
-
-.dashboard-grid:last-child {
-	margin-bottom: 0;
-}
-
-/* ============================================
-   Form Field Styles
-   Common form field layout and labels
-   ============================================ */
-.form-field {
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-}
-
-.field-label {
-	font-size: 13px;
-	font-weight: 600;
-	color: #334155;
-	letter-spacing: 0.1px;
-	display: flex;
-	align-items: center;
-	gap: 4px;
-}
-
-.required {
-	color: #ef4444;
-	font-weight: 700;
-}
-
-/* ============================================
-   Form Grid Layouts
-   Common grid layouts for form fields
-   ============================================ */
-
-/* Universal form grid - auto-fits columns based on available space */
-.form-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
-	gap: 16px 20px;
-	align-items: start;
-}
-
-/* ============================================
-   Header Actions
-   Common container for section header buttons
-   ============================================ */
-.header-actions {
-	display: flex;
-	gap: 12px;
-	align-items: center;
-}
-
-/* Section header with actions */
-.section-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
-
-/* ============================================
-   Grid Body and Professional Grid Styles
-   Common styling for Syncfusion grids
-   ============================================ */
-.grid-body {
-	padding: 0 !important;
-}
-
+/* ================================================================
+   9. SYNCFUSION GRID (PROFESSIONAL GRID)
+   ================================================================ */
 .professional-grid {
 	border: none;
 }
 
 .professional-grid .e-gridheader {
-	background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%);
-	border-bottom: 2px solid #e2e8f0;
+	background: linear-gradient(to bottom, var(--gray-50) 0%, var(--gray-100) 100%);
+	border-bottom: 2px solid var(--gray-200);
 }
 
 .professional-grid .e-headercell {
 	background: transparent;
-	color: #475569;
+	color: var(--gray-600);
 	font-weight: 600;
 	font-size: 12px;
 	text-transform: uppercase;
 	letter-spacing: 0.3px;
-	border-right: 1px solid #e2e8f0;
+	border-right: 1px solid var(--gray-200);
 	padding: 12px 8px;
 }
 
-.professional-grid .e-headercell:last-child {
+.professional-grid .e-headercell:last-child,
+.professional-grid .e-rowcell:last-child,
+.professional-grid .e-summarycell:last-child {
 	border-right: none;
 }
 
 .professional-grid .e-gridcontent {
-	background: #ffffff;
+	background: var(--bg-white);
 }
 
 .professional-grid .e-row {
 	transition: background-color 0.2s ease;
 }
 
-.professional-grid .e-row:hover {
-	background-color: #f8fafc;
+.professional-grid .e-row:hover,
+.professional-grid .e-row.e-altrow:hover {
+	background-color: var(--gray-50);
 }
 
 .professional-grid .e-row.e-altrow {
-	background-color: #fafbfc;
-}
-
-.professional-grid .e-row.e-altrow:hover {
-	background-color: #f8fafc;
+	background-color: var(--bg-light);
 }
 
 .professional-grid .e-rowcell {
-	border-right: 1px solid #f1f5f9;
-	border-bottom: 1px solid #f1f5f9;
+	border-right: 1px solid var(--gray-100);
+	border-bottom: 1px solid var(--gray-100);
 	padding: 10px 8px;
 	font-size: 13px;
-	color: #1e293b;
+	color: var(--gray-800);
 }
 
-.professional-grid .e-rowcell:last-child {
-	border-right: none;
-}
-
-/* Grid Footer Aggregates */
 .professional-grid .e-gridfooter {
-	background-color: #deecf9 !important;
-	border-top: 2px solid #cbd5e1;
+	background-color: var(--bg-summary) !important;
+	border-top: 2px solid var(--gray-300);
 }
 
 .professional-grid .e-summarycell {
-	background-color: #deecf9 !important;
+	background-color: var(--bg-summary) !important;
 	font-weight: 600;
-	color: #1e293b;
+	color: var(--gray-800);
 	padding: 12px 8px;
-	border-right: 1px solid #cbd5e1;
+	border-right: 1px solid var(--gray-300);
 }
 
-.professional-grid .e-summarycell:last-child {
-	border-right: none;
-}
-
-/* Empty Grid State */
 .professional-grid .e-emptyrow {
 	text-align: center;
 	padding: 48px 24px;
-	color: #94a3b8;
+	color: var(--gray-400);
 	font-size: 14px;
 }
 
-/* Grid Cell Value Styles */
-.grid-discount {
-	color: #dc2626;
+.e-grid .e-gridfooter,
+.e-grid .e-summaryrow,
+.e-grid .e-summaryrow .e-summarycell,
+.professional-grid .e-gridfooter,
+.professional-grid .e-summaryrow,
+.professional-grid .e-summarycell {
+	background-color: var(--bg-summary) !important;
+}
+
+/* ================================================================
+   10. GRID CELL VALUES & AGGREGATES
+   ================================================================ */
+/* Cell Value Colors */
+.grid-discount,
+.grid-debit {
+	color: var(--red);
+	font-weight: 600;
+}
+
+.grid-credit {
+	color: var(--green);
 	font-weight: 600;
 }
 
 .grid-total {
-	color: #1e40af;
+	color: var(--dark-blue);
 	font-weight: 700;
 	font-size: 14px;
 }
@@ -430,30 +430,11 @@ h1:focus {
 	font-size: 14px;
 }
 
-/* Aggregate Label and Value Styles */
+/* Aggregate Labels and Values */
 .aggregate-label {
 	text-align: left;
 	font-size: 13px;
-	color: #475569;
-}
-
-.aggregate-value {
-	text-align: right;
-	font-size: 13px;
-	color: #1e293b;
-}
-
-.aggregate-value.aggregate-discount {
-	color: #dc2626;
-}
-
-.aggregate-value.aggregate-total {
-	color: #1e40af;
-	font-size: 14px;
-}
-
-.aggregate-value.aggregate-total strong {
-	font-size: 15px;
+	color: var(--gray-600);
 }
 
 .aggregate-label strong,
@@ -461,43 +442,33 @@ h1:focus {
 	font-weight: 700;
 }
 
-/* ============================================
-   Syncfusion Grid Summary Row Styling
-   Light blue background for totals/aggregates
-   ============================================ */
-.e-grid .e-gridfooter,
-.e-grid .e-summaryrow,
-.e-grid .e-summaryrow .e-summarycell,
-.professional-grid .e-gridfooter,
-.professional-grid .e-summaryrow,
-.professional-grid .e-summarycell {
-	background-color: #deecf9 !important;
+.aggregate-value {
+	text-align: right;
+	font-size: 13px;
+	color: var(--gray-800);
 }
 
-/* ============================================
-   Grid Cell Value Colors (Debit/Credit)
-   ============================================ */
-.grid-debit {
-	color: #dc2626;
-	font-weight: 600;
-}
-
-.grid-credit {
-	color: #059669;
-	font-weight: 600;
-}
-
+.aggregate-value.aggregate-discount,
 .aggregate-value.aggregate-debit {
-	color: #dc2626;
+	color: var(--red);
 }
 
 .aggregate-value.aggregate-credit {
-	color: #059669;
+	color: var(--green);
 }
 
-/* ============================================
-   Filters Container and Grid Layout
-   ============================================ */
+.aggregate-value.aggregate-total {
+	color: var(--dark-blue);
+	font-size: 14px;
+}
+
+.aggregate-value.aggregate-total strong {
+	font-size: 15px;
+}
+
+/* ================================================================
+   11. FILTERS & REPORT LAYOUTS
+   ================================================================ */
 .filters-container {
 	display: flex;
 	flex-direction: column;
@@ -511,13 +482,11 @@ h1:focus {
 	align-items: end;
 }
 
-/* ============================================
-   Dual Grid Container (for side-by-side grids)
-   ============================================ */
+/* Grid Section (for side-by-side grids) */
 .grid-section {
-	background: #ffffff;
+	background: var(--bg-white);
 	border-radius: 8px;
-	border: 1px solid #e2e8f0;
+	border: 1px solid var(--gray-200);
 	overflow: hidden;
 }
 
@@ -526,8 +495,8 @@ h1:focus {
 	align-items: center;
 	gap: 8px;
 	padding: 12px 16px;
-	background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%);
-	border-bottom: 2px solid #e2e8f0;
+	background: linear-gradient(to bottom, var(--gray-50) 0%, var(--gray-100) 100%);
+	border-bottom: 2px solid var(--gray-200);
 }
 
 .grid-section-icon {
@@ -537,16 +506,19 @@ h1:focus {
 .grid-section-title {
 	font-size: 15px;
 	font-weight: 600;
-	color: #0f172a;
+	color: var(--gray-900);
 	margin: 0;
 }
 
 .grid-section-count {
 	font-size: 12px;
-	color: #64748b;
+	color: var(--gray-500);
 	margin-left: auto;
 }
 
+/* ================================================================
+   12. TRANSACTION PAGE LAYOUTS
+   ================================================================ */
 /* Two Column Layout (75-25 split) */
 .two-column-layout {
 	display: flex;
@@ -580,13 +552,7 @@ h1:focus {
 	gap: 6px;
 }
 
-.financial-row {
-	display: grid;
-	grid-template-columns: 100px 1fr;
-	align-items: center;
-	gap: 10px;
-}
-
+.financial-row,
 .financial-row-dual {
 	display: grid;
 	grid-template-columns: 100px 1fr;
@@ -604,13 +570,13 @@ h1:focus {
 .financial-row.total-row {
 	margin-top: 4px;
 	padding-top: 8px;
-	border-top: 2px solid #e2e8f0;
+	border-top: 2px solid var(--gray-200);
 }
 
 .financial-label {
 	font-size: 13px;
 	font-weight: 500;
-	color: #475569;
+	color: var(--gray-600);
 	text-align: right;
 	white-space: nowrap;
 }
@@ -618,7 +584,7 @@ h1:focus {
 .financial-label-total {
 	font-size: 14px;
 	font-weight: 700;
-	color: #0f172a;
+	color: var(--gray-900);
 	text-align: right;
 	white-space: nowrap;
 }
@@ -630,15 +596,11 @@ h1:focus {
 	align-items: stretch;
 }
 
-.date-year-wrapper> :first-child {
+.date-year-wrapper>* {
 	flex: 1;
 }
 
-.date-year-wrapper> :last-child {
-	flex: 1;
-}
-
-/* Reference Wrapper - used for purchase order, references, etc. */
+/* Reference Wrapper */
 .reference-wrapper {
 	display: flex;
 	gap: 8px;
@@ -655,10 +617,26 @@ h1:focus {
 	align-items: center;
 }
 
-/* ============================================
-   Cart Input Section Styles
-   Common styles for add-to-cart input forms
-   ============================================ */
+/* Checkbox Wrapper */
+.checkbox-wrapper {
+	height: 32px;
+	display: flex;
+	align-items: center;
+	padding: 0 12px;
+	background: var(--gray-50);
+	border: 1px solid var(--gray-300);
+	border-radius: var(--border-radius);
+	white-space: nowrap;
+}
+
+.checkbox-wrapper .custom-checkbox {
+	font-size: 13px;
+	font-weight: 500;
+}
+
+/* ================================================================
+   13. CART INPUT SECTION
+   ================================================================ */
 .cart-input-row {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
@@ -671,66 +649,21 @@ h1:focus {
 	margin-bottom: 0;
 }
 
-.cart-field {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	min-width: 0;
-}
-
-/* Span 2 columns for wider fields (item name, remarks) */
 .cart-field-wide {
 	grid-column: span 2;
 }
 
-.cart-label {
-	font-size: 12px;
-	font-weight: 600;
-	color: #475569;
-	text-transform: uppercase;
-	letter-spacing: 0.3px;
-}
-
-.cart-label .required {
-	color: #dc2626;
-	margin-left: 2px;
-}
-
-.cart-field .e-input-group,
-.cart-field .custom-numeric .e-input-group,
-.cart-field .custom-autocomplete .e-input-group,
-.cart-field .custom-textbox .e-input-group {
-	height: 32px;
-	background: #eff6ff;
-	border: 1px solid #3b82f6;
-}
-
-.cart-field .e-input-group input,
-.cart-field .custom-numeric .e-input-group input,
-.cart-field .custom-autocomplete .e-input-group input,
-.cart-field .custom-textbox .e-input-group input {
-	font-size: 14px;
-	font-weight: 500;
-	color: #1e293b;
-	padding: 8px 12px;
-}
-
-/* ============================================
-   Checkbox Wrapper
-   Common checkbox wrapper for forms and cart
-   ============================================ */
-.checkbox-wrapper {
-	height: 32px;
+/* ================================================================
+   14. DASHBOARD GRID
+   ================================================================ */
+.dashboard-grid {
 	display: flex;
-	align-items: center;
-	padding: 0 12px;
-	background: #f8fafc;
-	border: 1px solid #cbd5e1;
-	border-radius: 6px;
-	white-space: nowrap;
+	flex-wrap: wrap;
+	gap: 24px;
+	width: 100%;
+	margin-bottom: 32px;
 }
 
-.checkbox-wrapper .custom-checkbox {
-	font-size: 13px;
-	font-weight: 500;
+.dashboard-grid:last-child {
+	margin-bottom: 0;
 }
