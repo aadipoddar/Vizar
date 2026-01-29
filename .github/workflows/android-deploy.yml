@@ -9,13 +9,9 @@ jobs:
   version-check:
     uses: ./.github/workflows/version-checks.yml
 
-  setup-secrets:
-    uses: ./.github/workflows/setup-secrets.yml
-    secrets: inherit
-
   build:
     runs-on: windows-latest
-    needs: [version-check, setup-secrets]
+    needs: version-check
     if: needs.version-check.outputs.should-deploy == 'true'
 
     steps:
@@ -28,6 +24,29 @@ jobs:
     
     - name: Install .NET MAUI Workload
       run: dotnet workload install maui --skip-sign-check
+    
+    - name: Create Secrets.local_secrets.cs
+      run: |
+        $secretsContent = @"
+        namespace VizarLibrary.DataAccess;
+
+        public static partial class Secrets
+        {
+            static Secrets()
+            {
+                AzureConnectionString = "${{ secrets.AzureConnectionString }}";
+
+                AzureBlobStorageConnectionString = "${{ secrets.AzureBlobStorageConnectionString }}";
+                AzureBlobStorageAccountKey = "${{ secrets.AzureBlobStorageAccountKey }}";
+
+                SyncfusionLicense = "${{ secrets.SyncfusionLicense }}";
+
+                EmailPassword = "${{ secrets.EmailPassword }}";
+                ToEmail = "${{ secrets.ToEmail }}";
+            }
+        }
+        "@
+        Set-Content -Path "VizarLibrary/DataAccess/Secrets.local_secrets.cs" -Value $secretsContent
     
     - name: Setup Keystore
       run: |
