@@ -34,6 +34,30 @@ jobs:
       - name: Restore Vizar.Web
         run: dotnet restore Vizar/Vizar.Web/Vizar.Web.csproj
 
+      - name: Create Secrets.local_secrets.cs
+        run: |
+          $secretsContent = @"
+          namespace VizarLibrary.DataAccess;
+
+          public static partial class Secrets
+          {
+              static Secrets()
+              {
+                  AzureConnectionString = "${{ secrets.AzureConnectionString }}";
+
+                  AzureBlobStorageConnectionString = "${{ secrets.AzureBlobStorageConnectionString }}";
+                  AzureBlobStorageAccountKey = "${{ secrets.AzureBlobStorageAccountKey }}";
+
+                  SyncfusionLicense = "${{ secrets.SyncfusionLicense }}";
+
+                  EmailPassword = "${{ secrets.EmailPassword }}";
+                  ToEmail = "${{ secrets.ToEmail }}";
+              }
+          }
+          "@
+          Set-Content -Path "VizarLibrary/DataAccess/Secrets.local_secrets.cs" -Value $secretsContent
+        shell: pwsh
+
       - name: Build VizarLibrary
         run: dotnet build VizarLibrary/VizarLibrary.csproj --configuration Release --no-restore
 
