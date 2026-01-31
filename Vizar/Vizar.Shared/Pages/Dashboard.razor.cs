@@ -4,7 +4,7 @@ using VizarLibrary.Models.Operations;
 
 namespace Vizar.Shared.Pages;
 
-public partial class Dashboard : IAsyncDisposable
+public partial class Dashboard : IDisposable
 {
     private HotKeysContext _hotKeysContext;
     private UserModel _user;
@@ -115,8 +115,9 @@ public partial class Dashboard : IAsyncDisposable
     {
         if (_hotKeysContext is not null)
             await _hotKeysContext.DisposeAsync();
-
-        GC.SuppressFinalize(this);
     }
+
+    public void Dispose() =>
+        GC.SuppressFinalize(this);
     #endregion
 }
