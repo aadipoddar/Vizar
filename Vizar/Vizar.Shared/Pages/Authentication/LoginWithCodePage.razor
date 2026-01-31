@@ -9,11 +9,6 @@
             <img src="images/logo_full.png" alt="Vizar Logo" class="login-logo" />
         </div>
 
-        <!-- Title Section -->
-        <div class="title-section">
-            <p class="login-subtitle">Login with verification code</p>
-        </div>
-
         <!-- Login Form -->
         <div class="form-section">
             @if (!_isCodeSent)
@@ -91,7 +86,7 @@
 
             <!-- Back to Login Link -->
             <div class="forgot-password-section" style="margin-top: 8px;">
-                <a class="forgot-password-link" href="/login">
+                <a class="forgot-password-link" @onclick="() => NavigationManager.NavigateTo(PageRouteNames.Login, true)">
                     Back to Login
                 </a>
             </div>
@@ -184,19 +179,6 @@
         width: 400px;
         height: auto;
         object-fit: contain;
-    }
-
-    /* Title Section */
-    .title-section {
-        text-align: center;
-        margin-bottom: 40px;
-    }
-
-    .login-subtitle {
-        font-size: 16px;
-        color: var(--text-light);
-        margin: 0;
-        font-weight: 400;
     }
 
     /* Form Section */

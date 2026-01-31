@@ -1,3 +1,5 @@
+using Microsoft.JSInterop;
+
 using Syncfusion.Blazor.Inputs;
 
 using Vizar.Shared.Components.Dialog;
@@ -32,6 +34,8 @@ public partial class LoginPage : IAsyncDisposable
 
 	private ToastNotification _toastNotification;
 
+	private bool _yetiInitialized = false;
+
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
 		if (!firstRender)
@@ -43,16 +47,36 @@ public partial class LoginPage : IAsyncDisposable
 				.Add(Code.Enter, OnLoginClick, "Login", Exclude.None);
 
 			await DataStorageService.SecureRemoveAll();
-			await _phoneEmailTextBox.FocusAsync();
 
 			_maxLoginAttempts = int.Parse((await SettingsData.LoadSettingsByKey(SettingsKeys.MaxLoginAttempts)).Value);
 			_isLoginWithCodeEnabled = bool.Parse((await SettingsData.LoadSettingsByKey(SettingsKeys.EnableLoginWithCode)).Value);
 
 			_users = await CommonData.LoadTableData<UserModel>(TableNames.User);
+
+			// Initialize Yeti animation after a short delay to ensure DOM is ready
+			await Task.Delay(100);
+			await InitializeYetiAnimation();
+
+			await _phoneEmailTextBox.FocusAsync();
 		}
 		catch (Exception ex)
 		{
 			await _toastNotification.ShowAsync("An Error Occurred While Initializing Login Page", ex.Message, ToastType.Error);
+		}
+	}
+
+	private async Task InitializeYetiAnimation()
+	{
+		if (_yetiInitialized) return;
+
+		try
+		{
+			await JSRuntime.InvokeVoidAsync("YetiAnimation.init", "phoneEmailInput", "passwordInput");
+			_yetiInitialized = true;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Failed to initialize Yeti animation: {ex.Message}");
 		}
 	}
 
