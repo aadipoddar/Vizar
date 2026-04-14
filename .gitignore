@@ -418,3 +418,5 @@ FodyWeavers.xsd
 *.msp
 /.idea
 /VizarLibrary/DataAccess/Secrets.local_secrets.cs
+
+*.csproj.lscache
